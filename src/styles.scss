@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@font-face {
+  font-family: 'Inter';
+  src: url('../public/fonts/Inter/static/Inter_18pt-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('../public/fonts/Inter/static/Inter_18pt-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('../public/fonts/Inter/static/Inter_18pt-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('../public/fonts/Inter/static/Inter_18pt-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../public/fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../public/fonts/Playfair_Display/static/PlayfairDisplay-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../public/fonts/Playfair_Display/static/PlayfairDisplay-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../public/fonts/Playfair_Display/static/PlayfairDisplay-MediumItalic.ttf') format('truetype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../public/fonts/Playfair_Display/static/PlayfairDisplay-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../public/fonts/Playfair_Display/static/PlayfairDisplay-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../public/fonts/Playfair_Display/static/PlayfairDisplay-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../public/fonts/Playfair_Display/static/PlayfairDisplay-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../public/fonts/Playfair_Display/static/PlayfairDisplay-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('../public/fonts/Playfair_Display/static/PlayfairDisplay-BlackItalic.ttf') format('truetype');
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Keep a project-specific class for heavy serif headings without
+   overriding Tailwind's built-in `font-serif` utility */
+.font-serif-strong {
+  @apply font-serif font-bold;
+}
+
+/* Ensure the app root fills the viewport so flex column layouts can position footer reliably */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* Use the Tailwind `font-sans` theme as the default app font */
+body {
+  @apply font-sans;
+}

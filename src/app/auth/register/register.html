@@ -1,0 +1,38 @@
+<div class="flex items-center justify-center py-10 min-h-[70vh]">
+  <div class="w-full max-w-md">
+    <form (ngSubmit)="submit()" class="bg-white shadow-soft-xl rounded-2xl px-8 md:px-10 pt-8 pb-10 border border-base-200/50">
+      <div class="mb-8 text-center">
+        <h1 class="text-3xl font-serif font-bold text-neutral">Registrieren</h1>
+        <p class="text-gray-500 mt-2">Erstelle ein neues Konto.</p>
+      </div>
+
+      <div *ngIf="error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-6" role="alert">
+        <span class="block sm:inline">{{ error }}</span>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-neutral text-sm font-bold mb-2" for="name">Name</label>
+        <input id="name" name="name" [(ngModel)]="name" class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl" placeholder="Dein Name" />
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-neutral text-sm font-bold mb-2" for="email">E-Mail</label>
+        <input id="email" name="email" [(ngModel)]="email" type="email" class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl" placeholder="deine.email@example.com" />
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-neutral text-sm font-bold mb-2" for="password">Passwort</label>
+        <input id="password" name="password" [(ngModel)]="password" type="password" class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl" placeholder="Passwort" />
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-neutral text-sm font-bold mb-2" for="confirmPassword">Passwort bestätigen</label>
+        <input id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" type="password" class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl" placeholder="Passwort wiederholen" />
+      </div>
+
+      <button type="submit" [disabled]="isLoading" class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-focus">
+        {{ isLoading ? 'Registrieren...' : 'Registrieren' }}
+      </button>
+    </form>
+  </div>
+</div>
