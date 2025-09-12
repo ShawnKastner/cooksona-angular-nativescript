@@ -2,7 +2,7 @@ module.exports = {
   content: [
     './index.html',
     // Include Angular templates and TS files so Tailwind scans component HTML
-    './src/**/*.{html,ts}',
+    './apps/web/src/**/*.{html,ts}',
   ],
   theme: {
     extend: {
