@@ -12,7 +12,11 @@
     "importHelpers": true,
     "target": "ES2022",
     "module": "preserve",
-    "paths": {},
+    "paths": {
+      "@cooksona/auth": [
+        "libs/auth/index.ts"
+      ],
+    },
     "baseUrl": ".",
     "rootDir": "."
   },

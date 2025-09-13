@@ -1,0 +1,45 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { SeoComponent } from '../../shared/seo/seo.component';
+import { FeatureCardComponent, FeatureCardProps } from './feature-card.component';
+import { UtensilsCrossed, Sparkles, ShoppingBasket, ChefHat, BarChart2, Cookie } from 'libs/constants/icons';
+import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+
+@Component({
+  selector: 'app-landing',
+  standalone: true,
+  imports: [CommonModule, RouterModule, SeoComponent, FeatureCardComponent, SvgInjectDirective],
+  templateUrl: './landing.component.html',
+  styleUrl: './landing.component.scss',
+})
+export class LandingComponent {
+  readonly features: FeatureCardProps[] = [
+    {
+      icon: ChefHat,
+      title: 'Intelligente Essensplanung',
+      desc: 'Erstelle individuelle, gesunde und abwechslungsreiche Essenspläne mit nur wenigen Klicks.',
+    },
+    {
+      icon: ShoppingBasket,
+      title: 'Automatische Einkaufsliste',
+      desc: 'Alle Zutaten werden direkt in eine praktische Einkaufsliste übernommen.',
+    },
+    {
+      icon: BarChart2,
+      title: 'Nährwert-Analyse',
+      desc: 'Behalte Kalorien, Makros und Allergene immer im Blick.',
+    },
+    {
+      icon: Cookie,
+      title: 'Kochbuch & Favoriten',
+      desc: 'Speichere deine Lieblingsrezepte und verwalte dein persönliches Kochbuch.',
+    },
+  ];
+
+  protected readonly icons = {
+    UtensilsCrossed,
+    Sparkles,
+  } as const;
+}
+

@@ -1,0 +1,62 @@
+<app-seo
+  [title]="'CookSona – Essensplanung, Einkaufsliste & gesunde Rezepte online'"
+  [description]="'CookSona ist die smarte Lösung für Essensplanung, Einkaufsliste, gesunde Rezepte, Nährwert-Analyse und Kochbuch. Spare Zeit, Geld und ernähre dich besser!'"
+  [keywords]="'Essensplanung, Einkaufsliste, gesunde Rezepte, Kochbuch, Nährwertanalyse, Meal Planner, Ernährung, Food App, Rezepte speichern, Supermarkt, Familienplanung, Diät, Allergene, Kalorien, Makros, Wochenplan, Mahlzeiten, CookSona'"
+  image="/logo.png"
+></app-seo>
+
+<div class="min-h-screen flex flex-col bg-base-100 font-sans">
+  <div class="non-printable"><!-- Header wird im App-Layout gerendert --></div>
+  <main class="flex-grow flex flex-col items-center justify-center px-4 pt-12 pb-8">
+    <section class="max-w-3xl w-full text-center mb-12">
+      <div class="flex justify-center mb-6">
+        <div class="h-16 w-16 text-primary" [svgInject]="icons.UtensilsCrossed"></div>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-serif font-bold text-neutral mb-4">
+        CookSona – Essensplanung, Einkaufsliste & gesunde Rezepte
+      </h1>
+      <p class="text-lg md:text-xl text-gray-600 mb-6">
+        Die smarte Lösung für <strong>Essensplanung</strong>, <strong>Einkaufsliste</strong>,
+        <strong>gesunde Rezepte</strong>, <strong>Kochbuch</strong> und
+        <strong>Nährwert-Analyse</strong>. Spare Zeit, Geld und ernähre dich besser!
+      </p>
+      <div class="flex flex-col md:flex-row gap-4 justify-center mb-8">
+        <a
+          routerLink="/register"
+          class="bg-primary text-primary-content px-8 py-4 rounded-xl text-lg font-semibold shadow-soft hover:bg-primary-focus transition-all"
+        >
+          Jetzt kostenlos starten
+        </a>
+        <a
+          routerLink="/login"
+          class="text-primary px-8 py-4 rounded-xl text-lg font-semibold border border-primary hover:bg-base-200 transition-all"
+        >
+          Anmelden
+        </a>
+      </div>
+    </section>
+
+    <section class="max-w-4xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+      @for(feature of features;track feature; let i = $index){
+      <app-feature-card
+        [icon]="feature.icon"
+        [title]="feature.title"
+        [desc]="feature.desc"
+      />
+      }
+    </section>
+
+    <section class="max-w-2xl w-full mx-auto text-center mb-12">
+      <h3 class="text-lg font-semibold text-primary mb-2 flex items-center justify-center gap-2">
+        <span class="h-6 w-6 text-primary" [svgInject]="icons.Sparkles"></span>
+        Warum CookSona?
+      </h3>
+      <p class="text-gray-700 text-base mb-4">
+        Spare Zeit, Geld und Nerven bei der <strong>Essensplanung</strong>. CookSona hilft dir,
+        <strong>gesünder zu leben</strong> und nie wieder planlos im <strong>Supermarkt</strong>
+        zu stehen.
+      </p>
+    </section>
+  </main>
+</div>
+
