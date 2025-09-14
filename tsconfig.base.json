@@ -31,6 +31,6 @@
     "typeCheckHostBindings": true,
     "strictTemplates": true
   },
-  
+
   "exclude": ["node_modules", "tmp"]
 }

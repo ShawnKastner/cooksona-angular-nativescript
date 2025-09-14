@@ -30,20 +30,30 @@ export class PlanApiService {
 
   // Delete a plan for a user
   deletePlanForUser(planIdToDelete: string): Promise<void | undefined> {
-    return this.api.delete<void>(`/plans/${encodeURIComponent(planIdToDelete)}`);
+    return this.api.delete<void>(
+      `/plans/${encodeURIComponent(planIdToDelete)}`
+    );
   }
 
   saveCategorizedShoppingList(
     planId: string,
     categorizedList: CategorizedShoppingList
   ): Promise<MealPlan | undefined> {
-    return this.api.post<MealPlan>(`/plans/${encodeURIComponent(planId)}/categorized-shopping-list`, {
-      categorizedList,
-    });
+    return this.api.post<MealPlan>(
+      `/plans/${encodeURIComponent(planId)}/categorized-shopping-list`,
+      {
+        categorizedList,
+      }
+    );
   }
 
-  updateShoppingList(planId: string, shoppingList: ShoppingListItem[]): Promise<MealPlan | undefined> {
-    return this.api.put<MealPlan>(`/plans/${encodeURIComponent(planId)}`, { shoppingList });
+  updateShoppingList(
+    planId: string,
+    shoppingList: ShoppingListItem[]
+  ): Promise<MealPlan | undefined> {
+    return this.api.put<MealPlan>(`/plans/${encodeURIComponent(planId)}`, {
+      shoppingList,
+    });
   }
 
   // Client-side consolidation of shopping list
@@ -52,8 +62,12 @@ export class PlanApiService {
     for (const day of days) {
       for (const key of Object.keys(day)) {
         if (key !== 'day') {
-          const meal = (day as Record<string, unknown>)[key] as Recipe | undefined;
-          const mealIngredients = (meal as unknown as { ingredients?: Ingredient[] } | undefined)?.ingredients;
+          const meal = (day as Record<string, unknown>)[key] as
+            | Recipe
+            | undefined;
+          const mealIngredients = (
+            meal as unknown as { ingredients?: Ingredient[] } | undefined
+          )?.ingredients;
           if (mealIngredients && Array.isArray(mealIngredients)) {
             allIngredients.push(...mealIngredients);
           }
@@ -63,14 +77,18 @@ export class PlanApiService {
 
     const consolidated: Record<string, ShoppingListItem> = {};
     for (const ing of allIngredients) {
-      const key = `${ing.name.trim().toLowerCase()}_${ing.unit.trim().toLowerCase()}`;
+      const key = `${ing.name.trim().toLowerCase()}_${ing.unit
+        .trim()
+        .toLowerCase()}`;
       if (consolidated[key]) {
         const currentAmount = parseFloat(consolidated[key].amount);
         const newAmount = parseFloat(ing.amount);
         if (!Number.isNaN(currentAmount) && !Number.isNaN(newAmount)) {
           consolidated[key].amount = String(currentAmount + newAmount);
         } else {
-          consolidated[key].amount = `${consolidated[key].amount} + ${ing.amount}`;
+          consolidated[
+            key
+          ].amount = `${consolidated[key].amount} + ${ing.amount}`;
         }
       } else {
         consolidated[key] = {
@@ -109,9 +127,13 @@ export class PlanApiService {
       const newDay: DailyPlan = { ...day };
       for (const key of Object.keys(newDay)) {
         if (key !== 'day') {
-          const meal = (newDay as Record<string, unknown>)[key] as Recipe | undefined;
+          const meal = (newDay as Record<string, unknown>)[key] as
+            | Recipe
+            | undefined;
           if (meal && meal.id === originalRecipeId) {
-            (newDay as Record<string, unknown>)[key] = newRecipe as unknown as Recipe | undefined;
+            (newDay as Record<string, unknown>)[key] = newRecipe as unknown as
+              | Recipe
+              | undefined;
             recipeUpdated = true;
           }
         }
@@ -122,7 +144,10 @@ export class PlanApiService {
     if (recipeUpdated) {
       const nextPlan: MealPlan = { ...planToUpdate, days: updatedDays };
       nextPlan.shoppingList = this.recalculateShoppingList(nextPlan.days);
-      return this.api.put<MealPlan>(`/plans/${encodeURIComponent(planId)}`, nextPlan);
+      return this.api.put<MealPlan>(
+        `/plans/${encodeURIComponent(planId)}`,
+        nextPlan
+      );
     }
 
     return planToUpdate; // original if not updated
@@ -143,7 +168,8 @@ export class PlanApiService {
       if (day.day === dayName) {
         const newDay: DailyPlan = { ...day };
         if (Object.prototype.hasOwnProperty.call(newDay, mealKey)) {
-          (newDay as Record<string, unknown>)[mealKey] = newRecipe as unknown as Recipe | undefined;
+          (newDay as Record<string, unknown>)[mealKey] =
+            newRecipe as unknown as Recipe | undefined;
           mealSwapped = true;
         }
         return newDay;
@@ -154,10 +180,12 @@ export class PlanApiService {
     if (mealSwapped) {
       const nextPlan: MealPlan = { ...planToUpdate, days: updatedDays };
       nextPlan.shoppingList = this.recalculateShoppingList(nextPlan.days);
-      return this.api.put<MealPlan>(`/plans/${encodeURIComponent(planId)}`, nextPlan);
+      return this.api.put<MealPlan>(
+        `/plans/${encodeURIComponent(planId)}`,
+        nextPlan
+      );
     }
 
     return planToUpdate;
   }
 }
-

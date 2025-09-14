@@ -26,4 +26,3 @@ export interface MealPlan {
 }
 
 export type CategorizedShoppingList = Record<string, ShoppingListItem[]>;
-

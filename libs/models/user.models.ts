@@ -5,4 +5,3 @@ export type User = AuthUser & {
   createdAt?: string;
   updatedAt?: string;
 };
-

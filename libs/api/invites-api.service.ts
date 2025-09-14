@@ -18,4 +18,3 @@ export class InvitesApiService {
     return this.api.post<Invite>('/admin/invites', data);
   }
 }
-

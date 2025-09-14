@@ -25,7 +25,11 @@ export class MessageApiService {
       const allMessages = JSON.parse(stored) as Message[];
       return allMessages
         .filter((msg) => msg.status === 'answered' && !!msg.reply)
-        .sort((a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime());
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt ?? 0).getTime() -
+            new Date(a.createdAt ?? 0).getTime()
+        );
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error reading messages from localStorage', error);
@@ -62,7 +66,9 @@ export class MessageApiService {
       if (!ls) return new Set<string>();
       const key = `${SEEN_REPLIES_KEY_PREFIX}${userId}`;
       const raw = ls.getItem(key);
-      return raw ? new Set<string>(JSON.parse(raw) as string[]) : new Set<string>();
+      return raw
+        ? new Set<string>(JSON.parse(raw) as string[])
+        : new Set<string>();
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error reading seen replies from localStorage', error);
@@ -70,4 +76,3 @@ export class MessageApiService {
     }
   }
 }
-

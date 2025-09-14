@@ -18,4 +18,3 @@ export interface CreateInviteRequest {
   maxUses?: number;
   expiresAt?: string | null; // ISO string
 }
-

@@ -22,4 +22,3 @@ export class UserApiService {
     return this.api.post<{ ok: boolean }>('/auth/verify', { token });
   }
 }
-

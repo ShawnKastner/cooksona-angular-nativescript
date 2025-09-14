@@ -34,4 +34,3 @@ export class ContactApiService {
     return this.api.delete<void>(`/contact/${id}`);
   }
 }
-

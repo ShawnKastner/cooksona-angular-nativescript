@@ -33,7 +33,10 @@ export class ApiService {
     return this.getCookie('csrfToken');
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T | undefined> {
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T | undefined> {
     const csrfToken = this.getCsrfToken();
     const init: RequestInit = {
       credentials: 'include',
@@ -105,11 +108,16 @@ export class ApiService {
                   try {
                     errorBody = await r.json();
                   } catch {
-                    errorBody = { message: 'Ein unbekannter Fehler ist aufgetreten' };
+                    errorBody = {
+                      message: 'Ein unbekannter Fehler ist aufgetreten',
+                    };
                   }
                   return reject(errorBody);
                 }
-                if (r.status === 204 || r.headers.get('content-length') === '0') {
+                if (
+                  r.status === 204 ||
+                  r.headers.get('content-length') === '0'
+                ) {
                   resolve(undefined);
                 } else {
                   resolve((await r.json()) as T);
@@ -134,7 +142,10 @@ export class ApiService {
       throw { message: 'Ein unbekannter Fehler ist aufgetreten' } as const;
     }
 
-    if (response.status === 204 || response.headers.get('content-length') === '0') {
+    if (
+      response.status === 204 ||
+      response.headers.get('content-length') === '0'
+    ) {
       return undefined;
     }
     return (await response.json()) as T;
@@ -144,16 +155,40 @@ export class ApiService {
     return this.request<T>(endpoint, { method: 'GET', ...init });
   }
 
-  post<T>(endpoint: string, body: unknown, init?: RequestInit): Promise<T | undefined> {
-    return this.request<T>(endpoint, { method: 'POST', body: JSON.stringify(body), ...init });
+  post<T>(
+    endpoint: string,
+    body: unknown,
+    init?: RequestInit
+  ): Promise<T | undefined> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      ...init,
+    });
   }
 
-  put<T>(endpoint: string, body: unknown, init?: RequestInit): Promise<T | undefined> {
-    return this.request<T>(endpoint, { method: 'PUT', body: JSON.stringify(body), ...init });
+  put<T>(
+    endpoint: string,
+    body: unknown,
+    init?: RequestInit
+  ): Promise<T | undefined> {
+    return this.request<T>(endpoint, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+      ...init,
+    });
   }
 
-  patch<T>(endpoint: string, body: unknown, init?: RequestInit): Promise<T | undefined> {
-    return this.request<T>(endpoint, { method: 'PATCH', body: JSON.stringify(body), ...init });
+  patch<T>(
+    endpoint: string,
+    body: unknown,
+    init?: RequestInit
+  ): Promise<T | undefined> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+      ...init,
+    });
   }
 
   delete<T>(endpoint: string, init?: RequestInit): Promise<T | undefined> {
@@ -161,7 +196,9 @@ export class ApiService {
   }
 
   // AI service wrappers (generic to avoid tight coupling)
-  apiGenerateMealPlan<TOptions = unknown, TResult = unknown>(options: TOptions) {
+  apiGenerateMealPlan<TOptions = unknown, TResult = unknown>(
+    options: TOptions
+  ) {
     return this.post<TResult>('/ai/generate-plan', options);
   }
 
@@ -174,16 +211,27 @@ export class ApiService {
     return this.post<TResult>('/ai/generate-single-meal', payload);
   }
 
-  apiCategorizeShoppingList<TIngredient = unknown, TResult = unknown>(ingredients: TIngredient[]) {
+  apiCategorizeShoppingList<TIngredient = unknown, TResult = unknown>(
+    ingredients: TIngredient[]
+  ) {
     return this.post<TResult>('/ai/categorize-list', { ingredients });
   }
 
-  apiTransformRecipe<TRecipe = unknown, TResult = unknown>(recipe: TRecipe, modification: string) {
+  apiTransformRecipe<TRecipe = unknown, TResult = unknown>(
+    recipe: TRecipe,
+    modification: string
+  ) {
     return this.post<TResult>('/ai/transform-recipe', { recipe, modification });
   }
 
-  apiGenerateLeftoverRecipe<TResult = unknown>(ingredients: string, signal?: AbortSignal) {
-    return this.post<TResult>('/ai/generate-leftover', { ingredients }, { signal });
+  apiGenerateLeftoverRecipe<TResult = unknown>(
+    ingredients: string,
+    signal?: AbortSignal
+  ) {
+    return this.post<TResult>(
+      '/ai/generate-leftover',
+      { ingredients },
+      { signal }
+    );
   }
 }
-
