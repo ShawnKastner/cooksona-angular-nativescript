@@ -8,46 +8,31 @@ import { ResetPassword } from './components/auth/reset-password/reset-password';
 import { EmailVerification } from './components/auth/email-verification/email-verification';
 
 export const routes: Routes = [
-  // Public landing route (placeholder uses Login component)
+  // Public landing route
   { path: 'landing', component: LandingComponent },
 
+  // Invite redeem
+  { path: 'invite/redeem/:token', loadComponent: () => import('./pages/invite-redeem/invite-redeem.page').then(m => m.InviteRedeemPage) },
+  { path: 'invite/redeem', redirectTo: '/login', pathMatch: 'full' },
+
   // Auth pages: redirect signed-in users to home
-  {
-    path: 'login',
-    canActivate: [authRedirectGuard],
-    component: Login,
-  },
-  {
-    path: 'register',
-    canActivate: [authRedirectGuard],
-    component: Register,
-  },
-  {
-    path: 'forgot-password',
-    canActivate: [authRedirectGuard],
-    component: ForgotPassword,
-  },
-  {
-    path: 'reset-password',
-    canActivate: [authRedirectGuard],
-    component: ResetPassword,
-  },
-  {
-    path: 'email-verification',
-    canActivate: [authRedirectGuard],
-    component: EmailVerification,
-  },
-  // Protected home (placeholder uses EmailVerification until real home exists)
-  {
-    path: '',
-    canActivate: [protectedRouteGuard],
-    component: EmailVerification,
-  },
-  // Example admin area with role requirement (uncomment when available)
-  // {
-  //   path: 'admin',
-  //   canActivate: [protectedRouteGuard],
-  //   data: { requiredRole: 'admin' as const },
-  //   loadChildren: () => import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES),
-  // },
+  { path: 'login', canActivate: [authRedirectGuard], component: Login },
+  { path: 'register', canActivate: [authRedirectGuard], component: Register },
+  { path: 'forgot-password', canActivate: [authRedirectGuard], component: ForgotPassword },
+  { path: 'reset-password', canActivate: [authRedirectGuard], component: ResetPassword },
+  { path: 'verify-email', canActivate: [authRedirectGuard], component: EmailVerification },
+  { path: 'email-verification', canActivate: [authRedirectGuard], component: EmailVerification },
+
+  // Protected pages
+  { path: '', canActivate: [protectedRouteGuard], loadComponent: () => import('./features/planner/planner.page').then(m => m.PlannerPage) },
+  { path: 'profile', canActivate: [protectedRouteGuard], loadComponent: () => import('./components/profile/profile.page').then(m => m.ProfilePage) },
+  { path: 'cookbook', canActivate: [protectedRouteGuard], loadComponent: () => import('./features/cookbook/cookbook.page').then(m => m.CookbookPage) },
+  { path: 'admin', canActivate: [protectedRouteGuard], data: { requiredRole: 'admin' as const }, loadComponent: () => import('./features/admin/admin-dashboard.component').then(m => m.AdminDashboard) },
+
+  // Legal & contact
+  { path: 'datenschutz', loadComponent: () => import('./pages/legal/datenschutz.page').then(m => m.DatenschutzPage) },
+  { path: 'impressum', loadComponent: () => import('./pages/legal/impressum.page').then(m => m.ImpressumPage) },
+  { path: 'contact', loadComponent: () => import('./pages/legal/contact.page').then(m => m.ContactPage) },
+
+  { path: '**', redirectTo: '' },
 ];
