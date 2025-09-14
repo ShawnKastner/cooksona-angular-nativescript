@@ -4,6 +4,8 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideApiBaseUrl } from '@cooksona/api';
+import { environment } from '../environments/environment';
 
 import { routes } from './app.routes';
 
@@ -12,5 +14,6 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
+    provideApiBaseUrl(environment.apiBaseUrl),
   ],
 };

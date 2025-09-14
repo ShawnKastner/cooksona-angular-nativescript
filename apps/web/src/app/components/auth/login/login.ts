@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { LogIn } from 'libs/constants/icons';
 
 @Component({

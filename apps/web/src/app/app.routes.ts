@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
 import { authRedirectGuard, protectedRouteGuard } from '@cooksona/auth';
-import { Login } from './auth/login/login';
+import { Login } from './components/auth/login/login';
 import { LandingComponent } from './pages/landing/landing.component';
-import { Register } from './auth/register/register';
-import { ForgotPassword } from './auth/forgot-password/forgot-password';
-import { ResetPassword } from './auth/reset-password/reset-password';
-import { EmailVerification } from './auth/email-verification/email-verification';
+import { Register } from './components/auth/register/register';
+import { ForgotPassword } from './components/auth/forgot-password/forgot-password';
+import { ResetPassword } from './components/auth/reset-password/reset-password';
+import { EmailVerification } from './components/auth/email-verification/email-verification';
 
 export const routes: Routes = [
   // Public landing route (placeholder uses Login component)

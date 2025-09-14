@@ -13,7 +13,13 @@
     "target": "ES2022",
     "module": "preserve",
     "paths": {
-      "@cooksona/auth": ["libs/auth/index.ts"]
+      "@cooksona/auth": ["libs/auth/index.ts"],
+      "@cooksona/auth/*": ["libs/auth/*"],
+      "@cooksona/core/auth": ["libs/auth/index.ts"],
+      "@cooksona/api": ["libs/api/index.ts"],
+      "@cooksona/api/*": ["libs/api/*"],
+      "@cooksona/models": ["libs/models/index.ts"],
+      "@cooksona/models/*": ["libs/models/*"]
     },
     "baseUrl": ".",
     "rootDir": "."
@@ -25,14 +31,6 @@
     "typeCheckHostBindings": true,
     "strictTemplates": true
   },
-  "files": [],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.spec.json"
-    }
-  ],
+  
   "exclude": ["node_modules", "tmp"]
 }
