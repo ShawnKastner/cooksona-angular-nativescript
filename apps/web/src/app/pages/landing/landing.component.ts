@@ -2,14 +2,30 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SeoComponent } from '../../shared/seo/seo.component';
-import { FeatureCardComponent, FeatureCardProps } from './feature-card.component';
-import { UtensilsCrossed, Sparkles, ShoppingBasket, ChefHat, BarChart2, Cookie } from 'libs/constants/icons';
+import {
+  FeatureCardComponent,
+  FeatureCardProps,
+} from './feature-card.component';
+import {
+  UtensilsCrossed,
+  Sparkles,
+  ShoppingBasket,
+  ChefHat,
+  BarChart2,
+  Cookie,
+} from 'libs/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, RouterModule, SeoComponent, FeatureCardComponent, SvgInjectDirective],
+  imports: [
+    CommonModule,
+    RouterModule,
+    SeoComponent,
+    FeatureCardComponent,
+    SvgInjectDirective,
+  ],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
 })
@@ -42,4 +58,3 @@ export class LandingComponent {
     Sparkles,
   } as const;
 }
-

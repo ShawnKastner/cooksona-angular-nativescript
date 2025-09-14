@@ -21,7 +21,9 @@ describe('protectedRouteGuard', () => {
 
   it('blocks when loading', () => {
     auth.setLoading(true);
-    const result = TestBed.runInInjectionContext(() => protectedRouteGuard({ data: {} } as any, {} as any));
+    const result = TestBed.runInInjectionContext(() =>
+      protectedRouteGuard({ data: {} } as any, {} as any)
+    );
     expect(result).toBeFalse();
   });
 
@@ -29,7 +31,9 @@ describe('protectedRouteGuard', () => {
     const navSpy = spyOn(router, 'navigateByUrl');
     auth.setLoading(false);
     auth.setCurrentUser(null);
-    const result = TestBed.runInInjectionContext(() => protectedRouteGuard({ data: {} } as any, {} as any));
+    const result = TestBed.runInInjectionContext(() =>
+      protectedRouteGuard({ data: {} } as any, {} as any)
+    );
     expect(result).toBeFalse();
     expect(navSpy).toHaveBeenCalledWith('/landing');
   });
@@ -38,7 +42,9 @@ describe('protectedRouteGuard', () => {
     const navSpy = spyOn(router, 'navigateByUrl');
     auth.setLoading(false);
     auth.setCurrentUser({ id: '1', role: 'user', email: 'u@example.com' });
-    const result = TestBed.runInInjectionContext(() => protectedRouteGuard({ data: { requiredRole: 'admin' } } as any, {} as any));
+    const result = TestBed.runInInjectionContext(() =>
+      protectedRouteGuard({ data: { requiredRole: 'admin' } } as any, {} as any)
+    );
     expect(result).toBeFalse();
     expect(navSpy).toHaveBeenCalledWith('/landing');
   });
@@ -46,10 +52,13 @@ describe('protectedRouteGuard', () => {
   it('allows when authenticated and role matches or absent', () => {
     auth.setLoading(false);
     auth.setCurrentUser({ id: '1', role: 'admin', email: 'a@example.com' });
-    const result1 = TestBed.runInInjectionContext(() => protectedRouteGuard({ data: {} } as any, {} as any));
+    const result1 = TestBed.runInInjectionContext(() =>
+      protectedRouteGuard({ data: {} } as any, {} as any)
+    );
     expect(result1).toBeTrue();
-    const result2 = TestBed.runInInjectionContext(() => protectedRouteGuard({ data: { requiredRole: 'admin' } } as any, {} as any));
+    const result2 = TestBed.runInInjectionContext(() =>
+      protectedRouteGuard({ data: { requiredRole: 'admin' } } as any, {} as any)
+    );
     expect(result2).toBeTrue();
   });
 });
-

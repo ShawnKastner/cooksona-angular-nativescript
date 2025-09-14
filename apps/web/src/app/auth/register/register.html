@@ -79,8 +79,18 @@
         [disabled]="isLoading"
         class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-focus"
       >
+        <span class="w-5 h-5" [svgInject]="icons.UserPlus"></span>
         {{ isLoading ? "Registrieren..." : "Registrieren" }}
       </button>
+      <p class="text-center text-gray-500 text-sm mt-8">
+        Bereits ein Konto?
+        <a
+          class="font-bold text-primary hover:text-primary-focus cursor-pointer"
+          href="/login"
+        >
+          Hier anmelden
+        </a>
+      </p>
     </form>
   </div>
 </div>

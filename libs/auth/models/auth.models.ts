@@ -7,4 +7,3 @@ export interface AuthUser {
   email: string;
   displayName?: string;
 }
-

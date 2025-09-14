@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
+import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { LogIn } from 'libs/constants/icons';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, SvgInjectDirective],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
 })
@@ -19,6 +21,8 @@ export class Login {
   resendState: 'idle' | 'sending' | 'sent' | 'error' = 'idle';
   resendError: string | null = null;
   showPassword = false;
+
+  protected readonly icons = { LogIn } as const;
 
   constructor(private router: Router) {}
 

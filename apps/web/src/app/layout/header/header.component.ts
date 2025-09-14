@@ -2,7 +2,14 @@ import { Component, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
-import { UtensilsCrossed, User, LogOut, BookHeart, Shield, MessageSquare } from 'libs/constants/icons';
+import {
+  UtensilsCrossed,
+  User,
+  LogOut,
+  BookHeart,
+  Shield,
+  MessageSquare,
+} from 'libs/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 
 @Component({
@@ -24,7 +31,11 @@ export class HeaderComponent {
     MessageSquare,
   } as const;
 
-  constructor(private readonly router: Router, private readonly auth: AuthService, private readonly el: ElementRef) {}
+  constructor(
+    private readonly router: Router,
+    private readonly auth: AuthService,
+    private readonly el: ElementRef
+  ) {}
 
   get user$() {
     return this.auth.currentUser$;
@@ -57,4 +68,3 @@ export class HeaderComponent {
     this.router.navigateByUrl('/login').catch(() => {});
   }
 }
-

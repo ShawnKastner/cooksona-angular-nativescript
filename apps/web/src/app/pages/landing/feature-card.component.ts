@@ -13,7 +13,9 @@ export interface FeatureCardProps {
   standalone: true,
   imports: [CommonModule, SvgInjectDirective],
   template: `
-    <div class="bg-base-200 rounded-xl p-6 shadow-soft flex flex-col items-center">
+    <div
+      class="bg-base-200 rounded-xl p-6 shadow-soft flex flex-col items-center"
+    >
       <div class="h-8 w-8 text-primary" [svgInject]="icon"></div>
       <h2 class="text-xl font-bold mt-4 mb-2 text-neutral">{{ title }}</h2>
       <p class="text-gray-600 text-base">{{ desc }}</p>
@@ -25,4 +27,3 @@ export class FeatureCardComponent implements FeatureCardProps {
   @Input() title!: string;
   @Input() desc!: string;
 }
-

@@ -24,7 +24,12 @@ export class SeoComponent implements OnChanges, SeoProps {
   constructor(private readonly titleSvc: Title, private readonly meta: Meta) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['title'] || changes['description'] || changes['keywords'] || changes['image']) {
+    if (
+      changes['title'] ||
+      changes['description'] ||
+      changes['keywords'] ||
+      changes['image']
+    ) {
       this.apply();
     }
   }
@@ -41,19 +46,27 @@ export class SeoComponent implements OnChanges, SeoProps {
 
     // Open Graph
     this.meta.updateTag({ property: 'og:title', content: this.title });
-    this.meta.updateTag({ property: 'og:description', content: this.description });
+    this.meta.updateTag({
+      property: 'og:description',
+      content: this.description,
+    });
     if (this.image) {
       this.meta.updateTag({ property: 'og:image', content: this.image });
     }
     this.meta.updateTag({ property: 'og:type', content: 'website' });
 
     // Twitter
-    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    this.meta.updateTag({
+      name: 'twitter:card',
+      content: 'summary_large_image',
+    });
     this.meta.updateTag({ name: 'twitter:title', content: this.title });
-    this.meta.updateTag({ name: 'twitter:description', content: this.description });
+    this.meta.updateTag({
+      name: 'twitter:description',
+      content: this.description,
+    });
     if (this.image) {
       this.meta.updateTag({ name: 'twitter:image', content: this.image });
     }
   }
 }
-

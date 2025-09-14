@@ -15,4 +15,3 @@ export const authRedirectGuard: CanActivateFn = () => {
   }
   return true;
 };
-

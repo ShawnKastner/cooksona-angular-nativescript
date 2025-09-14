@@ -6,7 +6,10 @@
     "start": "nx serve",
     "build": "nx build",
     "watch": "nx build --watch --configuration development",
-    "test": "nx test"
+    "test": "nx test",
+    "format": "prettier --write \"**/*.{ts,js,json,scss,css,html,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,scss,css,html,md}\"",
+    "format:staged": "git diff --name-only --staged --relative | grep -E '\\.(ts|js|json|scss|css|html|md)$' | xargs --no-run-if-empty prettier --write"
   },
   "prettier": {
     "overrides": [

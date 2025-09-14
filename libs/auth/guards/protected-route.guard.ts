@@ -13,7 +13,8 @@ export const protectedRouteGuard: CanActivateFn = (
 
   // 1) Loading state handling (minimal viable): block or redirect if configured
   if (authService.isLoading) {
-    const loadingRedirect = (route.data?.['loadingRedirect'] as string | undefined) ?? undefined;
+    const loadingRedirect =
+      (route.data?.['loadingRedirect'] as string | undefined) ?? undefined;
     if (loadingRedirect) {
       router.navigateByUrl(loadingRedirect);
     }
@@ -36,4 +37,3 @@ export const protectedRouteGuard: CanActivateFn = (
 
   return true;
 };
-

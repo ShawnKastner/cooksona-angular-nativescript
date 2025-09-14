@@ -2,9 +2,9 @@
 
 **Struktur**
 
-* **Web-App (Angular):** `apps/web`
-* **Mobile-App (NativeScript + Angular):** `apps/mobile`
-* **Geteilte Bibliotheken (optional):** `libs/`
+- **Web-App (Angular):** `apps/web`
+- **Mobile-App (NativeScript + Angular):** `apps/mobile`
+- **Geteilte Bibliotheken (optional):** `libs/`
 
 > Nx-Workspace mit zwei Apps; Logik/Modelle/Services können über `libs/` geteilt werden.
 
@@ -12,9 +12,9 @@
 
 ## Voraussetzungen
 
-* **Node.js** LTS + **npm**
-* **Nx** (lokal via `npx`, keine globale Installation nötig)
-* **NativeScript CLI** *(global empfohlen)*
+- **Node.js** LTS + **npm**
+- **Nx** (lokal via `npx`, keine globale Installation nötig)
+- **NativeScript CLI** _(global empfohlen)_
 
 ```bash
 npm i -g nativescript
@@ -22,8 +22,8 @@ ns -v
 ns doctor
 ```
 
-* **Android**: Android Studio + SDK; Emulator **oder** USB-Gerät (USB-Debugging)
-* **iOS** *(nur macOS)*: Xcode + **CocoaPods**
+- **Android**: Android Studio + SDK; Emulator **oder** USB-Gerät (USB-Debugging)
+- **iOS** _(nur macOS)_: Xcode + **CocoaPods**
 
 ```bash
 sudo gem install cocoapods
@@ -181,8 +181,8 @@ ns build android --release --aab \
 
 **Artefakte (typisch):**
 
-* APK: `platforms/android/app/build/outputs/apk/release/app-release.apk`
-* AAB: `platforms/android/app/build/outputs/bundle/release/app-release.aab`
+- APK: `platforms/android/app/build/outputs/apk/release/app-release.apk`
+- AAB: `platforms/android/app/build/outputs/bundle/release/app-release.aab`
 
 ### iOS – Release (für Geräte / App Store)
 
@@ -224,15 +224,23 @@ export abstract class StoragePort {
 
 // apps/web/src/app/storage.web.ts
 export class WebStorage implements StoragePort {
-  get(k){ return localStorage.getItem(k); }
-  set(k,v){ localStorage.setItem(k, v); }
+  get(k) {
+    return localStorage.getItem(k);
+  }
+  set(k, v) {
+    localStorage.setItem(k, v);
+  }
 }
 
 // apps/mobile/src/app/storage.native.ts
-import { ApplicationSettings } from '@nativescript/core';
+import { ApplicationSettings } from "@nativescript/core";
 export class NativeStorage implements StoragePort {
-  get(k){ return ApplicationSettings.getString(k); }
-  set(k,v){ ApplicationSettings.setString(k, v); }
+  get(k) {
+    return ApplicationSettings.getString(k);
+  }
+  set(k, v) {
+    ApplicationSettings.setString(k, v);
+  }
 }
 ```
 
@@ -254,10 +262,10 @@ export class NativeStorage implements StoragePort {
 
 ## Troubleshooting (Kurz)
 
-* **`document is not defined` (Mobile):** Browser-API in geteilter Lib → über Adapter lösen (s. oben).
-* **Android-Emulator wird nicht gefunden:** AVD in Android Studio erstellen **und starten**, dann `ns run android` / `npx nx debug mobile android`.
-* **iOS Signing/Provisioning Fehler:** `--teamId` / `--provision` korrekt setzen oder in Xcode konfigurieren und archivieren.
-* **Build hängt / Altlasten:**
+- **`document is not defined` (Mobile):** Browser-API in geteilter Lib → über Adapter lösen (s. oben).
+- **Android-Emulator wird nicht gefunden:** AVD in Android Studio erstellen **und starten**, dann `ns run android` / `npx nx debug mobile android`.
+- **iOS Signing/Provisioning Fehler:** `--teamId` / `--provision` korrekt setzen oder in Xcode konfigurieren und archivieren.
+- **Build hängt / Altlasten:**
 
 ```bash
 # Root:
@@ -266,7 +274,7 @@ npx nx reset
 cd apps/mobile && ns clean && rm -rf platforms
 ```
 
-* **Tailwind (nur Web):** In `tailwind.config.cjs` muss `content` auf `apps/web/src/**/*.{html,ts}` zeigen.
+- **Tailwind (nur Web):** In `tailwind.config.cjs` muss `content` auf `apps/web/src/**/*.{html,ts}` zeigen.
 
 ---
 

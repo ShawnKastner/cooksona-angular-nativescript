@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { Mail } from 'libs/constants/icons';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SvgInjectDirective],
   templateUrl: './forgot-password.html',
   styleUrls: ['./forgot-password.scss'],
 })
@@ -14,6 +16,7 @@ export class ForgotPassword {
   message: string | null = null;
   error: string | null = null;
   isLoading = false;
+  protected readonly icons = { Mail } as const;
 
   async submit() {
     this.error = null;

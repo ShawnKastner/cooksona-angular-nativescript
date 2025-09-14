@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { UserPlus } from 'libs/constants/icons';
+import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SvgInjectDirective],
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
 })
@@ -16,6 +18,7 @@ export class Register {
   confirmPassword = '';
   error: string | null = null;
   isLoading = false;
+  protected readonly icons = { UserPlus } as const;
 
   async submit() {
     this.error = null;

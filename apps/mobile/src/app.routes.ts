@@ -8,6 +8,14 @@ export const routes: Routes = [
   { path: 'landing', component: HomeComponent },
 
   { path: '', redirectTo: '/home', pathMatch: 'full' },
-  { path: 'home', canActivate: [protectedRouteGuard], component: HomeComponent },
-  { path: 'item/:id', canActivate: [protectedRouteGuard], component: DetailComponent },
+  {
+    path: 'home',
+    canActivate: [protectedRouteGuard],
+    component: HomeComponent,
+  },
+  {
+    path: 'item/:id',
+    canActivate: [protectedRouteGuard],
+    component: DetailComponent,
+  },
 ];

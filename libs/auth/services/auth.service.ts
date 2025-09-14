@@ -5,11 +5,15 @@ import { AuthUser, UserRole } from '../models/auth.models';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
+  private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(
+    null
+  );
   private readonly isLoadingSubject = new BehaviorSubject<boolean>(false);
 
-  readonly currentUser$: Observable<AuthUser | null> = this.currentUserSubject.asObservable();
-  readonly isLoading$: Observable<boolean> = this.isLoadingSubject.asObservable();
+  readonly currentUser$: Observable<AuthUser | null> =
+    this.currentUserSubject.asObservable();
+  readonly isLoading$: Observable<boolean> =
+    this.isLoadingSubject.asObservable();
 
   get currentUser(): AuthUser | null {
     return this.currentUserSubject.getValue();
