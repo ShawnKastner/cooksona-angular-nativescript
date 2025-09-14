@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '@cooksona/auth';
 
 @Component({
   selector: 'app-reset-password',
@@ -18,7 +19,7 @@ export class ResetPassword {
   message: string | null = null;
   isLoading = false;
 
-  constructor(private route: ActivatedRoute, private router: Router) {
+  constructor(private route: ActivatedRoute, private router: Router, private auth: AuthService) {
     this.token = this.route.snapshot.queryParamMap.get('token');
     if (!this.token) {
       this.router.navigate(['/login']).catch(() => {});
@@ -42,8 +43,7 @@ export class ResetPassword {
     }
     this.isLoading = true;
     try {
-      // TODO: call API to reset password
-      await new Promise((r) => setTimeout(r, 700));
+      await this.auth.resetPassword(this.token, this.password);
       this.router
         .navigate(['/login'], { queryParams: { reset: 'success' } })
         .catch(() => {});

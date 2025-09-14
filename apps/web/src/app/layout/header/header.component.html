@@ -29,7 +29,7 @@
         >
           <span class="h-5 w-5 text-neutral" [svgInject]="icons.User"></span>
           <span class="font-semibold text-sm hidden sm:inline">{{
-            user.displayName || user.email
+            user.name
           }}</span>
         </button>
         @if(isDropdownOpen) {

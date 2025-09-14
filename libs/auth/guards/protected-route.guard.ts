@@ -24,14 +24,14 @@ export const protectedRouteGuard: CanActivateFn = (
   // 2) User must be authenticated
   const user = authService.currentUser;
   if (!user) {
-    router.navigateByUrl('/landing');
+    router.navigateByUrl('/');
     return false;
   }
 
   // 3) Optional role requirement
   const requiredRole = route.data?.['requiredRole'] as UserRole | undefined;
   if (requiredRole && user.role !== requiredRole) {
-    router.navigateByUrl('/landing');
+    router.navigateByUrl('/');
     return false;
   }
 

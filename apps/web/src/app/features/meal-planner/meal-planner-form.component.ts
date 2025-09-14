@@ -111,7 +111,7 @@ export class MealPlannerFormComponent implements OnChanges {
 
   get currentUserLabel(): string | null {
     const u = this.auth.currentUser;
-    return u?.displayName ?? u?.email ?? null;
+    return u?.name ?? u?.email ?? null;
   }
 
   // Helper for strict template typing with dynamic form control paths

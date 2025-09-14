@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { Mail } from 'libs/constants/icons';
+import { AuthService } from '@cooksona/auth';
 
 @Component({
   selector: 'app-forgot-password',
@@ -18,13 +19,14 @@ export class ForgotPassword {
   isLoading = false;
   protected readonly icons = { Mail } as const;
 
+  constructor(private readonly auth: AuthService) {}
+
   async submit() {
     this.error = null;
     this.message = null;
     this.isLoading = true;
     try {
-      // TODO: call real auth service
-      await new Promise((r) => setTimeout(r, 700));
+      await this.auth.requestPasswordReset(this.email);
       this.message =
         'Wenn die E-Mail existiert, wurde ein Link zum Zurücksetzen des Passworts versendet.';
     } catch {

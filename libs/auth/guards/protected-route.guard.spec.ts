@@ -27,7 +27,7 @@ describe('protectedRouteGuard', () => {
     expect(result).toBeFalse();
   });
 
-  it('redirects to /landing and blocks when not authenticated', () => {
+  it('redirects to / and blocks when not authenticated', () => {
     const navSpy = spyOn(router, 'navigateByUrl');
     auth.setLoading(false);
     auth.setCurrentUser(null);
@@ -35,10 +35,10 @@ describe('protectedRouteGuard', () => {
       protectedRouteGuard({ data: {} } as any, {} as any)
     );
     expect(result).toBeFalse();
-    expect(navSpy).toHaveBeenCalledWith('/landing');
+    expect(navSpy).toHaveBeenCalledWith('/');
   });
 
-  it('redirects to /landing on role mismatch', () => {
+  it('redirects to / on role mismatch', () => {
     const navSpy = spyOn(router, 'navigateByUrl');
     auth.setLoading(false);
     auth.setCurrentUser({ id: '1', role: 'user', email: 'u@example.com' });
@@ -46,7 +46,7 @@ describe('protectedRouteGuard', () => {
       protectedRouteGuard({ data: { requiredRole: 'admin' } } as any, {} as any)
     );
     expect(result).toBeFalse();
-    expect(navSpy).toHaveBeenCalledWith('/landing');
+    expect(navSpy).toHaveBeenCalledWith('/');
   });
 
   it('allows when authenticated and role matches or absent', () => {

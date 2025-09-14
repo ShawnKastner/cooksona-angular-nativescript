@@ -5,5 +5,5 @@ export interface AuthUser {
   id: string;
   role: UserRole;
   email: string;
-  displayName?: string;
+  name: string;
 }
