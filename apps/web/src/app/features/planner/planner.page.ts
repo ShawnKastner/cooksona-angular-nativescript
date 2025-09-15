@@ -26,6 +26,7 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
 import { TabsComponent } from './tabs.component';
 import { HistoryComponent } from './history.component';
 import { ShoppingListComponent } from './shopping-list.component';
+import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner.component';
 
 type ActiveTab = 'current' | 'shopping-list' | 'history';
 
@@ -41,6 +42,7 @@ type ActiveTab = 'current' | 'shopping-list' | 'history';
     TabsComponent,
     HistoryComponent,
     ShoppingListComponent,
+    LoadingSpinnerComponent
   ],
   templateUrl: './planner.page.html',
 })

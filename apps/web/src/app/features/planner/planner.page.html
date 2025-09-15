@@ -52,11 +52,7 @@
         </div>
         <div class="mt-6 flex-grow">
           @if(isLoading()){
-          <div class="flex items-center justify-center py-8">
-            <div
-              class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"
-            ></div>
-          </div>
+          <app-loading-spinner [label]="'Dein perfektes Menü wird kreiert...'" [subLabel]="'Die KI arbeitet. Bitte habe einen Moment Geduld.'"></app-loading-spinner>
           }@else if(error() && !swappingMealId()){
           <div
             class="bg-red-100 border-l-4 border-error text-red-800 p-4 rounded-r-lg non-printable"
