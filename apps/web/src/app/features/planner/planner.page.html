@@ -137,7 +137,7 @@
               [plans]="mealPlanHistory()"
               [activePlanId]="activePlanId()"
               (selectPlan)="selectPlan($event)"
-              (deletePlan)="deletePlan($event)"
+              (deletePlan)="requestDeletePlan($event)"
             ></app-history>
             }
           </div>
@@ -175,3 +175,15 @@
   [open]="isProUpgradeModalOpen()"
   (close)="handleCloseProUpgradeModal()"
 ></app-pro-upgrade-modal>
+
+<app-delete-confirm-modal
+  [open]="isDeletePlanModalOpen()"
+  [title]="'Plan löschen'"
+  [message]="
+    'Möchtest du diesen Plan wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.'
+  "
+  [details]="pendingPlanDetails()"
+  [confirmText]="'Löschen'"
+  (cancel)="cancelDeletePlan()"
+  (confirm)="confirmDeletePlan()"
+></app-delete-confirm-modal>

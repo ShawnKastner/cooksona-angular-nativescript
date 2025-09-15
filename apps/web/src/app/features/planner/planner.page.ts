@@ -31,6 +31,7 @@ import { RecipeTransformModalComponent } from '../../components/modals/recipe-tr
 import { LeftOverModalComponent } from '../../components/modals/left-over-modal.component';
 import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner.component';
 import { ProUpgradeModalComponent } from '../../components/modals/pro-upgrade-modal.component';
+import { DeleteConfirmModalComponent } from '../../components/modals/delete-confirm-modal.component';
 
 type ActiveTab = 'current' | 'shopping-list' | 'history';
 
@@ -51,6 +52,7 @@ type ActiveTab = 'current' | 'shopping-list' | 'history';
     RecipeTransformModalComponent,
     LeftOverModalComponent,
     ProUpgradeModalComponent,
+    DeleteConfirmModalComponent,
   ],
   templateUrl: './planner.page.html',
 })
@@ -71,6 +73,8 @@ export class PlannerPage implements OnInit {
   recipeToTransform = signal<Recipe | null>(null);
   isLeftoverModalOpen = signal(false);
   isProUpgradeModalOpen = signal(false);
+  isDeletePlanModalOpen = signal(false);
+  planPendingDeleteId = signal<string | null>(null);
 
   mealPlanHistory = signal<MealPlan[]>([]);
   activePlanId = signal<string | null>(null);
@@ -140,8 +144,19 @@ export class PlannerPage implements OnInit {
     this.activeTab.set('current');
   }
 
-  async deletePlan(id: string): Promise<void> {
-    if (!confirm('Plan wirklich löschen?')) return;
+  requestDeletePlan(id: string): void {
+    this.planPendingDeleteId.set(id);
+    this.isDeletePlanModalOpen.set(true);
+  }
+
+  cancelDeletePlan(): void {
+    this.isDeletePlanModalOpen.set(false);
+    setTimeout(() => this.planPendingDeleteId.set(null), 200);
+  }
+
+  async confirmDeletePlan(): Promise<void> {
+    const id = this.planPendingDeleteId();
+    if (!id) return;
     try {
       await this.planApi.deletePlanForUser(id);
       const updated = this.mealPlanHistory().filter((p) => p.id !== id);
@@ -153,6 +168,21 @@ export class PlannerPage implements OnInit {
     } catch (err) {
       console.error('Fehler beim Löschen des Plans', err);
       this.error.set('Plan konnte nicht gelöscht werden.');
+    } finally {
+      this.cancelDeletePlan();
+    }
+  }
+
+  pendingPlanDetails(): string {
+    const id = this.planPendingDeleteId();
+    if (!id) return '';
+    const plan = this.mealPlanHistory().find((p) => p.id === id);
+    if (!plan) return '';
+    try {
+      const date = new Date(plan.createdAt).toLocaleDateString('de-DE');
+      return `Plan vom ${date} wird gelöscht.`;
+    } catch {
+      return 'Dieser Plan wird gelöscht.';
     }
   }
 
