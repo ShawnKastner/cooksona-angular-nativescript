@@ -26,7 +26,11 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
 import { TabsComponent } from './tabs.component';
 import { HistoryComponent } from './history.component';
 import { ShoppingListComponent } from './shopping-list.component';
+import { RecipeDetailModalComponent } from '../../components/modals/recipe-detail-modal.component';
+import { RecipeTransformModalComponent } from '../../components/modals/recipe-transform-modal.component';
+import { LeftOverModalComponent } from '../../components/modals/left-over-modal.component';
 import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner.component';
+import { ProUpgradeModalComponent } from '../../components/modals/pro-upgrade-modal.component';
 
 type ActiveTab = 'current' | 'shopping-list' | 'history';
 
@@ -42,7 +46,11 @@ type ActiveTab = 'current' | 'shopping-list' | 'history';
     TabsComponent,
     HistoryComponent,
     ShoppingListComponent,
-    LoadingSpinnerComponent
+    LoadingSpinnerComponent,
+    RecipeDetailModalComponent,
+    RecipeTransformModalComponent,
+    LeftOverModalComponent,
+    ProUpgradeModalComponent
   ],
   templateUrl: './planner.page.html',
 })
@@ -57,6 +65,12 @@ export class PlannerPage implements OnInit {
   error = signal<string | null>(null);
   activeTab = signal<ActiveTab>('current');
   swappingMealId = signal<string | null>(null);
+  isRecipeModalOpen = signal(false);
+  selectedRecipe = signal<Recipe | null>(null);
+  isTransformModalOpen = signal(false);
+  recipeToTransform = signal<Recipe | null>(null);
+  isLeftoverModalOpen = signal(false);
+  isProUpgradeModalOpen = signal(false);
 
   mealPlanHistory = signal<MealPlan[]>([]);
   activePlanId = signal<string | null>(null);
@@ -118,7 +132,7 @@ export class PlannerPage implements OnInit {
   print(): void {
     try {
       window.print();
-    } catch {}
+    } catch { }
   }
 
   selectPlan(id: string): void {
@@ -171,11 +185,11 @@ export class PlannerPage implements OnInit {
       const planOptions: PlannerOptions = this.isProUser()
         ? options
         : {
-            ...options,
-            enableNutritionAnalysis: false,
-            planFocus: 'ausgewogen',
-            gourmetMode: false,
-          };
+          ...options,
+          enableNutritionAnalysis: false,
+          planFocus: 'ausgewogen',
+          gourmetMode: false,
+        };
 
       const planData = (await this.api.apiGenerateMealPlan<
         PlannerOptions,
@@ -202,7 +216,7 @@ export class PlannerPage implements OnInit {
       console.error(err);
       this.error.set(
         err?.message ??
-          'Ein unbekannter Fehler ist aufgetreten. Bitte erneut versuchen.'
+        'Ein unbekannter Fehler ist aufgetreten. Bitte erneut versuchen.'
       );
     } finally {
       this.isLoading.set(false);
@@ -217,8 +231,40 @@ export class PlannerPage implements OnInit {
   }
 
   handleShowRecipe(recipe: Recipe): void {
-    // TODO: open recipe modal; currently no-op
-    console.log('Show recipe', this.getEnrichedRecipe(recipe));
+    this.selectedRecipe.set(this.getEnrichedRecipe(recipe));
+    this.isRecipeModalOpen.set(true);
+  }
+
+  handleOpenTransformModal(recipe: Recipe): void {
+    this.recipeToTransform.set(this.getEnrichedRecipe(recipe));
+    this.isTransformModalOpen.set(true);
+  }
+
+  handleCloseRecipeModal(): void {
+    this.isRecipeModalOpen.set(false);
+    setTimeout(() => this.selectedRecipe.set(null), 200);
+  }
+
+  handleCloseTransformModal(): void {
+    this.isTransformModalOpen.set(false);
+    setTimeout(() => this.recipeToTransform.set(null), 200);
+  }
+
+  openLeftoverModal(): void { this.isLeftoverModalOpen.set(true); }
+  handleCloseLeftoverModal(): void { this.isLeftoverModalOpen.set(false); }
+
+  async handleSaveLeftoverRecipe(recipe: Recipe): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user) return;
+    try {
+      await this.cookbookApi.addRecipeToCookbook(recipe);
+      const set = new Set(this.favoriteRecipeIds());
+      set.add(recipe.id);
+      this.favoriteRecipeIds.set(set);
+    } catch (err) {
+      console.error('Fehler beim Speichern des Resterezepts', err);
+      this.error.set('Rezept konnte nicht gespeichert werden.');
+    }
   }
 
   async handleToggleFavorite(recipe: Recipe): Promise<void> {
@@ -237,16 +283,7 @@ export class PlannerPage implements OnInit {
     this.favoriteRecipeIds.set(set);
   }
 
-  handleOpenTransformModal(recipe: Recipe): void {
-    // TODO: open transform modal; currently no-op
-    console.log('Open transform modal for', this.getEnrichedRecipe(recipe));
-  }
-
-  async handleSwapMeal(ev: {
-    dayName: string;
-    mealKey: string;
-    recipe: Recipe;
-  }): Promise<void> {
+  async handleSwapMeal(ev: { dayName: string; mealKey: string; recipe: Recipe }): Promise<void> {
     const user = this.auth.currentUser;
     const active = this.activePlan();
     if (!user || !active) {
@@ -260,29 +297,21 @@ export class PlannerPage implements OnInit {
       if (!day) throw new Error('Tag nicht im Plan gefunden.');
 
       const otherMealNames = Object.values(day)
-        .filter(
-          (m): m is Recipe =>
-            typeof m === 'object' && m !== null && 'id' in (m as any)
-        )
+        .filter((m): m is Recipe => typeof m === 'object' && m !== null && 'id' in (m as any))
         .map((m) => (m as Recipe).name as string);
 
       const recipeHadNutrition = !!ev.recipe.nutrition;
       const newRecipe = (await this.api.apiGenerateSingleMeal({
-        planOptions: active.options ?? {
-          people: 2,
-          planDays: 7,
-          cookTime: '30 Minuten',
-          meals: {
-            breakfast: true,
-            lunch: true,
-            dinner: true,
-            snack: false,
-            dessert: false,
+        planOptions:
+          active.options ?? {
+            people: 2,
+            planDays: 7,
+            cookTime: '30 Minuten',
+            meals: { breakfast: true, lunch: true, dinner: true, snack: false, dessert: false },
+            enableNutritionAnalysis: false,
+            planFocus: 'ausgewogen',
+            gourmetMode: false,
           },
-          enableNutritionAnalysis: false,
-          planFocus: 'ausgewogen',
-          gourmetMode: false,
-        },
         mealType: ev.mealKey,
         otherMealNames,
         recipeHadNutrition,
@@ -299,14 +328,10 @@ export class PlannerPage implements OnInit {
       );
       if (updatedPlan) {
         this.mealPlanHistory.set(
-          this.mealPlanHistory().map((p) =>
-            p.id === updatedPlan.id ? updatedPlan : p
-          )
+          this.mealPlanHistory().map((p) => (p.id === updatedPlan.id ? updatedPlan : p))
         );
       } else {
-        throw new Error(
-          'Der Plan konnte nach dem Tausch nicht aktualisiert werden.'
-        );
+        throw new Error('Der Plan konnte nach dem Tausch nicht aktualisiert werden.');
       }
     } catch (err: any) {
       console.error(err);
@@ -316,13 +341,36 @@ export class PlannerPage implements OnInit {
     }
   }
 
-  openUpgradeModal(): void {
-    // TODO: integrate real upgrade modal
-    alert('Upgrade auf Pro ist erforderlich, um fortzufahren.');
+  async handleTransformComplete(ev: {
+    originalRecipeId: string;
+    transformedRecipe: Recipe;
+    action: 'updateInPlan' | 'saveAsCopy';
+  }): Promise<void> {
+    const user = this.auth.currentUser;
+    const activeId = this.activePlanId();
+    if (!user || !activeId) return;
+    if (ev.action === 'updateInPlan') {
+      const updatedPlan = await this.planApi.updateRecipeInPlan(
+        activeId,
+        ev.originalRecipeId,
+        ev.transformedRecipe
+      );
+      if (updatedPlan) {
+        this.mealPlanHistory.set(
+          this.mealPlanHistory().map((p) => (p.id === activeId ? updatedPlan : p))
+        );
+      }
+    } else if (ev.action === 'saveAsCopy') {
+      await this.cookbookApi.addRecipeToCookbook(ev.transformedRecipe);
+      const set = new Set(this.favoriteRecipeIds());
+      set.add(ev.transformedRecipe.id);
+      this.favoriteRecipeIds.set(set);
+    }
+    this.handleCloseTransformModal();
   }
 
-  openLeftoverModal(): void {
-    // TODO: implement leftover modal
-    alert('Resteverwerter demnächst verfügbar.');
-  }
+  openUpgradeModal(): void { this.isProUpgradeModalOpen.set(true); }
+  handleCloseProUpgradeModal(): void { this.isProUpgradeModalOpen.set(false); }
+
+
 }

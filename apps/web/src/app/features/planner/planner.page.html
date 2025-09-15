@@ -143,3 +143,30 @@
     </div>
   </div>
 </div>
+<!-- Modals -->
+<app-recipe-detail-modal
+  [open]="isRecipeModalOpen()"
+  [recipe]="selectedRecipe()"
+  [isFavorite]="selectedRecipe() ? favoriteRecipeIds().has(selectedRecipe()!.id) : false"
+  (close)="handleCloseRecipeModal()"
+  (toggleFavorite)="handleToggleFavorite($event)"
+  (openTransform)="handleOpenTransformModal($event)"
+></app-recipe-detail-modal>
+
+<app-recipe-transform-modal
+  [open]="isTransformModalOpen()"
+  [recipe]="recipeToTransform()"
+  (close)="handleCloseTransformModal()"
+  (transformComplete)="handleTransformComplete($event)"
+></app-recipe-transform-modal>
+
+<app-left-over-modal
+  [open]="isLeftoverModalOpen()"
+  (close)="handleCloseLeftoverModal()"
+  (saveRecipe)="handleSaveLeftoverRecipe($event)"
+></app-left-over-modal>
+
+<app-pro-upgrade-modal
+  [open]="isProUpgradeModalOpen()"
+  (close)="handleCloseProUpgradeModal()"
+></app-pro-upgrade-modal>
