@@ -100,9 +100,12 @@ export class MealPlannerFormComponent implements OnChanges {
         snack: [false],
         dessert: [false],
       }),
-      enableNutritionAnalysis: [false],
-      planFocus: ['ausgewogen', Validators.required],
-      gourmetMode: [false],
+      enableNutritionAnalysis: [{ value: false, disabled: !this.isProUser }],
+      planFocus: [
+        { value: 'ausgewogen', disabled: !this.isProUser },
+        Validators.required,
+      ],
+      gourmetMode: [{ value: false, disabled: !this.isProUser }],
     });
 
     this.form
@@ -114,6 +117,7 @@ export class MealPlannerFormComponent implements OnChanges {
     if (changes['isProUser']) {
       if (this.isProUser) {
         this.form.patchValue({ enableNutritionAnalysis: true });
+        this.setProControlsDisabled(false);
       } else {
         // enforce free plan constraints
         const days = Number(this.form.get('planDays')!.value) || 0;
@@ -123,6 +127,7 @@ export class MealPlannerFormComponent implements OnChanges {
           planFocus: 'ausgewogen',
           gourmetMode: false,
         });
+        this.setProControlsDisabled(true);
       }
     }
   }
@@ -160,5 +165,19 @@ export class MealPlannerFormComponent implements OnChanges {
   // Helper for strict template typing with dynamic form control paths
   control(path: string): FormControl {
     return this.form.get(path) as FormControl;
+  }
+
+  private setProControlsDisabled(disabled: boolean): void {
+    const names: Array<string> = [
+      'enableNutritionAnalysis',
+      'planFocus',
+      'gourmetMode',
+    ];
+    for (const n of names) {
+      const c = this.form.get(n);
+      if (!c) continue;
+      if (disabled) c.disable({ emitEvent: false });
+      else c.enable({ emitEvent: false });
+    }
   }
 }

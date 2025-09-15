@@ -50,7 +50,7 @@ type ActiveTab = 'current' | 'shopping-list' | 'history';
     RecipeDetailModalComponent,
     RecipeTransformModalComponent,
     LeftOverModalComponent,
-    ProUpgradeModalComponent
+    ProUpgradeModalComponent,
   ],
   templateUrl: './planner.page.html',
 })
@@ -132,7 +132,7 @@ export class PlannerPage implements OnInit {
   print(): void {
     try {
       window.print();
-    } catch { }
+    } catch {}
   }
 
   selectPlan(id: string): void {
@@ -185,11 +185,11 @@ export class PlannerPage implements OnInit {
       const planOptions: PlannerOptions = this.isProUser()
         ? options
         : {
-          ...options,
-          enableNutritionAnalysis: false,
-          planFocus: 'ausgewogen',
-          gourmetMode: false,
-        };
+            ...options,
+            enableNutritionAnalysis: false,
+            planFocus: 'ausgewogen',
+            gourmetMode: false,
+          };
 
       const planData = (await this.api.apiGenerateMealPlan<
         PlannerOptions,
@@ -216,7 +216,7 @@ export class PlannerPage implements OnInit {
       console.error(err);
       this.error.set(
         err?.message ??
-        'Ein unbekannter Fehler ist aufgetreten. Bitte erneut versuchen.'
+          'Ein unbekannter Fehler ist aufgetreten. Bitte erneut versuchen.'
       );
     } finally {
       this.isLoading.set(false);
@@ -250,8 +250,12 @@ export class PlannerPage implements OnInit {
     setTimeout(() => this.recipeToTransform.set(null), 200);
   }
 
-  openLeftoverModal(): void { this.isLeftoverModalOpen.set(true); }
-  handleCloseLeftoverModal(): void { this.isLeftoverModalOpen.set(false); }
+  openLeftoverModal(): void {
+    this.isLeftoverModalOpen.set(true);
+  }
+  handleCloseLeftoverModal(): void {
+    this.isLeftoverModalOpen.set(false);
+  }
 
   async handleSaveLeftoverRecipe(recipe: Recipe): Promise<void> {
     const user = this.auth.currentUser;
@@ -283,7 +287,11 @@ export class PlannerPage implements OnInit {
     this.favoriteRecipeIds.set(set);
   }
 
-  async handleSwapMeal(ev: { dayName: string; mealKey: string; recipe: Recipe }): Promise<void> {
+  async handleSwapMeal(ev: {
+    dayName: string;
+    mealKey: string;
+    recipe: Recipe;
+  }): Promise<void> {
     const user = this.auth.currentUser;
     const active = this.activePlan();
     if (!user || !active) {
@@ -297,21 +305,29 @@ export class PlannerPage implements OnInit {
       if (!day) throw new Error('Tag nicht im Plan gefunden.');
 
       const otherMealNames = Object.values(day)
-        .filter((m): m is Recipe => typeof m === 'object' && m !== null && 'id' in (m as any))
+        .filter(
+          (m): m is Recipe =>
+            typeof m === 'object' && m !== null && 'id' in (m as any)
+        )
         .map((m) => (m as Recipe).name as string);
 
       const recipeHadNutrition = !!ev.recipe.nutrition;
       const newRecipe = (await this.api.apiGenerateSingleMeal({
-        planOptions:
-          active.options ?? {
-            people: 2,
-            planDays: 7,
-            cookTime: '30 Minuten',
-            meals: { breakfast: true, lunch: true, dinner: true, snack: false, dessert: false },
-            enableNutritionAnalysis: false,
-            planFocus: 'ausgewogen',
-            gourmetMode: false,
+        planOptions: active.options ?? {
+          people: 2,
+          planDays: 7,
+          cookTime: '30 Minuten',
+          meals: {
+            breakfast: true,
+            lunch: true,
+            dinner: true,
+            snack: false,
+            dessert: false,
           },
+          enableNutritionAnalysis: false,
+          planFocus: 'ausgewogen',
+          gourmetMode: false,
+        },
         mealType: ev.mealKey,
         otherMealNames,
         recipeHadNutrition,
@@ -328,10 +344,14 @@ export class PlannerPage implements OnInit {
       );
       if (updatedPlan) {
         this.mealPlanHistory.set(
-          this.mealPlanHistory().map((p) => (p.id === updatedPlan.id ? updatedPlan : p))
+          this.mealPlanHistory().map((p) =>
+            p.id === updatedPlan.id ? updatedPlan : p
+          )
         );
       } else {
-        throw new Error('Der Plan konnte nach dem Tausch nicht aktualisiert werden.');
+        throw new Error(
+          'Der Plan konnte nach dem Tausch nicht aktualisiert werden.'
+        );
       }
     } catch (err: any) {
       console.error(err);
@@ -357,7 +377,9 @@ export class PlannerPage implements OnInit {
       );
       if (updatedPlan) {
         this.mealPlanHistory.set(
-          this.mealPlanHistory().map((p) => (p.id === activeId ? updatedPlan : p))
+          this.mealPlanHistory().map((p) =>
+            p.id === activeId ? updatedPlan : p
+          )
         );
       }
     } else if (ev.action === 'saveAsCopy') {
@@ -369,8 +391,10 @@ export class PlannerPage implements OnInit {
     this.handleCloseTransformModal();
   }
 
-  openUpgradeModal(): void { this.isProUpgradeModalOpen.set(true); }
-  handleCloseProUpgradeModal(): void { this.isProUpgradeModalOpen.set(false); }
-
-
+  openUpgradeModal(): void {
+    this.isProUpgradeModalOpen.set(true);
+  }
+  handleCloseProUpgradeModal(): void {
+    this.isProUpgradeModalOpen.set(false);
+  }
 }

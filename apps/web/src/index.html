@@ -8,7 +8,11 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <style>
       .mask-gradient {
-        -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+        -webkit-mask-image: linear-gradient(
+          to bottom,
+          black 70%,
+          transparent 100%
+        );
         mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
       }
       @media print {
@@ -101,12 +105,12 @@
         }
       }
       /* Hide number input spinners for a cleaner UI */
-      input[type='number']::-webkit-outer-spin-button,
-      input[type='number']::-webkit-inner-spin-button {
+      input[type="number"]::-webkit-outer-spin-button,
+      input[type="number"]::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
       }
-      input[type='number'] {
+      input[type="number"] {
         -moz-appearance: textfield;
         appearance: textfield;
       }

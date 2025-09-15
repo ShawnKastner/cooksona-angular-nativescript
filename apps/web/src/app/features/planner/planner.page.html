@@ -52,7 +52,10 @@
         </div>
         <div class="mt-6 flex-grow">
           @if(isLoading()){
-          <app-loading-spinner [label]="'Dein perfektes Menü wird kreiert...'" [subLabel]="'Die KI arbeitet. Bitte habe einen Moment Geduld.'"></app-loading-spinner>
+          <app-loading-spinner
+            [label]="'Dein perfektes Menü wird kreiert...'"
+            [subLabel]="'Die KI arbeitet. Bitte habe einen Moment Geduld.'"
+          ></app-loading-spinner>
           }@else if(error() && !swappingMealId()){
           <div
             class="bg-red-100 border-l-4 border-error text-red-800 p-4 rounded-r-lg non-printable"
@@ -147,7 +150,9 @@
 <app-recipe-detail-modal
   [open]="isRecipeModalOpen()"
   [recipe]="selectedRecipe()"
-  [isFavorite]="selectedRecipe() ? favoriteRecipeIds().has(selectedRecipe()!.id) : false"
+  [isFavorite]="
+    selectedRecipe() ? favoriteRecipeIds().has(selectedRecipe()!.id) : false
+  "
   (close)="handleCloseRecipeModal()"
   (toggleFavorite)="handleToggleFavorite($event)"
   (openTransform)="handleOpenTransformModal($event)"

@@ -37,4 +37,3 @@ export class LoadingSpinnerComponent {
   /** Compact mode: smaller spinner and no text */
   @Input() compact = false;
 }
-

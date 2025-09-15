@@ -2,7 +2,14 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { BookText, Heart, Wand2, Users, Printer, X } from 'libs/constants/icons';
+import {
+  BookText,
+  Heart,
+  Wand2,
+  Users,
+  Printer,
+  X,
+} from 'libs/constants/icons';
 import { AuthService } from '@cooksona/auth';
 
 @Component({
@@ -11,60 +18,113 @@ import { AuthService } from '@cooksona/auth';
   imports: [CommonModule, SvgInjectDirective],
   template: `
     @if (open && recipe) {
-      <div class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 printable-modal-wrapper" role="dialog" aria-modal="true" (click)="close.emit()">
-        <div class="bg-base-100 rounded-2xl shadow-soft-xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-base-200 printable-modal-content" (click)="$event.stopPropagation()">
-          <header class="p-6 border-b border-base-200 flex items-start justify-between">
-            <div>
-              <h2 class="text-3xl font-serif font-bold text-neutral">{{ recipe!.name }}</h2>
-              @if (recipe.servings) {
-                <div class="flex items-center gap-2 text-gray-500 mt-1">
-                  <span class="w-5 h-5" [svgInject]="icons.Users"></span>
-                  <span>Für {{ recipe!.servings }} {{ recipe!.servings! > 1 ? 'Personen' : 'Person' }}</span>
-                </div>
-              }
+    <div
+      class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 printable-modal-wrapper"
+      role="dialog"
+      aria-modal="true"
+      (click)="close.emit()"
+    >
+      <div
+        class="bg-base-100 rounded-2xl shadow-soft-xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-base-200 printable-modal-content"
+        (click)="$event.stopPropagation()"
+      >
+        <header
+          class="p-6 border-b border-base-200 flex items-start justify-between"
+        >
+          <div>
+            <h2 class="text-3xl font-serif font-bold text-neutral">
+              {{ recipe!.name }}
+            </h2>
+            @if (recipe.servings) {
+            <div class="flex items-center gap-2 text-gray-500 mt-1">
+              <span class="w-5 h-5" [svgInject]="icons.Users"></span>
+              <span
+                >Für {{ recipe!.servings }}
+                {{ recipe!.servings! > 1 ? 'Personen' : 'Person' }}</span
+              >
             </div>
-            <div class="flex items-center gap-2">
-              <button type="button" class="p-2 rounded-full text-gray-400 hover:text-primary transition-colors non-printable-modal-button" aria-label="Rezept drucken" title="Rezept drucken" (click)="handlePrint()">
-                <span class="w-6 h-6" [svgInject]="icons.Printer"></span>
-              </button>
-              <button type="button" class="p-2 rounded-full text-gray-400 hover:text-red-500 transition-colors non-printable-modal-button" aria-label="Zu Favoriten hinzufügen" (click)="toggleFavorite.emit(recipe!)">
-                <span class="w-6 h-6" [ngClass]="isFavorite ? 'text-red-500 fill-current' : ''" [svgInject]="icons.Heart"></span>
-              </button>
-              <button type="button" class="p-2 rounded-full text-gray-400 hover:bg-base-200 hover:text-neutral transition-colors non-printable-modal-button" (click)="close.emit()">
-                <span class="w-6 h-6" [svgInject]="icons.X"></span>
-              </button>
-            </div>
-          </header>
-          <div class="p-6 md:p-8 overflow-y-auto space-y-8">
-            <div>
-              <h3 class="text-xl font-serif font-bold text-primary mb-3">Zutaten</h3>
-              <ul class="list-disc list-inside text-neutral space-y-2 columns-1 md:columns-2">
-                @for (item of recipe!.ingredients; track item) {
-                  <li><span class="font-semibold">{{ (item.amount + ' ' + item.unit).trim() }}</span> {{ item.name }}</li>
-                }
-              </ul>
-            </div>
-            @if (recipe.instructions?.length) {
-              <div>
-                <h3 class="text-xl font-serif font-bold text-primary mb-3">Anleitung</h3>
-                <ol class="list-decimal list-outside ml-5 text-neutral space-y-3 leading-relaxed">
-                  @for (step of recipe!.instructions!; track step) {
-                    <li class="pl-2">{{ step }}</li>
-                  }
-                </ol>
-              </div>
             }
           </div>
-          @if (isPro) {
-            <footer class="p-4 bg-base-100/50 border-t border-base-200 text-right non-printable-modal-button">
-              <button type="button" class="inline-flex items-center gap-2 text-sm font-semibold bg-secondary/20 text-secondary-focus hover:bg-secondary/30 transition-colors px-4 py-2 rounded-lg" (click)="handleTransformClick()">
-                <span class="w-4 h-4" [svgInject]="icons.Wand2"></span>
-                Rezept anpassen
-              </button>
-            </footer>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              class="p-2 rounded-full text-gray-400 hover:text-primary transition-colors non-printable-modal-button"
+              aria-label="Rezept drucken"
+              title="Rezept drucken"
+              (click)="handlePrint()"
+            >
+              <span class="w-6 h-6" [svgInject]="icons.Printer"></span>
+            </button>
+            <button
+              type="button"
+              class="p-2 rounded-full text-gray-400 hover:text-red-500 transition-colors non-printable-modal-button"
+              aria-label="Zu Favoriten hinzufügen"
+              (click)="toggleFavorite.emit(recipe!)"
+            >
+              <span
+                class="w-6 h-6"
+                [ngClass]="isFavorite ? 'text-red-500 fill-current' : ''"
+                [svgInject]="icons.Heart"
+              ></span>
+            </button>
+            <button
+              type="button"
+              class="p-2 rounded-full text-gray-400 hover:bg-base-200 hover:text-neutral transition-colors non-printable-modal-button"
+              (click)="close.emit()"
+            >
+              <span class="w-6 h-6" [svgInject]="icons.X"></span>
+            </button>
+          </div>
+        </header>
+        <div class="p-6 md:p-8 overflow-y-auto space-y-8">
+          <div>
+            <h3 class="text-xl font-serif font-bold text-primary mb-3">
+              Zutaten
+            </h3>
+            <ul
+              class="list-disc list-inside text-neutral space-y-2 columns-1 md:columns-2"
+            >
+              @for (item of recipe!.ingredients; track item) {
+              <li>
+                <span class="font-semibold">{{
+                  (item.amount + ' ' + item.unit).trim()
+                }}</span>
+                {{ item.name }}
+              </li>
+              }
+            </ul>
+          </div>
+          @if (recipe.instructions?.length) {
+          <div>
+            <h3 class="text-xl font-serif font-bold text-primary mb-3">
+              Anleitung
+            </h3>
+            <ol
+              class="list-decimal list-outside ml-5 text-neutral space-y-3 leading-relaxed"
+            >
+              @for (step of recipe!.instructions!; track step) {
+              <li class="pl-2">{{ step }}</li>
+              }
+            </ol>
+          </div>
           }
         </div>
+        @if (isPro) {
+        <footer
+          class="p-4 bg-base-100/50 border-t border-base-200 text-right non-printable-modal-button"
+        >
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 text-sm font-semibold bg-secondary/20 text-secondary-focus hover:bg-secondary/30 transition-colors px-4 py-2 rounded-lg"
+            (click)="handleTransformClick()"
+          >
+            <span class="w-4 h-4" [svgInject]="icons.Wand2"></span>
+            Rezept anpassen
+          </button>
+        </footer>
+        }
       </div>
+    </div>
     }
   `,
 })
@@ -81,7 +141,11 @@ export class RecipeDetailModalComponent {
   constructor(private readonly auth: AuthService) {}
 
   get isPro(): boolean {
-    try { return this.auth.isProUser(); } catch { return true; }
+    try {
+      return this.auth.isProUser();
+    } catch {
+      return true;
+    }
   }
 
   handleTransformClick(): void {

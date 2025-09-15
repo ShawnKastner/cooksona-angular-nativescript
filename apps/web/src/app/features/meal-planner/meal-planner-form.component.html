@@ -254,7 +254,6 @@
             type="checkbox"
             class="toggle toggle-sm"
             formControlName="enableNutritionAnalysis"
-            [disabled]="!isProUser"
           />
         </div>
         <div
@@ -271,7 +270,6 @@
             <select
               class="w-full bg-base-200/60 border-2 border-transparent rounded-xl py-1 pr-10 pl-3 text-sm focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary appearance-none"
               formControlName="planFocus"
-              [disabled]="!isProUser"
             >
               <option value="ausgewogen">Ausgewogen</option>
               <option value="proteinreich">Proteinreich</option>
@@ -304,7 +302,6 @@
             type="checkbox"
             class="toggle toggle-sm"
             formControlName="gourmetMode"
-            [disabled]="!isProUser"
           />
         </div>
         @if(!isProUser) {
