@@ -78,7 +78,7 @@ const PAGE_SIZE = 5;
           >
             <div class="flex-1 grid grid-cols-12 gap-4 items-center">
               <div class="col-span-12 sm:col-span-2">
-                {{ statusBadge(msg.status) }}
+                <span [innerHTML]="statusBadge(msg.status)"></span>
               </div>
               <div class="col-span-12 sm:col-span-3">
                 <span
@@ -264,11 +264,17 @@ export class ContactRequestsPanelComponent {
   statusBadge(status: Message['status']): string {
     switch (status) {
       case 'answered':
-        return 'Beantwortet';
+        return `<span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
+            Beantwortet
+          </span>`;
       case 'read':
-        return 'Gelesen';
+        return `<span class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">
+            Gelesen
+          </span>`;
       default:
-        return 'Neu';
+        return `<span class="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
+            Neu
+          </span>`;
     }
   }
 
