@@ -8,13 +8,15 @@ import { ApiService, CookbookApiService, PlanApiService } from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
 import { SeoComponent } from '../../shared/seo/seo.component';
 import { ClipboardList, ClipboardCheck, BookOpen, ChefHat, ShoppingBasket, Printer, Recycle, UtensilsCrossed } from 'libs/constants/icons';
+import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { TabsComponent } from './tabs.component';
 
 type ActiveTab = 'current' | 'shopping-list' | 'history';
 
 @Component({
   selector: 'app-planner-page',
   standalone: true,
-  imports: [CommonModule, MealPlannerFormComponent, MealPlanDisplayComponent, SeoComponent],
+  imports: [CommonModule, MealPlannerFormComponent, MealPlanDisplayComponent, SeoComponent, SvgInjectDirective, TabsComponent],
   templateUrl: './planner.page.html',
 })
 export class PlannerPage implements OnInit {
@@ -43,6 +45,12 @@ export class PlannerPage implements OnInit {
   isProUser = signal(true);
   remainingRequests = signal<number>(3);
 
+  navTabs = [
+    { id: 'current', label: 'Aktueller Plan', icon: this.icons.ClipboardList },
+    { id: 'shopping-list', label: 'Einkaufsliste', icon: this.icons.ClipboardCheck },
+    { id: 'history', label: 'Verlauf', icon: this.icons.BookOpen },
+  ];
+
   async ngOnInit(): Promise<void> {
     const user = this.auth.currentUser;
     if (!user) return;
@@ -60,8 +68,8 @@ export class PlannerPage implements OnInit {
     }
   }
 
-  setActiveTab(tab: ActiveTab): void {
-    this.activeTab.set(tab);
+  setActiveTab(tab: ActiveTab | string): void {
+    this.activeTab.set(tab as ActiveTab);
   }
 
   print(): void {
@@ -220,4 +228,3 @@ export class PlannerPage implements OnInit {
     alert('Resteverwerter demnächst verfügbar.');
   }
 }
-

@@ -27,13 +27,13 @@ describe('authRedirectGuard', () => {
     expect(result).toBeTrue();
   });
 
-  it('redirects to /planner and blocks when user exists', () => {
+  it('redirects to / and blocks when user exists', () => {
     const navigateSpy = spyOn(router, 'navigateByUrl');
     auth.setCurrentUser({ id: '1', role: 'user', email: 'u@example.com' });
     const result = TestBed.runInInjectionContext(() =>
       authRedirectGuard({} as any, {} as any)
     );
     expect(result).toBeFalse();
-    expect(navigateSpy).toHaveBeenCalledWith('/planner');
+    expect(navigateSpy).toHaveBeenCalledWith('/');
   });
 });

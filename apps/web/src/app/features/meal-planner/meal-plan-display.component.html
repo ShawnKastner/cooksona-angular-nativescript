@@ -1,116 +1,133 @@
 <div class="space-y-4">
-  <div *ngFor="let day of mealPlan.days; let i = index" class="bg-white rounded-2xl shadow-soft overflow-hidden transition-all duration-300 meal-plan-accordion-item">
+  @for(day of mealPlan.days; track day; let i = $index) {
+  <div class="bg-white rounded-2xl shadow-soft overflow-hidden transition-all duration-300 meal-plan-accordion-item">
     <h2>
-      <button
-        type="button"
+      <button type="button"
         class="flex items-center justify-between w-full p-5 font-serif text-xl text-left text-neutral hover:bg-base-100/50 transition-colors meal-plan-accordion-button"
-        (click)="handleToggle(i)"
-        [attr.aria-expanded]="isOpen(i)"
-      >
+        (click)="handleToggle(i)" [attr.aria-expanded]="isOpen(i)">
         <span>{{ day.day }}</span>
-        <span class="w-6 h-6 text-gray-400" [class.rotate-180]="isOpen(i)" [innerHTML]="icons.ChevronDown"></span>
+        <span class="w-6 h-6 text-gray-400" [class.rotate-180]="isOpen(i)" [svgInject]="icons.ChevronDown"></span>
       </button>
     </h2>
-    <div class="transition-all duration-500 ease-in-out meal-plan-accordion-content"
-         [ngClass]="{
+    <div class="transition-all duration-500 ease-in-out meal-plan-accordion-content" [ngClass]="{
            'max-h-[1500px] opacity-100': isOpen(i),
            'max-h-0 opacity-0': !isOpen(i)
          }">
       <div class="p-5 border-t border-base-200 bg-base-100/40">
         <div class="flex flex-wrap gap-6">
-          <ng-container *ngFor="let mealKey of mealKeys">
-            <ng-container *ngIf="getMeal(day, mealKey) as meal">
-              <!-- MealCard -->
-              <div class="flex-1 min-w-[250px] bg-base-100/50 p-5 rounded-2xl border border-base-200 relative group hover:border-primary/50 hover:shadow-soft transition-all flex flex-col">
-                <div class="absolute top-3 right-3 flex gap-1">
-                  <button
-                    (click)="$event.stopPropagation(); toggleFavorite.emit(meal)"
-                    class="p-1.5 transition-colors"
-                    [ngClass]="isFav(meal.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'"
-                    [attr.aria-label]="isFav(meal.id) ? 'Aus Kochbuch entfernen' : 'Zum Kochbuch hinzufügen'"
-                    [attr.title]="isFav(meal.id) ? 'Aus Kochbuch entfernen' : 'Zum Kochbuch hinzufügen'"
-                  >
-                    <span class="w-6 h-6" [ngClass]="{ 'fill-current': isFav(meal.id) }" [innerHTML]="icons.Heart"></span>
-                  </button>
+          @for(mealKey of mealKeys; track mealKey) {
+          @if(getMeal(day, mealKey); as meal) {
+          <!-- MealCard -->
+          <div
+            class="flex-1 min-w-[250px] bg-base-100/50 p-5 rounded-2xl border border-base-200 relative group hover:border-primary/50 hover:shadow-soft transition-all flex flex-col">
+            <div class="absolute top-3 right-3 flex gap-1">
+              <button (click)="$event.stopPropagation(); toggleFavorite.emit(meal)" class="p-1.5 transition-colors"
+                [ngClass]="isFav(meal.id) ? 'text-red-500' : 'text-gray-400 hover:text-red-500'"
+                [attr.aria-label]="isFav(meal.id) ? 'Aus Kochbuch entfernen' : 'Zum Kochbuch hinzufügen'"
+                [attr.title]="isFav(meal.id) ? 'Aus Kochbuch entfernen' : 'Zum Kochbuch hinzufügen'">
+                <span class="w-6 h-6" [ngClass]="{ 'fill-current': isFav(meal.id) }" [svgInject]="icons.Heart"></span>
+              </button>
+            </div>
+
+            <div class="flex items-center gap-3 text-lg font-semibold text-neutral font-serif">
+              <span class="w-6 h-6 text-secondary" [svgInject]="mealIcon(mealKey) || ''"></span>
+              {{ tMeal[mealKey] }}
+            </div>
+            <h4 class="font-bold text-primary group-hover:text-primary-focus transition-colors mt-2 text-lg pr-8">
+              {{ meal.name || meal.title || 'Rezept' }}
+            </h4>
+            <div class="flex items-center gap-2 text-sm text-gray-500 mt-1">
+              <span class="w-4 h-4" [svgInject]="icons.Users"></span>
+              <span>
+                Für {{ servingsFor(meal) || 1 }} {{ (servingsFor(meal) || 1) > 1 ? 'Personen' : 'Person' }}
+              </span>
+            </div>
+
+            <ul
+              class="mt-3 list-disc list-inside text-sm text-gray-600 space-y-1.5 min-h-[120px] flex flex-col justify-start">
+              @for(item of (meal.ingredients || []).slice(0,5); track item; let j = $index) {
+              <li [attr.data-key]="item.name + '-' + j">
+                <span class="font-medium text-neutral">{{ (item.amount + ' ' + item.unit).trim() }}</span>
+                {{ ' ' + item.name }}
+              </li>
+              }
+              @if((meal.ingredients || []).length > 5) {
+              <li class="text-xs text-gray-400 italic">...und weitere
+                Zutaten</li>
+              }
+              @for(_ of range(fillerCount(meal)); track _; let index = $index) {
+              <li class="invisible">&nbsp;</li>
+              }
+            </ul>
+
+            <div class="flex-1"></div>
+
+            @if(meal.nutrition) {
+            <div class="mt-4 pt-4 border-t border-base-200/80">
+              <h5 class="text-sm font-semibold text-neutral mb-2 flex items-center gap-2">
+                <span class="w-4 h-4 text-gray-400" [svgInject]="icons.BarChart2"></span>
+                Nährwert-Info (ca. pro Portion)
+              </h5>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <div class="text-center bg-base-100/60 p-2 rounded-lg">
+                  <span class="font-bold text-lg block text-neutral">{{ meal.nutrition.calories }}</span>
+                  <span class="text-gray-500 text-xs uppercase tracking-wider">kcal</span>
                 </div>
-
-                <div class="flex items-center gap-3 text-lg font-semibold text-neutral font-serif">
-                  <span class="w-6 h-6 text-secondary" [innerHTML]="mealIcon(mealKey) || ''"></span>
-                  {{ tMeal[mealKey] }}
+                <div class="text-center bg-base-100/60 p-2 rounded-lg">
+                  <span class="font-bold text-lg block text-neutral">{{ meal.nutrition.protein }}</span>
+                  <span class="text-gray-500 text-xs uppercase tracking-wider">Protein</span>
                 </div>
-                <h4 class="font-bold text-primary group-hover:text-primary-focus transition-colors mt-2 text-lg pr-8">
-                  {{ meal.name || meal.title || 'Rezept' }}
-                </h4>
-                <div class="flex items-center gap-2 text-sm text-gray-500 mt-1">
-                  <span class="w-4 h-4" [innerHTML]="icons.Users"></span>
-                  <span>
-                    Für {{ servingsFor(meal) || 1 }} {{ (servingsFor(meal) || 1) > 1 ? 'Personen' : 'Person' }}
-                  </span>
+                <div class="text-center bg-base-100/60 p-2 rounded-lg">
+                  <span class="font-bold text-lg block text-neutral">{{ meal.nutrition.carbs }}</span>
+                  <span class="text-gray-500 text-xs uppercase tracking-wider">Kohlenh.</span>
                 </div>
-
-                <ul class="mt-3 list-disc list-inside text-sm text-gray-600 space-y-1.5 min-h-[120px] flex flex-col justify-start">
-                  <li *ngFor="let item of (meal.ingredients || []).slice(0,5); index as j" [attr.data-key]="item.name + '-' + j">
-                    <span class="font-medium text-neutral">{{ (item.amount + ' ' + item.unit).trim() }}</span>
-                    {{ ' ' + item.name }}
-                  </li>
-                  <li *ngIf="(meal.ingredients || []).length > 5" class="text-xs text-gray-400 italic">...und weitere Zutaten</li>
-                  <li *ngFor="let _ of range(fillerCount(meal)); index as k" class="invisible">&nbsp;</li>
-                </ul>
-
-                <div class="flex-1"></div>
-
-                <div *ngIf="meal.nutrition" class="mt-4 pt-4 border-t border-base-200/80">
-                  <h5 class="text-sm font-semibold text-neutral mb-2 flex items-center gap-2">
-                    <span class="w-4 h-4 text-gray-400" [innerHTML]="icons.BarChart2"></span>
-                    Nährwert-Info (ca. pro Portion)
-                  </h5>
-                  <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    <div class="text-center bg-base-100/60 p-2 rounded-lg">
-                      <span class="font-bold text-lg block text-neutral">{{ meal.nutrition.calories }}</span>
-                      <span class="text-gray-500 text-xs uppercase tracking-wider">kcal</span>
-                    </div>
-                    <div class="text-center bg-base-100/60 p-2 rounded-lg">
-                      <span class="font-bold text-lg block text-neutral">{{ meal.nutrition.protein }}</span>
-                      <span class="text-gray-500 text-xs uppercase tracking-wider">Protein</span>
-                    </div>
-                    <div class="text-center bg-base-100/60 p-2 rounded-lg">
-                      <span class="font-bold text-lg block text-neutral">{{ meal.nutrition.carbs }}</span>
-                      <span class="text-gray-500 text-xs uppercase tracking-wider">Kohlenh.</span>
-                    </div>
-                    <div class="text-center bg-base-100/60 p-2 rounded-lg">
-                      <span class="font-bold text-lg block text-neutral">{{ meal.nutrition.fat }}</span>
-                      <span class="text-gray-500 text-xs uppercase tracking-wider">Fett</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
-                  <button *ngIf="meal.instructions?.length" (click)="$event.stopPropagation(); showRecipe.emit(meal)" class="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-focus transition-colors">
-                    <span class="w-4 h-4" [innerHTML]="icons.BookText"></span>
-                    Anleitung
-                  </button>
-                  <div *ngIf="isProUser" class="flex items-center gap-x-3">
-                    <button (click)="$event.stopPropagation(); swapMeal.emit({ dayName: day.day, mealKey: mealKey, recipe: meal })" class="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-focus transition-colors" title="Mahlzeit tauschen">
-                      <span class="w-4 h-4" [innerHTML]="icons.Shuffle"></span>
-                      Tauschen
-                    </button>
-                    <button (click)="$event.stopPropagation(); openTransformModal.emit(meal)" class="flex items-center gap-1.5 text-sm font-semibold text-secondary hover:text-secondary-focus transition-colors" title="Rezept anpassen">
-                      <span class="w-4 h-4" [innerHTML]="icons.Wand2"></span>
-                      Anpassen
-                    </button>
-                  </div>
-                </div>
-
-                <div *ngIf="swappingMealId === meal.id" class="absolute inset-0 bg-white/70 rounded-2xl flex flex-col items-center justify-center text-center">
-                  <div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <p class="mt-3 text-sm font-semibold text-neutral">Tausche Mahlzeit...</p>
+                <div class="text-center bg-base-100/60 p-2 rounded-lg">
+                  <span class="font-bold text-lg block text-neutral">{{ meal.nutrition.fat }}</span>
+                  <span class="text-gray-500 text-xs uppercase tracking-wider">Fett</span>
                 </div>
               </div>
-            </ng-container>
-          </ng-container>
+            </div>
+
+            <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
+              @if(meal.instructions?.length) {
+              <button (click)="$event.stopPropagation(); showRecipe.emit(meal)"
+                class="flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary-focus transition-colors">
+                <span class="w-4 h-4" [svgInject]="icons.BookText"></span>
+                Anleitung
+              </button>
+              }
+              @if(isProUser) {
+              <div class="flex items-center gap-x-3">
+                <button
+                  (click)="$event.stopPropagation(); swapMeal.emit({ dayName: day.day, mealKey: mealKey, recipe: meal })"
+                  class="flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary-focus transition-colors"
+                  title="Mahlzeit tauschen">
+                  <span class="w-4 h-4" [svgInject]="icons.Shuffle"></span>
+                  Tauschen
+                </button>
+                <button (click)="$event.stopPropagation(); openTransformModal.emit(meal)"
+                  class="flex items-center gap-1.5 text-sm font-semibold text-secondary hover:text-secondary-focus transition-colors"
+                  title="Rezept anpassen">
+                  <span class="w-4 h-4" [svgInject]="icons.Wand2"></span>
+                  Anpassen
+                </button>
+              </div>
+              }
+            </div>
+
+            @if(swappingMealId === meal.id) {
+            <div class="absolute inset-0 bg-white/70 rounded-2xl flex flex-col items-center justify-center text-center">
+              <div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <p class="mt-3 text-sm font-semibold text-neutral">Tausche Mahlzeit...</p>
+            </div>
+            }
+            }
+          </div>
+          }
+          }
         </div>
       </div>
     </div>
   </div>
+  }
 </div>
-

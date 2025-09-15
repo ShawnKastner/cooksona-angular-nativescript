@@ -17,11 +17,12 @@ import {
   ChevronDown,
 } from 'libs/constants/icons';
 import { AuthService } from '@cooksona/auth';
+import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 
 @Component({
   selector: 'app-meal-planner-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, SvgInjectDirective],
   templateUrl: './meal-planner-form.component.html',
 })
 export class MealPlannerFormComponent implements OnChanges {

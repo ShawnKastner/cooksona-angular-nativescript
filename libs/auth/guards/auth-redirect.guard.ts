@@ -10,7 +10,8 @@ export const authRedirectGuard: CanActivateFn = () => {
 
   const user = authService.currentUser;
   if (user) {
-    router.navigateByUrl('/planner');
+    // send logged-in users to the planner at root
+    router.navigateByUrl('/');
     return false;
   }
   return true;

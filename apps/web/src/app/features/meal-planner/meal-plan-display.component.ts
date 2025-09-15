@@ -16,13 +16,14 @@ import {
   Users,
   Shuffle,
 } from 'libs/constants/icons';
+import { SvgInjectDirective } from "../../shared/directives/svg-inject.directive";
 
 type MealKey = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
 
 @Component({
   selector: 'app-meal-plan-display',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SvgInjectDirective],
   templateUrl: './meal-plan-display.component.html',
 })
 export class MealPlanDisplayComponent {

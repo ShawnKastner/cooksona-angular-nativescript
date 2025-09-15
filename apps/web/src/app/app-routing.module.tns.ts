@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+/* import { Routes } from '@angular/router';
 import { Login } from './components/auth/login/login';
 import { Register } from './components/auth/register/register';
 import { ForgotPassword } from './components/auth/forgot-password/forgot-password';
@@ -32,3 +32,4 @@ export const routes: Routes = [
     component: EmailVerification,
   },
 ];
+ */

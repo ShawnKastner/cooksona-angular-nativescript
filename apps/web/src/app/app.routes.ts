@@ -8,8 +8,8 @@ import { ResetPassword } from './components/auth/reset-password/reset-password';
 import { EmailVerification } from './components/auth/email-verification/email-verification';
 
 export const routes: Routes = [
-  // Landing at root (redirects away if logged in)
-  { path: '', canActivate: [authRedirectGuard], component: LandingComponent },
+  // Landing at /landing (root will be planner for logged-in users)
+  { path: 'landing', canActivate: [authRedirectGuard], component: LandingComponent },
 
   // Invite redeem
   { path: 'invite/redeem/:token', loadComponent: () => import('./pages/invite-redeem/invite-redeem.page').then(m => m.InviteRedeemPage) },
@@ -23,8 +23,8 @@ export const routes: Routes = [
   { path: 'verify-email', canActivate: [authRedirectGuard], component: EmailVerification },
   { path: 'email-verification', canActivate: [authRedirectGuard], component: EmailVerification },
 
-  // Protected pages
-  { path: 'planner', canActivate: [protectedRouteGuard], loadComponent: () => import('./features/planner/planner.page').then(m => m.PlannerPage) },
+  // Protected pages - planner is the app root for authenticated users
+  { path: '', canActivate: [protectedRouteGuard], loadComponent: () => import('./features/planner/planner.page').then(m => m.PlannerPage) },
   { path: 'profile', canActivate: [protectedRouteGuard], loadComponent: () => import('./components/profile/profile.page').then(m => m.ProfilePage) },
   { path: 'cookbook', canActivate: [protectedRouteGuard], loadComponent: () => import('./features/cookbook/cookbook.page').then(m => m.CookbookPage) },
   { path: 'admin', canActivate: [protectedRouteGuard], data: { requiredRole: 'admin' as const }, loadComponent: () => import('./features/admin/admin-dashboard.component').then(m => m.AdminDashboard) },

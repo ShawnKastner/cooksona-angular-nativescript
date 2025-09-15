@@ -21,6 +21,15 @@
           {
             "glob": "**/*",
             "input": "apps/web/public"
+          },
+          {
+            "glob": "**/*",
+            "input": "public"
+          },
+          {
+            "glob": "favicon.svg",
+            "input": "apps/web/src",
+            "output": "."
           }
         ],
         "styles": ["apps/web/src/styles.scss"],
