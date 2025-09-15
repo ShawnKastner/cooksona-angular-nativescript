@@ -2,21 +2,46 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MealPlannerFormComponent } from '../meal-planner/meal-planner-form.component';
 import { MealPlanDisplayComponent } from '../meal-planner/meal-plan-display.component';
-import { PlannerOptions, MealPlan, Ingredient, DailyPlan } from '@cooksona/models/plan.models';
+import {
+  PlannerOptions,
+  MealPlan,
+  Ingredient,
+  DailyPlan,
+} from '@cooksona/models/plan.models';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { ApiService, CookbookApiService, PlanApiService } from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
 import { SeoComponent } from '../../shared/seo/seo.component';
-import { ClipboardList, ClipboardCheck, BookOpen, ChefHat, ShoppingBasket, Printer, Recycle, UtensilsCrossed } from 'libs/constants/icons';
+import {
+  ClipboardList,
+  ClipboardCheck,
+  BookOpen,
+  ChefHat,
+  ShoppingBasket,
+  Printer,
+  Recycle,
+  UtensilsCrossed,
+} from 'libs/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { TabsComponent } from './tabs.component';
+import { HistoryComponent } from './history.component';
+import { ShoppingListComponent } from './shopping-list.component';
 
 type ActiveTab = 'current' | 'shopping-list' | 'history';
 
 @Component({
   selector: 'app-planner-page',
   standalone: true,
-  imports: [CommonModule, MealPlannerFormComponent, MealPlanDisplayComponent, SeoComponent, SvgInjectDirective, TabsComponent],
+  imports: [
+    CommonModule,
+    MealPlannerFormComponent,
+    MealPlanDisplayComponent,
+    SeoComponent,
+    SvgInjectDirective,
+    TabsComponent,
+    HistoryComponent,
+    ShoppingListComponent,
+  ],
   templateUrl: './planner.page.html',
 })
 export class PlannerPage implements OnInit {
@@ -36,10 +61,22 @@ export class PlannerPage implements OnInit {
   favoriteRecipeIds = signal<Set<string>>(new Set());
 
   // Derived
-  activePlan = computed(() => this.mealPlanHistory().find((p) => p.id === this.activePlanId()) || null);
+  activePlan = computed(
+    () =>
+      this.mealPlanHistory().find((p) => p.id === this.activePlanId()) || null
+  );
 
   // Icons for template
-  readonly icons = { ClipboardList, ClipboardCheck, BookOpen, ChefHat, ShoppingBasket, Printer, Recycle, UtensilsCrossed } as const;
+  readonly icons = {
+    ClipboardList,
+    ClipboardCheck,
+    BookOpen,
+    ChefHat,
+    ShoppingBasket,
+    Printer,
+    Recycle,
+    UtensilsCrossed,
+  } as const;
 
   // Basic pro logic placeholders (replace with real subscription logic later)
   isProUser = signal(true);
@@ -47,7 +84,11 @@ export class PlannerPage implements OnInit {
 
   navTabs = [
     { id: 'current', label: 'Aktueller Plan', icon: this.icons.ClipboardList },
-    { id: 'shopping-list', label: 'Einkaufsliste', icon: this.icons.ClipboardCheck },
+    {
+      id: 'shopping-list',
+      label: 'Einkaufsliste',
+      icon: this.icons.ClipboardCheck,
+    },
     { id: 'history', label: 'Verlauf', icon: this.icons.BookOpen },
   ];
 
@@ -73,7 +114,9 @@ export class PlannerPage implements OnInit {
   }
 
   print(): void {
-    try { window.print(); } catch {}
+    try {
+      window.print();
+    } catch {}
   }
 
   selectPlan(id: string): void {
@@ -97,6 +140,13 @@ export class PlannerPage implements OnInit {
     }
   }
 
+  handleShoppingListCategorized(updatedPlan: MealPlan): void {
+    const updated = this.mealPlanHistory().map((p) =>
+      p.id === updatedPlan.id ? updatedPlan : p
+    );
+    this.mealPlanHistory.set(updated);
+  }
+
   async handleGeneratePlan(options: PlannerOptions): Promise<void> {
     const user = this.auth.currentUser;
     if (!user) {
@@ -105,7 +155,9 @@ export class PlannerPage implements OnInit {
     }
 
     if (!this.isProUser() && this.remainingRequests() <= 0) {
-      this.error.set('Dein Freikontingent ist aufgebraucht. Upgrade erforderlich.');
+      this.error.set(
+        'Dein Freikontingent ist aufgebraucht. Upgrade erforderlich.'
+      );
       this.openUpgradeModal();
       return;
     }
@@ -116,9 +168,17 @@ export class PlannerPage implements OnInit {
     try {
       const planOptions: PlannerOptions = this.isProUser()
         ? options
-        : { ...options, enableNutritionAnalysis: false, planFocus: 'ausgewogen', gourmetMode: false };
+        : {
+            ...options,
+            enableNutritionAnalysis: false,
+            planFocus: 'ausgewogen',
+            gourmetMode: false,
+          };
 
-      const planData = (await this.api.apiGenerateMealPlan<PlannerOptions, { days: DailyPlan[]; shoppingList: Ingredient[] }>(planOptions))!;
+      const planData = (await this.api.apiGenerateMealPlan<
+        PlannerOptions,
+        { days: DailyPlan[]; shoppingList: Ingredient[] }
+      >(planOptions))!;
 
       if (!this.isProUser()) {
         this.remainingRequests.set(Math.max(0, this.remainingRequests() - 1));
@@ -138,7 +198,10 @@ export class PlannerPage implements OnInit {
       }
     } catch (err: any) {
       console.error(err);
-      this.error.set(err?.message ?? 'Ein unbekannter Fehler ist aufgetreten. Bitte erneut versuchen.');
+      this.error.set(
+        err?.message ??
+          'Ein unbekannter Fehler ist aufgetreten. Bitte erneut versuchen.'
+      );
     } finally {
       this.isLoading.set(false);
     }
@@ -177,7 +240,11 @@ export class PlannerPage implements OnInit {
     console.log('Open transform modal for', this.getEnrichedRecipe(recipe));
   }
 
-  async handleSwapMeal(ev: { dayName: string; mealKey: string; recipe: Recipe }): Promise<void> {
+  async handleSwapMeal(ev: {
+    dayName: string;
+    mealKey: string;
+    recipe: Recipe;
+  }): Promise<void> {
     const user = this.auth.currentUser;
     const active = this.activePlan();
     if (!user || !active) {
@@ -191,24 +258,53 @@ export class PlannerPage implements OnInit {
       if (!day) throw new Error('Tag nicht im Plan gefunden.');
 
       const otherMealNames = Object.values(day)
-        .filter((m): m is Recipe => typeof m === 'object' && m !== null && 'id' in (m as any))
+        .filter(
+          (m): m is Recipe =>
+            typeof m === 'object' && m !== null && 'id' in (m as any)
+        )
         .map((m) => (m as Recipe).name as string);
 
       const recipeHadNutrition = !!ev.recipe.nutrition;
       const newRecipe = (await this.api.apiGenerateSingleMeal({
-        planOptions: active.options ?? { people: 2, planDays: 7, cookTime: '30 Minuten', meals: { breakfast: true, lunch: true, dinner: true, snack: false, dessert: false }, enableNutritionAnalysis: false, planFocus: 'ausgewogen', gourmetMode: false },
+        planOptions: active.options ?? {
+          people: 2,
+          planDays: 7,
+          cookTime: '30 Minuten',
+          meals: {
+            breakfast: true,
+            lunch: true,
+            dinner: true,
+            snack: false,
+            dessert: false,
+          },
+          enableNutritionAnalysis: false,
+          planFocus: 'ausgewogen',
+          gourmetMode: false,
+        },
         mealType: ev.mealKey,
         otherMealNames,
         recipeHadNutrition,
       })) as Recipe | undefined;
 
-      if (!newRecipe) throw new Error('Neues Rezept konnte nicht generiert werden.');
+      if (!newRecipe)
+        throw new Error('Neues Rezept konnte nicht generiert werden.');
 
-      const updatedPlan = await this.planApi.swapMealInPlan(active.id, ev.dayName, ev.mealKey, newRecipe);
+      const updatedPlan = await this.planApi.swapMealInPlan(
+        active.id,
+        ev.dayName,
+        ev.mealKey,
+        newRecipe
+      );
       if (updatedPlan) {
-        this.mealPlanHistory.set(this.mealPlanHistory().map((p) => (p.id === updatedPlan.id ? updatedPlan : p)));
+        this.mealPlanHistory.set(
+          this.mealPlanHistory().map((p) =>
+            p.id === updatedPlan.id ? updatedPlan : p
+          )
+        );
       } else {
-        throw new Error('Der Plan konnte nach dem Tausch nicht aktualisiert werden.');
+        throw new Error(
+          'Der Plan konnte nach dem Tausch nicht aktualisiert werden.'
+        );
       }
     } catch (err: any) {
       console.error(err);

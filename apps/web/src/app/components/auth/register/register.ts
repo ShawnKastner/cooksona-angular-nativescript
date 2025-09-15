@@ -25,12 +25,18 @@ export class Register {
   showPassword2 = false;
   protected readonly icons = { UserPlus, Eye, EyeOff } as const;
 
-  constructor(private readonly auth: AuthService, private readonly router: Router) {}
+  constructor(
+    private readonly auth: AuthService,
+    private readonly router: Router
+  ) {}
 
   async submit() {
     this.error = null;
     // Basic validation similar to zod schema
-    const nameOk = this.name.trim().length >= 2 && this.name.trim().length <= 50 && /^[a-zA-ZäöüÄÖÜß\s-]+$/.test(this.name.trim());
+    const nameOk =
+      this.name.trim().length >= 2 &&
+      this.name.trim().length <= 50 &&
+      /^[a-zA-ZäöüÄÖÜß\s-]+$/.test(this.name.trim());
     if (!nameOk) {
       this.error = 'Bitte gib einen gültigen Namen an.';
       return;
@@ -41,9 +47,15 @@ export class Register {
       return;
     }
     const pw = this.password;
-    const pwOk = pw.length >= 8 && pw.length <= 72 && /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(pw);
+    const pwOk =
+      pw.length >= 8 &&
+      pw.length <= 72 &&
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        pw
+      );
     if (!pwOk) {
-      this.error = 'Das Passwort muss mind. 8 Zeichen und Groß-/Kleinbuchstaben, Zahl und Sonderzeichen enthalten.';
+      this.error =
+        'Das Passwort muss mind. 8 Zeichen und Groß-/Kleinbuchstaben, Zahl und Sonderzeichen enthalten.';
       return;
     }
     if (this.password !== this.confirmPassword) {
@@ -52,7 +64,11 @@ export class Register {
     }
     this.isLoading = true;
     try {
-      await this.auth.register({ name: this.name.trim(), email: this.email.trim(), password: this.password });
+      await this.auth.register({
+        name: this.name.trim(),
+        email: this.email.trim(),
+        password: this.password,
+      });
       await this.router.navigateByUrl('/login?registered=true');
     } finally {
       this.isLoading = false;

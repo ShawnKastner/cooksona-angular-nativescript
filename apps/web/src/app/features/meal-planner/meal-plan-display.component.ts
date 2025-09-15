@@ -1,4 +1,11 @@
-import { Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  computed,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MealPlan, DailyPlan } from '@cooksona/models/plan.models';
 import { Recipe } from '@cooksona/models/recipe.models';
@@ -16,7 +23,7 @@ import {
   Users,
   Shuffle,
 } from 'libs/constants/icons';
-import { SvgInjectDirective } from "../../shared/directives/svg-inject.directive";
+import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 
 type MealKey = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
 
@@ -35,7 +42,11 @@ export class MealPlanDisplayComponent {
   @Output() showRecipe = new EventEmitter<Recipe>();
   @Output() toggleFavorite = new EventEmitter<Recipe>();
   @Output() openTransformModal = new EventEmitter<Recipe>();
-  @Output() swapMeal = new EventEmitter<{ dayName: string; mealKey: string; recipe: Recipe }>();
+  @Output() swapMeal = new EventEmitter<{
+    dayName: string;
+    mealKey: string;
+    recipe: Recipe;
+  }>();
 
   openIndex = signal<number | null>(0);
 
@@ -47,7 +58,20 @@ export class MealPlanDisplayComponent {
     dessert: 'Dessert',
   } as const;
 
-  readonly icons = { ChevronDown, Sandwich, Soup, Utensils, Cookie, CakeSlice, BarChart2, BookText, Heart, Wand2, Users, Shuffle } as const;
+  readonly icons = {
+    ChevronDown,
+    Sandwich,
+    Soup,
+    Utensils,
+    Cookie,
+    CakeSlice,
+    BarChart2,
+    BookText,
+    Heart,
+    Wand2,
+    Users,
+    Shuffle,
+  } as const;
 
   mealIcon(key: MealKey): string | null {
     switch (key) {
@@ -74,7 +98,13 @@ export class MealPlanDisplayComponent {
     this.openIndex.set(this.isOpen(index) ? null : index);
   }
 
-  mealKeys: ReadonlyArray<MealKey> = ['breakfast', 'lunch', 'dinner', 'snack', 'dessert'] as const;
+  mealKeys: ReadonlyArray<MealKey> = [
+    'breakfast',
+    'lunch',
+    'dinner',
+    'snack',
+    'dessert',
+  ] as const;
 
   servingsFor(recipe: Recipe): number | undefined {
     return recipe.servings ?? this.mealPlan.options?.people;
@@ -97,4 +127,3 @@ export class MealPlanDisplayComponent {
     return Array.from({ length: n }, (_, i) => i);
   }
 }
-

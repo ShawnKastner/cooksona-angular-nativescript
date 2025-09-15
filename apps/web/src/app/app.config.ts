@@ -20,7 +20,8 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       multi: true,
-      useFactory: (auth: AuthService) => () => auth.refreshCurrentUser().catch(() => {}),
+      useFactory: (auth: AuthService) => () =>
+        auth.refreshCurrentUser().catch(() => {}),
       deps: [AuthService],
     },
   ],

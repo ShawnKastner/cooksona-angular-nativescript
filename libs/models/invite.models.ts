@@ -2,14 +2,14 @@ export type InviteRole = 'admin' | 'user';
 
 export interface Invite {
   id: string;
-  code: string;
-  email?: string;
-  role?: InviteRole;
-  maxUses?: number;
-  uses?: number;
-  createdBy?: string;
-  createdAt?: string;
-  expiresAt?: string | null;
+  token: string;
+  status: 'ACTIVE' | 'USED' | 'EXPIRED';
+  presetRole: InviteRole;
+  lifetimeSubscription?: boolean;
+  subscriptionEndsAt?: string | null;
+  expiresAt: string;
+  createdAt: string;
+  description?: string;
 }
 
 export interface CreateInviteRequest {
@@ -17,4 +17,5 @@ export interface CreateInviteRequest {
   role?: InviteRole;
   maxUses?: number;
   expiresAt?: string | null; // ISO string
+  description?: string;
 }

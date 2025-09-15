@@ -19,7 +19,11 @@ export class ResetPassword {
   message: string | null = null;
   isLoading = false;
 
-  constructor(private route: ActivatedRoute, private router: Router, private auth: AuthService) {
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private auth: AuthService
+  ) {
     this.token = this.route.snapshot.queryParamMap.get('token');
     if (!this.token) {
       this.router.navigate(['/login']).catch(() => {});

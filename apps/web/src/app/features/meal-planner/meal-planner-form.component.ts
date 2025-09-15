@@ -1,6 +1,19 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators, FormControl, FormGroup } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  Validators,
+  FormControl,
+  FormGroup,
+} from '@angular/forms';
 import { PlannerOptions } from '@cooksona/models/plan.models';
 import {
   Sparkles,
@@ -32,9 +45,28 @@ export class MealPlannerFormComponent implements OnChanges {
   @Output() submitPlan = new EventEmitter<PlannerOptions>();
   @Output() showUpgradeModal = new EventEmitter<void>();
 
-  readonly icons = { Sparkles, BarChart2, Target, Award, Leaf, ShieldBan, Users, CalendarDays, Clock, Flame, Check, ChevronDown } as const;
+  readonly icons = {
+    Sparkles,
+    BarChart2,
+    Target,
+    Award,
+    Leaf,
+    ShieldBan,
+    Users,
+    CalendarDays,
+    Clock,
+    Flame,
+    Check,
+    ChevronDown,
+  } as const;
 
-  readonly mealTypes = ['breakfast', 'lunch', 'dinner', 'snack', 'dessert'] as const;
+  readonly mealTypes = [
+    'breakfast',
+    'lunch',
+    'dinner',
+    'snack',
+    'dessert',
+  ] as const;
   readonly mealTypeTranslations: Record<string, string> = {
     breakfast: 'Frühstück',
     lunch: 'Mittagessen',
@@ -47,12 +79,18 @@ export class MealPlannerFormComponent implements OnChanges {
 
   showPlanDaysHint = false;
 
-  constructor(private readonly fb: FormBuilder, public readonly auth: AuthService) {
+  constructor(
+    private readonly fb: FormBuilder,
+    public readonly auth: AuthService
+  ) {
     this.form = this.fb.group({
       diet: [''],
       allergies: [''],
       people: [2, [Validators.required, Validators.min(1), Validators.max(10)]],
-      planDays: [7, [Validators.required, Validators.min(1), Validators.max(14)]],
+      planDays: [
+        7,
+        [Validators.required, Validators.min(1), Validators.max(14)],
+      ],
       cookTime: ['30 Minuten', Validators.required],
       calories: [2000, [Validators.min(0), Validators.max(10000)]],
       meals: this.fb.group({
@@ -67,7 +105,9 @@ export class MealPlannerFormComponent implements OnChanges {
       gourmetMode: [false],
     });
 
-    this.form.get('planDays')!.valueChanges.subscribe(() => this.onPlanDaysChange());
+    this.form
+      .get('planDays')!
+      .valueChanges.subscribe(() => this.onPlanDaysChange());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -90,11 +130,13 @@ export class MealPlannerFormComponent implements OnChanges {
   onPlanDaysChange(): void {
     const days = Number(this.form.get('planDays')!.value) || 0;
     if (!this.isProUser) {
-      if (days > 3) this.form.get('planDays')!.setValue(3, { emitEvent: false });
+      if (days > 3)
+        this.form.get('planDays')!.setValue(3, { emitEvent: false });
       this.showPlanDaysHint = false;
     } else {
       this.showPlanDaysHint = days > 14;
-      if (days > 14) this.form.get('planDays')!.setValue(14, { emitEvent: false });
+      if (days > 14)
+        this.form.get('planDays')!.setValue(14, { emitEvent: false });
     }
   }
 
@@ -120,4 +162,3 @@ export class MealPlannerFormComponent implements OnChanges {
     return this.form.get(path) as FormControl;
   }
 }
-

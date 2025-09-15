@@ -35,19 +35,23 @@ export class Login implements OnInit {
   ngOnInit(): void {
     const params = this.route.snapshot.queryParamMap;
     if (params.get('registered') === 'true') {
-      this.info = 'Registrierung erfolgreich! Bitte prüfe deine E-Mails und bestätige deine Adresse.';
+      this.info =
+        'Registrierung erfolgreich! Bitte prüfe deine E-Mails und bestätige deine Adresse.';
       this.clearQueryParams();
     }
     if (params.get('registered') === 'invite') {
-      this.info = 'Account erfolgreich erstellt! Du kannst dich jetzt direkt einloggen.';
+      this.info =
+        'Account erfolgreich erstellt! Du kannst dich jetzt direkt einloggen.';
       this.clearQueryParams();
     }
     if (params.get('inviteError') === 'used') {
-      this.error = 'Dieser Einladungslink wurde bereits verwendet oder ist ungültig. Bitte fordere eine neue Einladung an oder logge dich direkt ein.';
+      this.error =
+        'Dieser Einladungslink wurde bereits verwendet oder ist ungültig. Bitte fordere eine neue Einladung an oder logge dich direkt ein.';
       this.clearQueryParams();
     }
     if (params.get('reset') === 'success') {
-      this.info = 'Dein Passwort wurde erfolgreich zurückgesetzt. Du kannst dich jetzt einloggen.';
+      this.info =
+        'Dein Passwort wurde erfolgreich zurückgesetzt. Du kannst dich jetzt einloggen.';
       this.clearQueryParams();
     }
   }
@@ -87,7 +91,8 @@ export class Login implements OnInit {
 
       if (err && typeof err === 'object') {
         const obj = err as Record<string, unknown>;
-        const backendMessage = obj['message'] ?? obj['error'] ?? obj['detail'] ?? err;
+        const backendMessage =
+          obj['message'] ?? obj['error'] ?? obj['detail'] ?? err;
         const msg = normalizeMessage(backendMessage);
         this.error = msg || 'Ein unbekannter Fehler ist aufgetreten.';
       } else if (typeof err === 'string') {

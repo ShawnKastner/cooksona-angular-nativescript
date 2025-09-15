@@ -62,7 +62,7 @@ export class PlanApiService {
     for (const day of days) {
       for (const key of Object.keys(day)) {
         if (key !== 'day') {
-          const meal = (day as Record<string, unknown>)[key] as
+          const meal = (day as unknown as Record<string, unknown>)[key] as
             | Recipe
             | undefined;
           const mealIngredients = (
@@ -127,13 +127,12 @@ export class PlanApiService {
       const newDay: DailyPlan = { ...day };
       for (const key of Object.keys(newDay)) {
         if (key !== 'day') {
-          const meal = (newDay as Record<string, unknown>)[key] as
+          const meal = (newDay as unknown as Record<string, unknown>)[key] as
             | Recipe
             | undefined;
           if (meal && meal.id === originalRecipeId) {
-            (newDay as Record<string, unknown>)[key] = newRecipe as unknown as
-              | Recipe
-              | undefined;
+            (newDay as unknown as Record<string, unknown>)[key] =
+              newRecipe as unknown as Recipe | undefined;
             recipeUpdated = true;
           }
         }
@@ -168,7 +167,7 @@ export class PlanApiService {
       if (day.day === dayName) {
         const newDay: DailyPlan = { ...day };
         if (Object.prototype.hasOwnProperty.call(newDay, mealKey)) {
-          (newDay as Record<string, unknown>)[mealKey] =
+          (newDay as unknown as Record<string, unknown>)[mealKey] =
             newRecipe as unknown as Recipe | undefined;
           mealSwapped = true;
         }

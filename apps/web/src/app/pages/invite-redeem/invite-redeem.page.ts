@@ -11,9 +11,15 @@ import { InviteRedeemApiService } from '@cooksona/api';
   template: `
     <div class="container mx-auto p-6">
       <h2 class="text-2xl font-bold mb-2">Einladung einlösen</h2>
-      <p class="text-gray-600" *ngIf="state === 'pending'">Wird verarbeitet...</p>
-      <p class="text-success" *ngIf="state === 'success'">Einladung erfolgreich eingelöst. Du wirst weitergeleitet...</p>
-      <p class="text-error" *ngIf="state === 'error'">Einlösen der Einladung ist fehlgeschlagen.</p>
+      <p class="text-gray-600" *ngIf="state === 'pending'">
+        Wird verarbeitet...
+      </p>
+      <p class="text-success" *ngIf="state === 'success'">
+        Einladung erfolgreich eingelöst. Du wirst weitergeleitet...
+      </p>
+      <p class="text-error" *ngIf="state === 'error'">
+        Einlösen der Einladung ist fehlgeschlagen.
+      </p>
     </div>
   `,
 })
@@ -32,12 +38,18 @@ export class InviteRedeemPage implements OnInit {
     }
     try {
       // In a real flow, collect user data before redeem. Here it's just a placeholder.
-      await this.invites.redeemInvite(token, { name: 'User', email: 'user@example.com', password: 'Temp#1234' });
+      await this.invites.redeemInvite(token, {
+        name: 'User',
+        email: 'user@example.com',
+        password: 'Temp#1234',
+      });
       this.state = 'success';
-      setTimeout(() => this.router.navigateByUrl('/login').catch(() => {}), 1200);
+      setTimeout(
+        () => this.router.navigateByUrl('/login').catch(() => {}),
+        1200
+      );
     } catch {
       this.state = 'error';
     }
   }
 }
-

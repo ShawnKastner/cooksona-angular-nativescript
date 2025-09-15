@@ -51,7 +51,10 @@ export class AuthService {
 
   constructor(private readonly api: ApiService) {}
 
-  async login(credentials: { email: string; password: string }): Promise<AuthUser> {
+  async login(credentials: {
+    email: string;
+    password: string;
+  }): Promise<AuthUser> {
     this.setLoading(true);
     try {
       const resp = await this.api.post<User | { user: User }>(
@@ -60,7 +63,9 @@ export class AuthService {
       );
       const user: User | undefined = (resp as any)?.user ?? (resp as any);
       if (!user) {
-        throw { message: 'Login fehlgeschlagen. Bitte erneut versuchen.' } as const;
+        throw {
+          message: 'Login fehlgeschlagen. Bitte erneut versuchen.',
+        } as const;
       }
       this.setCurrentUser(user);
       return user;
@@ -69,7 +74,11 @@ export class AuthService {
     }
   }
 
-  async register(payload: { name: string; email: string; password: string }): Promise<void> {
+  async register(payload: {
+    name: string;
+    email: string;
+    password: string;
+  }): Promise<void> {
     this.setLoading(true);
     try {
       // Convention: backend returns created user or message; we don't auto-login
@@ -123,7 +132,9 @@ export class AuthService {
   }
 
   async upgradeToPro(planType: string): Promise<void> {
-    const updated = await this.api.post<User>('/subscription/upgrade', { planType });
+    const updated = await this.api.post<User>('/subscription/upgrade', {
+      planType,
+    });
     if (updated) this.setCurrentUser(updated);
   }
 
@@ -131,7 +142,9 @@ export class AuthService {
     const u = this.currentUser as User | null;
     const subId = (u as any)?.paypalSubscriptionId as string | undefined;
     if (!subId) return;
-    await this.api.post('/paypal/cancel-subscription', { subscriptionId: subId });
+    await this.api.post('/paypal/cancel-subscription', {
+      subscriptionId: subId,
+    });
     // Best-effort refresh
     await this.refreshCurrentUser();
   }
@@ -140,7 +153,9 @@ export class AuthService {
     const u = this.currentUser as User | null;
     const subId = (u as any)?.paypalSubscriptionId as string | undefined;
     if (!subId) return;
-    await this.api.post('/paypal/reactivate-subscription', { subscriptionId: subId });
+    await this.api.post('/paypal/reactivate-subscription', {
+      subscriptionId: subId,
+    });
     await this.refreshCurrentUser();
   }
 
@@ -150,25 +165,32 @@ export class AuthService {
   }
 
   isProUser(): boolean {
-    const u = this.currentUser as (User & {
-      lifetimeSubscription?: boolean;
-      subscriptionStatus?: 'active' | 'canceled' | 'inactive' | 'none';
-      subscriptionEndsAt?: string;
-    }) | null;
+    const u = this.currentUser as
+      | (User & {
+          lifetimeSubscription?: boolean;
+          subscriptionStatus?: 'active' | 'canceled' | 'inactive' | 'none';
+          subscriptionEndsAt?: string;
+        })
+      | null;
     if (!u) return false;
     if (u.lifetimeSubscription) return true;
     const endsAt = u.subscriptionEndsAt ? new Date(u.subscriptionEndsAt) : null;
     const now = new Date();
     if (u.subscriptionStatus === 'active') return true;
-    if (u.subscriptionStatus === 'canceled' && endsAt && endsAt > now) return true;
-    if (u.subscriptionStatus === 'inactive' && endsAt && endsAt > now) return true;
+    if (u.subscriptionStatus === 'canceled' && endsAt && endsAt > now)
+      return true;
+    if (u.subscriptionStatus === 'inactive' && endsAt && endsAt > now)
+      return true;
     return false;
   }
 
   getRemainingRequests(freeLimit = 5): number {
-    const u = this.currentUser as (User & { lifetimeSubscription?: boolean; requestCount?: number }) | null;
+    const u = this.currentUser as
+      | (User & { lifetimeSubscription?: boolean; requestCount?: number })
+      | null;
     if (!u) return freeLimit;
-    if (this.isProUser() || (u as any).lifetimeSubscription) return Number.POSITIVE_INFINITY;
+    if (this.isProUser() || (u as any).lifetimeSubscription)
+      return Number.POSITIVE_INFINITY;
     const used = Number((u as any).requestCount ?? 0);
     return Math.max(0, freeLimit - used);
   }

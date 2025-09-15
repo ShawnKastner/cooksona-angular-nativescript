@@ -2,39 +2,22 @@ import { Recipe } from './recipe.models';
 
 export interface Ingredient {
   name: string;
+  amount: string;
   unit: string;
-  amount: string; // keep as string to match free-form inputs
 }
 
 export interface ShoppingListItem extends Ingredient {
   id: string;
   checked: boolean;
-  category?: string;
 }
-
-// Flexible daily plan: allows arbitrary meal keys except the required "day"
-export type DailyPlan = { day: string } & Record<string, Recipe | undefined>;
-
-export interface MealPlan {
-  id: string;
-  userId: string;
-  createdAt: string;
-  days: DailyPlan[];
-  shoppingList: ShoppingListItem[];
-  title?: string;
-  notes?: string;
-  options?: PlannerOptions;
-}
-
-export type CategorizedShoppingList = Record<string, ShoppingListItem[]>;
 
 export interface PlannerOptions {
-  diet?: string;
-  allergies?: string;
-  people: number; // 1..10
-  planDays: number; // 1..14
-  cookTime: string; // e.g., '30 Minuten'
-  calories?: number; // optional
+  diet: string;
+  allergies: string;
+  people: number;
+  planDays: number;
+  cookTime: string;
+  calories?: number;
   meals: {
     breakfast: boolean;
     lunch: boolean;
@@ -42,7 +25,33 @@ export interface PlannerOptions {
     snack: boolean;
     dessert: boolean;
   };
-  enableNutritionAnalysis: boolean;
-  planFocus: string; // 'ausgewogen' | ...
-  gourmetMode: boolean;
+  enableNutritionAnalysis?: boolean;
+  planFocus?: 'ausgewogen' | 'proteinreich' | 'kohlenhydratarm' | 'fettarm';
+  gourmetMode?: boolean;
+}
+
+export interface DailyPlan {
+  day: string;
+  breakfast?: Recipe;
+  lunch?: Recipe;
+  dinner?: Recipe;
+  snack?: Recipe;
+  dessert?: Recipe;
+}
+
+export interface CategorizedShoppingListItem {
+  category: string;
+  items: ShoppingListItem[];
+}
+
+export type CategorizedShoppingList = CategorizedShoppingListItem[];
+
+export interface MealPlan {
+  id: string;
+  createdAt: string;
+  userId: string;
+  options: PlannerOptions;
+  days: DailyPlan[];
+  shoppingList: ShoppingListItem[];
+  categorizedShoppingList?: CategorizedShoppingList | null;
 }

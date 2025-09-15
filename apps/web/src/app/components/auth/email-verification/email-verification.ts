@@ -14,7 +14,11 @@ export class EmailVerification implements OnInit {
   status: 'pending' | 'success' | 'error' = 'pending';
   message = '';
 
-  constructor(private route: ActivatedRoute, private router: Router, private users: UserApiService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private users: UserApiService
+  ) {}
 
   async ngOnInit(): Promise<void> {
     const params = this.route.snapshot.queryParamMap;
@@ -28,10 +32,12 @@ export class EmailVerification implements OnInit {
       const res = await this.users.verifyEmail(token);
       if (res && res.ok) {
         this.status = 'success';
-        this.message = 'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.';
+        this.message =
+          'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.';
       } else {
         this.status = 'success';
-        this.message = 'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.';
+        this.message =
+          'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.';
       }
     } catch {
       this.status = 'error';
