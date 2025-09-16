@@ -114,9 +114,12 @@
         <ng-container>
           <button
             type="submit"
-            class="bg-primary text-white font-bold py-2.5 px-6 rounded-xl hover:bg-primary-focus transition-colors disabled:bg-base-300"
-            [disabled]="form.invalid"
+            class="bg-primary text-white font-bold py-2.5 px-6 rounded-xl hover:bg-primary-focus transition-colors disabled:bg-base-300 inline-flex items-center gap-2"
+            [disabled]="form.invalid || isSaving"
           >
+            @if (isSaving) {
+            <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+            }
             Profil speichern
           </button>
           <button

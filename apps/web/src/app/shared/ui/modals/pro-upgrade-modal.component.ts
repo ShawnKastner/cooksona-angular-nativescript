@@ -10,7 +10,7 @@ import {
   inject,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import {
   BarChart2,
   Check,

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy, DestroyRef, NgZone, ChangeDetectorRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import {
@@ -8,7 +8,7 @@ import {
   FormGroup,
 } from '@angular/forms';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { ProUpgradeModalComponent } from '../modals/pro-upgrade-modal.component';
+import { ProUpgradeModalComponent } from '../../shared/ui/modals/pro-upgrade-modal.component';
 import {
   User as UserIcon,
   Mail,
@@ -39,6 +39,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   readonly auth = inject(AuthService);
   private readonly contactApi = inject(ContactApiService);
   private readonly api = inject(ApiService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly zone = inject(NgZone);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // Icons
   readonly icons = { UserIcon, Mail, Star, Inbox, ChevronDown } as const;
@@ -60,6 +63,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   saveError: string | null = null;
   saveSuccess: string | null = null;
   isEditing = false;
+  isSaving = false;
 
   // Requests
   contactRequests: Message[] = [];
@@ -90,7 +94,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (u?.id) void this.loadRequests(u.id);
 
     // If user later updates (rare), reflect in form
-    this.auth.currentUser$.pipe(takeUntilDestroyed()).subscribe((user) => {
+    this.auth.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((user) => {
       if (!user) return;
       this.form.patchValue(
         { name: user.name ?? '', email: user.email ?? '' },
@@ -196,16 +200,29 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
     this.saveError = null;
     this.saveSuccess = null;
+    this.isSaving = true;
+    this.cdr.markForCheck();
     try {
       await this.auth.updateProfile(this.form.value);
-      this.saveSuccess = 'Profil aktualisiert.';
-      this.isEditing = false;
+      this.zone.run(() => {
+        this.saveSuccess = 'Profil aktualisiert.';
+        this.isEditing = false;
+        this.cdr.markForCheck();
+      });
     } catch (err: any) {
-      const backendMessage = err?.message || err?.error || err?.detail;
-      this.saveError =
-        typeof backendMessage === 'string' && backendMessage.trim().length > 0
-          ? backendMessage
-          : 'Aktualisierung fehlgeschlagen.';
+      this.zone.run(() => {
+        const backendMessage = err?.message || err?.error || err?.detail;
+        this.saveError =
+          typeof backendMessage === 'string' && backendMessage.trim().length > 0
+            ? backendMessage
+            : 'Aktualisierung fehlgeschlagen.';
+        this.cdr.markForCheck();
+      });
+    } finally {
+      this.zone.run(() => {
+        this.isSaving = false;
+        this.cdr.markForCheck();
+      });
     }
   }
 

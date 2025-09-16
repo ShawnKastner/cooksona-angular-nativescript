@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import {
   BookText,
   Heart,

@@ -5,9 +5,9 @@ import { BookHeart } from 'libs/constants/icons';
 import { CookbookApiService } from '@cooksona/api';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { CookbookCardComponent } from './cookbook-card.component';
-import { RecipeDetailModalComponent } from '../../components/modals/recipe-detail-modal.component';
-import { RecipeTransformModalComponent } from '../../components/modals/recipe-transform-modal.component';
-import { DeleteConfirmModalComponent } from '../../components/modals/delete-confirm-modal.component';
+import { RecipeTransformModalComponent } from '../../shared/ui/modals/recipe-transform-modal.component';
+import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
+import { RecipeDetailModalComponent } from '../../shared/ui/modals/recipe-detail-modal.component';
 
 @Component({
   selector: 'app-cookbook-page',

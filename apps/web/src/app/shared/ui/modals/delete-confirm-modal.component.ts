@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import { X, Trash } from 'libs/constants/icons';
 
 @Component({

@@ -3,7 +3,7 @@ import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } 
 import { CommonModule } from '@angular/common';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { Shield, Users, Pencil, Trash, Inbox, Clipboard } from 'libs/constants/icons';
-import { DeleteConfirmModalComponent } from '../../components/modals/delete-confirm-modal.component';
+import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
 import { User } from '@cooksona/models/user.models';
 import { UserApiService, InvitesApiService } from '@cooksona/api';
 import { Invite } from '@cooksona/models/invite.models';

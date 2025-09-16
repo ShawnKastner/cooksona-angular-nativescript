@@ -10,7 +10,6 @@ import { AuthService } from '@cooksona/auth';
   standalone: true,
   imports: [CommonModule, FormsModule, SvgInjectDirective],
   templateUrl: './forgot-password.html',
-  styleUrl: './forgot-password.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordComponent {
@@ -37,3 +36,4 @@ export class ForgotPasswordComponent {
     }
   }
 }
+

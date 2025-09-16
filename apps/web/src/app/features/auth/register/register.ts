@@ -1,9 +1,8 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserPlus } from 'libs/constants/icons';
+import { UserPlus, Eye, EyeOff } from 'libs/constants/icons';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
-import { Eye, EyeOff } from 'libs/constants/icons';
 import { Router } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
 
@@ -12,7 +11,6 @@ import { AuthService } from '@cooksona/auth';
   standalone: true,
   imports: [CommonModule, FormsModule, SvgInjectDirective],
   templateUrl: './register.html',
-  styleUrl: './register.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {
@@ -33,7 +31,6 @@ export class RegisterComponent {
 
   async submit() {
     this.error = null;
-    // Basic validation similar to zod schema
     const nameOk =
       this.name.trim().length >= 2 &&
       this.name.trim().length <= 50 &&
@@ -76,14 +73,8 @@ export class RegisterComponent {
     }
   }
 
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
-  togglePassword2() {
-    this.showPassword2 = !this.showPassword2;
-  }
-
-  navigateToLogin() {
-    this.router.navigate(['/login']).catch(() => {});
-  }
+  togglePassword() { this.showPassword = !this.showPassword; }
+  togglePassword2() { this.showPassword2 = !this.showPassword2; }
+  navigateToLogin() { this.router.navigate(['/login']).catch(() => {}); }
 }
+

@@ -25,12 +25,12 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
 import { TabsComponent } from './tabs.component';
 import { HistoryComponent } from './history.component';
 import { ShoppingListComponent } from './shopping-list.component';
-import { RecipeDetailModalComponent } from '../../components/modals/recipe-detail-modal.component';
-import { RecipeTransformModalComponent } from '../../components/modals/recipe-transform-modal.component';
-import { LeftOverModalComponent } from '../../components/modals/left-over-modal.component';
+import { RecipeDetailModalComponent } from '../../shared/ui/modals/recipe-detail-modal.component';
+import { RecipeTransformModalComponent } from '../../shared/ui/modals/recipe-transform-modal.component';
+import { LeftOverModalComponent } from '../../shared/ui/modals/left-over-modal.component';
 import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner.component';
-import { ProUpgradeModalComponent } from '../../components/modals/pro-upgrade-modal.component';
-import { DeleteConfirmModalComponent } from '../../components/modals/delete-confirm-modal.component';
+import { ProUpgradeModalComponent } from '../../shared/ui/modals/pro-upgrade-modal.component';
+import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
 
 type ActiveTab = 'current' | 'shopping-list' | 'history';
 

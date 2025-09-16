@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
 import { authRedirectGuard, protectedRouteGuard } from '@cooksona/auth';
-import { LoginComponent } from './components/auth/login/login';
+import { LoginComponent } from './features/auth/login/login';
 import { LandingComponent } from './pages/landing/landing.component';
-import { RegisterComponent } from './components/auth/register/register';
-import { ForgotPasswordComponent } from './components/auth/forgot-password/forgot-password';
-import { ResetPasswordComponent } from './components/auth/reset-password/reset-password';
-import { EmailVerificationComponent } from './components/auth/email-verification/email-verification';
+import { RegisterComponent } from './features/auth/register/register';
+import { ForgotPasswordComponent } from './features/auth/forgot-password/forgot-password';
+import { ResetPasswordComponent } from './features/auth/reset-password/reset-password';
+import { EmailVerificationComponent } from './features/auth/email-verification/email-verification';
 
 export const routes: Routes = [
   // Landing at /landing (root will be planner for logged-in users)
@@ -78,7 +78,7 @@ export const routes: Routes = [
     path: 'profile',
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
-      import('./components/profile/profile.page').then((m) => m.ProfileComponent),
+      import('./features/profile/profile.page').then((m) => m.ProfileComponent),
     data: {
       title: 'Profil',
       description:

@@ -12,7 +12,6 @@ import { ApiService } from '@cooksona/api';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, SvgInjectDirective],
   templateUrl: './login.html',
-  styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent implements OnInit {
@@ -136,7 +135,6 @@ export class LoginComponent implements OnInit {
   }
 
   navigateToRegister() {
-    // navigate to register route if exists
     this.router.navigate(['/register']).catch(() => {});
   }
 
@@ -145,9 +143,7 @@ export class LoginComponent implements OnInit {
   }
 
   get shouldShowResend() {
-    return (
-      this.error === 'Bitte bestätige zuerst deine E-Mail-Adresse.' &&
-      !!this.email
-    );
+    return this.error === 'Bitte bestätige zuerst deine E-Mail-Adresse.' && !!this.email;
   }
 }
+

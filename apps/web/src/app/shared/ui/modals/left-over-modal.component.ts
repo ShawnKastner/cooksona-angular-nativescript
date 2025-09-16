@@ -10,7 +10,7 @@ import {
   inject,
 } from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import {
   X,
   Sparkles,

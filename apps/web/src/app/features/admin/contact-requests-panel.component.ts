@@ -5,7 +5,7 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
 import { ChevronDown, Inbox, Send, Trash } from 'libs/constants/icons';
 import { ContactApiService } from '@cooksona/api';
 import { Message } from '@cooksona/models/contact.models';
-import { DeleteConfirmModalComponent } from '../../components/modals/delete-confirm-modal.component';
+import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
 import { PaginationComponent } from '../../shared/ui/pagination.component';
 
 type MessageFilter = 'all' | 'unread' | 'read' | 'answered';
