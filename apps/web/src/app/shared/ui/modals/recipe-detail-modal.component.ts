@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import {
@@ -22,6 +22,7 @@ import { AuthService } from '@cooksona/auth';
       class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 printable-modal-wrapper"
       role="dialog"
       aria-modal="true"
+      [attr.aria-labelledby]="'recipe-detail-title'"
       (click)="close.emit()"
     >
       <div
@@ -32,7 +33,7 @@ import { AuthService } from '@cooksona/auth';
           class="p-6 border-b border-base-200 flex items-start justify-between"
         >
           <div>
-            <h2 class="text-3xl font-serif font-bold text-neutral">
+            <h2 class="text-3xl font-serif font-bold text-neutral" id="recipe-detail-title">
               {{ recipe!.name }}
             </h2>
             @if (recipe.servings) {
@@ -169,5 +170,10 @@ export class RecipeDetailModalComponent {
       // fallback
       window.print();
     }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
+    if (this.open) this.close.emit();
   }
 }

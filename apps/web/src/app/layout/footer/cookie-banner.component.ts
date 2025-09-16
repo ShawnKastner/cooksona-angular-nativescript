@@ -61,12 +61,11 @@ interface CookiePreferences {
                     erforderlich und können nicht deaktiviert werden.
                   </p>
                 </div>
-                <input
-                  type="checkbox"
-                  [checked]="preferences.necessary"
-                  disabled
-                  class="toggle toggle-primary"
-                />
+                <label class="relative inline-flex items-center cursor-not-allowed opacity-70">
+                  <input type="checkbox" class="sr-only" [checked]="preferences.necessary" disabled />
+                  <div class="h-5 w-10 rounded-full bg-base-300"></div>
+                  <div class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow"></div>
+                </label>
               </div>
 
               <div class="flex items-center justify-between">
@@ -77,12 +76,16 @@ interface CookiePreferences {
                     z.B. Ihre Einstellungen zu speichern.
                   </p>
                 </div>
-                <input
-                  type="checkbox"
-                  [checked]="preferences.functional"
-                  (change)="handlePreferenceChange('functional')"
-                  class="toggle toggle-primary"
-                />
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="sr-only peer"
+                    [checked]="preferences.functional"
+                    (change)="handlePreferenceChange('functional')"
+                  />
+                  <div class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"></div>
+                  <div class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+                </label>
               </div>
 
               <div class="flex items-center justify-between">
@@ -93,12 +96,16 @@ interface CookiePreferences {
                     interagieren, um unsere Dienste zu verbessern.
                   </p>
                 </div>
-                <input
-                  type="checkbox"
-                  [checked]="preferences.analytics"
-                  (change)="handlePreferenceChange('analytics')"
-                  class="toggle toggle-primary"
-                />
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="sr-only peer"
+                    [checked]="preferences.analytics"
+                    (change)="handlePreferenceChange('analytics')"
+                  />
+                  <div class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"></div>
+                  <div class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+                </label>
               </div>
 
               <div class="flex items-center justify-between">
@@ -109,12 +116,16 @@ interface CookiePreferences {
                     abzustimmen.
                   </p>
                 </div>
-                <input
-                  type="checkbox"
-                  [checked]="preferences.marketing"
-                  (change)="handlePreferenceChange('marketing')"
-                  class="toggle toggle-primary"
-                />
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    class="sr-only peer"
+                    [checked]="preferences.marketing"
+                    (change)="handlePreferenceChange('marketing')"
+                  />
+                  <div class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"></div>
+                  <div class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+                </label>
               </div>
 
               <div class="mt-4 p-4 bg-base-200 rounded-lg text-sm">

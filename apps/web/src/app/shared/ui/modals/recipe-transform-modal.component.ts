@@ -1,19 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  inject,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import { ApiService } from '@cooksona/api';
 import { X, Wand2, Sparkles, Check, BookHeart, BarChart2, Users } from 'libs/constants/icons';
-import { ChangeDetectionStrategy } from '@angular/core';
 
 export type TransformAction = 'updateInPlan' | 'saveAsCopy';
 
@@ -28,6 +19,7 @@ export type TransformAction = 'updateInPlan' | 'saveAsCopy';
       (click)="close.emit()"
       role="dialog"
       aria-modal="true"
+      [attr.aria-labelledby]="'transform-title'"
     >
       <div
         class="bg-base-100 rounded-2xl shadow-soft-xl w-full max-w-4xl transform transition-all max-h-[90vh] flex flex-col border border-base-200"
@@ -39,6 +31,7 @@ export type TransformAction = 'updateInPlan' | 'saveAsCopy';
           <div>
             <h2
               class="text-3xl font-serif font-bold text-neutral flex items-center gap-3"
+              id="transform-title"
             >
               <span
                 class="w-7 h-7 text-secondary"
@@ -400,5 +393,10 @@ export class RecipeTransformModalComponent implements OnChanges {
         : 'Im Kochbuch gespeichert!';
     // Optional: self-close after brief success, parent may also close
     setTimeout(() => this.close.emit(), 2000);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
+    if (this.open) this.close.emit();
   }
 }

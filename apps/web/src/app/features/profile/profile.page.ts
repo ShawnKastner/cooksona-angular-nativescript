@@ -18,6 +18,7 @@ import {
   ChevronDown,
 } from 'libs/constants/icons';
 import { AuthService } from '@cooksona/auth';
+import { SnackbarService } from '../../shared/ui/snackbar.service';
 import { ContactApiService } from '@cooksona/api';
 import { ApiService } from '@cooksona/api';
 import { Message } from '@cooksona/models/contact.models';
@@ -46,6 +47,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   readonly auth = inject(AuthService);
   private readonly contactApi = inject(ContactApiService);
   private readonly api = inject(ApiService);
+  private readonly snackbar = inject(SnackbarService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly zone = inject(NgZone);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -211,21 +213,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
       const value = this.form.getRawValue();
       await this.auth.updateProfile(value);
       this.zone.run(() => {
-        this.saveSuccess = 'Profil aktualisiert.';
+        this.snackbar.success('Profil aktualisiert.');
+        this.saveSuccess = null;
         this.isEditing = false;
         this.cdr.markForCheck();
-        setTimeout(() => {
-          this.saveSuccess = null;
-          this.cdr.markForCheck();
-        }, 3000);
       });
     } catch (err: any) {
       this.zone.run(() => {
         const backendMessage = err?.message || err?.error || err?.detail;
-        this.saveError =
+        const msg =
           typeof backendMessage === 'string' && backendMessage.trim().length > 0
             ? backendMessage
             : 'Aktualisierung fehlgeschlagen.';
+        this.saveError = null;
+        this.snackbar.error(msg);
         this.cdr.markForCheck();
       });
     } finally {

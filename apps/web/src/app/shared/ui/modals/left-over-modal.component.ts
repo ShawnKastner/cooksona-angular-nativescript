@@ -1,14 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  inject,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import {
@@ -22,7 +14,6 @@ import {
 } from 'libs/constants/icons';
 import { ApiService } from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
-import { ChangeDetectionStrategy } from '@angular/core';
 
 const FREE_USER_REQUEST_LIMIT = 5;
 
@@ -37,6 +28,7 @@ const FREE_USER_REQUEST_LIMIT = 5;
       (click)="close.emit()"
       role="dialog"
       aria-modal="true"
+      [attr.aria-labelledby]="'leftover-title'"
     >
       <div
         class="bg-base-100 rounded-2xl shadow-soft-xl w-full max-w-2xl transform transition-all max-h-[90vh] flex flex-col border border-base-200"
@@ -48,6 +40,7 @@ const FREE_USER_REQUEST_LIMIT = 5;
           <div>
             <h2
               class="text-3xl font-serif font-bold text-neutral flex items-center gap-3"
+              id="leftover-title"
             >
               <span
                 class="w-7 h-7 text-primary"
@@ -331,5 +324,10 @@ export class LeftOverModalComponent implements OnChanges {
     if (!this.generatedRecipe) return;
     this.saveRecipe.emit(this.generatedRecipe);
     this.success = 'Rezept im Kochbuch gespeichert!';
+  }
+
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
+    if (this.open) this.close.emit();
   }
 }

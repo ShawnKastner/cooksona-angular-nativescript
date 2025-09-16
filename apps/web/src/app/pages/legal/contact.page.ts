@@ -12,6 +12,7 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
 import { MessageSquare, Send } from 'libs/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { ContactApiService } from '@cooksona/api';
+import { SnackbarService } from '../../shared/ui/snackbar.service';
 
 
 type ContactFormModel = {
@@ -48,23 +49,6 @@ type ContactFormModel = {
             Haben Sie eine Frage, einen Vorschlag oder benötigen Sie Hilfe?
           </p>
         </div>
-
-        @if (success) {
-        <div
-          class="bg-green-100 border-l-4 border-success text-green-800 p-4 rounded-r-lg mb-6"
-          role="alert"
-        >
-          <p class="font-bold">Nachricht gesendet</p>
-          <p>{{ success }}</p>
-        </div>
-        } @if (error) {
-        <div
-          class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-6"
-          role="alert"
-        >
-          <span class="block sm:inline">{{ error }}</span>
-        </div>
-        }
 
         <form [formGroup]="form" (ngSubmit)="handleSubmit()" class="space-y-6">
           <div>
@@ -157,6 +141,7 @@ export class ContactPage {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly auth = inject(AuthService);
   private readonly contactApi = inject(ContactApiService);
+  private readonly snackbar = inject(SnackbarService);
 
   readonly icons = { MessageSquare, Send } as const;
 
@@ -173,24 +158,20 @@ export class ContactPage {
     }),
   });
   isSending = false;
-  error: string | null = null;
-  success: string | null = null;
 
   get currentUserId(): string | null {
     return (this.auth.currentUser as any)?.id ?? null;
   }
 
   async handleSubmit(): Promise<void> {
-    this.error = null;
-    this.success = null;
     const val = this.form.getRawValue();
     const msg = val.message.trim();
     if (!msg) {
-      this.error = 'Bitte geben Sie eine Nachricht ein.';
+      this.snackbar.error('Bitte geben Sie eine Nachricht ein.');
       return;
     }
     if (!this.currentUserId && !String(val.email || '').trim()) {
-      this.error = 'Bitte geben Sie Ihre E-Mail-Adresse an.';
+      this.snackbar.error('Bitte geben Sie Ihre E-Mail-Adresse an.');
       return;
     }
     this.isSending = true;
@@ -209,14 +190,13 @@ export class ContactPage {
           message: msg,
         } as any);
       }
-      this.success =
-        'Vielen Dank für Ihre Nachricht! Wir werden uns so schnell wie möglich bei Ihnen melden.';
+      this.snackbar.success('Vielen Dank! Wir melden uns so schnell wie möglich.');
       // reset
       this.form.patchValue({ message: '', requestType: 'feature', email: '' });
       this.form.markAsPristine();
       this.form.markAsUntouched();
     } catch {
-      this.error = 'Fehler beim Senden. Bitte versuchen Sie es später erneut.';
+      this.snackbar.error('Fehler beim Senden. Bitte versuchen Sie es später erneut.');
     }
     this.isSending = false;
     this.form.enable({ emitEvent: false });

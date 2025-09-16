@@ -1,15 +1,5 @@
 import { CommonModule } from '@angular/common';
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  Output,
-  SimpleChanges,
-  inject,
-  ChangeDetectionStrategy,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import {
   BarChart2,
@@ -38,6 +28,7 @@ type ModalView = 'selection' | 'paypal' | 'processing' | 'success';
       class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
+      [attr.aria-labelledby]="'pro-upgrade-title'"
       (click)="handleOverlayClick()"
     >
       <div
@@ -48,7 +39,7 @@ type ModalView = 'selection' | 'paypal' | 'processing' | 'success';
       >
         <!-- Header -->
         <div class="flex items-center justify-between px-6 md:px-8 pt-6">
-          <h2 class="text-xl font-extrabold text-neutral tracking-tight">
+          <h2 class="text-xl font-extrabold text-neutral tracking-tight" id="pro-upgrade-title">
             {{
               view === 'selection'
                 ? 'CookSona Pro freischalten'
@@ -412,6 +403,11 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
   }
 
   handleClose(): void {
+    if (this.canCloseNow) this.close.emit();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
     if (this.canCloseNow) this.close.emit();
   }
 
