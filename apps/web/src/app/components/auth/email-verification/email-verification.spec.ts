@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EmailVerification } from './email-verification';
+import { EmailVerificationComponent } from './email-verification';
 
-describe('EmailVerification', () => {
-  let component: EmailVerification;
-  let fixture: ComponentFixture<EmailVerification>;
+describe('EmailVerificationComponent', () => {
+  let component: EmailVerificationComponent;
+  let fixture: ComponentFixture<EmailVerificationComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [EmailVerification],
+      imports: [EmailVerificationComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(EmailVerification);
+    fixture = TestBed.createComponent(EmailVerificationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,8 +10,9 @@ import { AuthService } from '@cooksona/auth';
   imports: [CommonModule, FormsModule],
   templateUrl: './reset-password.html',
   styleUrls: ['./reset-password.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ResetPassword {
+export class ResetPasswordComponent {
   token: string | null = null;
   password = '';
   confirmPassword = '';

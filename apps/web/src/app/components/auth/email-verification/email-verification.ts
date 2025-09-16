@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UserApiService } from '@cooksona/api';
@@ -9,8 +9,9 @@ import { UserApiService } from '@cooksona/api';
   imports: [CommonModule],
   templateUrl: './email-verification.html',
   styleUrls: ['./email-verification.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EmailVerification implements OnInit {
+export class EmailVerificationComponent implements OnInit {
   status: 'pending' | 'success' | 'error' = 'pending';
   message = '';
 

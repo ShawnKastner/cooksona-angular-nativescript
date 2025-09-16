@@ -1,5 +1,5 @@
 // apps/web/src/app/features/admin/admin-dashboard.component.ts
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import {
@@ -35,6 +35,7 @@ import { ContactRequestsPanelComponent } from './contact-requests-panel.componen
     CreateInviteModalComponent,
     ContactRequestsPanelComponent,
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <app-seo
       [title]="'Admin – CookSona'"
@@ -346,7 +347,7 @@ import { ContactRequestsPanelComponent } from './contact-requests-panel.componen
     </div>
   `,
 })
-export class AdminDashboard implements OnInit {
+export class AdminDashboardComponent implements OnInit {
   private readonly usersApi = inject(UserApiService);
   private readonly invitesApi = inject(InvitesApiService);
 

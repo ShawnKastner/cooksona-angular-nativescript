@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -13,8 +13,9 @@ import { ApiService } from '@cooksona/api';
   imports: [CommonModule, FormsModule, RouterModule, SvgInjectDirective],
   templateUrl: './login.html',
   styleUrls: ['./login.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Login implements OnInit {
+export class LoginComponent implements OnInit {
   email = '';
   password = '';
   info: string | null = null;

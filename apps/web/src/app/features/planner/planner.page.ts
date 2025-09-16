@@ -57,7 +57,7 @@ type ActiveTab = 'current' | 'shopping-list' | 'history';
   templateUrl: './planner.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PlannerPage implements OnInit {
+export class PlannerComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly api = inject(ApiService);
   private readonly planApi = inject(PlanApiService);

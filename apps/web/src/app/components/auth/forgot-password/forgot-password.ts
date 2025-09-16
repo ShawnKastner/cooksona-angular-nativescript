@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
@@ -11,8 +11,9 @@ import { AuthService } from '@cooksona/auth';
   imports: [CommonModule, FormsModule, SvgInjectDirective],
   templateUrl: './forgot-password.html',
   styleUrls: ['./forgot-password.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ForgotPassword {
+export class ForgotPasswordComponent {
   email = '';
   message: string | null = null;
   error: string | null = null;

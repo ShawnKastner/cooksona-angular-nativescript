@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { BookHeart } from 'libs/constants/icons';
@@ -21,8 +21,9 @@ import { DeleteConfirmModalComponent } from '../../components/modals/delete-conf
     DeleteConfirmModalComponent,
   ],
   templateUrl: './cookbook.page.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CookbookPage implements OnInit {
+export class CookbookComponent implements OnInit {
   private readonly cookbookApi = inject(CookbookApiService);
 
   // State

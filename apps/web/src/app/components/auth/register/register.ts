@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserPlus } from 'libs/constants/icons';
@@ -13,8 +13,9 @@ import { AuthService } from '@cooksona/auth';
   imports: [CommonModule, FormsModule, SvgInjectDirective],
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Register {
+export class RegisterComponent {
   name = '';
   email = '';
   password = '';

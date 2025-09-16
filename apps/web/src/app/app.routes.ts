@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
 import { authRedirectGuard, protectedRouteGuard } from '@cooksona/auth';
-import { Login } from './components/auth/login/login';
+import { LoginComponent } from './components/auth/login/login';
 import { LandingComponent } from './pages/landing/landing.component';
-import { Register } from './components/auth/register/register';
-import { ForgotPassword } from './components/auth/forgot-password/forgot-password';
-import { ResetPassword } from './components/auth/reset-password/reset-password';
-import { EmailVerification } from './components/auth/email-verification/email-verification';
+import { RegisterComponent } from './components/auth/register/register';
+import { ForgotPasswordComponent } from './components/auth/forgot-password/forgot-password';
+import { ResetPasswordComponent } from './components/auth/reset-password/reset-password';
+import { EmailVerificationComponent } from './components/auth/email-verification/email-verification';
 
 export const routes: Routes = [
   // Landing at /landing (root will be planner for logged-in users)
@@ -13,7 +13,14 @@ export const routes: Routes = [
     path: 'landing',
     canActivate: [authRedirectGuard],
     component: LandingComponent,
-    data: { title: 'Essensplanung & Rezepte' },
+    data: {
+      title: 'Essensplanung & Rezepte',
+      description:
+        "CookSona ist die smarte Lösung für Essensplanung, Einkaufsliste, gesunde Rezepte, Nährwert-Analyse und Kochbuch. Spare Zeit, Geld und ernähre dich besser!",
+      keywords:
+        'Essensplanung, Einkaufsliste, gesunde Rezepte, Kochbuch, Nährwertanalyse, Meal Planner, Ernährung, Food App, Rezepte speichern, Supermarkt, Familienplanung, Diät, Allergene, Kalorien, Makros, Wochenplan, Mahlzeiten, CookSona',
+      image: '/logo.png',
+    },
   },
 
   // Invite redeem
@@ -28,30 +35,30 @@ export const routes: Routes = [
   { path: 'invite/redeem', redirectTo: '/login', pathMatch: 'full' },
 
   // Auth pages: redirect signed-in users to home
-  { path: 'login', canActivate: [authRedirectGuard], component: Login, data: { title: 'Anmelden' } },
-  { path: 'register', canActivate: [authRedirectGuard], component: Register, data: { title: 'Registrieren' } },
+  { path: 'login', canActivate: [authRedirectGuard], component: LoginComponent, data: { title: 'Anmelden' } },
+  { path: 'register', canActivate: [authRedirectGuard], component: RegisterComponent, data: { title: 'Registrieren' } },
   {
     path: 'forgot-password',
     canActivate: [authRedirectGuard],
-    component: ForgotPassword,
+    component: ForgotPasswordComponent,
     data: { title: 'Passwort vergessen' },
   },
   {
     path: 'reset-password',
     canActivate: [authRedirectGuard],
-    component: ResetPassword,
+    component: ResetPasswordComponent,
     data: { title: 'Passwort zurücksetzen' },
   },
   {
     path: 'verify-email',
     canActivate: [authRedirectGuard],
-    component: EmailVerification,
+    component: EmailVerificationComponent,
     data: { title: 'E-Mail bestätigen' },
   },
   {
     path: 'email-verification',
     canActivate: [authRedirectGuard],
-    component: EmailVerification,
+    component: EmailVerificationComponent,
     data: { title: 'E-Mail bestätigen' },
   },
 
@@ -60,21 +67,25 @@ export const routes: Routes = [
     path: '',
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
-      import('./features/planner/planner.page').then((m) => m.PlannerPage),
-    data: { title: 'Planer' },
+      import('./features/planner/planner.page').then((m) => m.PlannerComponent),
+    data: {
+      title: 'Planer',
+      description:
+        'Plane deine Mahlzeiten, erstelle Einkaufslisten und speichere Rezepte mit CookSona.',
+    },
   },
   {
     path: 'profile',
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
-      import('./components/profile/profile.page').then((m) => m.ProfilePage),
+      import('./components/profile/profile.page').then((m) => m.ProfileComponent),
     data: { title: 'Profil' },
   },
   {
     path: 'cookbook',
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
-      import('./features/cookbook/cookbook.page').then((m) => m.CookbookPage),
+      import('./features/cookbook/cookbook.page').then((m) => m.CookbookComponent),
     data: { title: 'Kochbuch' },
   },
   {
@@ -83,7 +94,7 @@ export const routes: Routes = [
     data: { requiredRole: 'admin' as const, title: 'Admin' },
     loadComponent: () =>
       import('./features/admin/admin-dashboard.component').then(
-        (m) => m.AdminDashboard
+        (m) => m.AdminDashboardComponent
       ),
   },
 
@@ -104,7 +115,10 @@ export const routes: Routes = [
     path: 'contact',
     loadComponent: () =>
       import('./pages/legal/contact.page').then((m) => m.ContactPage),
-    data: { title: 'Kontakt' },
+    data: {
+      title: 'Kontakt',
+      description: 'Fragen, Vorschläge oder Support? Kontaktiere das CookSona Team.',
+    },
   },
 
   { path: '**', redirectTo: '' },

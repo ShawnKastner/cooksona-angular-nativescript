@@ -35,7 +35,7 @@ import { User } from '@cooksona/models/user.models';
   templateUrl: './profile.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfilePage implements OnInit, OnDestroy {
+export class ProfileComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   readonly auth = inject(AuthService);
   private readonly contactApi = inject(ContactApiService);
