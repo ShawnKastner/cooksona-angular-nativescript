@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './layout/header/header.component';
 import { FooterComponent } from './layout/footer/footer.component';
 import { CookieBannerComponent } from './layout/footer/cookie-banner.component';
+import { SnackbarComponent } from './shared/ui/snackbar.component';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import { CookieBannerComponent } from './layout/footer/cookie-banner.component';
     HeaderComponent,
     FooterComponent,
     CookieBannerComponent,
+    SnackbarComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
