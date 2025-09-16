@@ -1,0 +1,298 @@
+<app-seo
+  [title]="'Admin – CookSona'"
+  [description]="
+    'Admin-Dashboard für Benutzer, Einladungen und Kontaktanfragen.'
+  "
+/>
+<div class="max-w-6xl mx-auto p-8">
+  @if (success()) {
+  <div
+    class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-green-100 text-green-800 px-6 py-3 rounded-xl shadow font-semibold"
+  >
+    {{ success() }}
+  </div>
+  }
+  <div class="flex items-center gap-4 mb-2">
+    <span class="w-10 h-10 text-primary" [svgInject]="icons.Shield"></span>
+    <div>
+      <h1 class="text-4xl font-serif font-bold">Admin Dashboard</h1>
+      <div class="text-gray-500 text-lg">Verwaltung und Systemübersicht.</div>
+    </div>
+  </div>
+  <div
+    class="bg-white p-6 md:p-8 rounded-2xl shadow-soft border border-base-200 mb-10"
+    style="overflow-x: auto"
+  >
+    <div class="flex gap-8 border-b mb-8 mt-6">
+      <button
+        class="flex items-center gap-2 pb-3 px-2 text-lg font-semibold border-b-2 transition-colors"
+        [ngClass]="
+          activeTab() === 'users'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-gray-500 hover:text-primary'
+        "
+        (click)="setTab('users')"
+      >
+        <span class="w-5 h-5" [svgInject]="icons.Users"></span> Benutzer
+        verwalten
+      </button>
+      <button
+        class="flex items-center gap-2 pb-3 px-2 text-lg font-semibold border-b-2 transition-colors"
+        [ngClass]="
+          activeTab() === 'invites'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-gray-500 hover:text-primary'
+        "
+        (click)="setTab('invites')"
+      >
+        <span class="w-5 h-5" [svgInject]="icons.Shield"></span>
+        Einladungslinks
+      </button>
+      <button
+        class="flex items-center gap-2 pb-3 px-2 text-lg font-semibold border-b-2 transition-colors"
+        [ngClass]="
+          activeTab() === 'contact'
+            ? 'border-primary text-primary'
+            : 'border-transparent text-gray-500 hover:text-primary'
+        "
+        (click)="setTab('contact')"
+      >
+        <span class="w-5 h-5" [svgInject]="icons.Inbox"></span>
+        Kontaktanfragen
+      </button>
+    </div>
+
+    @if (activeTab() === 'users') {
+    <div>
+      @if (isLoadingUsers()) {<p>Lade Benutzer...</p>
+      } @if (error()) {
+      <div class="text-error bg-red-50 p-4 rounded-lg">{{ error() }}</div>
+      } @if (!isLoadingUsers() && !error()) {
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white text-sm">
+          <thead class="bg-base-200/60">
+            <tr>
+              <th class="text-left font-semibold text-neutral p-3">Name</th>
+              <th class="text-left font-semibold text-neutral p-3">E-Mail</th>
+              <th class="text-left font-semibold text-neutral p-3">Rolle</th>
+              <th class="text-left font-semibold text-neutral p-3">Abo</th>
+              <th class="text-left font-semibold text-neutral p-3">
+                Registriert am
+              </th>
+              <th class="text-right font-semibold text-neutral p-3">Aktionen</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of paginatedUsers(); track user.id; let i = $index) {
+            <tr
+              class="border-b border-base-200"
+              [ngClass]="i % 2 === 0 ? 'bg-white' : 'bg-base-100/30'"
+            >
+              <td class="p-3 font-medium text-neutral">{{ user.name }}</td>
+              <td class="p-3 text-gray-600">{{ maskEmail(user.email) }}</td>
+              <td class="p-3 text-gray-600 capitalize">{{ user.role }}</td>
+              <td class="p-3">
+                {{
+                  user.lifetimeSubscription
+                    ? 'Lifetime'
+                    : user.subscriptionEndsAt
+                    ? 'Bis ' + formatDate(user.subscriptionEndsAt)
+                    : 'Kein Abo'
+                }}
+              </td>
+              <td class="p-3 text-gray-600">
+                {{ formatDate($any(user).createdAt) }}
+              </td>
+              <td class="p-3 text-right">
+                <div class="flex justify-end items-center gap-2">
+                  <button
+                    (click)="startEditUser(user)"
+                    class="p-2 text-gray-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                    title="Benutzer bearbeiten"
+                  >
+                    <span class="w-4 h-4" [svgInject]="icons.Pencil"></span>
+                  </button>
+                  <button
+                    (click)="prepareDeleteUser(user)"
+                    class="p-2 text-gray-500 hover:text-error hover:bg-error/10 rounded-full transition-colors"
+                    title="Benutzer löschen"
+                  >
+                    <span class="w-4 h-4" [svgInject]="icons.Trash"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (userTotalPages() > 1) {
+      <div class="flex justify-center items-center gap-4 mt-6">
+        <button
+          class="px-3 py-1 rounded bg-base-200 text-gray-700 disabled:opacity-50"
+          [disabled]="userPage() === 1"
+          (click)="userPage.set(userPage() > 1 ? userPage() - 1 : 1)"
+        >
+          &lt; Vorherige
+        </button>
+        <span class="font-semibold"
+          >Seite {{ userPage() }} von {{ userTotalPages() }}</span
+        >
+        <button
+          class="px-3 py-1 rounded bg-base-200 text-gray-700 disabled:opacity-50"
+          [disabled]="userPage() === userTotalPages()"
+          (click)="
+            userPage.set(
+              userPage() < userTotalPages()
+                ? userPage() + 1
+                : userTotalPages()
+            )
+          "
+        >
+          Nächste &gt;
+        </button>
+      </div>
+      } }
+    </div>
+    } @if (activeTab() === 'invites') {
+    <div>
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-serif font-bold text-neutral">
+          Einladungslinks
+        </h2>
+        <button
+          (click)="inviteOpen.set(true)"
+          class="flex items-center gap-2 bg-yellow-200 text-yellow-900 font-bold px-4 py-2 rounded-lg hover:bg-yellow-300 transition-colors"
+        >
+          <span class="w-5 h-5" [svgInject]="icons.Shield"></span>
+          Neuen Link erstellen
+        </button>
+      </div>
+      @if (isLoadingInvites()) {
+      <div>Lade Einladungen ...</div>
+      } @else if (invites().length === 0) {
+      <div class="text-gray-500">Keine Einladungen vorhanden.</div>
+      } @else {
+      <table class="w-full border rounded-xl overflow-hidden mb-8 text-sm">
+        <thead class="bg-base-200">
+          <tr>
+            <th class="p-3 text-left">Link-Token</th>
+            <th class="p-3 text-left">Beschreibung</th>
+            <th class="p-3 text-left">Rolle</th>
+            <th class="p-3 text-left">Abo</th>
+            <th class="p-3 text-left">Erstellt am</th>
+            <th class="p-3 text-left">Gültig bis</th>
+            <th class="p-3 text-left">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (inv of paginatedInvites(); track inv.id) {
+          <tr class="border-b">
+            <td class="p-3 font-mono">{{ shortToken(inv.token) }}</td>
+            <td class="p-3 text-gray-600">{{ inv.description || '-' }}</td>
+            <td class="p-3">{{ inv.presetRole }}</td>
+            <td class="p-3">
+              {{
+                inv.lifetimeSubscription
+                  ? 'Lifetime'
+                  : inv.subscriptionEndsAt
+                  ? 'Custom'
+                  : 'Kein Abo'
+              }}
+            </td>
+            <td class="p-3">
+              {{ inv.createdAt ? formatDate(inv.createdAt) : '-' }}
+            </td>
+            <td class="p-3">
+              {{ inv.expiresAt ? formatDate(inv.expiresAt) : 'Unbegrenzt' }}
+            </td>
+            <td class="p-3">
+              <button
+                class="p-2 text-gray-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                (click)="copyInvite(inv)"
+                title="Einladungslink kopieren"
+              >
+                <span class="w-4 h-4" [svgInject]="icons.Clipboard"></span>
+              </button>
+              @if (copiedInviteId() === inv.id) {
+              <span class="ml-2 text-green-600 text-xs">Kopiert!</span> }
+              <button
+                class="p-2 text-gray-500 hover:text-error hover:bg-error/10 rounded-full transition-colors"
+                (click)="openDeleteInvite(inv)"
+                title="Einladung löschen"
+              >
+                <span class="w-4 h-4" [svgInject]="icons.Trash"></span>
+              </button>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+      @if (inviteTotalPages() > 1) {
+      <div class="flex justify-center items-center gap-4 mt-6">
+        <button
+          class="px-3 py-1 rounded bg-base-200 text-gray-700 disabled:opacity-50"
+          [disabled]="invitePage() === 1"
+          (click)="invitePage.set(invitePage() > 1 ? invitePage() - 1 : 1)"
+        >
+          &lt; Vorherige
+        </button>
+        <span class="font-semibold"
+          >Seite {{ invitePage() }} von {{ inviteTotalPages() }}</span
+        >
+        <button
+          class="px-3 py-1 rounded bg-base-200 text-gray-700 disabled:opacity-50"
+          [disabled]="invitePage() === inviteTotalPages()"
+          (click)="
+            invitePage.set(
+              invitePage() < inviteTotalPages()
+                ? invitePage() + 1
+                : inviteTotalPages()
+            )
+          "
+        >
+          Nächste &gt;
+        </button>
+      </div>
+      } }
+    </div>
+    } @if (activeTab() === 'contact') {
+    <app-contact-requests-panel />
+    }
+  </div>
+
+  <!-- Modals -->
+  <app-edit-user-modal
+    [open]="!!editingUser()"
+    [user]="editingUser()"
+    (close)="editingUser.set(null)"
+    (save)="handleUpdateUser($event)"
+  />
+
+  <app-create-invite-modal
+    [open]="inviteOpen()"
+    (close)="inviteOpen.set(false)"
+    (created)="handleInviteCreated($event)"
+  />
+
+  <app-delete-confirm-modal
+    [open]="deleteInviteModalOpen()"
+    [title]="'Einladung löschen'"
+    [message]="'Möchtest du diese Einladung wirklich löschen?'"
+    [details]="pendingInviteDetails()"
+    [confirmText]="'Löschen'"
+    (cancel)="closeDeleteInviteModal()"
+    (confirm)="confirmDeleteInvite()"
+  />
+
+  <app-delete-confirm-modal
+    [open]="deleteUserModalOpen()"
+    [title]="'Benutzer löschen'"
+    [message]="'Möchtest du diesen Benutzer wirklich löschen?'"
+    [details]="pendingUserDetails()"
+    [confirmText]="'Löschen'"
+    (cancel)="closeDeleteUserModal()"
+    (confirm)="confirmDeleteUser()"
+  />
+</div>
+
