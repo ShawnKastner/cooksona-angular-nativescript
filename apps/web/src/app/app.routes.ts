@@ -16,7 +16,7 @@ export const routes: Routes = [
     data: {
       title: 'Essensplanung & Rezepte',
       description:
-        "CookSona ist die smarte Lösung für Essensplanung, Einkaufsliste, gesunde Rezepte, Nährwert-Analyse und Kochbuch. Spare Zeit, Geld und ernähre dich besser!",
+        'CookSona ist die smarte Lösung für Essensplanung, Einkaufsliste, gesunde Rezepte, Nährwert-Analyse und Kochbuch. Spare Zeit, Geld und ernähre dich besser!',
       keywords:
         'Essensplanung, Einkaufsliste, gesunde Rezepte, Kochbuch, Nährwertanalyse, Meal Planner, Ernährung, Food App, Rezepte speichern, Supermarkt, Familienplanung, Diät, Allergene, Kalorien, Makros, Wochenplan, Mahlzeiten, CookSona',
       image: '/favicon.svg',
@@ -35,8 +35,18 @@ export const routes: Routes = [
   { path: 'invite/redeem', redirectTo: '/login', pathMatch: 'full' },
 
   // Auth pages: redirect signed-in users to home
-  { path: 'login', canActivate: [authRedirectGuard], component: LoginComponent, data: { title: 'Anmelden' } },
-  { path: 'register', canActivate: [authRedirectGuard], component: RegisterComponent, data: { title: 'Registrieren' } },
+  {
+    path: 'login',
+    canActivate: [authRedirectGuard],
+    component: LoginComponent,
+    data: { title: 'Anmelden' },
+  },
+  {
+    path: 'register',
+    canActivate: [authRedirectGuard],
+    component: RegisterComponent,
+    data: { title: 'Registrieren' },
+  },
   {
     path: 'forgot-password',
     canActivate: [authRedirectGuard],
@@ -89,7 +99,9 @@ export const routes: Routes = [
     path: 'cookbook',
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
-      import('./features/cookbook/cookbook.page').then((m) => m.CookbookComponent),
+      import('./features/cookbook/cookbook.page').then(
+        (m) => m.CookbookComponent
+      ),
     data: { title: 'Kochbuch' },
   },
   {
@@ -98,7 +110,8 @@ export const routes: Routes = [
     data: {
       requiredRole: 'admin' as const,
       title: 'Admin',
-      description: 'Admin-Dashboard für Benutzer, Einladungen und Kontaktanfragen.',
+      description:
+        'Admin-Dashboard für Benutzer, Einladungen und Kontaktanfragen.',
     },
     loadComponent: () =>
       import('./features/admin/admin-dashboard.component').then(
@@ -125,7 +138,8 @@ export const routes: Routes = [
       import('./pages/legal/contact.page').then((m) => m.ContactPage),
     data: {
       title: 'Kontakt',
-      description: 'Fragen, Vorschläge oder Support? Kontaktiere das CookSona Team.',
+      description:
+        'Fragen, Vorschläge oder Support? Kontaktiere das CookSona Team.',
     },
   },
 

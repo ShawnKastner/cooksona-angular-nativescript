@@ -10,7 +10,9 @@ export interface SnackbarMessage {
 
 @Injectable({ providedIn: 'root' })
 export class SnackbarService {
-  private readonly _message$ = new BehaviorSubject<SnackbarMessage | null>(null);
+  private readonly _message$ = new BehaviorSubject<SnackbarMessage | null>(
+    null
+  );
   readonly message$ = this._message$.asObservable();
   private hideTimer: any = null;
 
@@ -20,10 +22,18 @@ export class SnackbarService {
     this.hideTimer = setTimeout(() => this.clear(), duration);
   }
 
-  info(text: string, duration = 3000) { this.show(text, 'info', duration); }
-  success(text: string, duration = 3000) { this.show(text, 'success', duration); }
-  error(text: string, duration = 4000) { this.show(text, 'error', duration); }
-  warning(text: string, duration = 3500) { this.show(text, 'warning', duration); }
+  info(text: string, duration = 3000) {
+    this.show(text, 'info', duration);
+  }
+  success(text: string, duration = 3000) {
+    this.show(text, 'success', duration);
+  }
+  error(text: string, duration = 4000) {
+    this.show(text, 'error', duration);
+  }
+  warning(text: string, duration = 3500) {
+    this.show(text, 'warning', duration);
+  }
 
   clear() {
     if (this.hideTimer) clearTimeout(this.hideTimer);
@@ -31,4 +41,3 @@ export class SnackbarService {
     this._message$.next(null);
   }
 }
-

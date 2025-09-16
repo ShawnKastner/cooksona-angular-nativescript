@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -34,7 +42,11 @@ type MealsGroup = {
 };
 
 type CookTimeOption = '15 Minuten' | '30 Minuten' | '45 Minuten' | '1 Stunde';
-type PlanFocusOption = 'ausgewogen' | 'proteinreich' | 'kohlenhydratarm' | 'fettarm';
+type PlanFocusOption =
+  | 'ausgewogen'
+  | 'proteinreich'
+  | 'kohlenhydratarm'
+  | 'fettarm';
 
 type PlannerForm = FormGroup<{
   diet: FormControl<string>;
@@ -96,15 +108,26 @@ export class MealPlannerFormComponent implements OnChanges {
 
   showPlanDaysHint = false;
 
-  constructor(private readonly fb: NonNullableFormBuilder, public readonly auth: AuthService) {
+  constructor(
+    private readonly fb: NonNullableFormBuilder,
+    public readonly auth: AuthService
+  ) {
     this.form = this.fb.group({
       diet: this.fb.control<string>(''),
       allergies: this.fb.control<string>(''),
       people: this.fb.control<number>(2, {
-        validators: [Validators.required, Validators.min(1), Validators.max(10)],
+        validators: [
+          Validators.required,
+          Validators.min(1),
+          Validators.max(10),
+        ],
       }),
       planDays: this.fb.control<number>(7, {
-        validators: [Validators.required, Validators.min(1), Validators.max(14)],
+        validators: [
+          Validators.required,
+          Validators.min(1),
+          Validators.max(14),
+        ],
       }),
       cookTime: this.fb.control<CookTimeOption>('30 Minuten', {
         validators: [Validators.required],
@@ -119,15 +142,26 @@ export class MealPlannerFormComponent implements OnChanges {
         snack: this.fb.control<boolean>(false),
         dessert: this.fb.control<boolean>(false),
       }),
-      enableNutritionAnalysis: this.fb.control<boolean>({ value: false, disabled: !this.isProUser } as any),
-      planFocus: this.fb.control<PlanFocusOption>({ value: 'ausgewogen', disabled: !this.isProUser } as any, {
-        validators: [Validators.required],
-        nonNullable: true,
+      enableNutritionAnalysis: this.fb.control<boolean>({
+        value: false,
+        disabled: !this.isProUser,
       } as any),
-      gourmetMode: this.fb.control<boolean>({ value: false, disabled: !this.isProUser } as any),
+      planFocus: this.fb.control<PlanFocusOption>(
+        { value: 'ausgewogen', disabled: !this.isProUser } as any,
+        {
+          validators: [Validators.required],
+          nonNullable: true,
+        } as any
+      ),
+      gourmetMode: this.fb.control<boolean>({
+        value: false,
+        disabled: !this.isProUser,
+      } as any),
     }) as PlannerForm;
 
-    this.form.controls.planDays.valueChanges.subscribe(() => this.onPlanDaysChange());
+    this.form.controls.planDays.valueChanges.subscribe(() =>
+      this.onPlanDaysChange()
+    );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -182,7 +216,9 @@ export class MealPlannerFormComponent implements OnChanges {
   // Helper for strict template typing with dynamic form control paths
   // Overload to support dot-paths in template (e.g. 'meals.breakfast') and typed top-level keys
   control(path: string): any;
-  control<K extends keyof PlannerForm['controls']>(key: K): PlannerForm['controls'][K];
+  control<K extends keyof PlannerForm['controls']>(
+    key: K
+  ): PlannerForm['controls'][K];
   control(arg: string | keyof PlannerForm['controls']): any {
     if (typeof arg === 'string') return this.form.get(arg) as any;
     return this.form.controls[arg as keyof PlannerForm['controls']];

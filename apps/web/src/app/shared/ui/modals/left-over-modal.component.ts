@@ -1,6 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  inject,
+  HostListener,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import {

@@ -94,7 +94,6 @@
         </div>
       </div>
 
-      
       <div class="flex justify-end gap-2">
         @if (isEditing) {
         <ng-container>
@@ -104,9 +103,10 @@
             [disabled]="form.invalid || isSaving"
           >
             @if (isSaving) {
-            <span class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-            }
-            Profil speichern
+            <span
+              class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"
+            ></span>
+            } Profil speichern
           </button>
           <button
             type="button"
@@ -525,7 +525,10 @@
       >
         Abbrechen
       </button>
-      <button class="px-3 py-1.5 text-sm font-semibold rounded-lg bg-primary text-primary-content hover:bg-primary-focus transition-colors" (click)="confirmReactivate()">
+      <button
+        class="px-3 py-1.5 text-sm font-semibold rounded-lg bg-primary text-primary-content hover:bg-primary-focus transition-colors"
+        (click)="confirmReactivate()"
+      >
         Reaktivieren
       </button>
     </div>

@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, Output, computed, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  computed,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MealPlan, DailyPlan } from '@cooksona/models/plan.models';
 import { Recipe } from '@cooksona/models/recipe.models';

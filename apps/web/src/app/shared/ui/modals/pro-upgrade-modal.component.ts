@@ -1,5 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, inject, ChangeDetectionStrategy, HostListener } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output,
+  SimpleChanges,
+  inject,
+  ChangeDetectionStrategy,
+  HostListener,
+} from '@angular/core';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import {
   BarChart2,
@@ -41,7 +52,10 @@ type ModalView = 'selection' | 'paypal' | 'processing' | 'success';
       >
         <!-- Header -->
         <div class="flex items-center justify-between px-6 md:px-8 pt-6">
-          <h2 class="text-xl font-extrabold text-neutral tracking-tight" id="pro-upgrade-title">
+          <h2
+            class="text-xl font-extrabold text-neutral tracking-tight"
+            id="pro-upgrade-title"
+          >
             {{
               view === 'selection'
                 ? 'CookSona Pro freischalten'

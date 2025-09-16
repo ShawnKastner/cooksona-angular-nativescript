@@ -73,8 +73,13 @@ export class RegisterComponent {
     }
   }
 
-  togglePassword() { this.showPassword = !this.showPassword; }
-  togglePassword2() { this.showPassword2 = !this.showPassword2; }
-  navigateToLogin() { this.router.navigate(['/login']).catch(() => {}); }
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+  togglePassword2() {
+    this.showPassword2 = !this.showPassword2;
+  }
+  navigateToLogin() {
+    this.router.navigate(['/login']).catch(() => {});
+  }
 }
-

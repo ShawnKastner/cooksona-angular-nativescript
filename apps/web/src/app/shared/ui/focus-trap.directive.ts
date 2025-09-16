@@ -1,4 +1,9 @@
-import { AfterViewInit, Directive, ElementRef, HostListener } from '@angular/core';
+import {
+  AfterViewInit,
+  Directive,
+  ElementRef,
+  HostListener,
+} from '@angular/core';
 
 @Directive({
   selector: '[appFocusTrap]',
@@ -15,22 +20,34 @@ export class FocusTrapDirective implements AfterViewInit {
   private get focusables(): HTMLElement[] {
     const root = this.host.nativeElement;
     const selector = [
-      'a[href]','area[href]','input:not([disabled]):not([type="hidden"])',
-      'select:not([disabled])','textarea:not([disabled])','button:not([disabled])',
-      '[tabindex]:not([tabindex="-1"])','[contenteditable="true"]'
+      'a[href]',
+      'area[href]',
+      'input:not([disabled]):not([type="hidden"])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      'button:not([disabled])',
+      '[tabindex]:not([tabindex="-1"])',
+      '[contenteditable="true"]',
     ].join(',');
     const nodes = Array.from(root.querySelectorAll<HTMLElement>(selector));
-    return nodes.filter(el => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length));
+    return nodes.filter(
+      (el) =>
+        !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)
+    );
   }
 
   private focusFirstElement(): void {
     const list = this.focusables;
     if (list.length > 0) {
-      try { list[0].focus(); } catch {}
+      try {
+        list[0].focus();
+      } catch {}
     } else {
       const root = this.host.nativeElement;
       root.setAttribute('tabindex', '-1');
-      try { root.focus(); } catch {}
+      try {
+        root.focus();
+      } catch {}
     }
   }
 
@@ -60,4 +77,3 @@ export class FocusTrapDirective implements AfterViewInit {
     }
   }
 }
-

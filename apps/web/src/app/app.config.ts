@@ -1,5 +1,16 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection, APP_INITIALIZER } from '@angular/core';
-import { provideRouter, withPreloading, PreloadAllModules, withViewTransitions, withInMemoryScrolling } from '@angular/router';
+import {
+  ApplicationConfig,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+  APP_INITIALIZER,
+} from '@angular/core';
+import {
+  provideRouter,
+  withPreloading,
+  PreloadAllModules,
+  withViewTransitions,
+  withInMemoryScrolling,
+} from '@angular/router';
 import { provideApiBaseUrl } from '@cooksona/api';
 import { environment } from '../environments/environment';
 import { AuthService } from '@cooksona/auth';
@@ -16,7 +27,10 @@ export const appConfig: ApplicationConfig = {
       routes,
       withPreloading(PreloadAllModules),
       withViewTransitions(),
-      withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' })
+      withInMemoryScrolling({
+        scrollPositionRestoration: 'enabled',
+        anchorScrolling: 'enabled',
+      })
     ),
     provideApiBaseUrl(environment.apiBaseUrl),
     { provide: TitleStrategy, useClass: SeoTitleStrategy },

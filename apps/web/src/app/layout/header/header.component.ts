@@ -1,4 +1,9 @@
-import { Component, ElementRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@cooksona/auth';

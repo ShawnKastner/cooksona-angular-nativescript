@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { MealPlan } from '@cooksona/models/plan.models';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { Trash, Calendar } from 'libs/constants/icons';

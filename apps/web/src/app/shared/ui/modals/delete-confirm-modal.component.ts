@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy, HostListener } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ChangeDetectionStrategy,
+  HostListener,
+} from '@angular/core';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import { FocusTrapDirective } from '../focus-trap.directive';
 import { X, Trash } from 'libs/constants/icons';

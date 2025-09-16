@@ -1,6 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  computed,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { ChevronDown, Inbox, Send, Trash } from 'libs/constants/icons';
 import { ContactApiService } from '@cooksona/api';

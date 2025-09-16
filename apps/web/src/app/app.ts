@@ -12,7 +12,7 @@ import { SnackbarComponent } from './shared/ui/snackbar.component';
     HeaderComponent,
     FooterComponent,
     CookieBannerComponent,
-    SnackbarComponent
+    SnackbarComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',

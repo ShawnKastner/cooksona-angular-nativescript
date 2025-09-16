@@ -58,7 +58,8 @@
 
     @if (activeTab() === 'users') {
     <div>
-      @if (isLoadingUsers()) {<p>Lade Benutzer...</p>
+      @if (isLoadingUsers()) {
+      <p>Lade Benutzer...</p>
       } @if (error()) {
       <div class="text-error bg-red-50 p-4 rounded-lg">{{ error() }}</div>
       } @if (!isLoadingUsers() && !error()) {
@@ -73,7 +74,9 @@
               <th class="text-left font-semibold text-neutral p-3">
                 Registriert am
               </th>
-              <th class="text-right font-semibold text-neutral p-3">Aktionen</th>
+              <th class="text-right font-semibold text-neutral p-3">
+                Aktionen
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -88,10 +91,10 @@
               <td class="p-3">
                 {{
                   user.lifetimeSubscription
-                    ? 'Lifetime'
+                    ? "Lifetime"
                     : user.subscriptionEndsAt
-                    ? 'Bis ' + formatDate(user.subscriptionEndsAt)
-                    : 'Kein Abo'
+                    ? "Bis " + formatDate(user.subscriptionEndsAt)
+                    : "Kein Abo"
                 }}
               </td>
               <td class="p-3 text-gray-600">
@@ -163,22 +166,22 @@
           @for (inv of paginatedInvites(); track inv.id) {
           <tr class="border-b">
             <td class="p-3 font-mono">{{ shortToken(inv.token) }}</td>
-            <td class="p-3 text-gray-600">{{ inv.description || '-' }}</td>
+            <td class="p-3 text-gray-600">{{ inv.description || "-" }}</td>
             <td class="p-3">{{ inv.presetRole }}</td>
             <td class="p-3">
               {{
                 inv.lifetimeSubscription
-                  ? 'Lifetime'
+                  ? "Lifetime"
                   : inv.subscriptionEndsAt
-                  ? 'Custom'
-                  : 'Kein Abo'
+                  ? "Custom"
+                  : "Kein Abo"
               }}
             </td>
             <td class="p-3">
-              {{ inv.createdAt ? formatDate(inv.createdAt) : '-' }}
+              {{ inv.createdAt ? formatDate(inv.createdAt) : "-" }}
             </td>
             <td class="p-3">
-              {{ inv.expiresAt ? formatDate(inv.expiresAt) : 'Unbegrenzt' }}
+              {{ inv.expiresAt ? formatDate(inv.expiresAt) : "Unbegrenzt" }}
             </td>
             <td class="p-3">
               <button

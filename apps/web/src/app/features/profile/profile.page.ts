@@ -1,4 +1,13 @@
-import { Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy, DestroyRef, NgZone, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  inject,
+  ChangeDetectionStrategy,
+  DestroyRef,
+  NgZone,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import {
@@ -23,7 +32,6 @@ import { ContactApiService } from '@cooksona/api';
 import { ApiService } from '@cooksona/api';
 import { Message } from '@cooksona/models/contact.models';
 import { User } from '@cooksona/models/user.models';
-
 
 type ProfileFormModel = {
   name: FormControl<string>;
@@ -93,7 +101,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
         ],
       }),
       email: this.fb.control<string>(u?.email ?? '', {
-        validators: [Validators.required, Validators.email, Validators.maxLength(100)],
+        validators: [
+          Validators.required,
+          Validators.email,
+          Validators.maxLength(100),
+        ],
       }),
     });
 
@@ -101,13 +113,15 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (u?.id) void this.loadRequests(u.id);
 
     // If user later updates (rare), reflect in form
-    this.auth.currentUser$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((user) => {
-      if (!user) return;
-      this.form.patchValue(
-        { name: user.name ?? '', email: user.email ?? '' },
-        { emitEvent: false }
-      );
-    });
+    this.auth.currentUser$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((user) => {
+        if (!user) return;
+        this.form.patchValue(
+          { name: user.name ?? '', email: user.email ?? '' },
+          { emitEvent: false }
+        );
+      });
   }
 
   ngOnDestroy(): void {}

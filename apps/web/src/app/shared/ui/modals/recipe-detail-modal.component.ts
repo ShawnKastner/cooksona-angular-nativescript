@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy, HostListener } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ChangeDetectionStrategy,
+  HostListener,
+} from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import {
@@ -35,7 +42,10 @@ import { FocusTrapDirective } from '../focus-trap.directive';
           class="p-6 border-b border-base-200 flex items-start justify-between"
         >
           <div>
-            <h2 class="text-3xl font-serif font-bold text-neutral" id="recipe-detail-title">
+            <h2
+              class="text-3xl font-serif font-bold text-neutral"
+              id="recipe-detail-title"
+            >
               {{ recipe!.name }}
             </h2>
             @if (recipe.servings) {

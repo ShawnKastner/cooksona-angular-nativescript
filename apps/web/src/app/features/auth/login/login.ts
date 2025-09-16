@@ -143,7 +143,9 @@ export class LoginComponent implements OnInit {
   }
 
   get shouldShowResend() {
-    return this.error === 'Bitte bestätige zuerst deine E-Mail-Adresse.' && !!this.email;
+    return (
+      this.error === 'Bitte bestätige zuerst deine E-Mail-Adresse.' &&
+      !!this.email
+    );
   }
 }
-

@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -61,10 +70,19 @@ interface CookiePreferences {
                     erforderlich und können nicht deaktiviert werden.
                   </p>
                 </div>
-                <label class="relative inline-flex items-center cursor-not-allowed opacity-70">
-                  <input type="checkbox" class="sr-only" [checked]="preferences.necessary" disabled />
+                <label
+                  class="relative inline-flex items-center cursor-not-allowed opacity-70"
+                >
+                  <input
+                    type="checkbox"
+                    class="sr-only"
+                    [checked]="preferences.necessary"
+                    disabled
+                  />
                   <div class="h-5 w-10 rounded-full bg-base-300"></div>
-                  <div class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow"></div>
+                  <div
+                    class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow"
+                  ></div>
                 </label>
               </div>
 
@@ -83,8 +101,12 @@ interface CookiePreferences {
                     [checked]="preferences.functional"
                     (change)="handlePreferenceChange('functional')"
                   />
-                  <div class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"></div>
-                  <div class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+                  <div
+                    class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"
+                  ></div>
+                  <div
+                    class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"
+                  ></div>
                 </label>
               </div>
 
@@ -103,8 +125,12 @@ interface CookiePreferences {
                     [checked]="preferences.analytics"
                     (change)="handlePreferenceChange('analytics')"
                   />
-                  <div class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"></div>
-                  <div class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+                  <div
+                    class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"
+                  ></div>
+                  <div
+                    class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"
+                  ></div>
                 </label>
               </div>
 
@@ -123,8 +149,12 @@ interface CookiePreferences {
                     [checked]="preferences.marketing"
                     (change)="handlePreferenceChange('marketing')"
                   />
-                  <div class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"></div>
-                  <div class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"></div>
+                  <div
+                    class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"
+                  ></div>
+                  <div
+                    class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"
+                  ></div>
                 </label>
               </div>
 

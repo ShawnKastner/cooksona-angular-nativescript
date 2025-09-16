@@ -1,4 +1,11 @@
-import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MealPlannerFormComponent } from '../meal-planner/meal-planner-form.component';
 import { MealPlanDisplayComponent } from '../meal-planner/meal-plan-display.component';

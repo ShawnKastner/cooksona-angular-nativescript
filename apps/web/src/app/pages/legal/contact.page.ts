@@ -14,7 +14,6 @@ import { AuthService } from '@cooksona/auth';
 import { ContactApiService } from '@cooksona/api';
 import { SnackbarService } from '../../shared/ui/snackbar.service';
 
-
 type ContactFormModel = {
   requestType: FormControl<'feature' | 'support' | 'feedback' | 'other'>;
   message: FormControl<string>;
@@ -24,13 +23,8 @@ type ContactFormModel = {
 @Component({
   selector: 'app-contact-page',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    SvgInjectDirective,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, SvgInjectDirective],
   template: `
-    
     <div class="max-w-2xl mx-auto">
       <div
         class="bg-white shadow-soft-xl rounded-2xl p-8 md:p-10 border border-base-200/50"
@@ -148,7 +142,7 @@ export class ContactPage {
   form: FormGroup<ContactFormModel> = this.fb.group<ContactFormModel>({
     requestType: this.fb.control<'feature' | 'support' | 'feedback' | 'other'>(
       'feature',
-      {validators: [Validators.required] }
+      { validators: [Validators.required] }
     ),
     message: this.fb.control<string>('', {
       validators: [Validators.required],
@@ -190,13 +184,17 @@ export class ContactPage {
           message: msg,
         } as any);
       }
-      this.snackbar.success('Vielen Dank! Wir melden uns so schnell wie möglich.');
+      this.snackbar.success(
+        'Vielen Dank! Wir melden uns so schnell wie möglich.'
+      );
       // reset
       this.form.patchValue({ message: '', requestType: 'feature', email: '' });
       this.form.markAsPristine();
       this.form.markAsUntouched();
     } catch {
-      this.snackbar.error('Fehler beim Senden. Bitte versuchen Sie es später erneut.');
+      this.snackbar.error(
+        'Fehler beim Senden. Bitte versuchen Sie es später erneut.'
+      );
     }
     this.isSending = false;
     this.form.enable({ emitEvent: false });

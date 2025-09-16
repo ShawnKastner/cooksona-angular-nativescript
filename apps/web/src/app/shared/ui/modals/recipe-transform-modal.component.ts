@@ -1,11 +1,29 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  inject,
+  HostListener,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import { ApiService } from '@cooksona/api';
 import { FocusTrapDirective } from '../focus-trap.directive';
-import { X, Wand2, Sparkles, Check, BookHeart, BarChart2, Users } from 'libs/constants/icons';
+import {
+  X,
+  Wand2,
+  Sparkles,
+  Check,
+  BookHeart,
+  BarChart2,
+  Users,
+} from 'libs/constants/icons';
 
 export type TransformAction = 'updateInPlan' | 'saveAsCopy';
 

@@ -1,4 +1,11 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+  signal,
+  computed,
+  ChangeDetectionStrategy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { BookHeart } from 'libs/constants/icons';

@@ -49,4 +49,3 @@ export class EmailVerificationComponent implements OnInit {
     this.router.navigate(['/login']).catch(() => {});
   }
 }
-

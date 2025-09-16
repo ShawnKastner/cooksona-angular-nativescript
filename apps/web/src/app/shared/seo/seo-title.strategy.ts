@@ -30,8 +30,14 @@ export class SeoTitleStrategy extends TitleStrategy {
 
       if (description) {
         this.meta.updateTag({ name: 'description', content: description });
-        this.meta.updateTag({ property: 'og:description', content: description });
-        this.meta.updateTag({ name: 'twitter:description', content: description });
+        this.meta.updateTag({
+          property: 'og:description',
+          content: description,
+        });
+        this.meta.updateTag({
+          name: 'twitter:description',
+          content: description,
+        });
       }
       if (keywords) {
         this.meta.updateTag({ name: 'keywords', content: keywords });
@@ -46,13 +52,18 @@ export class SeoTitleStrategy extends TitleStrategy {
       if (image) {
         this.meta.updateTag({ property: 'og:image', content: image });
         this.meta.updateTag({ name: 'twitter:image', content: image });
-        this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+        this.meta.updateTag({
+          name: 'twitter:card',
+          content: 'summary_large_image',
+        });
       }
       this.meta.updateTag({ property: 'og:type', content: 'website' });
     }
   }
 
-  private getDeepestData(state: RouterStateSnapshot): Record<string, any> | null {
+  private getDeepestData(
+    state: RouterStateSnapshot
+  ): Record<string, any> | null {
     let route: any = state.root;
     let data: Record<string, any> | null = null;
     while (route.firstChild) {

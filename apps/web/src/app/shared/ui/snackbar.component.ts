@@ -16,8 +16,10 @@ import { SnackbarService, SnackbarMessage } from './snackbar.service';
       aria-live="polite"
     >
       <div class="px-4 py-3 rounded-xl flex items-start gap-3">
-        <span class="inline-block w-2 h-2 rounded-full mt-2"
-          [ngClass]="dotClass(msg.level)"></span>
+        <span
+          class="inline-block w-2 h-2 rounded-full mt-2"
+          [ngClass]="dotClass(msg.level)"
+        ></span>
         <div class="text-sm font-semibold text-neutral-800">{{ msg.text }}</div>
       </div>
     </div>
@@ -62,4 +64,3 @@ export class SnackbarComponent implements OnDestroy {
     }
   }
 }
-
