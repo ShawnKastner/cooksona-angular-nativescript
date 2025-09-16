@@ -33,16 +33,19 @@ type MealsGroup = {
   dessert: FormControl<boolean>;
 };
 
+type CookTimeOption = '15 Minuten' | '30 Minuten' | '45 Minuten' | '1 Stunde';
+type PlanFocusOption = 'ausgewogen' | 'proteinreich' | 'kohlenhydratarm' | 'fettarm';
+
 type PlannerForm = FormGroup<{
   diet: FormControl<string>;
   allergies: FormControl<string>;
   people: FormControl<number>;
   planDays: FormControl<number>;
-  cookTime: FormControl<string>;
+  cookTime: FormControl<CookTimeOption>;
   calories: FormControl<number>;
   meals: FormGroup<MealsGroup>;
   enableNutritionAnalysis: FormControl<boolean>;
-  planFocus: FormControl<string>;
+  planFocus: FormControl<PlanFocusOption>;
   gourmetMode: FormControl<boolean>;
 }>;
 @Component({
@@ -103,7 +106,7 @@ export class MealPlannerFormComponent implements OnChanges {
       planDays: this.fb.control<number>(7, {
         validators: [Validators.required, Validators.min(1), Validators.max(14)],
       }),
-      cookTime: this.fb.control<string>('30 Minuten', {
+      cookTime: this.fb.control<CookTimeOption>('30 Minuten', {
         validators: [Validators.required],
       }),
       calories: this.fb.control<number>(2000, {
@@ -117,7 +120,7 @@ export class MealPlannerFormComponent implements OnChanges {
         dessert: this.fb.control<boolean>(false),
       }),
       enableNutritionAnalysis: this.fb.control<boolean>({ value: false, disabled: !this.isProUser } as any),
-      planFocus: this.fb.control<string>({ value: 'ausgewogen', disabled: !this.isProUser } as any, {
+      planFocus: this.fb.control<PlanFocusOption>({ value: 'ausgewogen', disabled: !this.isProUser } as any, {
         validators: [Validators.required],
         nonNullable: true,
       } as any),
