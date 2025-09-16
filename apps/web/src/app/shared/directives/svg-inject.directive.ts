@@ -57,11 +57,11 @@ export class SvgInjectDirective implements OnInit {
       }
     });
 
-    // Host durch echtes <svg> ersetzen
-    const parent = host.parentNode;
-    if (parent) {
-      this.r.insertBefore(parent, svgEl, host);
-      this.r.removeChild(parent, host);
+    // Render SVG inside host to keep Angular in control of lifecycle
+    // Clear host children first to avoid duplicates on re-render
+    while (host.firstChild) {
+      this.r.removeChild(host, host.firstChild);
     }
+    this.r.appendChild(host, svgEl);
   }
 }
