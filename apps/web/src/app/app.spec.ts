@@ -1,10 +1,19 @@
 import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { App } from './app';
+import { AuthService } from '@cooksona/auth';
+import { BehaviorSubject } from 'rxjs';
+
+class AuthStub {
+  private subj = new BehaviorSubject<any>(null);
+  currentUser$ = this.subj.asObservable();
+}
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
+      imports: [App, RouterTestingModule],
+      providers: [{ provide: AuthService, useClass: AuthStub }],
     }).compileComponents();
   });
 

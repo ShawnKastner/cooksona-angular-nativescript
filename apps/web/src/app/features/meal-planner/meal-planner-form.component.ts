@@ -69,7 +69,7 @@ type PlannerForm = FormGroup<{
 })
 export class MealPlannerFormComponent implements OnChanges {
   @Input() isLoading = false;
-  @Input() isProUser = false;
+  @Input() isProUser = true;
   @Input() remainingRequests: number | null = null;
   @Output() submitPlan = new EventEmitter<PlannerOptions>();
   @Output() showUpgradeModal = new EventEmitter<void>();
@@ -142,26 +142,27 @@ export class MealPlannerFormComponent implements OnChanges {
         snack: this.fb.control<boolean>(false),
         dessert: this.fb.control<boolean>(false),
       }),
-      enableNutritionAnalysis: this.fb.control<boolean>({
-        value: false,
-        disabled: !this.isProUser,
-      } as any),
+      enableNutritionAnalysis: this.fb.control<boolean>(false),
       planFocus: this.fb.control<PlanFocusOption>(
-        { value: 'ausgewogen', disabled: !this.isProUser } as any,
-        {
-          validators: [Validators.required],
-          nonNullable: true,
-        } as any
+        'ausgewogen' as PlanFocusOption,
+        { validators: [Validators.required], nonNullable: true } as any
       ),
-      gourmetMode: this.fb.control<boolean>({
-        value: false,
-        disabled: !this.isProUser,
-      } as any),
+      gourmetMode: this.fb.control<boolean>(false),
     }) as PlannerForm;
 
     this.form.controls.planDays.valueChanges.subscribe(() =>
       this.onPlanDaysChange()
     );
+
+    // Ensure disabled/enabled states are consistent and validity is up-to-date
+    this.setProControlsDisabled(!this.isProUser);
+    // Clamp initial planDays for free users so HTML max validator doesn't invalidate the form
+    if (!this.isProUser) {
+      const daysInit = Number(this.form.controls.planDays.value) || 0;
+      if (daysInit > 3)
+        this.form.controls.planDays.setValue(3, { emitEvent: false });
+    }
+    this.form.updateValueAndValidity({ emitEvent: false });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -201,6 +202,8 @@ export class MealPlannerFormComponent implements OnChanges {
   }
 
   submit(): void {
+    // Recompute validity in case external changes affected controls
+    this.form.updateValueAndValidity({ onlySelf: false });
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -233,8 +236,11 @@ export class MealPlannerFormComponent implements OnChanges {
     for (const n of names) {
       const c = this.form.get(n);
       if (!c) continue;
-      if (disabled) c.disable({ emitEvent: false });
-      else c.enable({ emitEvent: false });
+      if (disabled) {
+        c.disable({ emitEvent: false });
+      } else {
+        c.enable({ emitEvent: false });
+      }
     }
   }
 }

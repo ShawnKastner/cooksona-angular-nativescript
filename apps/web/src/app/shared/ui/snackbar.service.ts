@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 export type SnackbarLevel = 'info' | 'success' | 'error' | 'warning';
 export interface SnackbarMessage {
@@ -10,9 +10,8 @@ export interface SnackbarMessage {
 
 @Injectable({ providedIn: 'root' })
 export class SnackbarService {
-  private readonly _message$ = new BehaviorSubject<SnackbarMessage | null>(
-    null
-  );
+  // Use Subject so there is no initial null emission before first show()
+  private readonly _message$ = new Subject<SnackbarMessage | null>();
   readonly message$ = this._message$.asObservable();
   private hideTimer: any = null;
 
