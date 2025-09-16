@@ -250,11 +250,19 @@
               >Nährwertanalyse</span
             >
           </div>
-          <input
-            type="checkbox"
-            class="toggle toggle-sm"
-            formControlName="enableNutritionAnalysis"
-          />
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              class="sr-only peer"
+              formControlName="enableNutritionAnalysis"
+            />
+            <div
+              class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"
+            ></div>
+            <div
+              class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"
+            ></div>
+          </label>
         </div>
         <div
           class="flex justify-between items-center p-3 bg-base-100/60 rounded-xl"
@@ -298,11 +306,19 @@
               >Gourmet-Modus</span
             >
           </div>
-          <input
-            type="checkbox"
-            class="toggle toggle-sm"
-            formControlName="gourmetMode"
-          />
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              class="sr-only peer"
+              formControlName="gourmetMode"
+            />
+            <div
+              class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"
+            ></div>
+            <div
+              class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"
+            ></div>
+          </label>
         </div>
         @if(!isProUser) {
         <div class="text-center text-sm pt-2">
