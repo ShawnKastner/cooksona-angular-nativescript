@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
+import { FocusTrapDirective } from '../focus-trap.directive';
 import { X, Trash } from 'libs/constants/icons';
 
 @Component({
   selector: 'app-delete-confirm-modal',
   standalone: true,
-  imports: [CommonModule, SvgInjectDirective],
+  imports: [CommonModule, SvgInjectDirective, FocusTrapDirective],
   template: `
     @if (open) {
     <div
@@ -19,6 +20,7 @@ import { X, Trash } from 'libs/constants/icons';
       <div
         class="bg-white rounded-2xl shadow-2xl max-w-md w-full relative border border-base-200"
         (click)="$event.stopPropagation()"
+        appFocusTrap
       >
         <div class="flex items-center justify-between p-5 pb-3">
           <h2 class="text-xl font-bold text-neutral" id="modal-title">

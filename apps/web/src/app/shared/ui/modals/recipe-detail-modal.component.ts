@@ -11,11 +11,12 @@ import {
   X,
 } from 'libs/constants/icons';
 import { AuthService } from '@cooksona/auth';
+import { FocusTrapDirective } from '../focus-trap.directive';
 
 @Component({
   selector: 'app-recipe-detail-modal',
   standalone: true,
-  imports: [CommonModule, SvgInjectDirective],
+  imports: [CommonModule, SvgInjectDirective, FocusTrapDirective],
   template: `
     @if (open && recipe) {
     <div
@@ -28,6 +29,7 @@ import { AuthService } from '@cooksona/auth';
       <div
         class="bg-base-100 rounded-2xl shadow-soft-xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-base-200 printable-modal-content"
         (click)="$event.stopPropagation()"
+        appFocusTrap
       >
         <header
           class="p-6 border-b border-base-200 flex items-start justify-between"

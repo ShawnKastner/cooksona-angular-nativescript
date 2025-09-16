@@ -13,6 +13,7 @@ import {
   Users,
 } from 'libs/constants/icons';
 import { ApiService } from '@cooksona/api';
+import { FocusTrapDirective } from '../focus-trap.directive';
 import { AuthService } from '@cooksona/auth';
 
 const FREE_USER_REQUEST_LIMIT = 5;
@@ -20,7 +21,7 @@ const FREE_USER_REQUEST_LIMIT = 5;
 @Component({
   selector: 'app-left-over-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, SvgInjectDirective],
+  imports: [CommonModule, FormsModule, SvgInjectDirective, FocusTrapDirective],
   template: `
     @if (open) {
     <div
@@ -33,6 +34,7 @@ const FREE_USER_REQUEST_LIMIT = 5;
       <div
         class="bg-base-100 rounded-2xl shadow-soft-xl w-full max-w-2xl transform transition-all max-h-[90vh] flex flex-col border border-base-200"
         (click)="$event.stopPropagation()"
+        appFocusTrap
       >
         <header
           class="p-6 border-b border-base-200 flex items-start justify-between"

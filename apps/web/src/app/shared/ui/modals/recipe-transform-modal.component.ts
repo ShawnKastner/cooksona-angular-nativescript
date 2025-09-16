@@ -4,6 +4,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, injec
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import { ApiService } from '@cooksona/api';
+import { FocusTrapDirective } from '../focus-trap.directive';
 import { X, Wand2, Sparkles, Check, BookHeart, BarChart2, Users } from 'libs/constants/icons';
 
 export type TransformAction = 'updateInPlan' | 'saveAsCopy';
@@ -11,7 +12,7 @@ export type TransformAction = 'updateInPlan' | 'saveAsCopy';
 @Component({
   selector: 'app-recipe-transform-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule, SvgInjectDirective],
+  imports: [CommonModule, FormsModule, SvgInjectDirective, FocusTrapDirective],
   template: `
     @if (open && recipe) {
     <div
@@ -24,6 +25,7 @@ export type TransformAction = 'updateInPlan' | 'saveAsCopy';
       <div
         class="bg-base-100 rounded-2xl shadow-soft-xl w-full max-w-4xl transform transition-all max-h-[90vh] flex flex-col border border-base-200"
         (click)="$event.stopPropagation()"
+        appFocusTrap
       >
         <header
           class="p-6 border-b border-base-200 flex items-start justify-between"

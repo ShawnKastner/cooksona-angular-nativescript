@@ -13,6 +13,7 @@ import {
   Wand2,
 } from 'libs/constants/icons';
 import { SubscriptionType, User } from '@cooksona/models/user.models';
+import { FocusTrapDirective } from '../focus-trap.directive';
 import { ApiService } from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
 
@@ -21,7 +22,7 @@ type ModalView = 'selection' | 'paypal' | 'processing' | 'success';
 @Component({
   selector: 'app-pro-upgrade-modal',
   standalone: true,
-  imports: [CommonModule, SvgInjectDirective],
+  imports: [CommonModule, SvgInjectDirective, FocusTrapDirective],
   template: `
     @if (open) {
     <div
@@ -36,6 +37,7 @@ type ModalView = 'selection' | 'paypal' | 'processing' | 'success';
         [ngClass]="view === 'paypal' ? 'max-w-[560px]' : 'max-w-lg'"
         [style.maxHeight]="'min(90vh, 820px)'"
         (click)="$event.stopPropagation()"
+        appFocusTrap
       >
         <!-- Header -->
         <div class="flex items-center justify-between px-6 md:px-8 pt-6">
