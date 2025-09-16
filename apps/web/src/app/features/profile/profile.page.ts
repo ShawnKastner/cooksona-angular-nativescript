@@ -3,9 +3,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
-  FormBuilder,
+  NonNullableFormBuilder,
   Validators,
   FormGroup,
+  FormControl,
 } from '@angular/forms';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { ProUpgradeModalComponent } from '../../shared/ui/modals/pro-upgrade-modal.component';
@@ -22,6 +23,12 @@ import { ApiService } from '@cooksona/api';
 import { Message } from '@cooksona/models/contact.models';
 import { User } from '@cooksona/models/user.models';
 
+
+type ProfileFormModel = {
+  name: FormControl<string>;
+  email: FormControl<string>;
+};
+
 @Component({
   selector: 'app-profile-page',
   standalone: true,
@@ -35,7 +42,7 @@ import { User } from '@cooksona/models/user.models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfileComponent implements OnInit, OnDestroy {
-  private readonly fb = inject(FormBuilder);
+  private readonly fb = inject(NonNullableFormBuilder);
   readonly auth = inject(AuthService);
   private readonly contactApi = inject(ContactApiService);
   private readonly api = inject(ApiService);
@@ -59,7 +66,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
 
   // Form
-  form!: FormGroup;
+  form!: FormGroup<ProfileFormModel>;
   saveError: string | null = null;
   saveSuccess: string | null = null;
   isEditing = false;
@@ -74,20 +81,18 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     const u = this.auth.currentUser as User | null;
-    this.form = this.fb.group({
-      name: [
-        u?.name ?? '',
-        [
+    this.form = this.fb.group<ProfileFormModel>({
+      name: this.fb.control<string>(u?.name ?? '', {
+        validators: [
           Validators.required,
           Validators.minLength(2),
           Validators.maxLength(50),
           Validators.pattern(/^[a-zA-ZäöüÄÖÜß\s-]+$/),
         ],
-      ],
-      email: [
-        u?.email ?? '',
-        [Validators.required, Validators.email, Validators.maxLength(100)],
-      ],
+      }),
+      email: this.fb.control<string>(u?.email ?? '', {
+        validators: [Validators.required, Validators.email, Validators.maxLength(100)],
+      }),
     });
 
     // Load contact requests
@@ -203,7 +208,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.isSaving = true;
     this.cdr.markForCheck();
     try {
-      await this.auth.updateProfile(this.form.value);
+      const value = this.form.getRawValue();
+      await this.auth.updateProfile(value);
       this.zone.run(() => {
         this.saveSuccess = 'Profil aktualisiert.';
         this.isEditing = false;

@@ -3,15 +3,22 @@ import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
-  FormBuilder,
+  NonNullableFormBuilder,
   Validators,
   FormGroup,
+  FormControl,
 } from '@angular/forms';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { MessageSquare, Send } from 'libs/constants/icons';
-import { SeoComponent } from '../../shared/seo/seo.component';
 import { AuthService } from '@cooksona/auth';
 import { ContactApiService } from '@cooksona/api';
+
+
+type ContactFormModel = {
+  requestType: FormControl<'feature' | 'support' | 'feedback' | 'other'>;
+  message: FormControl<string>;
+  email: FormControl<string>;
+};
 
 @Component({
   selector: 'app-contact-page',
@@ -20,17 +27,9 @@ import { ContactApiService } from '@cooksona/api';
     CommonModule,
     ReactiveFormsModule,
     SvgInjectDirective,
-    SeoComponent,
   ],
   template: `
-    <app-seo
-      [title]="'Kontakt – CookSona'"
-      [description]="
-        'Fragen, Vorschläge oder Support? Kontaktiere das CookSona Team.'
-      "
-      [keywords]="'Kontakt, Support, Feedback, Anfrage'"
-    />
-
+    
     <div class="max-w-2xl mx-auto">
       <div
         class="bg-white shadow-soft-xl rounded-2xl p-8 md:p-10 border border-base-200/50"
@@ -155,16 +154,23 @@ import { ContactApiService } from '@cooksona/api';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactPage {
-  private readonly fb = inject(FormBuilder);
+  private readonly fb = inject(NonNullableFormBuilder);
   private readonly auth = inject(AuthService);
   private readonly contactApi = inject(ContactApiService);
 
   readonly icons = { MessageSquare, Send } as const;
 
-  form: FormGroup = this.fb.group({
-    requestType: ['feature', Validators.required],
-    message: ['', Validators.required],
-    email: ['', [Validators.email]],
+  form: FormGroup<ContactFormModel> = this.fb.group<ContactFormModel>({
+    requestType: this.fb.control<'feature' | 'support' | 'feedback' | 'other'>(
+      'feature',
+      {validators: [Validators.required] }
+    ),
+    message: this.fb.control<string>('', {
+      validators: [Validators.required],
+    }),
+    email: this.fb.control<string>('', {
+      validators: [Validators.email],
+    }),
   });
   isSending = false;
   error: string | null = null;
@@ -177,8 +183,8 @@ export class ContactPage {
   async handleSubmit(): Promise<void> {
     this.error = null;
     this.success = null;
-    const val = this.form.value as any;
-    const msg = String(val.message || '').trim();
+    const val = this.form.getRawValue();
+    const msg = val.message.trim();
     if (!msg) {
       this.error = 'Bitte geben Sie eine Nachricht ein.';
       return;
