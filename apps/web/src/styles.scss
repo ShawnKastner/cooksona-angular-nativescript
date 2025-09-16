@@ -3,7 +3,7 @@
 @tailwind utilities;
 @font-face {
   font-family: "Inter";
-  src: url("../../../public/fonts/Inter/static/Inter_18pt-Regular.ttf")
+  src: url("/fonts/Inter/static/Inter_18pt-Regular.ttf")
     format("truetype");
   font-weight: 400;
   font-style: normal;
@@ -11,7 +11,7 @@
 }
 @font-face {
   font-family: "Inter";
-  src: url("../../../public/fonts/Inter/static/Inter_18pt-Medium.ttf")
+  src: url("/fonts/Inter/static/Inter_18pt-Medium.ttf")
     format("truetype");
   font-weight: 500;
   font-style: normal;
@@ -19,7 +19,7 @@
 }
 @font-face {
   font-family: "Inter";
-  src: url("../../../public/fonts/Inter/static/Inter_18pt-SemiBold.ttf")
+  src: url("/fonts/Inter/static/Inter_18pt-SemiBold.ttf")
     format("truetype");
   font-weight: 600;
   font-style: normal;
@@ -27,7 +27,7 @@
 }
 @font-face {
   font-family: "Inter";
-  src: url("../../../public/fonts/Inter/static/Inter_18pt-Bold.ttf")
+  src: url("/fonts/Inter/static/Inter_18pt-Bold.ttf")
     format("truetype");
   font-weight: 700;
   font-style: normal;
@@ -35,7 +35,7 @@
 }
 @font-face {
   font-family: "Playfair Display";
-  src: url("../../../public/fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf")
+  src: url("/fonts/Playfair_Display/static/PlayfairDisplay-Regular.ttf")
     format("truetype");
   font-weight: 400;
   font-style: normal;
@@ -43,7 +43,7 @@
 }
 @font-face {
   font-family: "Playfair Display";
-  src: url("../../../public/fonts/Playfair_Display/static/PlayfairDisplay-Italic.ttf")
+  src: url("/fonts/Playfair_Display/static/PlayfairDisplay-Italic.ttf")
     format("truetype");
   font-weight: 400;
   font-style: italic;
@@ -51,7 +51,7 @@
 }
 @font-face {
   font-family: "Playfair Display";
-  src: url("../../../public/fonts/Playfair_Display/static/PlayfairDisplay-Medium.ttf")
+  src: url("/fonts/Playfair_Display/static/PlayfairDisplay-Medium.ttf")
     format("truetype");
   font-weight: 500;
   font-style: normal;
@@ -59,7 +59,7 @@
 }
 @font-face {
   font-family: "Playfair Display";
-  src: url("../../../public/fonts/Playfair_Display/static/PlayfairDisplay-MediumItalic.ttf")
+  src: url("/fonts/Playfair_Display/static/PlayfairDisplay-MediumItalic.ttf")
     format("truetype");
   font-weight: 500;
   font-style: italic;
@@ -67,7 +67,7 @@
 }
 @font-face {
   font-family: "Playfair Display";
-  src: url("../../../public/fonts/Playfair_Display/static/PlayfairDisplay-SemiBold.ttf")
+  src: url("/fonts/Playfair_Display/static/PlayfairDisplay-SemiBold.ttf")
     format("truetype");
   font-weight: 600;
   font-style: normal;
@@ -75,7 +75,7 @@
 }
 @font-face {
   font-family: "Playfair Display";
-  src: url("../../../public/fonts/Playfair_Display/static/PlayfairDisplay-SemiBoldItalic.ttf")
+  src: url("/fonts/Playfair_Display/static/PlayfairDisplay-SemiBoldItalic.ttf")
     format("truetype");
   font-weight: 600;
   font-style: italic;
@@ -83,7 +83,7 @@
 }
 @font-face {
   font-family: "Playfair Display";
-  src: url("../../../public/fonts/Playfair_Display/static/PlayfairDisplay-Bold.ttf")
+  src: url("/fonts/Playfair_Display/static/PlayfairDisplay-Bold.ttf")
     format("truetype");
   font-weight: 700;
   font-style: normal;
@@ -91,7 +91,7 @@
 }
 @font-face {
   font-family: "Playfair Display";
-  src: url("../../../public/fonts/Playfair_Display/static/PlayfairDisplay-BoldItalic.ttf")
+  src: url("/fonts/Playfair_Display/static/PlayfairDisplay-BoldItalic.ttf")
     format("truetype");
   font-weight: 700;
   font-style: italic;
@@ -99,7 +99,7 @@
 }
 @font-face {
   font-family: "Playfair Display";
-  src: url("../../../public/fonts/Playfair_Display/static/PlayfairDisplay-Black.ttf")
+  src: url("/fonts/Playfair_Display/static/PlayfairDisplay-Black.ttf")
     format("truetype");
   font-weight: 900;
   font-style: normal;
@@ -107,7 +107,7 @@
 }
 @font-face {
   font-family: "Playfair Display";
-  src: url("../../../public/fonts/Playfair_Display/static/PlayfairDisplay-BlackItalic.ttf")
+  src: url("/fonts/Playfair_Display/static/PlayfairDisplay-BlackItalic.ttf")
     format("truetype");
   font-weight: 900;
   font-style: italic;
@@ -134,4 +134,112 @@ body,
 /* Use the Tailwind `font-sans` theme as the default app font */
 body {
   @apply font-sans;
+}
+
+/* ---- Moved from index.html to global styles ---- */
+.mask-gradient {
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+
+/* Hide number input spinners for a cleaner UI */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: white !important;
+  }
+  /* Hide all elements marked as non-printable */
+  .non-printable {
+    display: none !important;
+  }
+  /* Make the main grid a block element to remove columns */
+  #planner-grid {
+    display: block !important;
+  }
+  /* Reset printable area styles */
+  #printable-area {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    min-height: auto !important;
+    background-color: white !important;
+  }
+  .meal-plan-accordion-item {
+    page-break-inside: avoid !important;
+    border: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    box-shadow: none !important;
+  }
+  /* Force accordion content to be visible for printing */
+  .meal-plan-accordion-content {
+    max-height: none !important;
+    opacity: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    padding: 1.25rem;
+    border-top: 1px solid #e5e7eb;
+  }
+  .meal-plan-accordion-button {
+    background-color: #f9fafb !important;
+  }
+  /* Hide chevron icon */
+  .meal-plan-accordion-button svg {
+    display: none !important;
+  }
+  #shopping-list-grid {
+    column-count: 3;
+    column-gap: 2rem;
+  }
+  #shopping-list-grid > * {
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Styles for recipe modal printing */
+  body.print-active * {
+    visibility: hidden;
+  }
+
+  body.print-active .printable-modal-wrapper,
+  body.print-active .printable-modal-wrapper * {
+    visibility: visible;
+  }
+
+  body.print-active .printable-modal-wrapper {
+    position: absolute !important;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    background: white !important;
+    z-index: 9999;
+  }
+
+  body.print-active .printable-modal-content {
+    box-shadow: none !important;
+    border: none !important;
+    max-height: none !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    position: relative !important;
+    page-break-inside: avoid;
+  }
+
+  body.print-active .non-printable-modal-button {
+    display: none !important;
+  }
 }
