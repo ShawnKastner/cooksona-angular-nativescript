@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Meta, Title } from '@angular/platform-browser';
 
@@ -14,6 +14,7 @@ export interface SeoProps {
   standalone: true,
   imports: [CommonModule],
   template: '',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SeoComponent implements OnChanges, SeoProps {
   @Input() title!: string;

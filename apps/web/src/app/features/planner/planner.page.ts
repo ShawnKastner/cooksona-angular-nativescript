@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MealPlannerFormComponent } from '../meal-planner/meal-planner-form.component';
 import { MealPlanDisplayComponent } from '../meal-planner/meal-plan-display.component';
@@ -55,6 +55,7 @@ type ActiveTab = 'current' | 'shopping-list' | 'history';
     DeleteConfirmModalComponent,
   ],
   templateUrl: './planner.page.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PlannerPage implements OnInit {
   private readonly auth = inject(AuthService);

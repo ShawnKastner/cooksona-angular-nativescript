@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
@@ -18,6 +18,7 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
   imports: [CommonModule, RouterModule, SvgInjectDirective],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
   isDropdownOpen = false;

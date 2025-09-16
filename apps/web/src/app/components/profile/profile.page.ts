@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -33,6 +33,7 @@ import { User } from '@cooksona/models/user.models';
     ProUpgradeModalComponent,
   ],
   templateUrl: './profile.page.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProfilePage implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);

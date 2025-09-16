@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SeoComponent } from '../../shared/seo/seo.component';
@@ -28,6 +28,7 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
   ],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingComponent {
   readonly features: FeatureCardProps[] = [

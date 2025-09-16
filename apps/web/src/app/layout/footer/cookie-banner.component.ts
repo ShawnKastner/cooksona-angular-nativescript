@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  SimpleChanges,
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -39,19 +31,19 @@ interface CookiePreferences {
           </div>
           <div class="flex justify-center gap-3 mt-2">
             <button
-              class="btn btn-sm btn-outline hover:bg-base-200"
+              class="px-3 py-1.5 text-sm font-semibold rounded-lg border border-base-300 text-neutral hover:bg-base-200 transition-colors"
               (click)="toggleDetails()"
             >
               {{ showDetails ? 'Schließen' : 'Einstellungen' }}
             </button>
             <button
-              class="btn btn-sm btn-primary hover:btn-primary-focus"
+              class="px-3 py-1.5 text-sm font-semibold rounded-lg bg-primary text-primary-content hover:bg-primary-focus transition-colors"
               (click)="handleAccept(true)"
             >
               Alle akzeptieren
             </button>
             <button
-              class="btn btn-sm btn-ghost hover:bg-base-200"
+              class="px-3 py-1.5 text-sm font-semibold rounded-lg text-neutral hover:bg-base-200 transition-colors"
               (click)="handleDecline()"
             >
               Nur notwendige
@@ -136,20 +128,20 @@ interface CookiePreferences {
               <div class="flex justify-end gap-3 mt-6">
                 @if(forceShow) {
                 <button
-                  class="btn btn-outline hover:bg-base-200"
+                  class="px-4 py-2 font-bold rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
                   (click)="handleClose()"
                 >
                   Schließen
                 </button>
                 <button
-                  class="btn btn-primary hover:btn-primary-focus"
+                  class="px-4 py-2 font-bold rounded-xl bg-primary text-primary-content hover:bg-primary-focus transition-colors"
                   (click)="handleAccept(false)"
                 >
                   Auswahl speichern
                 </button>
                 } @else {
                 <button
-                  class="btn btn-outline hover:bg-base-200"
+                  class="px-4 py-2 font-bold rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
                   (click)="showDetails = false"
                 >
                   Abbrechen
@@ -164,6 +156,7 @@ interface CookiePreferences {
     </div>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CookieBannerComponent implements OnInit, OnChanges {
   @Input() forceShow = false;

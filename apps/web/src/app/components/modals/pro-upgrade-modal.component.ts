@@ -8,6 +8,7 @@ import {
   Output,
   SimpleChanges,
   inject,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import {
@@ -333,6 +334,7 @@ type ModalView = 'selection' | 'paypal' | 'processing' | 'success';
     </div>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
   @Input() open = false;

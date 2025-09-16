@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 
@@ -21,6 +21,7 @@ export interface FeatureCardProps {
       <p class="text-gray-600 text-base">{{ desc }}</p>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FeatureCardComponent implements FeatureCardProps {
   @Input() icon!: string;

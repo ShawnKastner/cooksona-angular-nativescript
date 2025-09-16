@@ -22,6 +22,7 @@ import {
 } from 'libs/constants/icons';
 import { ApiService } from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
+import { ChangeDetectionStrategy } from '@angular/core';
 
 const FREE_USER_REQUEST_LIMIT = 5;
 
@@ -223,6 +224,7 @@ const FREE_USER_REQUEST_LIMIT = 5;
     </div>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LeftOverModalComponent implements OnChanges {
   @Input() open = false;

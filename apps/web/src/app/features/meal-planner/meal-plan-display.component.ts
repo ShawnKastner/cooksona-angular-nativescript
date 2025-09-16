@@ -1,11 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  computed,
-  signal,
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MealPlan, DailyPlan } from '@cooksona/models/plan.models';
 import { Recipe } from '@cooksona/models/recipe.models';
@@ -32,6 +25,7 @@ type MealKey = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
   standalone: true,
   imports: [CommonModule, SvgInjectDirective],
   templateUrl: './meal-plan-display.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MealPlanDisplayComponent {
   @Input({ required: true }) mealPlan!: MealPlan;

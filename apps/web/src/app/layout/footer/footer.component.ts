@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { CookieBannerComponent } from './cookie-banner.component';
@@ -9,6 +9,7 @@ import { CookieBannerComponent } from './cookie-banner.component';
   imports: [CommonModule, RouterModule, CookieBannerComponent],
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterComponent {
   showCookieSettings = false;

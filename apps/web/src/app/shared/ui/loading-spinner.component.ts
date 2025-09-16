@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-loading-spinner',
@@ -30,6 +30,7 @@ import { Component, Input } from '@angular/core';
       }
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoadingSpinnerComponent {
   @Input() label?: string;

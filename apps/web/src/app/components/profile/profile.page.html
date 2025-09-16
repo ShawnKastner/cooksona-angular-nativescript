@@ -492,14 +492,14 @@
       }
       <div class="flex justify-end gap-3">
         <button
-          class="btn btn-sm btn-outline"
+          class="px-3 py-1.5 text-sm font-semibold rounded-lg border border-base-300 text-neutral hover:bg-base-200 transition-colors"
           (click)="showCancelModal = false"
           [disabled]="cancelLoading"
         >
           Abbrechen
         </button>
         <button
-          class="btn btn-sm btn-error"
+          class="px-3 py-1.5 text-sm font-semibold rounded-lg bg-error text-white hover:bg-error/80 transition-colors"
           (click)="performCancelFlow()"
           [disabled]="cancelLoading"
         >
@@ -541,12 +541,12 @@
     </p>
     <div class="flex justify-end gap-3">
       <button
-        class="btn btn-sm btn-outline"
+        class="px-3 py-1.5 text-sm font-semibold rounded-lg border border-base-300 text-neutral hover:bg-base-200 transition-colors"
         (click)="showReactivateModal = false"
       >
         Abbrechen
       </button>
-      <button class="btn btn-sm btn-primary" (click)="confirmReactivate()">
+      <button class="px-3 py-1.5 text-sm font-semibold rounded-lg bg-primary text-primary-content hover:bg-primary-focus transition-colors" (click)="confirmReactivate()">
         Reaktivieren
       </button>
     </div>

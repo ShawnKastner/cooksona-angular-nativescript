@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import {
@@ -127,6 +127,7 @@ import { AuthService } from '@cooksona/auth';
     </div>
     }
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RecipeDetailModalComponent {
   @Input() open = false;

@@ -1,5 +1,5 @@
 // apps/web/src/app/pages/legal/contact.page.ts
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -152,6 +152,7 @@ import { ContactApiService } from '@cooksona/api';
       </div>
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ContactPage {
   private readonly fb = inject(FormBuilder);
