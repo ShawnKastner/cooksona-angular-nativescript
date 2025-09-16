@@ -95,6 +95,15 @@
         ],
         "styles": ["apps/web/src/styles.scss"]
       }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "options": {
+        "lintFilePatterns": [
+          "apps/web/**/*.{ts,tsx,js,jsx}",
+          "apps/web/**/*.spec.ts"
+        ]
+      }
     }
   }
 }
