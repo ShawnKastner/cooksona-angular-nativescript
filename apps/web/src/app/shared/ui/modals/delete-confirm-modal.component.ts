@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy, HostListener } from '@angular/core';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import { X, Trash } from 'libs/constants/icons';
 
@@ -14,13 +14,14 @@ import { X, Trash } from 'libs/constants/icons';
       (click)="onOverlayClick()"
       role="dialog"
       aria-modal="true"
+      [attr.aria-labelledby]="'modal-title'"
     >
       <div
         class="bg-white rounded-2xl shadow-2xl max-w-md w-full relative border border-base-200"
         (click)="$event.stopPropagation()"
       >
         <div class="flex items-center justify-between p-5 pb-3">
-          <h2 class="text-xl font-bold text-neutral">
+          <h2 class="text-xl font-bold text-neutral" id="modal-title">
             {{ title || 'Wirklich löschen?' }}
           </h2>
           <button
@@ -91,5 +92,10 @@ export class DeleteConfirmModalComponent {
 
   onOverlayClick(): void {
     if (!this.busy) this.cancel.emit();
+  }
+
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
+    if (this.open && !this.busy) this.cancel.emit();
   }
 }

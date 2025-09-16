@@ -214,6 +214,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.saveSuccess = 'Profil aktualisiert.';
         this.isEditing = false;
         this.cdr.markForCheck();
+        setTimeout(() => {
+          this.saveSuccess = null;
+          this.cdr.markForCheck();
+        }, 3000);
       });
     } catch (err: any) {
       this.zone.run(() => {

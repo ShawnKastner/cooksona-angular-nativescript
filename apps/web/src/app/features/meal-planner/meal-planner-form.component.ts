@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, Chang
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
-  FormBuilder,
+  NonNullableFormBuilder,
   Validators,
   FormControl,
   FormGroup,
@@ -25,6 +25,26 @@ import {
 import { AuthService } from '@cooksona/auth';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 
+type MealsGroup = {
+  breakfast: FormControl<boolean>;
+  lunch: FormControl<boolean>;
+  dinner: FormControl<boolean>;
+  snack: FormControl<boolean>;
+  dessert: FormControl<boolean>;
+};
+
+type PlannerForm = FormGroup<{
+  diet: FormControl<string>;
+  allergies: FormControl<string>;
+  people: FormControl<number>;
+  planDays: FormControl<number>;
+  cookTime: FormControl<string>;
+  calories: FormControl<number>;
+  meals: FormGroup<MealsGroup>;
+  enableNutritionAnalysis: FormControl<boolean>;
+  planFocus: FormControl<string>;
+  gourmetMode: FormControl<boolean>;
+}>;
 @Component({
   selector: 'app-meal-planner-form',
   standalone: true,
@@ -69,42 +89,42 @@ export class MealPlannerFormComponent implements OnChanges {
     dessert: 'Dessert',
   };
 
-  form!: FormGroup;
+  form!: PlannerForm;
 
   showPlanDaysHint = false;
 
-  constructor(
-    private readonly fb: FormBuilder,
-    public readonly auth: AuthService
-  ) {
+  constructor(private readonly fb: NonNullableFormBuilder, public readonly auth: AuthService) {
     this.form = this.fb.group({
-      diet: [''],
-      allergies: [''],
-      people: [2, [Validators.required, Validators.min(1), Validators.max(10)]],
-      planDays: [
-        7,
-        [Validators.required, Validators.min(1), Validators.max(14)],
-      ],
-      cookTime: ['30 Minuten', Validators.required],
-      calories: [2000, [Validators.min(0), Validators.max(10000)]],
-      meals: this.fb.group({
-        breakfast: [true],
-        lunch: [true],
-        dinner: [true],
-        snack: [false],
-        dessert: [false],
+      diet: this.fb.control<string>(''),
+      allergies: this.fb.control<string>(''),
+      people: this.fb.control<number>(2, {
+        validators: [Validators.required, Validators.min(1), Validators.max(10)],
       }),
-      enableNutritionAnalysis: [{ value: false, disabled: !this.isProUser }],
-      planFocus: [
-        { value: 'ausgewogen', disabled: !this.isProUser },
-        Validators.required,
-      ],
-      gourmetMode: [{ value: false, disabled: !this.isProUser }],
-    });
+      planDays: this.fb.control<number>(7, {
+        validators: [Validators.required, Validators.min(1), Validators.max(14)],
+      }),
+      cookTime: this.fb.control<string>('30 Minuten', {
+        validators: [Validators.required],
+      }),
+      calories: this.fb.control<number>(2000, {
+        validators: [Validators.min(0), Validators.max(10000)],
+      }),
+      meals: this.fb.group<MealsGroup>({
+        breakfast: this.fb.control<boolean>(true),
+        lunch: this.fb.control<boolean>(true),
+        dinner: this.fb.control<boolean>(true),
+        snack: this.fb.control<boolean>(false),
+        dessert: this.fb.control<boolean>(false),
+      }),
+      enableNutritionAnalysis: this.fb.control<boolean>({ value: false, disabled: !this.isProUser } as any),
+      planFocus: this.fb.control<string>({ value: 'ausgewogen', disabled: !this.isProUser } as any, {
+        validators: [Validators.required],
+        nonNullable: true,
+      } as any),
+      gourmetMode: this.fb.control<boolean>({ value: false, disabled: !this.isProUser } as any),
+    }) as PlannerForm;
 
-    this.form
-      .get('planDays')!
-      .valueChanges.subscribe(() => this.onPlanDaysChange());
+    this.form.controls.planDays.valueChanges.subscribe(() => this.onPlanDaysChange());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -127,15 +147,15 @@ export class MealPlannerFormComponent implements OnChanges {
   }
 
   onPlanDaysChange(): void {
-    const days = Number(this.form.get('planDays')!.value) || 0;
+    const days = this.form.controls.planDays.value || 0;
     if (!this.isProUser) {
       if (days > 3)
-        this.form.get('planDays')!.setValue(3, { emitEvent: false });
+        this.form.controls.planDays.setValue(3, { emitEvent: false });
       this.showPlanDaysHint = false;
     } else {
       this.showPlanDaysHint = days > 14;
       if (days > 14)
-        this.form.get('planDays')!.setValue(14, { emitEvent: false });
+        this.form.controls.planDays.setValue(14, { emitEvent: false });
     }
   }
 
@@ -148,7 +168,7 @@ export class MealPlannerFormComponent implements OnChanges {
       this.form.markAllAsTouched();
       return;
     }
-    this.submitPlan.emit(this.form.getRawValue() as PlannerOptions);
+    this.submitPlan.emit(this.form.getRawValue() as unknown as PlannerOptions);
   }
 
   get currentUserLabel(): string | null {
@@ -157,8 +177,12 @@ export class MealPlannerFormComponent implements OnChanges {
   }
 
   // Helper for strict template typing with dynamic form control paths
-  control(path: string): FormControl {
-    return this.form.get(path) as FormControl;
+  // Overload to support dot-paths in template (e.g. 'meals.breakfast') and typed top-level keys
+  control(path: string): any;
+  control<K extends keyof PlannerForm['controls']>(key: K): PlannerForm['controls'][K];
+  control(arg: string | keyof PlannerForm['controls']): any {
+    if (typeof arg === 'string') return this.form.get(arg) as any;
+    return this.form.controls[arg as keyof PlannerForm['controls']];
   }
 
   private setProControlsDisabled(disabled: boolean): void {
