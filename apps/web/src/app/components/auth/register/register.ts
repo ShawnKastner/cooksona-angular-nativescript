@@ -12,7 +12,7 @@ import { AuthService } from '@cooksona/auth';
   standalone: true,
   imports: [CommonModule, FormsModule, SvgInjectDirective],
   templateUrl: './register.html',
-  styleUrls: ['./register.scss'],
+  styleUrl: './register.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {

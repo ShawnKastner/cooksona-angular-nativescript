@@ -121,31 +121,11 @@
         </table>
       </div>
       @if (userTotalPages() > 1) {
-      <div class="flex justify-center items-center gap-4 mt-6">
-        <button
-          class="px-3 py-1 rounded bg-base-200 text-gray-700 disabled:opacity-50"
-          [disabled]="userPage() === 1"
-          (click)="userPage.set(userPage() > 1 ? userPage() - 1 : 1)"
-        >
-          &lt; Vorherige
-        </button>
-        <span class="font-semibold"
-          >Seite {{ userPage() }} von {{ userTotalPages() }}</span
-        >
-        <button
-          class="px-3 py-1 rounded bg-base-200 text-gray-700 disabled:opacity-50"
-          [disabled]="userPage() === userTotalPages()"
-          (click)="
-            userPage.set(
-              userPage() < userTotalPages()
-                ? userPage() + 1
-                : userTotalPages()
-            )
-          "
-        >
-          Nächste &gt;
-        </button>
-      </div>
+      <app-pagination
+        [page]="userPage()"
+        [totalPages]="userTotalPages()"
+        (pageChange)="userPage.set($event)"
+      />
       } }
     </div>
     } @if (activeTab() === 'invites') {
@@ -223,31 +203,11 @@
         </tbody>
       </table>
       @if (inviteTotalPages() > 1) {
-      <div class="flex justify-center items-center gap-4 mt-6">
-        <button
-          class="px-3 py-1 rounded bg-base-200 text-gray-700 disabled:opacity-50"
-          [disabled]="invitePage() === 1"
-          (click)="invitePage.set(invitePage() > 1 ? invitePage() - 1 : 1)"
-        >
-          &lt; Vorherige
-        </button>
-        <span class="font-semibold"
-          >Seite {{ invitePage() }} von {{ inviteTotalPages() }}</span
-        >
-        <button
-          class="px-3 py-1 rounded bg-base-200 text-gray-700 disabled:opacity-50"
-          [disabled]="invitePage() === inviteTotalPages()"
-          (click)="
-            invitePage.set(
-              invitePage() < inviteTotalPages()
-                ? invitePage() + 1
-                : inviteTotalPages()
-            )
-          "
-        >
-          Nächste &gt;
-        </button>
-      </div>
+      <app-pagination
+        [page]="invitePage()"
+        [totalPages]="inviteTotalPages()"
+        (pageChange)="invitePage.set($event)"
+      />
       } }
     </div>
     } @if (activeTab() === 'contact') {

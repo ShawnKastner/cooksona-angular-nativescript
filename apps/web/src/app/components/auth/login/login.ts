@@ -12,7 +12,7 @@ import { ApiService } from '@cooksona/api';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, SvgInjectDirective],
   templateUrl: './login.html',
-  styleUrls: ['./login.scss'],
+  styleUrl: './login.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent implements OnInit {

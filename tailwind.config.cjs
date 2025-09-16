@@ -1,6 +1,5 @@
 module.exports = {
   content: [
-    './index.html',
     // Include Angular templates and TS files so Tailwind scans component HTML
     './apps/web/src/**/*.{html,ts}',
   ],

@@ -8,7 +8,7 @@ import { UserApiService } from '@cooksona/api';
   standalone: true,
   imports: [CommonModule],
   templateUrl: './email-verification.html',
-  styleUrls: ['./email-verification.scss'],
+  styleUrl: './email-verification.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmailVerificationComponent implements OnInit {

@@ -6,6 +6,7 @@ import { ChevronDown, Inbox, Send, Trash } from 'libs/constants/icons';
 import { ContactApiService } from '@cooksona/api';
 import { Message } from '@cooksona/models/contact.models';
 import { DeleteConfirmModalComponent } from '../../components/modals/delete-confirm-modal.component';
+import { PaginationComponent } from '../../shared/ui/pagination.component';
 
 type MessageFilter = 'all' | 'unread' | 'read' | 'answered';
 const PAGE_SIZE = 5;
@@ -18,6 +19,7 @@ const PAGE_SIZE = 5;
     FormsModule,
     SvgInjectDirective,
     DeleteConfirmModalComponent,
+    PaginationComponent,
   ],
   templateUrl: './contact-requests-panel.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,23 +71,6 @@ export class ContactRequestsPanelComponent {
       return new Date(iso).toLocaleDateString('de-DE');
     } catch {
       return iso;
-    }
-  }
-
-  statusBadge(status: Message['status']): string {
-    switch (status) {
-      case 'answered':
-        return `<span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
-            Beantwortet
-          </span>`;
-      case 'read':
-        return `<span class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">
-            Gelesen
-          </span>`;
-      default:
-        return `<span class="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">
-            Neu
-          </span>`;
     }
   }
 

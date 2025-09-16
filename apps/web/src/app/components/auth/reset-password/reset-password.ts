@@ -9,7 +9,7 @@ import { AuthService } from '@cooksona/auth';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './reset-password.html',
-  styleUrls: ['./reset-password.scss'],
+  styleUrl: './reset-password.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ResetPasswordComponent {

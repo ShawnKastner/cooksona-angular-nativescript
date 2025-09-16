@@ -8,7 +8,7 @@ import { CookieBannerComponent } from './cookie-banner.component';
   standalone: true,
   imports: [CommonModule, RouterModule, CookieBannerComponent],
   templateUrl: './footer.component.html',
-  styleUrls: ['./footer.component.scss'],
+  styleUrl: './footer.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterComponent {

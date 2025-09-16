@@ -17,7 +17,7 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
   standalone: true,
   imports: [CommonModule, RouterModule, SvgInjectDirective],
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
+  styleUrl: './header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {

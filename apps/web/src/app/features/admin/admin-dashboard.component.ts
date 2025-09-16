@@ -10,6 +10,7 @@ import { Invite } from '@cooksona/models/invite.models';
 import { EditUserModalComponent } from './edit-user-modal.component';
 import { CreateInviteModalComponent } from './create-invite-modal.component';
 import { ContactRequestsPanelComponent } from './contact-requests-panel.component';
+import { PaginationComponent } from '../../shared/ui/pagination.component';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -21,6 +22,7 @@ import { ContactRequestsPanelComponent } from './contact-requests-panel.componen
     EditUserModalComponent,
     CreateInviteModalComponent,
     ContactRequestsPanelComponent,
+    PaginationComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-dashboard.component.html',
