@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -7,7 +8,6 @@ import {
   FormGroup,
 } from '@angular/forms';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { SeoComponent } from '../../shared/seo/seo.component';
 import { ProUpgradeModalComponent } from '../modals/pro-upgrade-modal.component';
 import {
   User as UserIcon,
@@ -29,7 +29,6 @@ import { User } from '@cooksona/models/user.models';
     CommonModule,
     ReactiveFormsModule,
     SvgInjectDirective,
-    SeoComponent,
     ProUpgradeModalComponent,
   ],
   templateUrl: './profile.page.html',
@@ -91,7 +90,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (u?.id) void this.loadRequests(u.id);
 
     // If user later updates (rare), reflect in form
-    this.auth.currentUser$.subscribe((user) => {
+    this.auth.currentUser$.pipe(takeUntilDestroyed()).subscribe((user) => {
       if (!user) return;
       this.form.patchValue(
         { name: user.name ?? '', email: user.email ?? '' },

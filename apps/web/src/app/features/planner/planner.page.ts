@@ -11,7 +11,6 @@ import {
 import { Recipe } from '@cooksona/models/recipe.models';
 import { ApiService, CookbookApiService, PlanApiService } from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
-import { SeoComponent } from '../../shared/seo/seo.component';
 import {
   ClipboardList,
   ClipboardCheck,
@@ -42,7 +41,6 @@ type ActiveTab = 'current' | 'shopping-list' | 'history';
     CommonModule,
     MealPlannerFormComponent,
     MealPlanDisplayComponent,
-    SeoComponent,
     SvgInjectDirective,
     TabsComponent,
     HistoryComponent,

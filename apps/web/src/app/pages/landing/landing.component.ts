@@ -1,7 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { SeoComponent } from '../../shared/seo/seo.component';
 import {
   FeatureCardComponent,
   FeatureCardProps,
@@ -22,7 +21,6 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
   imports: [
     CommonModule,
     RouterModule,
-    SeoComponent,
     FeatureCardComponent,
     SvgInjectDirective,
   ],

@@ -19,7 +19,7 @@ export const routes: Routes = [
         "CookSona ist die smarte Lösung für Essensplanung, Einkaufsliste, gesunde Rezepte, Nährwert-Analyse und Kochbuch. Spare Zeit, Geld und ernähre dich besser!",
       keywords:
         'Essensplanung, Einkaufsliste, gesunde Rezepte, Kochbuch, Nährwertanalyse, Meal Planner, Ernährung, Food App, Rezepte speichern, Supermarkt, Familienplanung, Diät, Allergene, Kalorien, Makros, Wochenplan, Mahlzeiten, CookSona',
-      image: '/logo.png',
+      image: '/favicon.svg',
     },
   },
 
@@ -79,7 +79,11 @@ export const routes: Routes = [
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
       import('./components/profile/profile.page').then((m) => m.ProfileComponent),
-    data: { title: 'Profil' },
+    data: {
+      title: 'Profil',
+      description:
+        'Dein persönliches Profil bei CookSona. Verwalte deine Daten, Einstellungen und Abonnements.',
+    },
   },
   {
     path: 'cookbook',
