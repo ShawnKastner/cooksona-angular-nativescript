@@ -5,9 +5,8 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
 import { Shield, Users, Pencil, Trash, Inbox, Clipboard } from 'libs/constants/icons';
 import { DeleteConfirmModalComponent } from '../../components/modals/delete-confirm-modal.component';
 import { User } from '@cooksona/models/user.models';
-import { UserApiService, InvitesApiService, ContactApiService } from '@cooksona/api';
+import { UserApiService, InvitesApiService } from '@cooksona/api';
 import { Invite } from '@cooksona/models/invite.models';
-import { SeoComponent } from '../../shared/seo/seo.component';
 import { EditUserModalComponent } from './edit-user-modal.component';
 import { CreateInviteModalComponent } from './create-invite-modal.component';
 import { ContactRequestsPanelComponent } from './contact-requests-panel.component';
@@ -19,7 +18,6 @@ import { ContactRequestsPanelComponent } from './contact-requests-panel.componen
     CommonModule,
     SvgInjectDirective,
     DeleteConfirmModalComponent,
-    SeoComponent,
     EditUserModalComponent,
     CreateInviteModalComponent,
     ContactRequestsPanelComponent,
@@ -180,4 +178,3 @@ export class AdminDashboardComponent implements OnInit {
   handleInviteCreated(inv: Invite): void { this.invites.set([inv, ...this.invites()]); }
   shortToken(token: string): string { return token ? `${token.slice(0, 3)}...${token.slice(-3)}` : ''; }
 }
-

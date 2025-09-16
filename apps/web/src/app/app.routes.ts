@@ -91,7 +91,11 @@ export const routes: Routes = [
   {
     path: 'admin',
     canActivate: [protectedRouteGuard],
-    data: { requiredRole: 'admin' as const, title: 'Admin' },
+    data: {
+      requiredRole: 'admin' as const,
+      title: 'Admin',
+      description: 'Admin-Dashboard für Benutzer, Einladungen und Kontaktanfragen.',
+    },
     loadComponent: () =>
       import('./features/admin/admin-dashboard.component').then(
         (m) => m.AdminDashboardComponent
