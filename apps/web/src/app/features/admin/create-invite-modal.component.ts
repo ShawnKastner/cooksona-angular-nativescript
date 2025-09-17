@@ -7,7 +7,7 @@ import {
   FormGroup,
 } from '@angular/forms';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { X, Check, Shield, Clipboard } from 'libs/constants/icons';
+import { X, Check } from '@cooksona/constants/icons';
 import { InvitesApiService } from '@cooksona/api';
 import { Invite } from '@cooksona/models/invite.models';
 
@@ -36,7 +36,15 @@ import { Invite } from '@cooksona/models/invite.models';
             <span class="w-5 h-5" [svgInject]="icons.X"></span>
           </button>
         </header>
-        @if (invite) {
+        @if (errorMsg) {
+        <div class="px-6 pt-4">
+          <div
+            class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm"
+          >
+            {{ errorMsg }}
+          </div>
+        </div>
+        } @if (invite) {
         <div class="p-6 space-y-6">
           <div
             class="bg-green-100 border border-green-300 rounded-lg px-4 py-3 flex items-center gap-3"
@@ -62,13 +70,23 @@ import { Invite } from '@cooksona/models/invite.models';
                 readonly
                 disabled
               />
+              @if (!copied) {
               <button
                 type="button"
                 class="bg-yellow-200 text-yellow-900 font-bold px-4 py-2 rounded-xl transition-colors hover:bg-yellow-300"
-                (click)="copy(invite)"
+                (click)="handleCopy(invite)"
               >
                 Kopieren
               </button>
+              } @else {
+              <button
+                type="button"
+                class="bg-green-600 text-white font-bold px-4 py-2 rounded-xl"
+                disabled
+              >
+                Kopiert!
+              </button>
+              }
             </div>
           </div>
           <div class="pt-4">
@@ -84,12 +102,12 @@ import { Invite } from '@cooksona/models/invite.models';
         <form [formGroup]="form" (ngSubmit)="submit()" class="p-6 space-y-6">
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-bold mb-1" for="role"
+              <label class="block text-sm font-bold mb-1" for="presetRole"
                 >Rolle</label
               >
               <select
-                id="role"
-                formControlName="role"
+                id="presetRole"
+                formControlName="presetRole"
                 class="w-full border p-2 rounded"
               >
                 <option value="user">Benutzer</option>
@@ -97,27 +115,46 @@ import { Invite } from '@cooksona/models/invite.models';
               </select>
             </div>
             <div>
-              <label class="block text-sm font-bold mb-1" for="maxUses"
-                >Max. Nutzungen</label
+              <label class="block text-sm font-bold mb-1"
+                >Abo-Typ bei Registrierung</label
               >
-              <input
-                id="maxUses"
-                type="number"
-                min="1"
-                formControlName="maxUses"
-                class="w-full border p-2 rounded"
-                placeholder="z.B. 1"
-              />
+              <div class="flex items-center gap-3 mb-2">
+                <input
+                  id="isLifetime"
+                  type="checkbox"
+                  formControlName="isLifetime"
+                />
+                <label for="isLifetime" class="text-sm">Lifetime</label>
+              </div>
+              @if (!form.value.isLifetime) {
+              <div>
+                <label
+                  class="block text-xs font-medium mb-1"
+                  for="subscriptionEndsAt"
+                  >Enddatum</label
+                >
+                <input
+                  id="subscriptionEndsAt"
+                  type="datetime-local"
+                  formControlName="subscriptionEndsAt"
+                  class="w-full border p-2 rounded"
+                  [required]="!form.value.isLifetime"
+                />
+              </div>
+              }
             </div>
             <div>
-              <label class="block text-sm font-bold mb-1" for="expiresAt"
-                >Gültig bis</label
+              <label class="block text-sm font-bold mb-1" for="expiryDays"
+                >Gültigkeit</label
               >
               <input
-                id="expiresAt"
-                type="datetime-local"
-                formControlName="expiresAt"
+                id="expiryDays"
+                type="number"
+                min="1"
+                formControlName="expiryDays"
                 class="w-full border p-2 rounded"
+                placeholder="7 Tage"
+                required
               />
             </div>
             <div>
@@ -144,6 +181,7 @@ import { Invite } from '@cooksona/models/invite.models';
             </button>
             <button
               type="submit"
+              [disabled]="submitting || form.invalid"
               class="flex-1 px-4 py-2 rounded bg-primary text-white font-bold flex items-center justify-center gap-2"
             >
               <span class="w-4 h-4" [svgInject]="icons.Check"></span>
@@ -164,34 +202,53 @@ export class CreateInviteModalComponent {
 
   form: FormGroup;
   invite: Invite | null = null;
-  readonly icons = { X, Check, Shield, Clipboard } as const;
+  copied = false;
+  readonly icons = { X, Check } as const;
+  errorMsg = '';
+  submitting = false;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly invitesApi: InvitesApiService
   ) {
     this.form = this.fb.group({
-      role: ['user', Validators.required],
-      maxUses: [1, [Validators.min(1)]],
-      expiresAt: [''],
+      presetRole: ['user', Validators.required],
+      isLifetime: [false],
+      subscriptionEndsAt: [''],
+      expiryDays: [7, [Validators.required, Validators.min(1)]],
       description: [''],
+    });
+
+    // Clear optional date and disable when Lifetime toggled on (UX + safety)
+    this.form.get('isLifetime')!.valueChanges.subscribe((isLife: boolean) => {
+      const ctrl = this.form.get('subscriptionEndsAt')!;
+      if (isLife) {
+        ctrl.setValue('');
+        ctrl.disable({ emitEvent: false });
+      } else {
+        ctrl.enable({ emitEvent: false });
+      }
     });
   }
 
   inviteUrl(inv: Invite): string {
     return `${window.location.origin}/invite/redeem/${inv.token}`;
   }
-  copy(inv: Invite): void {
+  handleCopy(inv: Invite): void {
     try {
       navigator.clipboard.writeText(this.inviteUrl(inv));
+      this.copied = true;
     } catch {}
   }
   resetForm(): void {
     this.invite = null;
+    this.copied = false;
+    this.errorMsg = '';
     this.form.reset({
-      role: 'user',
-      maxUses: 1,
-      expiresAt: '',
+      presetRole: 'user',
+      isLifetime: false,
+      subscriptionEndsAt: '',
+      expiryDays: 7,
       description: '',
     });
   }
@@ -200,17 +257,43 @@ export class CreateInviteModalComponent {
     if (this.form.invalid) return;
     const raw = this.form.value as any;
     const payload: any = {
-      role: raw.role,
-      maxUses: raw.maxUses ? Number(raw.maxUses) : undefined,
+      presetRole: raw.presetRole,
+      isLifetime: !!raw.isLifetime,
+      expiryDays: Number(raw.expiryDays),
       description: raw.description || undefined,
-      expiresAt: raw.expiresAt
-        ? new Date(raw.expiresAt).toISOString()
-        : undefined,
+      subscriptionEndsAt:
+        !raw.isLifetime && raw.subscriptionEndsAt
+          ? new Date(raw.subscriptionEndsAt).toISOString()
+          : undefined,
     };
-    const created = await this.invitesApi.createInvite(payload);
-    if (created) {
-      this.invite = created;
-      this.created.emit(created);
+    this.errorMsg = '';
+    this.submitting = true;
+    try {
+      // Server expects React-style fields; pass through as-is
+      let created = await this.invitesApi.createInvite(payload as any);
+      if (!created) {
+        // Fallback: fetch latest invite if server responded without body
+        const list = await this.invitesApi.getAllInvites();
+        if (list && list.length) {
+          created = list
+            .slice()
+            .sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+            )[0];
+        }
+      }
+      if (created) {
+        this.invite = created;
+        this.created.emit(created);
+        this.errorMsg = '';
+      }
+    } catch (e: any) {
+      this.errorMsg =
+        e?.message || 'Erstellen des Einladungslinks fehlgeschlagen.';
+    } finally {
+      this.submitting = false;
     }
   }
 }

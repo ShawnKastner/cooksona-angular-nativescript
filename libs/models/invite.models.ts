@@ -5,8 +5,8 @@ export interface Invite {
   token: string;
   status: 'ACTIVE' | 'USED' | 'EXPIRED';
   presetRole: InviteRole;
-  lifetimeSubscription?: boolean;
-  subscriptionEndsAt?: string | null;
+  presetLifetimeSubscription?: boolean;
+  presetSubscriptionEndsAt?: string | null;
   expiresAt: string;
   createdAt: string;
   description?: string;

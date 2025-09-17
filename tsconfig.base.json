@@ -19,7 +19,8 @@
       "@cooksona/api": ["libs/api/index.ts"],
       "@cooksona/api/*": ["libs/api/*"],
       "@cooksona/models": ["libs/models/index.ts"],
-      "@cooksona/models/*": ["libs/models/*"]
+      "@cooksona/models/*": ["libs/models/*"],
+      "@cooksona/constants/icons": ["libs/constants/icons.ts"]
     },
     "baseUrl": ".",
     "rootDir": "."
