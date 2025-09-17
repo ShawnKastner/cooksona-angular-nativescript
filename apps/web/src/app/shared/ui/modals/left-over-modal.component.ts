@@ -25,6 +25,7 @@ import {
 import { ApiService } from '@cooksona/api';
 import { FocusTrapDirective } from '../focus-trap.directive';
 import { AuthService } from '@cooksona/auth';
+import { toErrorMessage } from '../../utils/error.utils';
 
 const FREE_USER_REQUEST_LIMIT = 5;
 
@@ -322,11 +323,20 @@ export class LeftOverModalComponent implements OnChanges {
       if (!this.isProUser) {
         try {
           await this.auth.consumeRequest();
-        } catch {}
+        } catch (error) {
+          this.success = null;
+          this.error = toErrorMessage(
+            error,
+            'Deine Anfrage konnte nicht verbucht werden. Bitte lade die Seite neu.'
+          );
+        }
       }
-    } catch (err: any) {
-      if (err?.name === 'AbortError') return; // ignore abort
-      this.error = err?.message ?? 'Ein Fehler ist aufgetreten.';
+    } catch (error: any) {
+      if (error?.name === 'AbortError') return; // ignore abort
+      this.error = toErrorMessage(
+        error,
+        'Die Resteverwertung ist fehlgeschlagen. Bitte versuche es später erneut.'
+      );
     } finally {
       this.isLoading = false;
     }

@@ -7,6 +7,7 @@ import { Invite } from '@cooksona/models/invite.models';
 import { InvitesApiService } from '@cooksona/api';
 import { CreateInviteModalComponent } from './create-invite-modal.component';
 import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
+import { toErrorMessage } from '../../shared/utils/error.utils';
 
 @Component({
   selector: 'app-invites-panel',
@@ -48,6 +49,7 @@ export class InvitesPanelComponent implements OnInit {
 
   async fetchInvites(): Promise<void> {
     this.isLoadingInvites.set(true);
+    this.error.set(null);
     try {
       const fetched = await this.invitesApi.getAllInvites();
       const sorted = (fetched ?? [])
@@ -57,9 +59,12 @@ export class InvitesPanelComponent implements OnInit {
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
       this.invites.set(sorted);
-    } catch (err: any) {
+    } catch (error) {
       this.error.set(
-        err?.message ?? 'Einladungen konnten nicht geladen werden.'
+        toErrorMessage(
+          error,
+          'Einladungen konnten nicht geladen werden. Bitte versuche es später erneut.'
+        )
       );
     } finally {
       this.isLoadingInvites.set(false);
@@ -72,10 +77,18 @@ export class InvitesPanelComponent implements OnInit {
       navigator.clipboard.writeText(url);
       this.copiedInviteId.set(inv.id);
       setTimeout(() => this.copiedInviteId.set(null), 2000);
-    } catch {}
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Der Einladungslink konnte nicht kopiert werden. Bitte kopiere ihn manuell.'
+        )
+      );
+    }
   }
 
   openDeleteInvite(inv: Invite): void {
+    this.error.set(null);
     this.deleteInviteId.set(inv.id);
     this.deleteInviteModalOpen.set(true);
   }
@@ -94,13 +107,19 @@ export class InvitesPanelComponent implements OnInit {
   async confirmDeleteInvite(): Promise<void> {
     const id = this.deleteInviteId();
     if (!id) return;
+    this.error.set(null);
     try {
       await this.invitesApi.deleteInvite(id);
       this.invites.set(this.invites().filter((i) => i.id !== id));
       this.success.set('Einladungslink erfolgreich gelöscht.');
       setTimeout(() => this.success.set(null), 3500);
-    } catch (err: any) {
-      this.error.set(err?.message ?? 'Fehler beim Löschen der Einladung.');
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Die Einladung konnte nicht gelöscht werden. Bitte versuche es später erneut.'
+        )
+      );
     } finally {
       this.closeDeleteInviteModal();
     }
@@ -108,6 +127,8 @@ export class InvitesPanelComponent implements OnInit {
 
   handleInviteCreated(inv: Invite): void {
     this.invites.set([inv, ...this.invites()]);
+    this.success.set('Neuer Einladungslink erstellt.');
+    setTimeout(() => this.success.set(null), 3500);
   }
 
   shortToken(token: string): string {

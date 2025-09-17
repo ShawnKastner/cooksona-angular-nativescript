@@ -255,7 +255,7 @@
       <button
         class="font-bold px-5 py-2 rounded-md bg-error text-white hover:bg-error/80 transition-colors"
         style="min-width: 100px"
-        (click)="showDeleteModal = true"
+        (click)="openDeleteModal()"
       >
         Löschen
       </button>
@@ -292,11 +292,16 @@
             <span class="font-semibold">alle zugehörigen Daten</span>
             unwiderruflich löschen?
           </p>
-          <p class="text-error font-bold text-base">
-            Dieser Vorgang kann nicht rückgängig gemacht werden!
-          </p>
-        </div>
-        <div class="flex flex-row-reverse gap-4 mt-6">
+        <p class="text-error font-bold text-base">
+          Dieser Vorgang kann nicht rückgängig gemacht werden!
+        </p>
+      </div>
+      @if (deleteError) {
+      <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
+        {{ deleteError }}
+      </div>
+      }
+      <div class="flex flex-row-reverse gap-4 mt-6">
           <button
             class="px-6 py-2 rounded-lg font-bold bg-error text-white hover:bg-error/80 transition-colors shadow-soft"
             (click)="confirmDelete()"
@@ -305,7 +310,7 @@
           </button>
           <button
             class="px-6 py-2 rounded-lg font-bold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors shadow-soft"
-            (click)="showDeleteModal = false"
+            (click)="showDeleteModal = false; deleteError = null"
           >
             Abbrechen
           </button>
@@ -320,6 +325,11 @@
       <span class="w-6 h-6" [svgInject]="icons.Inbox"></span>
       Meine Anfragen
     </h2>
+    @if (requestsError) {
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-4">
+      {{ requestsError }}
+    </div>
+    }
     @if (loadingRequests) {
     <div
       class="bg-base-100 rounded-xl p-12 text-center flex flex-col items-center justify-center"
@@ -518,18 +528,25 @@
     <p class="mb-4 text-sm text-gray-700">
       Möchtest du dein Abonnement wirklich reaktivieren?
     </p>
+    @if (reactivateError) {
+    <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
+      {{ reactivateError }}
+    </div>
+    }
     <div class="flex justify-end gap-3">
       <button
         class="px-3 py-1.5 text-sm font-semibold rounded-lg border border-base-300 text-neutral hover:bg-base-200 transition-colors"
-        (click)="showReactivateModal = false"
+        (click)="showReactivateModal = false; reactivateError = null; reactivateLoading = false"
+        [disabled]="reactivateLoading"
       >
         Abbrechen
       </button>
       <button
         class="px-3 py-1.5 text-sm font-semibold rounded-lg bg-primary text-primary-content hover:bg-primary-focus transition-colors"
         (click)="confirmReactivate()"
+        [disabled]="reactivateLoading"
       >
-        Reaktivieren
+        {{ reactivateLoading ? 'Wird reaktiviert…' : 'Reaktivieren' }}
       </button>
     </div>
   </div>

@@ -10,6 +10,7 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
 import { X, Check } from '@cooksona/constants/icons';
 import { InvitesApiService } from '@cooksona/api';
 import { Invite } from '@cooksona/models/invite.models';
+import { toErrorMessage } from '../../shared/utils/error.utils';
 
 @Component({
   selector: 'app-create-invite-modal',
@@ -236,9 +237,15 @@ export class CreateInviteModalComponent {
   }
   handleCopy(inv: Invite): void {
     try {
+      this.errorMsg = '';
       navigator.clipboard.writeText(this.inviteUrl(inv));
       this.copied = true;
-    } catch {}
+    } catch (error) {
+      this.errorMsg = toErrorMessage(
+        error,
+        'Der Link konnte nicht kopiert werden. Bitte kopiere ihn manuell.'
+      );
+    }
   }
   resetForm(): void {
     this.invite = null;
@@ -289,9 +296,11 @@ export class CreateInviteModalComponent {
         this.created.emit(created);
         this.errorMsg = '';
       }
-    } catch (e: any) {
-      this.errorMsg =
-        e?.message || 'Erstellen des Einladungslinks fehlgeschlagen.';
+    } catch (error) {
+      this.errorMsg = toErrorMessage(
+        error,
+        'Der Einladungslink konnte nicht erstellt werden. Bitte versuche es später erneut.'
+      );
     } finally {
       this.submitting = false;
     }

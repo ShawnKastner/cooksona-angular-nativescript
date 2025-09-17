@@ -5,6 +5,7 @@ import { UserPlus, Eye, EyeOff } from 'libs/constants/icons';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { Router } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
+import { toErrorMessage } from '../../../shared/utils/error.utils';
 
 @Component({
   selector: 'app-register',
@@ -68,6 +69,11 @@ export class RegisterComponent {
         password: this.password,
       });
       await this.router.navigateByUrl('/login?registered=true');
+    } catch (error) {
+      this.error = toErrorMessage(
+        error,
+        'Die Registrierung ist fehlgeschlagen. Bitte versuche es später erneut.'
+      );
     } finally {
       this.isLoading.set(false);
     }

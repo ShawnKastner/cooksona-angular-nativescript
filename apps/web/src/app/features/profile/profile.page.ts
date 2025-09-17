@@ -32,6 +32,7 @@ import { ContactApiService } from '@cooksona/api';
 import { ApiService } from '@cooksona/api';
 import { Message } from '@cooksona/models/contact.models';
 import { User } from '@cooksona/models/user.models';
+import { toErrorMessage } from '../../shared/utils/error.utils';
 
 type ProfileFormModel = {
   name: FormControl<string>;
@@ -74,6 +75,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   cancelSuccess = false;
   showReactivateModal = false;
   showDeleteModal = false;
+  reactivateLoading = false;
+  reactivateError: string | null = null;
+  deleteError: string | null = null;
 
   // Form
   form!: FormGroup<ProfileFormModel>;
@@ -85,6 +89,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   // Requests
   contactRequests: Message[] = [];
   loadingRequests = false;
+  requestsError: string | null = null;
   expandedMessageId: string | null = null;
   currentPage = 1;
   readonly PAGE_SIZE = 5;
@@ -199,13 +204,19 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   async loadRequests(userId: string): Promise<void> {
     this.loadingRequests = true;
+    this.requestsError = null;
     try {
       const data = await this.contactApi.fetchUserContactRequests(userId);
       this.contactRequests = data ?? [];
-    } catch {
+    } catch (error) {
       this.contactRequests = [];
+      this.requestsError = toErrorMessage(
+        error,
+        'Die Nachrichten konnten nicht geladen werden. Bitte versuche es später erneut.'
+      );
     } finally {
       this.loadingRequests = false;
+      this.zone.run(() => this.cdr.markForCheck());
     }
   }
 
@@ -232,14 +243,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.isEditing = false;
         this.cdr.markForCheck();
       });
-    } catch (err: any) {
+    } catch (error) {
       this.zone.run(() => {
-        const backendMessage = err?.message || err?.error || err?.detail;
-        const msg =
-          typeof backendMessage === 'string' && backendMessage.trim().length > 0
-            ? backendMessage
-            : 'Aktualisierung fehlgeschlagen.';
-        this.saveError = null;
+        const msg = toErrorMessage(
+          error,
+          'Aktualisierung fehlgeschlagen. Bitte versuche es später erneut.'
+        );
+        this.saveError = msg;
         this.snackbar.error(msg);
         this.cdr.markForCheck();
       });
@@ -261,6 +271,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   openReactivateModal(): void {
     this.showReactivateModal = true;
+    this.reactivateError = null;
+    this.reactivateLoading = false;
+  }
+
+  openDeleteModal(): void {
+    this.deleteError = null;
+    this.showDeleteModal = true;
   }
 
   async performCancelFlow(): Promise<void> {
@@ -269,12 +286,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.cancelLoading = true;
     try {
       await this.auth.cancelSubscription();
-    } catch (err: any) {
-      const backendMessage = err?.message || err?.error || err?.detail;
-      this.cancelError =
-        typeof backendMessage === 'string' && backendMessage.trim().length > 0
-          ? backendMessage
-          : 'Kündigung fehlgeschlagen.';
+    } catch (error) {
+      this.cancelError = toErrorMessage(
+        error,
+        'Kündigung fehlgeschlagen. Bitte versuche es später erneut.'
+      );
       this.cancelLoading = false;
       return;
     }
@@ -296,15 +312,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
           }, 3000);
           return;
         }
-      } catch (err: any) {
-        const message = String(err?.message || err?.error || '');
-        const status = (err as any)?.status || (err as any)?.statusCode;
+      } catch (error: any) {
+        const message = String(error?.message || error?.error || '');
+        const status = error?.status || error?.statusCode;
         if (status === 429 || /429|Too Many Requests/i.test(message)) {
           this.cancelError =
             'Zu viele Anfragen an den Server. Bitte warte kurz und versuche es erneut.';
           this.cancelLoading = false;
           return;
         }
+        this.cancelError = toErrorMessage(
+          error,
+          'Der Kündigungsstatus konnte nicht geprüft werden. Bitte versuche es später erneut.'
+        );
+        this.cancelLoading = false;
+        return;
       }
       await new Promise((r) => setTimeout(r, intervalMs));
     }
@@ -314,18 +336,44 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   async confirmReactivate(): Promise<void> {
+    this.reactivateError = null;
+    this.reactivateLoading = true;
     try {
       await this.auth.reactivateSubscription();
-    } finally {
-      this.showReactivateModal = false;
+      await this.auth.refreshCurrentUser().catch(() => {});
+      this.zone.run(() => {
+        this.snackbar.success('Abonnement wurde reaktiviert.');
+        this.showReactivateModal = false;
+        this.reactivateLoading = false;
+        this.cdr.markForCheck();
+      });
+    } catch (error) {
+      this.zone.run(() => {
+        this.reactivateError = toErrorMessage(
+          error,
+          'Die Reaktivierung ist fehlgeschlagen. Bitte versuche es später erneut.'
+        );
+        this.reactivateLoading = false;
+        this.cdr.markForCheck();
+      });
     }
   }
 
   async confirmDelete(): Promise<void> {
+    this.deleteError = null;
     try {
       await this.auth.deleteAccount();
       window.location.href = '/';
-    } catch {}
+    } catch (error) {
+      this.zone.run(() => {
+        this.deleteError = toErrorMessage(
+          error,
+          'Das Profil konnte nicht gelöscht werden. Bitte versuche es später erneut.'
+        );
+        this.snackbar.error(this.deleteError);
+        this.cdr.markForCheck();
+      });
+    }
   }
 
   // UI helpers

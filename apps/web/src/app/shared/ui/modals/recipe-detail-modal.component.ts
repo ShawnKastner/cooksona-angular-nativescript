@@ -169,18 +169,24 @@ export class RecipeDetailModalComponent {
   }
 
   handlePrint(): void {
+    const after = () => {
+      document.body.classList.remove('print-active');
+      window.removeEventListener('afterprint', after as any);
+    };
+    let listenerRegistered = false;
     try {
-      // Optional body class toggling for print styling
       document.body.classList.add('print-active');
-      const after = () => {
-        document.body.classList.remove('print-active');
-        window.removeEventListener('afterprint', after as any);
-      };
       window.addEventListener('afterprint', after as any);
+      listenerRegistered = true;
       window.print();
     } catch {
-      // fallback
-      window.print();
+      if (listenerRegistered) {
+        window.removeEventListener('afterprint', after as any);
+        document.body.classList.remove('print-active');
+      }
+      window.alert(
+        'Der Druck konnte nicht gestartet werden. Bitte nutze die Druckfunktion deines Browsers (z.B. Strg+P).'
+      );
     }
   }
 

@@ -27,6 +27,7 @@ import { SubscriptionType, User } from '@cooksona/models/user.models';
 import { FocusTrapDirective } from '../focus-trap.directive';
 import { ApiService } from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
+import { toErrorMessage } from '../../utils/error.utils';
 
 type ModalView = 'selection' | 'paypal' | 'processing' | 'success';
 
@@ -371,6 +372,7 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
   private bodyOverflowPrev: string | null = null;
   private reloadTimer: any = null;
   private polling = false;
+  private lastPollingError: string | null = null;
 
   get canCloseNow(): boolean {
     return !this.isProcessing && this.view !== 'paypal';
@@ -446,6 +448,7 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
     this.isProcessing = true;
     this.setView('processing');
     this.subscriptionResult = null;
+    this.lastPollingError = null;
 
     const maxAttempts = 15; // ~30s if 2s interval (we use 2s)
     const intervalMs = 2000;
@@ -473,9 +476,8 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
           }, 3000);
           return;
         }
-      } catch (err) {
-        // ignore transient errors
-        console.warn('Fehler beim Abfragen des Benutzerstatus', err);
+      } catch (error) {
+        this.lastPollingError = toErrorMessage(error, '');
       }
       await new Promise((res) => setTimeout(res, intervalMs));
     }
@@ -485,6 +487,8 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
     this.isProcessing = false;
     this.setView('success');
     this.error =
-      'Die Zahlung konnte nicht bestätigt werden. Bitte prüfe dein PayPal-Konto oder versuche es später erneut.';
+      this.lastPollingError && this.lastPollingError.trim().length > 0
+        ? this.lastPollingError
+        : 'Die Zahlung konnte nicht bestätigt werden. Bitte prüfe dein PayPal-Konto oder versuche es später erneut.';
   }
 }
