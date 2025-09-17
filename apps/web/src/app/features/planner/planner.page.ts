@@ -27,7 +27,7 @@ import {
   Printer,
   Recycle,
   UtensilsCrossed,
-} from 'libs/constants/icons';
+} from '@cooksona/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { TabsComponent } from './tabs.component';
 import { HistoryComponent } from './history.component';

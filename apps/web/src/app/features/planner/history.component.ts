@@ -17,7 +17,7 @@ import { Trash, Calendar } from 'libs/constants/icons';
   template: `
     @if(plans.length === 0) {
     <div class="text-center text-gray-500 py-12">
-      <p class="font-serif text-xl text-neutral">Noch keine Pläne erstellt.</p>
+      <p class="font-serif-strong text-xl text-neutral">Noch keine Pläne erstellt.</p>
       <p class="text-sm mt-1">Dein erster Plan erscheint hier!</p>
     </div>
     }@else {

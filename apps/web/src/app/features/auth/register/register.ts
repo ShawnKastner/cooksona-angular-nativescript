@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UserPlus, Eye, EyeOff } from 'libs/constants/icons';
@@ -19,9 +19,9 @@ export class RegisterComponent {
   password = '';
   confirmPassword = '';
   error: string | null = null;
-  isLoading = false;
-  showPassword = false;
-  showPassword2 = false;
+  isLoading = signal(false);
+  showPassword = signal(false);
+  showPassword2 = signal(false);
   protected readonly icons = { UserPlus, Eye, EyeOff } as const;
 
   constructor(
@@ -60,7 +60,7 @@ export class RegisterComponent {
       this.error = 'Die Passwörter stimmen nicht überein.';
       return;
     }
-    this.isLoading = true;
+    this.isLoading.set(true);
     try {
       await this.auth.register({
         name: this.name.trim(),
@@ -69,15 +69,15 @@ export class RegisterComponent {
       });
       await this.router.navigateByUrl('/login?registered=true');
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 
   togglePassword() {
-    this.showPassword = !this.showPassword;
+    this.showPassword.set(!this.showPassword());
   }
   togglePassword2() {
-    this.showPassword2 = !this.showPassword2;
+    this.showPassword2.set(!this.showPassword2());
   }
   navigateToLogin() {
     this.router.navigate(['/login']).catch(() => {});
