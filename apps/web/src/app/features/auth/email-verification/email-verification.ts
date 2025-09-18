@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UserApiService } from '@cooksona/api';
+import { toErrorMessage } from '../../../shared/utils/error.utils';
 
 @Component({
   selector: 'app-email-verification',
@@ -39,9 +40,12 @@ export class EmailVerificationComponent implements OnInit {
         this.message =
           'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.';
       }
-    } catch {
+    } catch (error) {
       this.status = 'error';
-      this.message = 'Der Verifizierungslink ist ungültig oder abgelaufen.';
+      this.message = toErrorMessage(
+        error,
+        'Der Verifizierungslink ist ungültig oder abgelaufen.'
+      );
     }
   }
 

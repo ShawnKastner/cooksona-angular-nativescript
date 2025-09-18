@@ -13,6 +13,7 @@ import { MessageSquare, Send } from 'libs/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { ContactApiService } from '@cooksona/api';
 import { SnackbarService } from '../../shared/ui/snackbar.service';
+import { toErrorMessage } from '../../shared/utils/error.utils';
 
 type ContactFormModel = {
   requestType: FormControl<'feature' | 'support' | 'feedback' | 'other'>;
@@ -191,12 +192,16 @@ export class ContactPage {
       this.form.patchValue({ message: '', requestType: 'feature', email: '' });
       this.form.markAsPristine();
       this.form.markAsUntouched();
-    } catch {
+    } catch (error) {
       this.snackbar.error(
-        'Fehler beim Senden. Bitte versuchen Sie es später erneut.'
+        toErrorMessage(
+          error,
+          'Fehler beim Senden. Bitte versuchen Sie es später erneut.'
+        )
       );
+    } finally {
+      this.isSending = false;
+      this.form.enable({ emitEvent: false });
     }
-    this.isSending = false;
-    this.form.enable({ emitEvent: false });
   }
 }

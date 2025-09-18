@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { Mail } from 'libs/constants/icons';
 import { AuthService } from '@cooksona/auth';
+import { toErrorMessage } from '../../../shared/utils/error.utils';
 
 @Component({
   selector: 'app-forgot-password',
@@ -29,8 +30,11 @@ export class ForgotPasswordComponent {
       await this.auth.requestPasswordReset(this.email);
       this.message =
         'Wenn die E-Mail existiert, wurde ein Link zum Zurücksetzen des Passworts versendet.';
-    } catch {
-      this.error = 'Fehler beim Senden der E-Mail.';
+    } catch (error) {
+      this.error = toErrorMessage(
+        error,
+        'Fehler beim Senden der E-Mail. Bitte versuche es später erneut.'
+      );
     } finally {
       this.isLoading = false;
     }

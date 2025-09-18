@@ -7,6 +7,7 @@ import { PaginationComponent } from '../../shared/ui/pagination.component';
 import { Pencil, Trash } from '@cooksona/constants/icons';
 import { EditUserModalComponent } from './edit-user-modal.component';
 import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
+import { toErrorMessage } from '../../shared/utils/error.utils';
 
 @Component({
   selector: 'app-users-panel',
@@ -29,7 +30,6 @@ export class UsersPanelComponent implements OnInit {
   editingUser = signal<User | null>(null);
   deleteUserModalOpen = signal(false);
   deleteUserId = signal<string | null>(null);
-  deleteUserError = signal<string | null>(null);
   userPage = signal(1);
   readonly USERS_PER_PAGE = 5;
   userTotalPages = computed(() =>
@@ -48,11 +48,17 @@ export class UsersPanelComponent implements OnInit {
 
   async fetchUsers(): Promise<void> {
     this.isLoadingUsers.set(true);
+    this.error.set(null);
     try {
       const fetched = await this.usersApi.getAllUsers();
       this.users.set(fetched ?? []);
-    } catch (err: any) {
-      this.error.set(err?.message ?? 'Benutzer konnten nicht geladen werden.');
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Benutzer konnten nicht geladen werden. Bitte versuche es später erneut.'
+        )
+      );
     } finally {
       this.isLoadingUsers.set(false);
     }
@@ -71,6 +77,7 @@ export class UsersPanelComponent implements OnInit {
   }
 
   startEditUser(u: User): void {
+    this.error.set(null);
     this.editingUser.set(u);
   }
 
@@ -80,6 +87,7 @@ export class UsersPanelComponent implements OnInit {
     subscriptionEndsAt?: string;
     lifetimeSubscription?: boolean;
   }): Promise<void> {
+    this.error.set(null);
     try {
       const saved = await this.usersApi.updateUser(updated.id, updated as any);
       if (saved)
@@ -87,14 +95,20 @@ export class UsersPanelComponent implements OnInit {
           this.users().map((u) => (u.id === saved.id ? saved : u))
         );
       this.editingUser.set(null);
-    } catch (err: any) {
+      this.success.set('Benutzer wurde aktualisiert.');
+      setTimeout(() => this.success.set(null), 3500);
+    } catch (error) {
       this.error.set(
-        err?.message ?? 'Fehler beim Aktualisieren des Benutzers.'
+        toErrorMessage(
+          error,
+          'Der Benutzer konnte nicht aktualisiert werden. Bitte versuche es später erneut.'
+        )
       );
     }
   }
 
   prepareDeleteUser(u: User): void {
+    this.error.set(null);
     this.deleteUserId.set(u.id);
     this.deleteUserModalOpen.set(true);
   }
@@ -113,13 +127,19 @@ export class UsersPanelComponent implements OnInit {
   async confirmDeleteUser(): Promise<void> {
     const id = this.deleteUserId();
     if (!id) return;
+    this.error.set(null);
     try {
       await this.usersApi.deleteUser(id);
       this.users.set(this.users().filter((u) => u.id !== id));
       this.success.set('Benutzer erfolgreich gelöscht.');
       setTimeout(() => this.success.set(null), 3500);
-    } catch (err: any) {
-      this.error.set(err?.message ?? 'Fehler beim Löschen des Benutzers.');
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Der Benutzer konnte nicht gelöscht werden. Bitte versuche es später erneut.'
+        )
+      );
     } finally {
       this.closeDeleteUserModal();
     }

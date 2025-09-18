@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '@cooksona/auth';
+import { toErrorMessage } from '../../../shared/utils/error.utils';
 
 @Component({
   selector: 'app-reset-password',
@@ -51,9 +52,11 @@ export class ResetPasswordComponent {
       this.router
         .navigate(['/login'], { queryParams: { reset: 'success' } })
         .catch(() => {});
-    } catch {
-      this.error =
-        'Fehler beim Zurücksetzen des Passworts. Der Link ist möglicherweise abgelaufen oder ungültig.';
+    } catch (error) {
+      this.error = toErrorMessage(
+        error,
+        'Fehler beim Zurücksetzen des Passworts. Der Link ist möglicherweise abgelaufen oder ungültig.'
+      );
     } finally {
       this.isLoading = false;
     }

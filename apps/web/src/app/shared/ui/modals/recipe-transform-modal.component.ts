@@ -14,6 +14,7 @@ import {
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import { ApiService } from '@cooksona/api';
+import { toErrorMessage } from '../../utils/error.utils';
 import { FocusTrapDirective } from '../focus-trap.directive';
 import {
   X,
@@ -393,8 +394,11 @@ export class RecipeTransformModalComponent implements OnChanges {
       )) as Recipe | undefined;
       if (!result) throw new Error('Ein Fehler ist aufgetreten.');
       this.transformedRecipe = result;
-    } catch (err: any) {
-      this.error = err?.message ?? 'Ein Fehler ist aufgetreten.';
+    } catch (error) {
+      this.error = toErrorMessage(
+        error,
+        'Das Rezept konnte nicht angepasst werden. Bitte versuche es später erneut.'
+      );
     } finally {
       this.isLoading = false;
     }

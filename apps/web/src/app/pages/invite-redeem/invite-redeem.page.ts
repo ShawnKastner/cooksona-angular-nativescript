@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, InviteRedeemApiService } from '@cooksona/api';
+import { toErrorMessage } from '../../shared/utils/error.utils';
 
 interface InviteRedeemInfo {
   presetRole: 'admin' | 'user';
@@ -291,8 +292,11 @@ export class InviteRedeemPage implements OnInit {
       await this.router
         .navigate(['/login'], { queryParams: { registered: 'invite' } })
         .catch(() => {});
-    } catch (err) {
-      this.error = this.extractErrorMessage(err);
+    } catch (error) {
+      this.error = toErrorMessage(
+        error,
+        'Ein unbekannter Fehler ist aufgetreten'
+      );
     } finally {
       this.submitting = false;
     }
@@ -355,30 +359,4 @@ export class InviteRedeemPage implements OnInit {
       .catch(() => {});
   }
 
-  private extractErrorMessage(error: unknown): string {
-    if (!error) {
-      return 'Ein unbekannter Fehler ist aufgetreten';
-    }
-
-    if (typeof error === 'string') {
-      return error;
-    }
-
-    if (typeof error === 'object') {
-      const maybeMessage = (error as { message?: unknown }).message;
-      if (typeof maybeMessage === 'string' && maybeMessage.trim()) {
-        return maybeMessage;
-      }
-
-      const maybeMessages = (error as { messages?: unknown }).messages;
-      if (Array.isArray(maybeMessages)) {
-        return maybeMessages
-          .map((value) => (typeof value === 'string' ? value : ''))
-          .filter(Boolean)
-          .join('\n');
-      }
-    }
-
-    return 'Ein unbekannter Fehler ist aufgetreten';
-  }
 }

@@ -13,6 +13,7 @@ import { ContactApiService } from '@cooksona/api';
 import { Message } from '@cooksona/models/contact.models';
 import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
 import { PaginationComponent } from '../../shared/ui/pagination.component';
+import { toErrorMessage } from '../../shared/utils/error.utils';
 
 type MessageFilter = 'all' | 'unread' | 'read' | 'answered';
 const PAGE_SIZE = 5;
@@ -44,6 +45,8 @@ export class ContactRequestsPanelComponent {
   deleteModalOpen = signal(false);
   deleteTargetId = signal<string | null>(null);
   deleteTargetMessage = signal<string | undefined>(undefined);
+  error = signal<string | null>(null);
+  success = signal<string | null>(null);
 
   filters: MessageFilter[] = ['all', 'unread', 'read', 'answered'];
   requestTypeTranslations: Record<Message['requestType'], string> = {
@@ -59,12 +62,20 @@ export class ContactRequestsPanelComponent {
 
   async fetchMessages(): Promise<void> {
     this.loading.set(true);
+    this.error.set(null);
     try {
       const data = await this.contactApi.fetchContactRequests();
       this.messages.set(
         (data ?? []).sort(
           (a, b) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+      );
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Die Kontaktanfragen konnten nicht geladen werden. Bitte versuche es später erneut.'
         )
       );
     } finally {
@@ -123,26 +134,50 @@ export class ContactRequestsPanelComponent {
     this.expandedMessageId.set(isExpanded ? null : msg.id);
     this.replyText = '';
     if (!isExpanded && msg.status === 'unread') {
-      await this.contactApi.updateContactRequest(msg.id, { status: 'read' });
-      await this.fetchMessages();
+      try {
+        await this.contactApi.updateContactRequest(msg.id, { status: 'read' });
+        await this.fetchMessages();
+      } catch (error) {
+        await this.fetchMessages();
+        this.error.set(
+          toErrorMessage(
+            error,
+            'Die Nachricht konnte nicht als gelesen markiert werden. Bitte versuche es später erneut.'
+          )
+        );
+      }
     }
   }
 
   async handleReply(msg: Message): Promise<void> {
     if (!this.replyText.trim()) return;
     this.replyLoadingId.set(msg.id);
-    await this.contactApi.updateContactRequest(msg.id, {
-      status: 'answered',
-      reply: this.replyText.trim(),
-    });
-    this.replyLoadingId.set(null);
-    this.replyText = '';
-    this.expandedMessageId.set(null);
-    await this.fetchMessages();
+    this.error.set(null);
+    try {
+      await this.contactApi.updateContactRequest(msg.id, {
+        status: 'answered',
+        reply: this.replyText.trim(),
+      });
+      this.replyText = '';
+      this.expandedMessageId.set(null);
+      await this.fetchMessages();
+      this.success.set('Antwort wurde gesendet.');
+      setTimeout(() => this.success.set(null), 3500);
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Die Antwort konnte nicht gesendet werden. Bitte versuche es später erneut.'
+        )
+      );
+    } finally {
+      this.replyLoadingId.set(null);
+    }
   }
 
   openDeleteMessage(msg: Message, ev: MouseEvent): void {
     ev.stopPropagation();
+    this.error.set(null);
     this.deleteTargetId.set(msg.id);
     this.deleteTargetMessage.set(msg.message);
     this.deleteModalOpen.set(true);
@@ -155,8 +190,20 @@ export class ContactRequestsPanelComponent {
   async confirmDelete(): Promise<void> {
     const id = this.deleteTargetId();
     if (!id) return;
-    await this.contactApi.deleteContactRequest(id);
-    this.closeDeleteModal();
-    await this.fetchMessages();
+    this.error.set(null);
+    try {
+      await this.contactApi.deleteContactRequest(id);
+      this.closeDeleteModal();
+      await this.fetchMessages();
+      this.success.set('Die Nachricht wurde gelöscht.');
+      setTimeout(() => this.success.set(null), 3500);
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Die Nachricht konnte nicht gelöscht werden. Bitte versuche es später erneut.'
+        )
+      );
+    }
   }
 }

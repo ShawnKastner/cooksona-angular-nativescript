@@ -15,6 +15,7 @@ import { CookbookCardComponent } from './cookbook-card.component';
 import { RecipeTransformModalComponent } from '../../shared/ui/modals/recipe-transform-modal.component';
 import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
 import { RecipeDetailModalComponent } from '../../shared/ui/modals/recipe-detail-modal.component';
+import { toErrorMessage } from '../../shared/utils/error.utils';
 
 @Component({
   selector: 'app-cookbook-page',
@@ -36,6 +37,7 @@ export class CookbookComponent implements OnInit {
   // State
   cookbook = signal<Recipe[]>([]);
   searchTerm = signal('');
+  error = signal<string | null>(null);
 
   // Modals
   selectedRecipe = signal<Recipe | null>(null);
@@ -51,12 +53,17 @@ export class CookbookComponent implements OnInit {
   }
 
   private async loadCookbook(): Promise<void> {
+    this.error.set(null);
     try {
       const recipes = await this.cookbookApi.getCookbookForUser();
       this.cookbook.set(recipes ?? []);
-    } catch (e) {
-      console.error('Failed to fetch cookbook', e);
-      this.cookbook.set([]);
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Deine Kochbuch-Einträge konnten nicht geladen werden. Bitte versuche es später erneut.'
+        )
+      );
     }
   }
 
@@ -66,6 +73,7 @@ export class CookbookComponent implements OnInit {
   }
 
   handleShowRecipe(recipe: Recipe): void {
+    this.error.set(null);
     this.selectedRecipe.set(this.enrichRecipeWithFallback(recipe));
   }
 
@@ -73,14 +81,15 @@ export class CookbookComponent implements OnInit {
     this.selectedRecipe.set(null);
   }
 
-  async handleRemoveRecipe(recipeId: string): Promise<void> {
-    try {
-      await this.cookbookApi.removeRecipeFromCookbook(recipeId);
-    } catch {}
-    this.cookbook.set(this.cookbook().filter((r) => r.id !== recipeId));
+  async handleToggleFavoriteInModal(recipe: Recipe): Promise<void> {
+    const success = await this.removeRecipe(recipe.id);
+    if (success) {
+      this.handleCloseDetailModal();
+    }
   }
 
   requestRemoveRecipe(recipe: Recipe): void {
+    this.error.set(null);
     this.recipePendingDelete.set(recipe);
     this.deleteModalOpen.set(true);
   }
@@ -93,16 +102,14 @@ export class CookbookComponent implements OnInit {
   async confirmRemove(): Promise<void> {
     const r = this.recipePendingDelete();
     if (!r) return;
-    await this.handleRemoveRecipe(r.id);
-    this.cancelRemove();
-  }
-
-  handleToggleFavoriteInModal(recipe: Recipe): void {
-    void this.handleRemoveRecipe(recipe.id);
-    this.handleCloseDetailModal();
+    const success = await this.removeRecipe(r.id);
+    if (success) {
+      this.cancelRemove();
+    }
   }
 
   handleOpenTransformModal(recipe: Recipe): void {
+    this.error.set(null);
     this.recipeToTransform.set(this.enrichRecipeWithFallback(recipe));
     this.isTransformModalOpen.set(true);
   }
@@ -117,13 +124,31 @@ export class CookbookComponent implements OnInit {
     transformedRecipe: Recipe;
     action: 'updateInPlan' | 'saveAsCopy';
   }): Promise<void> {
+    this.error.set(null);
+    let shouldCloseModal = true;
     try {
       const newRecipe = await this.cookbookApi.addRecipeToCookbook(
         ev.transformedRecipe
       );
-      if (newRecipe) this.cookbook.set([newRecipe, ...this.cookbook()]);
-    } catch {}
-    this.handleCloseTransformModal();
+      if (!newRecipe) {
+        throw new Error(
+          'Das transformierte Rezept konnte nicht gespeichert werden.'
+        );
+      }
+      this.cookbook.set([newRecipe, ...this.cookbook()]);
+    } catch (error) {
+      shouldCloseModal = false;
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Das Rezept konnte nicht gespeichert werden. Bitte versuche es später erneut.'
+        )
+      );
+    } finally {
+      if (shouldCloseModal) {
+        this.handleCloseTransformModal();
+      }
+    }
   }
 
   filteredCookbook = computed(() => {
@@ -136,4 +161,21 @@ export class CookbookComponent implements OnInit {
         recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(term))
     );
   });
+
+  private async removeRecipe(recipeId: string): Promise<boolean> {
+    this.error.set(null);
+    try {
+      await this.cookbookApi.removeRecipeFromCookbook(recipeId);
+      this.cookbook.set(this.cookbook().filter((recipe) => recipe.id !== recipeId));
+      return true;
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Das Rezept konnte nicht entfernt werden. Bitte versuche es später erneut.'
+        )
+      );
+      return false;
+    }
+  }
 }

@@ -25,6 +25,16 @@
     </div>
   </div>
 
+  @if (error()) {
+  <div
+    class="bg-red-100 border-l-4 border-error text-red-800 p-4 rounded-r-lg mb-6"
+    role="alert"
+  >
+    <p class="font-bold">Ein Fehler ist aufgetreten</p>
+    <p class="text-sm">{{ error() }}</p>
+  </div>
+  }
+
   @if (filteredCookbook().length > 0) {
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     @for (recipe of filteredCookbook(); track recipe.id) {

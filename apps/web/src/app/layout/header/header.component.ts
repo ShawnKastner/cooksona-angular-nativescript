@@ -16,6 +16,8 @@ import {
   MessageSquare,
 } from 'libs/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { SnackbarService } from '../../shared/ui/snackbar.service';
+import { toErrorMessage } from '../../shared/utils/error.utils';
 
 @Component({
   selector: 'app-header',
@@ -40,7 +42,8 @@ export class HeaderComponent {
   constructor(
     private readonly router: Router,
     private readonly auth: AuthService,
-    private readonly el: ElementRef
+    private readonly el: ElementRef,
+    private readonly snackbar: SnackbarService
   ) {}
 
   get user$() {
@@ -68,9 +71,18 @@ export class HeaderComponent {
     this.router.navigateByUrl(path).catch(() => {});
   }
 
-  logout(): void {
-    this.auth.logout();
-    this.closeDropdown();
-    this.router.navigateByUrl('/login').catch(() => {});
+  async logout(): Promise<void> {
+    try {
+      await this.auth.logout();
+      this.closeDropdown();
+      await this.router.navigateByUrl('/login').catch(() => {});
+    } catch (error) {
+      this.snackbar.error(
+        toErrorMessage(
+          error,
+          'Abmeldung fehlgeschlagen. Bitte versuche es später erneut.'
+        )
+      );
+    }
   }
 }
