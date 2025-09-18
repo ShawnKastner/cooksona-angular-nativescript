@@ -6,6 +6,7 @@ import { SvgInjectDirective } from '../../../shared/directives/svg-inject.direct
 import { LogIn } from 'libs/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { ApiService } from '@cooksona/api';
+import { toErrorMessage } from '../../../shared/utils/error.utils';
 
 @Component({
   selector: 'app-login',
@@ -76,30 +77,11 @@ export class LoginComponent implements OnInit {
     try {
       await this.auth.login({ email: this.email, password: this.password });
       await this.router.navigateByUrl('/');
-    } catch (err: unknown) {
-      const normalizeMessage = (m: unknown): string => {
-        if (m === null || m === undefined) return '';
-        if (typeof m === 'string') return m;
-        if (Array.isArray(m)) return m.join('\n');
-        if (typeof m === 'object') {
-          const obj = m as Record<string, unknown>;
-          const msg = obj['message'];
-          return typeof msg === 'string' ? msg : JSON.stringify(m);
-        }
-        return String(m);
-      };
-
-      if (err && typeof err === 'object') {
-        const obj = err as Record<string, unknown>;
-        const backendMessage =
-          obj['message'] ?? obj['error'] ?? obj['detail'] ?? err;
-        const msg = normalizeMessage(backendMessage);
-        this.error = msg || 'Ein unbekannter Fehler ist aufgetreten.';
-      } else if (typeof err === 'string') {
-        this.error = err;
-      } else {
-        this.error = 'Ein unbekannter Fehler ist aufgetreten.';
-      }
+    } catch (error) {
+      this.error = toErrorMessage(
+        error,
+        'Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.'
+      );
     }
   }
 
@@ -115,17 +97,11 @@ export class LoginComponent implements OnInit {
       await this.api.post('/auth/resend-verification', { email: this.email });
       this.resendState = 'sent';
       this.info = 'E-Mail wurde erneut versendet.';
-    } catch (err: unknown) {
-      let backendMessage: unknown;
-      if (typeof err === 'string') backendMessage = err;
-      else if (err && typeof err === 'object') {
-        const obj = err as Record<string, unknown>;
-        backendMessage = obj['message'] ?? obj['error'] ?? obj['detail'];
-      }
-      this.resendError =
-        typeof backendMessage === 'string' && backendMessage.trim().length > 0
-          ? backendMessage
-          : 'Senden fehlgeschlagen. Bitte versuche es später erneut.';
+    } catch (error) {
+      this.resendError = toErrorMessage(
+        error,
+        'Senden fehlgeschlagen. Bitte versuche es später erneut.'
+      );
       this.resendState = 'error';
     }
   }

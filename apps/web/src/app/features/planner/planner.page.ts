@@ -38,6 +38,7 @@ import { LeftOverModalComponent } from '../../shared/ui/modals/left-over-modal.c
 import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner.component';
 import { ProUpgradeModalComponent } from '../../shared/ui/modals/pro-upgrade-modal.component';
 import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
+import { toErrorMessage } from '../../shared/utils/error.utils';
 
 type ActiveTab = 'current' | 'shopping-list' | 'history';
 
@@ -129,9 +130,13 @@ export class PlannerComponent implements OnInit {
       this.mealPlanHistory.set(plans);
       if (plans.length > 0) this.activePlanId.set(plans[0].id);
       this.favoriteRecipeIds.set(new Set((cookbook ?? []).map((r) => r.id)));
-    } catch (e) {
-      console.error('Fehler beim Laden der Pläne oder des Kochbuchs', e);
-      this.error.set('Daten konnten nicht geladen werden.');
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Deine Planungsdaten konnten nicht geladen werden. Bitte versuche es später erneut.'
+        )
+      );
     }
   }
 
@@ -142,7 +147,14 @@ export class PlannerComponent implements OnInit {
   print(): void {
     try {
       window.print();
-    } catch {}
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Der Druck konnte nicht gestartet werden. Bitte verwende die Druckfunktion deines Browsers.'
+        )
+      );
+    }
   }
 
   selectPlan(id: string): void {
@@ -171,9 +183,13 @@ export class PlannerComponent implements OnInit {
         this.activePlanId.set(updated.length > 0 ? updated[0].id : null);
         if (updated.length === 0) this.activeTab.set('current');
       }
-    } catch (err) {
-      console.error('Fehler beim Löschen des Plans', err);
-      this.error.set('Plan konnte nicht gelöscht werden.');
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Plan konnte nicht gelöscht werden. Bitte versuche es später erneut.'
+        )
+      );
     } finally {
       this.cancelDeletePlan();
     }
@@ -248,11 +264,12 @@ export class PlannerComponent implements OnInit {
         this.activePlanId.set(newPlan.id);
         this.activeTab.set('current');
       }
-    } catch (err: any) {
-      console.error(err);
+    } catch (error) {
       this.error.set(
-        err?.message ??
-          'Ein unbekannter Fehler ist aufgetreten. Bitte erneut versuchen.'
+        toErrorMessage(
+          error,
+          'Der Plan konnte nicht erstellt werden. Bitte versuche es später erneut.'
+        )
       );
     } finally {
       this.isLoading.set(false);
@@ -295,32 +312,55 @@ export class PlannerComponent implements OnInit {
 
   async handleSaveLeftoverRecipe(recipe: Recipe): Promise<void> {
     const user = this.auth.currentUser;
-    if (!user) return;
+    if (!user) {
+      this.error.set('Bitte melde dich an, um Rezepte zu speichern.');
+      return;
+    }
     try {
       await this.cookbookApi.addRecipeToCookbook(recipe);
       const set = new Set(this.favoriteRecipeIds());
       set.add(recipe.id);
       this.favoriteRecipeIds.set(set);
-    } catch (err) {
-      console.error('Fehler beim Speichern des Resterezepts', err);
-      this.error.set('Rezept konnte nicht gespeichert werden.');
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Das Rezept konnte nicht gespeichert werden. Bitte versuche es später erneut.'
+        )
+      );
     }
   }
 
   async handleToggleFavorite(recipe: Recipe): Promise<void> {
     const user = this.auth.currentUser;
-    if (!user) return;
-    const enriched = this.getEnrichedRecipe(recipe);
-    const set = new Set(this.favoriteRecipeIds());
-    const isFav = set.has(enriched.id);
-    if (isFav) {
-      await this.cookbookApi.removeRecipeFromCookbook(enriched.id);
-      set.delete(enriched.id);
-    } else {
-      await this.cookbookApi.addRecipeToCookbook(enriched);
-      set.add(enriched.id);
+    if (!user) {
+      this.error.set('Bitte melde dich an, um Favoriten zu verwalten.');
+      return;
     }
-    this.favoriteRecipeIds.set(set);
+    const enriched = this.getEnrichedRecipe(recipe);
+    const currentFavorites = new Set(this.favoriteRecipeIds());
+    const updatedFavorites = new Set(currentFavorites);
+    const isFav = updatedFavorites.has(enriched.id);
+    try {
+      if (isFav) {
+        await this.cookbookApi.removeRecipeFromCookbook(enriched.id);
+        updatedFavorites.delete(enriched.id);
+      } else {
+        await this.cookbookApi.addRecipeToCookbook(enriched);
+        updatedFavorites.add(enriched.id);
+      }
+      this.favoriteRecipeIds.set(updatedFavorites);
+    } catch (error) {
+      this.favoriteRecipeIds.set(currentFavorites);
+      this.error.set(
+        toErrorMessage(
+          error,
+          isFav
+            ? 'Der Favorit konnte nicht entfernt werden. Bitte versuche es später erneut.'
+            : 'Das Rezept konnte nicht als Favorit gespeichert werden. Bitte versuche es später erneut.'
+        )
+      );
+    }
   }
 
   async handleSwapMeal(ev: {
@@ -389,9 +429,13 @@ export class PlannerComponent implements OnInit {
           'Der Plan konnte nach dem Tausch nicht aktualisiert werden.'
         );
       }
-    } catch (err: any) {
-      console.error(err);
-      this.error.set(err?.message ?? 'Ein unbekannter Fehler ist aufgetreten.');
+    } catch (error) {
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Der Austausch des Rezepts ist fehlgeschlagen. Bitte versuche es später erneut.'
+        )
+      );
     } finally {
       this.swappingMealId.set(null);
     }
@@ -404,27 +448,50 @@ export class PlannerComponent implements OnInit {
   }): Promise<void> {
     const user = this.auth.currentUser;
     const activeId = this.activePlanId();
-    if (!user || !activeId) return;
-    if (ev.action === 'updateInPlan') {
-      const updatedPlan = await this.planApi.updateRecipeInPlan(
-        activeId,
-        ev.originalRecipeId,
-        ev.transformedRecipe
-      );
-      if (updatedPlan) {
+    if (!user || !activeId) {
+      this.error.set('Bitte melde dich an, um Rezepte zu bearbeiten.');
+      return;
+    }
+
+    const currentFavorites = new Set(this.favoriteRecipeIds());
+    let shouldCloseModal = true;
+
+    try {
+      if (ev.action === 'updateInPlan') {
+        const updatedPlan = await this.planApi.updateRecipeInPlan(
+          activeId,
+          ev.originalRecipeId,
+          ev.transformedRecipe
+        );
+        if (!updatedPlan) {
+          throw new Error(
+            'Der aktualisierte Plan wurde nicht gespeichert. Bitte versuche es erneut.'
+          );
+        }
         this.mealPlanHistory.set(
           this.mealPlanHistory().map((p) =>
             p.id === activeId ? updatedPlan : p
           )
         );
+      } else if (ev.action === 'saveAsCopy') {
+        await this.cookbookApi.addRecipeToCookbook(ev.transformedRecipe);
+        const updatedFavorites = new Set(currentFavorites);
+        updatedFavorites.add(ev.transformedRecipe.id);
+        this.favoriteRecipeIds.set(updatedFavorites);
       }
-    } else if (ev.action === 'saveAsCopy') {
-      await this.cookbookApi.addRecipeToCookbook(ev.transformedRecipe);
-      const set = new Set(this.favoriteRecipeIds());
-      set.add(ev.transformedRecipe.id);
-      this.favoriteRecipeIds.set(set);
+    } catch (error) {
+      shouldCloseModal = false;
+      this.favoriteRecipeIds.set(currentFavorites);
+      const fallback =
+        ev.action === 'updateInPlan'
+          ? 'Das Rezept konnte nicht im Plan aktualisiert werden. Bitte versuche es später erneut.'
+          : 'Das Rezept konnte nicht gespeichert werden. Bitte versuche es später erneut.';
+      this.error.set(toErrorMessage(error, fallback));
+    } finally {
+      if (shouldCloseModal) {
+        this.handleCloseTransformModal();
+      }
     }
-    this.handleCloseTransformModal();
   }
 
   openUpgradeModal(): void {
