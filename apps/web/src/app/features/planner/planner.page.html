@@ -45,24 +45,34 @@
         </div>
         <div class="mt-6 flex-grow">
           @if(!activePlan()) {
-            <div class="text-center pt-12 flex flex-col items-center justify-center h-full">
-                      <div class="relative w-full max-w-sm">
-                        <div class="absolute -top-4 -left-4 w-16 h-16 bg-primary/10 rounded-full animate-pulse"></div>
-                        <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-secondary/10 rounded-full animate-pulse delay-75"></div>
-                        <div class="relative bg-white/50 backdrop-blur-sm p-8 rounded-2xl border-2 border-dashed border-base-300">
-                          <span class="mx-auto h-16 w-16 text-base-300" [svgInject]="icons.UtensilsCrossed"></span>
-                          <h2 class="mt-6 text-2xl font-serif font-bold text-neutral">
-                            Dein Ernährungsplan wartet
-                          </h2>
-                          <p class="mt-2 text-gray-500">
-                            Fülle links das Formular aus, um loszulegen, oder wähle einen Plan aus
-                            deinem Verlauf.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-          }
-          @if(isLoading() && !isLoading()){
+          <div
+            class="text-center pt-12 flex flex-col items-center justify-center h-full"
+          >
+            <div class="relative w-full max-w-sm">
+              <div
+                class="absolute -top-4 -left-4 w-16 h-16 bg-primary/10 rounded-full animate-pulse"
+              ></div>
+              <div
+                class="absolute -bottom-4 -right-4 w-20 h-20 bg-secondary/10 rounded-full animate-pulse delay-75"
+              ></div>
+              <div
+                class="relative bg-white/50 backdrop-blur-sm p-8 rounded-2xl border-2 border-dashed border-base-300"
+              >
+                <span
+                  class="mx-auto h-16 w-16 text-base-300"
+                  [svgInject]="icons.UtensilsCrossed"
+                ></span>
+                <h2 class="mt-6 text-2xl font-serif font-bold text-neutral">
+                  Dein Ernährungsplan wartet
+                </h2>
+                <p class="mt-2 text-gray-500">
+                  Fülle links das Formular aus, um loszulegen, oder wähle einen
+                  Plan aus deinem Verlauf.
+                </p>
+              </div>
+            </div>
+          </div>
+          } @if(isLoading() && !isLoading()){
           <app-loading-spinner
             [label]="'Dein perfektes Menü wird kreiert...'"
             [subLabel]="'Die KI arbeitet. Bitte habe einen Moment Geduld.'"

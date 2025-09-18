@@ -1,6 +1,11 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, InviteRedeemApiService } from '@cooksona/api';
 
@@ -37,8 +42,12 @@ interface InviteRedeemInfo {
               class="bg-white shadow-soft-xl rounded-2xl px-8 md:px-10 pt-8 pb-10 border border-base-200/50"
             >
               <div class="mb-8 text-center">
-                <h1 class="text-4xl font-serif font-bold text-neutral">Einladung annehmen</h1>
-                <p class="text-gray-500 mt-2">Erstelle deinen Account und starte direkt durch.</p>
+                <h1 class="text-4xl font-serif font-bold text-neutral">
+                  Einladung annehmen
+                </h1>
+                <p class="text-gray-500 mt-2">
+                  Erstelle deinen Account und starte direkt durch.
+                </p>
               </div>
 
               <div
@@ -50,7 +59,10 @@ interface InviteRedeemInfo {
               </div>
 
               <div class="mb-4">
-                <label class="block text-neutral text-sm font-bold mb-2" for="name">
+                <label
+                  class="block text-neutral text-sm font-bold mb-2"
+                  for="name"
+                >
                   Name
                 </label>
                 <input
@@ -64,7 +76,10 @@ interface InviteRedeemInfo {
               </div>
 
               <div class="mb-4">
-                <label class="block text-neutral text-sm font-bold mb-2" for="email">
+                <label
+                  class="block text-neutral text-sm font-bold mb-2"
+                  for="email"
+                >
                   E-Mail
                 </label>
                 <input
@@ -79,7 +94,10 @@ interface InviteRedeemInfo {
               </div>
 
               <div class="mb-8">
-                <label class="block text-neutral text-sm font-bold mb-2" for="password">
+                <label
+                  class="block text-neutral text-sm font-bold mb-2"
+                  for="password"
+                >
                   Passwort
                 </label>
                 <div class="relative">
@@ -165,12 +183,23 @@ interface InviteRedeemInfo {
 
               <div class="mt-8 text-center text-gray-500 text-sm">
                 Du wurdest eingeladen als
-                <b>{{ currentInvite.presetRole === 'admin' ? 'Administrator' : 'Benutzer' }}</b>.<br />
-                <span *ngIf="currentInvite.presetLifetimeSubscription" class="text-green-600">
+                <b>{{
+                  currentInvite.presetRole === 'admin'
+                    ? 'Administrator'
+                    : 'Benutzer'
+                }}</b
+                >.<br />
+                <span
+                  *ngIf="currentInvite.presetLifetimeSubscription"
+                  class="text-green-600"
+                >
                   Dein Account erhält ein lebenslanges Abonnement.
                 </span>
                 <span
-                  *ngIf="!currentInvite.presetLifetimeSubscription && currentInvite.presetSubscriptionEndsAt"
+                  *ngIf="
+                    !currentInvite.presetLifetimeSubscription &&
+                    currentInvite.presetSubscriptionEndsAt
+                  "
                   class="text-blue-600"
                 >
                   Dein Abonnement läuft bis:
@@ -178,7 +207,8 @@ interface InviteRedeemInfo {
                 </span>
                 <span
                   *ngIf="
-                    !currentInvite.presetLifetimeSubscription && !currentInvite.presetSubscriptionEndsAt
+                    !currentInvite.presetLifetimeSubscription &&
+                    !currentInvite.presetSubscriptionEndsAt
                   "
                   class="text-gray-600"
                 >
@@ -303,7 +333,9 @@ export class InviteRedeemPage implements OnInit {
     this.loading = true;
     try {
       const safeToken = encodeURIComponent(token);
-      const invite = await this.api.get<InviteRedeemInfo>(`/invites/redeem/${safeToken}`);
+      const invite = await this.api.get<InviteRedeemInfo>(
+        `/invites/redeem/${safeToken}`
+      );
       if (!invite) {
         this.navigateToInviteError();
         return;
@@ -318,7 +350,9 @@ export class InviteRedeemPage implements OnInit {
   }
 
   private navigateToInviteError(): void {
-    this.router.navigate(['/login'], { queryParams: { inviteError: 'used' } }).catch(() => {});
+    this.router
+      .navigate(['/login'], { queryParams: { inviteError: 'used' } })
+      .catch(() => {});
   }
 
   private extractErrorMessage(error: unknown): string {

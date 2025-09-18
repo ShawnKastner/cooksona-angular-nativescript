@@ -13,7 +13,8 @@ export class SeoTitleStrategy extends TitleStrategy {
   override updateTitle(routerState: RouterStateSnapshot): void {
     const deepest = this.getDeepestData(routerState);
     const built =
-      this.buildTitle(routerState) ?? (deepest?.['title'] as string | undefined);
+      this.buildTitle(routerState) ??
+      (deepest?.['title'] as string | undefined);
     const finalTitle = this.resolveTitle(built);
 
     this.title.setTitle(finalTitle);
@@ -32,7 +33,10 @@ export class SeoTitleStrategy extends TitleStrategy {
     if (description) {
       this.meta.updateTag({ name: 'description', content: description });
       this.meta.updateTag({ property: 'og:description', content: description });
-      this.meta.updateTag({ name: 'twitter:description', content: description });
+      this.meta.updateTag({
+        name: 'twitter:description',
+        content: description,
+      });
     }
     if (keywords) {
       this.meta.updateTag({ name: 'keywords', content: keywords });
@@ -40,7 +44,10 @@ export class SeoTitleStrategy extends TitleStrategy {
     if (image) {
       this.meta.updateTag({ property: 'og:image', content: image });
       this.meta.updateTag({ name: 'twitter:image', content: image });
-      this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+      this.meta.updateTag({
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      });
     }
   }
 
