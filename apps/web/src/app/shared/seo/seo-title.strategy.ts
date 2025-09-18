@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
-import { RouterStateSnapshot, TitleStrategy } from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  Data,
+  RouterStateSnapshot,
+  TitleStrategy,
+} from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class SeoTitleStrategy extends TitleStrategy {
@@ -51,16 +56,19 @@ export class SeoTitleStrategy extends TitleStrategy {
     }
   }
 
-  private getDeepestData(
-    state: RouterStateSnapshot
-  ): Record<string, any> | null {
-    let route: any = state.root;
-    let data: Record<string, any> | null = null;
-    while (route.firstChild) {
+  private getDeepestData(state: RouterStateSnapshot): Data | null {
+    let route: ActivatedRouteSnapshot | null = state.root;
+    let deepestData: Data | null = null;
+    while (route?.firstChild) {
       route = route.firstChild;
-      if (route.data) data = route.data;
+      if (route.data) {
+        deepestData = route.data;
+      }
     }
-    return data;
+    if (route?.data) {
+      deepestData = route.data;
+    }
+    return deepestData;
   }
 
   private resolveTitle(built: string | undefined | null): string {

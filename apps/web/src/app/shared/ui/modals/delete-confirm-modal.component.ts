@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { SvgInjectDirective } from '../../directives/svg-inject.directive';
 import { FocusTrapDirective } from '../focus-trap.directive';
-import { X, Trash } from 'libs/constants/icons';
+import { X, Trash } from '@cooksona/constants/icons';
 
 @Component({
   selector: 'app-delete-confirm-modal',

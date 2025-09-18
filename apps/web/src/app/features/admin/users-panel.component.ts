@@ -81,15 +81,12 @@ export class UsersPanelComponent implements OnInit {
     this.editingUser.set(u);
   }
 
-  async handleUpdateUser(updated: {
-    id: string;
-    role?: string;
-    subscriptionEndsAt?: string;
-    lifetimeSubscription?: boolean;
-  }): Promise<void> {
+  async handleUpdateUser(
+    updated: Pick<User, 'id'> & Partial<User>
+  ): Promise<void> {
     this.error.set(null);
     try {
-      const saved = await this.usersApi.updateUser(updated.id, updated as any);
+      const saved = await this.usersApi.updateUser(updated.id, updated);
       if (saved)
         this.users.set(
           this.users().map((u) => (u.id === saved.id ? saved : u))

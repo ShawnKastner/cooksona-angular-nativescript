@@ -1,2 +1,2 @@
-/// <reference path="./node_modules/@nativescript/types-ios/index.d.ts" />
-/// <reference path="./node_modules/@nativescript/types-android/lib/android-21.d.ts" />
+import '@nativescript/types-ios';
+import '@nativescript/types-android';

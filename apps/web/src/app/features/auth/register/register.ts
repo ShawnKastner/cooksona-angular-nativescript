@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { UserPlus, Eye, EyeOff } from 'libs/constants/icons';
+import { UserPlus, Eye, EyeOff } from '@cooksona/constants/icons';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { Router } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
@@ -30,7 +30,7 @@ export class RegisterComponent {
     private readonly router: Router
   ) {}
 
-  async submit() {
+  async submit(): Promise<void> {
     this.error = null;
     const nameOk =
       this.name.trim().length >= 2 &&
@@ -85,7 +85,11 @@ export class RegisterComponent {
   togglePassword2() {
     this.showPassword2.set(!this.showPassword2());
   }
-  navigateToLogin() {
-    this.router.navigate(['/login']).catch(() => {});
+  navigateToLogin(): void {
+    this.router
+      .navigate(['/login'])
+      .catch((navigationError) =>
+        console.error('Navigation to login failed', navigationError)
+      );
   }
 }

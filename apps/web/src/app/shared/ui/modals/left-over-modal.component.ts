@@ -21,7 +21,7 @@ import {
   Recycle,
   BarChart2,
   Users,
-} from 'libs/constants/icons';
+} from '@cooksona/constants/icons';
 import { ApiService } from '@cooksona/api';
 import { FocusTrapDirective } from '../focus-trap.directive';
 import { AuthService } from '@cooksona/auth';
@@ -314,10 +314,10 @@ export class LeftOverModalComponent implements OnChanges {
 
     this.isLoading = true;
     try {
-      const result = (await this.api.apiGenerateLeftoverRecipe<Recipe>(
+      const result = await this.api.apiGenerateLeftoverRecipe<Recipe>(
         this.ingredients,
         this.abortController.signal
-      )) as Recipe | undefined;
+      );
       if (!result) throw new Error('Ein Fehler ist aufgetreten.');
       this.generatedRecipe = result;
       if (!this.isProUser) {
@@ -331,8 +331,8 @@ export class LeftOverModalComponent implements OnChanges {
           );
         }
       }
-    } catch (error: any) {
-      if (error?.name === 'AbortError') return; // ignore abort
+    } catch (error: unknown) {
+      if (this.isAbortError(error)) return; // ignore abort
       this.error = toErrorMessage(
         error,
         'Die Resteverwertung ist fehlgeschlagen. Bitte versuche es später erneut.'
@@ -351,5 +351,11 @@ export class LeftOverModalComponent implements OnChanges {
   @HostListener('document:keydown.escape')
   onEsc(): void {
     if (this.open) this.close.emit();
+  }
+
+  private isAbortError(error: unknown): boolean {
+    if (typeof error !== 'object' || !error) return false;
+    const maybeName = (error as { name?: unknown }).name;
+    return typeof maybeName === 'string' && maybeName === 'AbortError';
   }
 }

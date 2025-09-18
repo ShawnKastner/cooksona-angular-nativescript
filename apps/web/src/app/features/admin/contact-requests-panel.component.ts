@@ -8,7 +8,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { ChevronDown, Inbox, Send, Trash } from 'libs/constants/icons';
+import { ChevronDown, Inbox, Send, Trash } from '@cooksona/constants/icons';
 import { ContactApiService } from '@cooksona/api';
 import { Message } from '@cooksona/models/contact.models';
 import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';

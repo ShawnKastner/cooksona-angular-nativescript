@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { SimpleChange } from '@angular/core';
 import { MealPlannerFormComponent } from './meal-planner-form.component';
 
 describe('MealPlannerFormComponent', () => {
@@ -24,13 +25,9 @@ describe('MealPlannerFormComponent', () => {
   it('enforces free plan limits when isProUser=false', () => {
     comp.form.controls.planDays.setValue(10);
     comp.isProUser = false;
+    const change = new SimpleChange(true, false, false);
     comp.ngOnChanges({
-      isProUser: {
-        previousValue: true,
-        currentValue: false,
-        firstChange: false,
-        isFirstChange: () => false,
-      } as any,
+      isProUser: change,
     });
     expect(comp.form.controls.planDays.value).toBe(3);
     expect(comp.form.controls.enableNutritionAnalysis.disabled).toBeTrue();

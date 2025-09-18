@@ -3,7 +3,6 @@ import {
   EventEmitter,
   Input,
   Output,
-  computed,
   signal,
   ChangeDetectionStrategy,
 } from '@angular/core';
@@ -23,7 +22,7 @@ import {
   Wand2,
   Users,
   Shuffle,
-} from 'libs/constants/icons';
+} from '@cooksona/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 
 type MealKey = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
@@ -118,7 +117,7 @@ export class MealPlanDisplayComponent {
 
   // Helpers for template logic
   getMeal(day: DailyPlan, key: MealKey): Recipe | undefined {
-    return (day as any)[key] as Recipe | undefined;
+    return day[key];
   }
   fillerCount(recipe: Recipe): number {
     const len = (recipe?.ingredients ?? []).length;

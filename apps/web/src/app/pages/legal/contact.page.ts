@@ -9,7 +9,7 @@ import {
   FormControl,
 } from '@angular/forms';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { MessageSquare, Send } from 'libs/constants/icons';
+import { MessageSquare, Send } from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { ContactApiService } from '@cooksona/api';
 import { SnackbarService } from '../../shared/ui/snackbar.service';
@@ -19,6 +19,12 @@ type ContactFormModel = {
   requestType: FormControl<'feature' | 'support' | 'feedback' | 'other'>;
   message: FormControl<string>;
   email: FormControl<string>;
+};
+
+type ContactFormValue = {
+  requestType: 'feature' | 'support' | 'feedback' | 'other';
+  message: string;
+  email: string;
 };
 
 @Component({
@@ -155,11 +161,11 @@ export class ContactPage {
   isSending = false;
 
   get currentUserId(): string | null {
-    return (this.auth.currentUser as any)?.id ?? null;
+    return this.auth.currentUser?.id ?? null;
   }
 
   async handleSubmit(): Promise<void> {
-    const val = this.form.getRawValue();
+    const val: ContactFormValue = this.form.getRawValue();
     const msg = val.message.trim();
     if (!msg) {
       this.snackbar.error('Bitte geben Sie eine Nachricht ein.');
@@ -177,13 +183,13 @@ export class ContactPage {
           userId: this.currentUserId,
           requestType: val.requestType,
           message: msg,
-        } as any);
+        });
       } else {
         await this.contactApi.createContactRequest({
-          email: val.email,
+          email: val.email.trim(),
           requestType: val.requestType,
           message: msg,
-        } as any);
+        });
       }
       this.snackbar.success(
         'Vielen Dank! Wir melden uns so schnell wie möglich.'

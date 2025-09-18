@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
-import { LogIn } from 'libs/constants/icons';
+import { LogIn } from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { ApiService } from '@cooksona/api';
 import { toErrorMessage } from '../../../shared/utils/error.utils';
@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
     this.router.navigate([], { queryParams: {}, replaceUrl: true });
   }
 
-  async submit() {
+  async submit(): Promise<void> {
     this.error = null;
     this.info = null;
 
@@ -85,7 +85,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  async resendEmail() {
+  async resendEmail(): Promise<void> {
     this.resendError = null;
     if (!this.email) {
       this.resendError = 'Bitte E-Mail angeben, um erneut zu senden.';
@@ -106,19 +106,27 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  togglePassword() {
+  togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
 
-  navigateToRegister() {
-    this.router.navigate(['/register']).catch(() => {});
+  navigateToRegister(): void {
+    this.router
+      .navigate(['/register'])
+      .catch((navigationError) =>
+        console.error('Navigation to register failed', navigationError)
+      );
   }
 
-  navigateToForgot() {
-    this.router.navigate(['/forgot-password']).catch(() => {});
+  navigateToForgot(): void {
+    this.router
+      .navigate(['/forgot-password'])
+      .catch((navigationError) =>
+        console.error('Navigation to forgot-password failed', navigationError)
+      );
   }
 
-  get shouldShowResend() {
+  get shouldShowResend(): boolean {
     return (
       this.error === 'Bitte bestätige zuerst deine E-Mail-Adresse.' &&
       !!this.email

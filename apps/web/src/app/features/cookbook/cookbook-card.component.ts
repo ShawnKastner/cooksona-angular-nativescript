@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { BookText, Trash, Wand2, Users } from 'libs/constants/icons';
+import { BookText, Trash, Wand2, Users } from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
 
 @Component({

@@ -24,7 +24,7 @@ import {
   BookHeart,
   BarChart2,
   Users,
-} from 'libs/constants/icons';
+} from '@cooksona/constants/icons';
 
 export type TransformAction = 'updateInPlan' | 'saveAsCopy';
 
@@ -388,13 +388,13 @@ export class RecipeTransformModalComponent implements OnChanges {
     this.error = null;
     this.transformedRecipe = null;
     try {
-      const result = (await this.api.apiTransformRecipe<Recipe, Recipe>(
+      const result = await this.api.apiTransformRecipe<Recipe, Recipe>(
         r,
         this.modification
-      )) as Recipe | undefined;
+      );
       if (!result) throw new Error('Ein Fehler ist aufgetreten.');
       this.transformedRecipe = result;
-    } catch (error) {
+    } catch (error: unknown) {
       this.error = toErrorMessage(
         error,
         'Das Rezept konnte nicht angepasst werden. Bitte versuche es später erneut.'

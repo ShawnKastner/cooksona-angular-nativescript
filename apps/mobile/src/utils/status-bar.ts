@@ -35,12 +35,14 @@ export function setStatusBarColor(
       if (sdkVersion >= 23) {
         // api level 23+ can programmatically change the text color of the status bar
         // see here: https://developer.android.com/reference/android/view/View#SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-        activity
-          .getWindow()
-          .getDecorView()
-          .setSystemUiVisibility(
-            (<any>android.view.View).SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-          );
+        const decorView = activity.getWindow().getDecorView();
+        const viewStatics = android.view.View as unknown as {
+          SYSTEM_UI_FLAG_LIGHT_STATUS_BAR?: number;
+        };
+        const lightStatusFlag = viewStatics.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+        if (lightStatusFlag !== undefined) {
+          decorView.setSystemUiVisibility(lightStatusFlag);
+        }
       }
     }
   }

@@ -2,15 +2,43 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import {
   ReactiveFormsModule,
-  FormBuilder,
   Validators,
   FormGroup,
+  FormControl,
 } from '@angular/forms';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { X, Check } from '@cooksona/constants/icons';
 import { InvitesApiService } from '@cooksona/api';
-import { Invite } from '@cooksona/models/invite.models';
+import {
+  CreateInviteRequest,
+  Invite,
+  InviteRole,
+} from '@cooksona/models/invite.models';
 import { toErrorMessage } from '../../shared/utils/error.utils';
+
+type InviteFormControls = {
+  presetRole: FormControl<InviteRole>;
+  isLifetime: FormControl<boolean>;
+  subscriptionEndsAt: FormControl<string>;
+  expiryDays: FormControl<number>;
+  description: FormControl<string>;
+};
+
+type InviteFormValue = {
+  presetRole: InviteRole;
+  isLifetime: boolean;
+  subscriptionEndsAt: string;
+  expiryDays: number;
+  description: string;
+};
+
+type CreateInvitePayload = {
+  presetRole: InviteRole;
+  isLifetime: boolean;
+  expiryDays: number;
+  description?: string;
+  subscriptionEndsAt?: string;
+};
 
 @Component({
   selector: 'app-create-invite-modal',
@@ -201,29 +229,38 @@ export class CreateInviteModalComponent {
   @Output() close = new EventEmitter<void>();
   @Output() created = new EventEmitter<Invite>();
 
-  form: FormGroup;
+  form: FormGroup<InviteFormControls>;
   invite: Invite | null = null;
   copied = false;
   readonly icons = { X, Check } as const;
   errorMsg = '';
   submitting = false;
 
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly invitesApi: InvitesApiService
-  ) {
-    this.form = this.fb.group({
-      presetRole: ['user', Validators.required],
-      isLifetime: [false],
-      subscriptionEndsAt: [''],
-      expiryDays: [7, [Validators.required, Validators.min(1)]],
-      description: [''],
+  constructor(private readonly invitesApi: InvitesApiService) {
+    this.form = new FormGroup<InviteFormControls>({
+      presetRole: new FormControl<InviteRole>('user', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      isLifetime: new FormControl<boolean>(false, {
+        nonNullable: true,
+      }),
+      subscriptionEndsAt: new FormControl<string>('', {
+        nonNullable: true,
+      }),
+      expiryDays: new FormControl<number>(7, {
+        nonNullable: true,
+        validators: [Validators.required, Validators.min(1)],
+      }),
+      description: new FormControl<string>('', {
+        nonNullable: true,
+      }),
     });
 
     // Clear optional date and disable when Lifetime toggled on (UX + safety)
-    this.form.get('isLifetime')!.valueChanges.subscribe((isLife: boolean) => {
-      const ctrl = this.form.get('subscriptionEndsAt')!;
-      if (isLife) {
+    this.form.controls.isLifetime.valueChanges.subscribe((isLifetime) => {
+      const ctrl = this.form.controls.subscriptionEndsAt;
+      if (isLifetime) {
         ctrl.setValue('');
         ctrl.disable({ emitEvent: false });
       } else {
@@ -258,26 +295,28 @@ export class CreateInviteModalComponent {
       expiryDays: 7,
       description: '',
     });
+    this.form.controls.subscriptionEndsAt.enable({ emitEvent: false });
   }
 
   async submit(): Promise<void> {
     if (this.form.invalid) return;
-    const raw = this.form.value as any;
-    const payload: any = {
+    const raw: InviteFormValue = this.form.getRawValue();
+    const payload: CreateInvitePayload = {
       presetRole: raw.presetRole,
-      isLifetime: !!raw.isLifetime,
+      isLifetime: raw.isLifetime,
       expiryDays: Number(raw.expiryDays),
-      description: raw.description || undefined,
-      subscriptionEndsAt:
-        !raw.isLifetime && raw.subscriptionEndsAt
-          ? new Date(raw.subscriptionEndsAt).toISOString()
-          : undefined,
+      description: raw.description.trim() || undefined,
     };
+    if (!raw.isLifetime && raw.subscriptionEndsAt) {
+      payload.subscriptionEndsAt = new Date(raw.subscriptionEndsAt).toISOString();
+    }
     this.errorMsg = '';
     this.submitting = true;
     try {
       // Server expects React-style fields; pass through as-is
-      let created = await this.invitesApi.createInvite(payload as any);
+      let created = await this.invitesApi.createInvite(
+        payload as unknown as CreateInviteRequest
+      );
       if (!created) {
         // Fallback: fetch latest invite if server responded without body
         const list = await this.invitesApi.getAllInvites();

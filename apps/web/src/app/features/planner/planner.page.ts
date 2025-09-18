@@ -41,6 +41,14 @@ import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confi
 import { toErrorMessage } from '../../shared/utils/error.utils';
 
 type ActiveTab = 'current' | 'shopping-list' | 'history';
+type MealField = Exclude<keyof DailyPlan, 'day'>;
+const MEAL_FIELDS: MealField[] = [
+  'breakfast',
+  'lunch',
+  'dinner',
+  'snack',
+  'dessert',
+];
 
 @Component({
   selector: 'app-planner-page',
@@ -243,10 +251,14 @@ export class PlannerComponent implements OnInit {
             gourmetMode: false,
           };
 
-      const planData = (await this.api.apiGenerateMealPlan<
+      const planData = await this.api.apiGenerateMealPlan<
         PlannerOptions,
         { days: DailyPlan[]; shoppingList: Ingredient[] }
-      >(planOptions))!;
+      >(planOptions);
+
+      if (!planData) {
+        throw new Error('Plan konnte nicht generiert werden.');
+      }
 
       if (!this.isProUser()) {
         this.remainingRequests.set(Math.max(0, this.remainingRequests() - 1));
@@ -380,34 +392,35 @@ export class PlannerComponent implements OnInit {
       const day = active.days.find((d) => d.day === ev.dayName);
       if (!day) throw new Error('Tag nicht im Plan gefunden.');
 
-      const otherMealNames = Object.values(day)
-        .filter(
-          (m): m is Recipe =>
-            typeof m === 'object' && m !== null && 'id' in (m as any)
-        )
-        .map((m) => (m as Recipe).name as string);
+      const otherMealNames = MEAL_FIELDS.map((key) => day[key])
+        .filter((meal): meal is Recipe => !!meal)
+        .map((meal) => meal.name);
 
       const recipeHadNutrition = !!ev.recipe.nutrition;
-      const newRecipe = (await this.api.apiGenerateSingleMeal({
-        planOptions: active.options ?? {
-          people: 2,
-          planDays: 7,
-          cookTime: '30 Minuten',
-          meals: {
-            breakfast: true,
-            lunch: true,
-            dinner: true,
-            snack: false,
-            dessert: false,
+      const newRecipe = await this.api.apiGenerateSingleMeal<
+        PlannerOptions,
+        Recipe
+      >({
+        planOptions:
+          active.options ?? {
+            people: 2,
+            planDays: 7,
+            cookTime: '30 Minuten',
+            meals: {
+              breakfast: true,
+              lunch: true,
+              dinner: true,
+              snack: false,
+              dessert: false,
+            },
+            enableNutritionAnalysis: false,
+            planFocus: 'ausgewogen',
+            gourmetMode: false,
           },
-          enableNutritionAnalysis: false,
-          planFocus: 'ausgewogen',
-          gourmetMode: false,
-        },
         mealType: ev.mealKey,
         otherMealNames,
         recipeHadNutrition,
-      })) as Recipe | undefined;
+      });
 
       if (!newRecipe)
         throw new Error('Neues Rezept konnte nicht generiert werden.');

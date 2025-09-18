@@ -16,12 +16,17 @@ import {
   ShoppingListItem,
   CategorizedShoppingList,
 } from '@cooksona/models/plan.models';
-import { ListTree } from 'libs/constants/icons';
+import { ListTree } from '@cooksona/constants/icons';
 import { toErrorMessage } from '../../shared/utils/error.utils';
 
 interface CategoryBlock {
   category: string;
   items: ShoppingListItem[];
+}
+
+interface CategorizedResponse {
+  category: string;
+  items: Ingredient[];
 }
 
 @Component({
@@ -223,7 +228,7 @@ export class ShoppingListComponent implements OnChanges {
       if (this.categorizedList) {
         const categorizedPlan = await this.plans.saveCategorizedShoppingList(
           this.planId,
-          this.categorizedList as unknown as CategorizedShoppingList
+          this.ensureCategorizedPayload(this.categorizedList)
         );
         if (!categorizedPlan) {
           throw new Error(
@@ -258,27 +263,35 @@ export class ShoppingListComponent implements OnChanges {
       const rawIngredients: Ingredient[] = this.list.map(
         ({ name, amount, unit }) => ({ name, amount, unit })
       );
-      const sortedRaw = (await this.api.apiCategorizeShoppingList<
+      const sortedRaw = await this.api.apiCategorizeShoppingList<
         Ingredient,
-        { category: string; items: Ingredient[] }[]
-      >(rawIngredients))!;
+        CategorizedResponse[]
+      >(rawIngredients);
 
-      const categoryBlocks: CategoryBlock[] = sortedRaw.map((category) => ({
-        category: (category as any).category,
-        items: (category.items || []).map((item: Ingredient) => {
+      if (!sortedRaw) {
+        throw new Error('Die Liste konnte nicht sortiert werden.');
+      }
+
+      const categoryBlocks: CategoryBlock[] = sortedRaw.map((category) => {
+        const items = (category.items ?? []).map((item) => {
           const existing = this.list.find(
             (i) =>
               i.name === item.name &&
               i.amount === item.amount &&
               i.unit === item.unit
           );
-          return (existing ?? {
+          if (existing) {
+            return { ...existing };
+          }
+          const newItem: ShoppingListItem = {
             ...item,
             id: this.generateId(),
             checked: false,
-          }) as ShoppingListItem;
-        }),
-      }));
+          };
+          return newItem;
+        });
+        return { category: category.category, items };
+      });
 
       const updatedPlan = await this.plans.saveCategorizedShoppingList(
         this.planId,
@@ -311,8 +324,20 @@ export class ShoppingListComponent implements OnChanges {
       if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
         return crypto.randomUUID();
       }
-    } catch {}
+    } catch (error) {
+      console.warn('Falling back to timestamp-based id generation', error);
+    }
     return `id_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  }
+
+  private ensureCategorizedPayload(
+    blocks: CategoryBlock[]
+  ): CategorizedShoppingList {
+    const payload = this.toCategorizedShoppingList(blocks);
+    if (!payload) {
+      throw new Error('Die kategorisierte Einkaufsliste ist leer.');
+    }
+    return payload;
   }
 
   private fromRecord(

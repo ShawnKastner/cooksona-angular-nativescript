@@ -1,6 +1,5 @@
 import {
   Component,
-  OnDestroy,
   OnInit,
   inject,
   ChangeDetectionStrategy,
@@ -25,7 +24,7 @@ import {
   Star,
   Inbox,
   ChevronDown,
-} from 'libs/constants/icons';
+} from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { SnackbarService } from '../../shared/ui/snackbar.service';
 import { ContactApiService } from '@cooksona/api';
@@ -51,7 +50,7 @@ type ProfileFormModel = {
   templateUrl: './profile.page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProfileComponent implements OnInit, OnDestroy {
+export class ProfileComponent implements OnInit {
   private readonly fb = inject(NonNullableFormBuilder);
   readonly auth = inject(AuthService);
   private readonly contactApi = inject(ContactApiService);
@@ -129,8 +128,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy(): void {}
-
   // Helpers
   formatDate(iso: string | null | undefined): string {
     if (!iso) return '';
@@ -142,11 +139,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   // Subscription derived flags for the template (avoid complex expr in HTML)
-  private get u(): any {
-    return this.auth.currentUser as any;
+  private get currentUserSnapshot(): User | null {
+    return this.auth.currentUser as User | null;
   }
   private get endsAt(): Date | null {
-    const iso = this.u?.subscriptionEndsAt as string | null | undefined;
+    const iso = this.currentUserSnapshot?.subscriptionEndsAt ?? null;
     if (!iso) return null;
     try {
       return new Date(iso);
@@ -159,13 +156,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   get isLifetime(): boolean {
-    return !!this.u?.lifetimeSubscription;
+    return !!this.currentUserSnapshot?.lifetimeSubscription;
   }
   get hasPaypalId(): boolean {
-    return !!this.u?.paypalSubscriptionId;
+    return !!this.currentUserSnapshot?.paypalSubscriptionId;
   }
   get subStatus(): string | null {
-    return this.u?.subscriptionStatus ?? null;
+    return this.currentUserSnapshot?.subscriptionStatus ?? null;
   }
   get isInviteActiveNoPaypal(): boolean {
     return (
@@ -194,7 +191,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   get showUpgradeCta(): boolean {
     const ended = !!this.endsAt && this.endsAt < this.now;
     const neverPro =
-      !this.u?.subscriptionEndsAt &&
+      !this.currentUserSnapshot?.subscriptionEndsAt &&
       this.subStatus !== 'active' &&
       !this.isLifetime;
     return (
@@ -306,16 +303,42 @@ export class ProfileComponent implements OnInit, OnDestroy {
           this.cancelLoading = false;
           try {
             await this.auth.refreshCurrentUser();
-          } catch {}
+          } catch (refreshError) {
+            console.warn(
+              'Failed to refresh current user after cancellation',
+              refreshError
+            );
+          }
           setTimeout(() => {
             this.showCancelModal = false;
           }, 3000);
           return;
         }
-      } catch (error: any) {
-        const message = String(error?.message || error?.error || '');
-        const status = error?.status || error?.statusCode;
-        if (status === 429 || /429|Too Many Requests/i.test(message)) {
+      } catch (error: unknown) {
+        const errObject =
+          typeof error === 'object' && error !== null
+            ? (error as {
+                message?: unknown;
+                error?: unknown;
+                status?: unknown;
+                statusCode?: unknown;
+              })
+            : {};
+        const messageValue =
+          typeof errObject.message === 'string'
+            ? errObject.message
+            : typeof errObject.error === 'string'
+              ? errObject.error
+              : '';
+        const statusRaw =
+          errObject.status ?? errObject.statusCode ?? undefined;
+        const status =
+          typeof statusRaw === 'number'
+            ? statusRaw
+            : typeof statusRaw === 'string'
+              ? Number(statusRaw)
+              : undefined;
+        if (status === 429 || /429|Too Many Requests/i.test(messageValue)) {
           this.cancelError =
             'Zu viele Anfragen an den Server. Bitte warte kurz und versuche es erneut.';
           this.cancelLoading = false;
@@ -340,7 +363,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.reactivateLoading = true;
     try {
       await this.auth.reactivateSubscription();
-      await this.auth.refreshCurrentUser().catch(() => {});
+      await this.auth
+        .refreshCurrentUser()
+        .catch((refreshError) =>
+          console.warn('Failed to refresh current user after reactivation', refreshError)
+        );
       this.zone.run(() => {
         this.snackbar.success('Abonnement wurde reaktiviert.');
         this.showReactivateModal = false;

@@ -38,7 +38,11 @@ export const appConfig: ApplicationConfig = {
       provide: APP_INITIALIZER,
       multi: true,
       useFactory: (auth: AuthService) => () =>
-        auth.refreshCurrentUser().catch(() => {}),
+        auth
+          .refreshCurrentUser()
+          .catch((error) =>
+            console.warn('Failed to refresh current user during init', error)
+          ),
       deps: [AuthService],
     },
   ],

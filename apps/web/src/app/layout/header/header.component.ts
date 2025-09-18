@@ -14,7 +14,7 @@ import {
   BookHeart,
   Shield,
   MessageSquare,
-} from 'libs/constants/icons';
+} from '@cooksona/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { SnackbarService } from '../../shared/ui/snackbar.service';
 import { toErrorMessage } from '../../shared/utils/error.utils';
@@ -68,14 +68,22 @@ export class HeaderComponent {
 
   navigateTo(path: string): void {
     this.closeDropdown();
-    this.router.navigateByUrl(path).catch(() => {});
+    this.router
+      .navigateByUrl(path)
+      .catch((navigationError) =>
+        console.error('Header navigation failed', navigationError)
+      );
   }
 
   async logout(): Promise<void> {
     try {
       await this.auth.logout();
       this.closeDropdown();
-      await this.router.navigateByUrl('/login').catch(() => {});
+      await this.router
+        .navigateByUrl('/login')
+        .catch((navigationError) =>
+          console.error('Redirect to login after logout failed', navigationError)
+        );
     } catch (error) {
       this.snackbar.error(
         toErrorMessage(

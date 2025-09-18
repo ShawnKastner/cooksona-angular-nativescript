@@ -13,7 +13,7 @@ export class SnackbarService {
   // Use Subject so there is no initial null emission before first show()
   private readonly _message$ = new Subject<SnackbarMessage | null>();
   readonly message$ = this._message$.asObservable();
-  private hideTimer: any = null;
+  private hideTimer: ReturnType<typeof setTimeout> | null = null;
 
   show(text: string, level: SnackbarLevel = 'info', duration = 3000) {
     if (this.hideTimer) clearTimeout(this.hideTimer);

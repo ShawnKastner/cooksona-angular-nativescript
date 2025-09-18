@@ -27,11 +27,15 @@ export class ResetPasswordComponent {
   ) {
     this.token = this.route.snapshot.queryParamMap.get('token');
     if (!this.token) {
-      this.router.navigate(['/login']).catch(() => {});
+      void this.router
+        .navigate(['/login'])
+        .catch((navigationError) =>
+          console.error('Redirect to login failed', navigationError)
+        );
     }
   }
 
-  async submit() {
+  async submit(): Promise<void> {
     this.error = null;
     this.message = null;
     if (!this.token) {
@@ -49,9 +53,11 @@ export class ResetPasswordComponent {
     this.isLoading = true;
     try {
       await this.auth.resetPassword(this.token, this.password);
-      this.router
+      void this.router
         .navigate(['/login'], { queryParams: { reset: 'success' } })
-        .catch(() => {});
+        .catch((navigationError) =>
+          console.error('Navigation to login failed', navigationError)
+        );
     } catch (error) {
       this.error = toErrorMessage(
         error,

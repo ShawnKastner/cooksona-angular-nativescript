@@ -4,7 +4,7 @@ import {
   NativeScriptRouterModule,
 } from '@nativescript/angular';
 import { Page } from '@nativescript/core';
-import { ItemService, Item } from '../../core/services/item.service';
+import { ItemService } from '../../core/services/item.service';
 
 @Component({
   selector: 'ns-home',
@@ -18,7 +18,7 @@ export class HomeComponent {
 
   constructor() {
     // Setup large titles on iOS
-    this.page.on('loaded', (args) => {
+    this.page.on('loaded', () => {
       if (__IOS__) {
         const navigationController: UINavigationController =
           this.page.frame.ios.controller;

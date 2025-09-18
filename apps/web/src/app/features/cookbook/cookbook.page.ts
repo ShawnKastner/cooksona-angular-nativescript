@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { BookHeart } from 'libs/constants/icons';
+import { BookHeart } from '@cooksona/constants/icons';
 import { CookbookApiService } from '@cooksona/api';
 import { Recipe } from '@cooksona/models/recipe.models';
 import { CookbookCardComponent } from './cookbook-card.component';

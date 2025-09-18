@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
-import { Mail } from 'libs/constants/icons';
+import { Mail } from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { toErrorMessage } from '../../../shared/utils/error.utils';
 

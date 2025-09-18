@@ -4,9 +4,10 @@ import { ProfileComponent } from './profile.page';
 import { AuthService } from '@cooksona/auth';
 import { ContactApiService, ApiService } from '@cooksona/api';
 import { SnackbarService } from '../../shared/ui/snackbar.service';
+import { User } from '@cooksona/models/user.models';
 
 class AuthStub {
-  private subj = new BehaviorSubject<any>({
+  private subj = new BehaviorSubject<User | null>({
     id: 'u1',
     name: 'Max',
     email: 'max@example.com',
@@ -15,7 +16,9 @@ class AuthStub {
   get currentUser() {
     return this.subj.value;
   }
-  updateProfile = jasmine.createSpy('updateProfile').and.resolveTo();
+  updateProfile = jasmine
+    .createSpy<() => Promise<void>>('updateProfile')
+    .and.resolveTo();
 }
 class ApiStub {}
 class ContactApiStub {}
@@ -48,8 +51,10 @@ describe('ProfileComponent', () => {
   });
 
   it('submits profile, calls updateProfile and shows success snackbar', async () => {
-    const auth = TestBed.inject(AuthService) as any;
-    const snackbar = TestBed.inject(SnackbarService) as any;
+    const auth = TestBed.inject(AuthService) as unknown as AuthStub;
+    const snackbar = TestBed.inject(
+      SnackbarService
+    ) as unknown as SnackbarStub;
     comp.isEditing = true;
     comp.form.patchValue({ name: 'Moritz', email: 'm@example.com' });
     await comp.handleSubmit();

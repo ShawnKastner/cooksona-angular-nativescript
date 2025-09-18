@@ -12,7 +12,7 @@ import {
   ChefHat,
   BarChart2,
   Cookie,
-} from 'libs/constants/icons';
+} from '@cooksona/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 
 @Component({

@@ -8,13 +8,25 @@ import {
 } from '@angular/core';
 import {
   ReactiveFormsModule,
-  FormBuilder,
   Validators,
   FormGroup,
+  FormControl,
 } from '@angular/forms';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { X, User as UserIcon, Shield, Star, Check } from 'libs/constants/icons';
+import { X, User as UserIcon, Shield, Star, Check } from '@cooksona/constants/icons';
 import { User } from '@cooksona/models/user.models';
+
+type EditUserFormControls = {
+  role: FormControl<'admin' | 'user'>;
+  subscriptionEndsAt: FormControl<string>;
+  lifetimeSubscription: FormControl<boolean>;
+};
+
+type EditUserFormValue = {
+  role: 'admin' | 'user';
+  subscriptionEndsAt: string;
+  lifetimeSubscription: boolean;
+};
 
 @Component({
   selector: 'app-edit-user-modal',
@@ -87,7 +99,7 @@ import { User } from '@cooksona/models/user.models';
                   type="date"
                   class="w-full px-4 py-3 bg-base-200 border-2 border-base-200 rounded-xl"
                   formControlName="subscriptionEndsAt"
-                  [disabled]="form.get('lifetimeSubscription')?.value"
+                  [disabled]="lifetimeSelected"
                 />
               </div>
               <div>
@@ -130,21 +142,23 @@ export class EditUserModalComponent implements OnChanges {
   @Input() open = false;
   @Input() user: User | null = null;
   @Output() close = new EventEmitter<void>();
-  @Output() save = new EventEmitter<{
-    id: string;
-    role?: string;
-    subscriptionEndsAt?: string;
-    lifetimeSubscription?: boolean;
-  }>();
+  @Output() save = new EventEmitter<Pick<User, 'id'> & Partial<User>>();
 
-  form: FormGroup;
+  form: FormGroup<EditUserFormControls>;
   readonly icons = { X, UserIcon, Shield, Star, Check } as const;
 
-  constructor(private readonly fb: FormBuilder) {
-    this.form = this.fb.group({
-      role: ['user', Validators.required],
-      subscriptionEndsAt: [''],
-      lifetimeSubscription: [false],
+  constructor() {
+    this.form = new FormGroup<EditUserFormControls>({
+      role: new FormControl<'admin' | 'user'>('user', {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
+      subscriptionEndsAt: new FormControl<string>('', {
+        nonNullable: true,
+      }),
+      lifetimeSubscription: new FormControl<boolean>(false, {
+        nonNullable: true,
+      }),
     });
   }
 
@@ -156,7 +170,7 @@ export class EditUserModalComponent implements OnChanges {
       : '';
     this.form.patchValue(
       {
-        role: u.role || 'user',
+        role: (u.role as 'admin' | 'user') || 'user',
         subscriptionEndsAt: dateStr,
         lifetimeSubscription: !!u.lifetimeSubscription,
       },
@@ -164,13 +178,20 @@ export class EditUserModalComponent implements OnChanges {
     );
   }
 
+  get lifetimeSelected(): boolean {
+    return this.form.controls.lifetimeSubscription.value;
+  }
+
   submit(): void {
-    const val = this.form.value as any;
-    const payload = {
-      id: this.user?.id || '',
+    const val: EditUserFormValue = this.form.getRawValue();
+    if (!this.user?.id) return;
+    const payload: Pick<User, 'id'> & Partial<User> = {
+      id: this.user.id,
       role: val.role,
-      subscriptionEndsAt: val.subscriptionEndsAt || undefined,
-      lifetimeSubscription: !!val.lifetimeSubscription,
+      subscriptionEndsAt: this.lifetimeSelected
+        ? undefined
+        : val.subscriptionEndsAt || undefined,
+      lifetimeSubscription: val.lifetimeSubscription,
     };
     this.save.emit(payload);
   }

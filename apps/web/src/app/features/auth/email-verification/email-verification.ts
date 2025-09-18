@@ -25,7 +25,11 @@ export class EmailVerificationComponent implements OnInit {
     const params = this.route.snapshot.queryParamMap;
     const token = params.get('token');
     if (!token) {
-      this.router.navigate(['/login']).catch(() => {});
+      this.router
+        .navigate(['/login'])
+        .catch((navigationError) =>
+          console.error('Redirect to login failed', navigationError)
+        );
       return;
     }
     this.status = 'pending';
@@ -49,7 +53,11 @@ export class EmailVerificationComponent implements OnInit {
     }
   }
 
-  goToLogin() {
-    this.router.navigate(['/login']).catch(() => {});
+  goToLogin(): void {
+    this.router
+      .navigate(['/login'])
+      .catch((navigationError) =>
+        console.error('Navigation to login failed', navigationError)
+      );
   }
 }

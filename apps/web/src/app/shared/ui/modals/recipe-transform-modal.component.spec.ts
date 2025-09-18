@@ -19,9 +19,9 @@ describe('RecipeTransformModalComponent', () => {
     comp.recipe = {
       id: 'r1',
       name: 'Test',
-      ingredients: [],
+      ingredients: [{ name: 'Ingredient', amount: '1', unit: 'Stk' }],
       instructions: [],
-    } as any;
+    };
     fixture.detectChanges();
   });
 

@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { MealPlan } from '@cooksona/models/plan.models';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { Trash, Calendar } from 'libs/constants/icons';
+import { Trash, Calendar } from '@cooksona/constants/icons';
 
 @Component({
   selector: 'app-history',

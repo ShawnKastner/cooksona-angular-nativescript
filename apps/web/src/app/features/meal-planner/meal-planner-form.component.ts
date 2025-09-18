@@ -14,6 +14,7 @@ import {
   Validators,
   FormControl,
   FormGroup,
+  AbstractControl,
 } from '@angular/forms';
 import { PlannerOptions } from '@cooksona/models/plan.models';
 import {
@@ -29,7 +30,7 @@ import {
   Flame,
   Check,
   ChevronDown,
-} from 'libs/constants/icons';
+} from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 
@@ -60,6 +61,25 @@ type PlannerForm = FormGroup<{
   planFocus: FormControl<PlanFocusOption>;
   gourmetMode: FormControl<boolean>;
 }>;
+
+type PlannerFormValue = {
+  diet: string;
+  allergies: string;
+  people: number;
+  planDays: number;
+  cookTime: CookTimeOption;
+  calories: number;
+  meals: {
+    breakfast: boolean;
+    lunch: boolean;
+    dinner: boolean;
+    snack: boolean;
+    dessert: boolean;
+  };
+  enableNutritionAnalysis: boolean;
+  planFocus: PlanFocusOption;
+  gourmetMode: boolean;
+};
 @Component({
   selector: 'app-meal-planner-form',
   standalone: true,
@@ -144,8 +164,8 @@ export class MealPlannerFormComponent implements OnChanges {
       }),
       enableNutritionAnalysis: this.fb.control<boolean>(false),
       planFocus: this.fb.control<PlanFocusOption>(
-        'ausgewogen' as PlanFocusOption,
-        { validators: [Validators.required], nonNullable: true } as any
+        'ausgewogen',
+        Validators.required
       ),
       gourmetMode: this.fb.control<boolean>(false),
     }) as PlannerForm;
@@ -172,7 +192,7 @@ export class MealPlannerFormComponent implements OnChanges {
         this.setProControlsDisabled(false);
       } else {
         // enforce free plan constraints
-        const days = Number(this.form.get('planDays')!.value) || 0;
+        const days = this.form.controls.planDays.value;
         this.form.patchValue({
           planDays: Math.min(days, 3),
           enableNutritionAnalysis: false,
@@ -208,7 +228,13 @@ export class MealPlannerFormComponent implements OnChanges {
       this.form.markAllAsTouched();
       return;
     }
-    this.submitPlan.emit(this.form.getRawValue() as unknown as PlannerOptions);
+    const value: PlannerFormValue = this.form.getRawValue();
+    const { calories, ...rest } = value;
+    const payload: PlannerOptions = {
+      ...rest,
+      calories: Number.isFinite(calories) ? calories : undefined,
+    };
+    this.submitPlan.emit(payload);
   }
 
   get currentUserLabel(): string | null {
@@ -218,28 +244,30 @@ export class MealPlannerFormComponent implements OnChanges {
 
   // Helper for strict template typing with dynamic form control paths
   // Overload to support dot-paths in template (e.g. 'meals.breakfast') and typed top-level keys
-  control(path: string): any;
+  control(path: string): AbstractControl | null;
   control<K extends keyof PlannerForm['controls']>(
     key: K
   ): PlannerForm['controls'][K];
-  control(arg: string | keyof PlannerForm['controls']): any {
-    if (typeof arg === 'string') return this.form.get(arg) as any;
-    return this.form.controls[arg as keyof PlannerForm['controls']];
+  control(
+    arg: string | keyof PlannerForm['controls']
+  ): AbstractControl | PlannerForm['controls'][keyof PlannerForm['controls']] | null {
+    if (typeof arg === 'string') return this.form.get(arg);
+    return this.form.controls[arg];
   }
 
   private setProControlsDisabled(disabled: boolean): void {
-    const names: Array<string> = [
+    const names: Array<keyof PlannerFormValue> = [
       'enableNutritionAnalysis',
       'planFocus',
       'gourmetMode',
     ];
     for (const n of names) {
-      const c = this.form.get(n);
-      if (!c) continue;
+      const control = this.control(n);
+      if (!control) continue;
       if (disabled) {
-        c.disable({ emitEvent: false });
+        control.disable({ emitEvent: false });
       } else {
-        c.enable({ emitEvent: false });
+        control.enable({ emitEvent: false });
       }
     }
   }

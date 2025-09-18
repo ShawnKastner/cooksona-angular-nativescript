@@ -291,7 +291,9 @@ export class InviteRedeemPage implements OnInit {
       });
       await this.router
         .navigate(['/login'], { queryParams: { registered: 'invite' } })
-        .catch(() => {});
+        .catch((navigationError) =>
+          console.error('Redirect to login after invite redeem failed', navigationError)
+        );
     } catch (error) {
       this.error = toErrorMessage(
         error,
@@ -317,7 +319,11 @@ export class InviteRedeemPage implements OnInit {
 
   navigateToLogin(event?: Event): void {
     event?.preventDefault();
-    this.router.navigate(['/login']).catch(() => {});
+    this.router
+      .navigate(['/login'])
+      .catch((navigationError) =>
+        console.error('Navigation to login failed', navigationError)
+      );
   }
 
   formatDate(value?: string | null): string {
@@ -346,7 +352,8 @@ export class InviteRedeemPage implements OnInit {
       }
 
       this.invite = invite;
-    } catch {
+    } catch (error) {
+      console.error('Failed to load invite details', error);
       this.navigateToInviteError();
     } finally {
       this.loading = false;
@@ -356,6 +363,8 @@ export class InviteRedeemPage implements OnInit {
   private navigateToInviteError(): void {
     this.router
       .navigate(['/login'], { queryParams: { inviteError: 'used' } })
-      .catch(() => {});
+      .catch((navigationError) =>
+        console.error('Redirect to login after invite error failed', navigationError)
+      );
   }
 }

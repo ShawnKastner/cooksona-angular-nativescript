@@ -16,7 +16,7 @@ import {
   Users,
   Printer,
   X,
-} from 'libs/constants/icons';
+} from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { FocusTrapDirective } from '../focus-trap.directive';
 
@@ -171,17 +171,17 @@ export class RecipeDetailModalComponent {
   handlePrint(): void {
     const after = () => {
       document.body.classList.remove('print-active');
-      window.removeEventListener('afterprint', after as any);
+      window.removeEventListener('afterprint', after);
     };
     let listenerRegistered = false;
     try {
       document.body.classList.add('print-active');
-      window.addEventListener('afterprint', after as any);
+      window.addEventListener('afterprint', after);
       listenerRegistered = true;
       window.print();
     } catch {
       if (listenerRegistered) {
-        window.removeEventListener('afterprint', after as any);
+        window.removeEventListener('afterprint', after);
         document.body.classList.remove('print-active');
       }
       window.alert(

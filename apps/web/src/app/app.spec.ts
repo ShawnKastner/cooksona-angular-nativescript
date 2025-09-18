@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { App } from './app';
-import { AuthService } from '@cooksona/auth';
+import { AuthService, AuthUser } from '@cooksona/auth';
 import { BehaviorSubject } from 'rxjs';
 
 class AuthStub {
-  private subj = new BehaviorSubject<any>(null);
+  private subj = new BehaviorSubject<AuthUser | null>(null);
   currentUser$ = this.subj.asObservable();
 }
 

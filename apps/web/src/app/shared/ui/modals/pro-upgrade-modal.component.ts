@@ -22,7 +22,7 @@ import {
   X,
   ListTree,
   Wand2,
-} from 'libs/constants/icons';
+} from '@cooksona/constants/icons';
 import { SubscriptionType, User } from '@cooksona/models/user.models';
 import { FocusTrapDirective } from '../focus-trap.directive';
 import { ApiService } from '@cooksona/api';
@@ -370,7 +370,7 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
   subscriptionResult: 'success' | 'failure' | null = null;
 
   private bodyOverflowPrev: string | null = null;
-  private reloadTimer: any = null;
+  private reloadTimer: ReturnType<typeof setTimeout> | null = null;
   private polling = false;
   private lastPollingError: string | null = null;
 
@@ -382,10 +382,10 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
     if (changes['open']) {
       if (this.open) {
         // lock body scroll
-        try {
+        if (typeof document !== 'undefined') {
           this.bodyOverflowPrev = document.body.style.overflow;
           document.body.style.overflow = 'hidden';
-        } catch {}
+        }
         // reset view when opening
         this.view = 'selection';
         this.isProcessing = false;
@@ -394,9 +394,9 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
         this.subscriptionResult = null;
       } else {
         // unlock on close
-        try {
-          document.body.style.overflow = this.bodyOverflowPrev || '';
-        } catch {}
+        if (typeof document !== 'undefined') {
+          document.body.style.overflow = this.bodyOverflowPrev ?? '';
+        }
         // small delay to reset state similar to React
         setTimeout(() => {
           this.view = 'selection';
@@ -410,9 +410,9 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    try {
-      document.body.style.overflow = this.bodyOverflowPrev || '';
-    } catch {}
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = this.bodyOverflowPrev ?? '';
+    }
     if (this.reloadTimer) clearTimeout(this.reloadTimer);
   }
 
@@ -459,20 +459,25 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
         if (
           user &&
           (user.subscriptionStatus === 'active' ||
-            !!(user as any).paypalSubscriptionId ||
-            (user as any).subscriptionType)
+            !!user.paypalSubscriptionId ||
+            !!user.subscriptionType)
         ) {
           this.subscriptionResult = 'success';
           this.isProcessing = false;
           try {
             await this.auth.refreshCurrentUser();
-          } catch {}
+          } catch (refreshError) {
+            console.warn(
+              'Failed to refresh current user after PayPal confirmation',
+              refreshError
+            );
+          }
           this.setView('success');
           // Auto reload after 3s
           this.reloadTimer = setTimeout(() => {
-            try {
+            if (typeof window !== 'undefined') {
               window.location.reload();
-            } catch {}
+            }
           }, 3000);
           return;
         }

@@ -1,7 +1,7 @@
 import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { Shield, Users, Inbox } from 'libs/constants/icons';
+import { Shield, Users, Inbox } from '@cooksona/constants/icons';
 import { ContactRequestsPanelComponent } from './contact-requests-panel.component';
 import { InvitesPanelComponent } from './invites-panel.component';
 import { UsersPanelComponent } from './users-panel.component';

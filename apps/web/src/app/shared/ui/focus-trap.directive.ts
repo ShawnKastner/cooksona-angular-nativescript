@@ -41,13 +41,17 @@ export class FocusTrapDirective implements AfterViewInit {
     if (list.length > 0) {
       try {
         list[0].focus();
-      } catch {}
+      } catch (error) {
+        console.warn('Focus trap failed to focus first element', error);
+      }
     } else {
       const root = this.host.nativeElement;
       root.setAttribute('tabindex', '-1');
       try {
         root.focus();
-      } catch {}
+      } catch (error) {
+        console.warn('Focus trap failed to focus host element', error);
+      }
     }
   }
 

@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authRedirectGuard, protectedRouteGuard } from '@cooksona/auth';
+import { protectedRouteGuard } from '@cooksona/auth';
 import { HomeComponent } from './features/home/home.component';
 import { DetailComponent } from './features/detail/detail.component';
 
