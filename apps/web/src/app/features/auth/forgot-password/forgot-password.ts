@@ -1,6 +1,16 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  FormsModule,
+  NonNullableFormBuilder,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { Mail } from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
@@ -9,15 +19,18 @@ import { toErrorMessage } from '../../../shared/utils/error.utils';
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, FormsModule, SvgInjectDirective],
+  imports: [CommonModule, FormsModule, SvgInjectDirective, ReactiveFormsModule],
   templateUrl: './forgot-password.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ForgotPasswordComponent {
-  email = '';
+  fb = inject(NonNullableFormBuilder);
+  forgotPasswordForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+  });
   message: string | null = null;
   error: string | null = null;
-  isLoading = false;
+  isLoading = signal(false);
   protected readonly icons = { Mail } as const;
 
   constructor(private readonly auth: AuthService) {}
@@ -25,9 +38,11 @@ export class ForgotPasswordComponent {
   async submit() {
     this.error = null;
     this.message = null;
-    this.isLoading = true;
+    this.isLoading.set(true);
     try {
-      await this.auth.requestPasswordReset(this.email);
+      await this.auth.requestPasswordReset(
+        this.forgotPasswordForm.controls.email.value
+      );
       this.message =
         'Wenn die E-Mail existiert, wurde ein Link zum Zurücksetzen des Passworts versendet.';
     } catch (error) {
@@ -36,7 +51,7 @@ export class ForgotPasswordComponent {
         'Fehler beim Senden der E-Mail. Bitte versuche es später erneut.'
       );
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 }

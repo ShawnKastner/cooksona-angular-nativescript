@@ -14,6 +14,7 @@ import { AuthService } from '@cooksona/auth';
 import { ContactApiService } from '@cooksona/api';
 import { SnackbarService } from '../../shared/ui/snackbar.service';
 import { toErrorMessage } from '../../shared/utils/error.utils';
+import { LoadingSpinnerSmallComponent } from '../../shared/ui/loading-spinner-small.component';
 
 type ContactFormModel = {
   requestType: FormControl<'feature' | 'support' | 'feedback' | 'other'>;
@@ -30,7 +31,12 @@ type ContactFormValue = {
 @Component({
   selector: 'app-contact-page',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SvgInjectDirective],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    SvgInjectDirective,
+    LoadingSpinnerSmallComponent,
+  ],
   template: `
     <div class="max-w-2xl mx-auto">
       <div
@@ -107,26 +113,7 @@ type ContactFormValue = {
               class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-focus focus:outline-none focus:ring-4 focus:ring-primary/40 transition-all duration-300 disabled:bg-base-300"
             >
               @if (isSending) {
-              <svg
-                class="animate-spin -ml-1 mr-3 h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
+              <app-loading-spinner-small />
               Senden... } @else {
               <span class="w-5 h-5" [svgInject]="icons.Send"></span>
               Nachricht senden }

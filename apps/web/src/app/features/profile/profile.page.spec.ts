@@ -52,9 +52,7 @@ describe('ProfileComponent', () => {
 
   it('submits profile, calls updateProfile and shows success snackbar', async () => {
     const auth = TestBed.inject(AuthService) as unknown as AuthStub;
-    const snackbar = TestBed.inject(
-      SnackbarService
-    ) as unknown as SnackbarStub;
+    const snackbar = TestBed.inject(SnackbarService) as unknown as SnackbarStub;
     comp.isEditing = true;
     comp.form.patchValue({ name: 'Moritz', email: 'm@example.com' });
     await comp.handleSubmit();

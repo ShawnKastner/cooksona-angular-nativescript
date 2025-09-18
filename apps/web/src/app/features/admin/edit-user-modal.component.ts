@@ -13,7 +13,13 @@ import {
   FormControl,
 } from '@angular/forms';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { X, User as UserIcon, Shield, Star, Check } from '@cooksona/constants/icons';
+import {
+  X,
+  User as UserIcon,
+  Shield,
+  Star,
+  Check,
+} from '@cooksona/constants/icons';
 import { User } from '@cooksona/models/user.models';
 
 type EditUserFormControls = {

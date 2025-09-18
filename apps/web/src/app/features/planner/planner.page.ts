@@ -114,7 +114,7 @@ export class PlannerComponent implements OnInit {
   } as const;
 
   // Basic pro logic placeholders (replace with real subscription logic later)
-  isProUser = signal(true);
+  isProUser = signal(false);
   remainingRequests = signal<number>(3);
 
   navTabs = [
@@ -401,22 +401,21 @@ export class PlannerComponent implements OnInit {
         PlannerOptions,
         Recipe
       >({
-        planOptions:
-          active.options ?? {
-            people: 2,
-            planDays: 7,
-            cookTime: '30 Minuten',
-            meals: {
-              breakfast: true,
-              lunch: true,
-              dinner: true,
-              snack: false,
-              dessert: false,
-            },
-            enableNutritionAnalysis: false,
-            planFocus: 'ausgewogen',
-            gourmetMode: false,
+        planOptions: active.options ?? {
+          people: 2,
+          planDays: 7,
+          cookTime: '30 Minuten',
+          meals: {
+            breakfast: true,
+            lunch: true,
+            dinner: true,
+            snack: false,
+            dessert: false,
           },
+          enableNutritionAnalysis: false,
+          planFocus: 'ausgewogen',
+          gourmetMode: false,
+        },
         mealType: ev.mealKey,
         otherMealNames,
         recipeHadNutrition,

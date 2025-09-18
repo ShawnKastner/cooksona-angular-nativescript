@@ -33,6 +33,8 @@ import {
 } from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner.component';
+import { LoadingSpinnerSmallComponent } from '../../shared/ui/loading-spinner-small.component';
 
 type MealsGroup = {
   breakfast: FormControl<boolean>;
@@ -83,13 +85,18 @@ type PlannerFormValue = {
 @Component({
   selector: 'app-meal-planner-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SvgInjectDirective],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    SvgInjectDirective,
+    LoadingSpinnerSmallComponent,
+  ],
   templateUrl: './meal-planner-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MealPlannerFormComponent implements OnChanges {
   @Input() isLoading = false;
-  @Input() isProUser = true;
+  @Input() isProUser = false;
   @Input() remainingRequests: number | null = null;
   @Output() submitPlan = new EventEmitter<PlannerOptions>();
   @Output() showUpgradeModal = new EventEmitter<void>();
@@ -250,7 +257,10 @@ export class MealPlannerFormComponent implements OnChanges {
   ): PlannerForm['controls'][K];
   control(
     arg: string | keyof PlannerForm['controls']
-  ): AbstractControl | PlannerForm['controls'][keyof PlannerForm['controls']] | null {
+  ):
+    | AbstractControl
+    | PlannerForm['controls'][keyof PlannerForm['controls']]
+    | null {
     if (typeof arg === 'string') return this.form.get(arg);
     return this.form.controls[arg];
   }

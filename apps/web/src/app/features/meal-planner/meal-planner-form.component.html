@@ -189,25 +189,21 @@
       <label class="block text-sm font-bold text-neutral mb-2"
         >Mahlzeiten auswählen</label
       >
-      <div class="grid grid-cols-2 gap-3">
+      <div formGroupName="meals" class="grid grid-cols-2 gap-3">
         @for(meal of mealTypes; track meal) {
         <label
           class="flex items-center space-x-3 p-3 bg-base-100/60 rounded-xl has-[:checked]:bg-primary/10 has-[:checked]:ring-2 has-[:checked]:ring-primary transition-all cursor-pointer hover:bg-base-200/60"
         >
-          <input
-            type="checkbox"
-            class="sr-only"
-            [formControl]="control('meals.' + meal)"
-          />
+          <input type="checkbox" class="sr-only" [formControlName]="meal" />
           <div
             class="w-5 h-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all"
             [ngClass]="
-              control('meals.' + meal).value
+              control('meals.' + meal)?.value
                 ? 'bg-primary border-primary'
                 : 'border-gray-400'
             "
           >
-            @if(control('meals.' + meal).value) {
+            @if(control('meals.' + meal)?.value) {
             <span
               class="w-3.5 h-3.5 text-white"
               [svgInject]="icons.Check"
@@ -357,26 +353,7 @@
         class="w-full flex items-center justify-center gap-3 bg-gradient-to-br from-primary to-primary-focus text-primary-content font-bold py-3.5 px-4 rounded-xl hover:shadow-soft-lg focus:outline-none focus:ring-4 focus:ring-primary/40 transition-all duration-300 disabled:bg-base-300 disabled:cursor-not-allowed disabled:shadow-none transform hover:-translate-y-0.5"
       >
         @if(isLoading) {
-        <svg
-          class="animate-spin -ml-1 mr-3 h-5 w-5"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            class="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="4"
-          ></circle>
-          <path
-            class="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
-        </svg>
+        <app-loading-spinner-small />
         Wird erstellt... }@else {
         <span class="w-5 h-5" [svgInject]="icons.Sparkles"></span>
         Meinen Plan erstellen }

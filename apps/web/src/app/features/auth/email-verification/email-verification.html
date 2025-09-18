@@ -1,26 +1,83 @@
-<div class="max-w-md mx-auto my-16 p-8 bg-white rounded-2xl shadow-soft-xl">
-  <h2 class="text-2xl font-bold text-neutral mb-4">E-Mail Verifizierung</h2>
+<div
+  style="
+    max-width: 420px;
+    margin: 60px auto;
+    padding: 32px 28px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Inter', Arial, sans-serif;
+  "
+>
+  <h2
+    style="
+      font-size: 28px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 12px;
+    "
+  >
+    E-Mail Verifizierung
+  </h2>
 
-  @if(status==='pending') {
-  <div class="w-full text-center my-6">
-    <div class="mx-auto mb-4 loader"></div>
-    <p class="text-gray-500">Deine E-Mail wird gerade bestätigt...</p>
+  @if (status === 'pending') {
+  <div style="width: 100%; text-align: center; margin: 24px 0">
+    <div
+      class="loader"
+      style="
+        margin: 0 auto 16px;
+        width: 32px;
+        height: 32px;
+        border: 4px solid #eee;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      "
+    ></div>
+    <p style="color: #888; font-size: 16px">
+      Deine E-Mail wird gerade bestätigt...
+    </p>
   </div>
-  }@else if(status==='success') {
-  <div class="w-full text-center my-6">
-    <div class="text-5xl text-green-600 mb-2">✓</div>
-    <p class="text-green-600 font-medium mb-4">{{ message }}</p>
+  } @if (status === 'success') {
+  <div style="width: 100%; text-align: center; margin: 24px 0">
+    <div style="font-size: 48px; color: #27ae60; margin-bottom: 8px">✓</div>
+    <p
+      style="
+        color: #27ae60;
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      "
+    >
+      {{ message() }}
+    </p>
     <button
-      class="bg-primary text-primary-content px-4 py-2 rounded-lg hover:bg-primary-focus transition-all shadow-soft"
+      class="bg-primary text-primary-content px-4 py-2 rounded-lg hover:bg-primary-focus transition-all shadow-soft hover:shadow-soft-lg"
       (click)="goToLogin()"
     >
       Zum Login
     </button>
   </div>
-  }@else if(status==='error') {
-  <div class="w-full text-center my-6">
-    <div class="text-5xl text-red-600 mb-2">✗</div>
-    <p class="text-red-600 font-medium">{{ message }}</p>
+  } @if (status === 'error') {
+  <div style="width: 100%; text-align: center; margin: 24px 0">
+    <div style="font-size: 48px; color: #e74c3c; margin-bottom: 8px">✗</div>
+    <p style="color: #e74c3c; font-size: 18px; font-weight: 500">
+      {{ message() }}
+    </p>
   </div>
   }
+
+  <style>
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
 </div>

@@ -1,24 +1,62 @@
-import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
+import {
+  Component,
+  ChangeDetectionStrategy,
+  signal,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  FormsModule,
+  NonNullableFormBuilder,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { UserPlus, Eye, EyeOff } from '@cooksona/constants/icons';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { Router } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
 import { toErrorMessage } from '../../../shared/utils/error.utils';
+import { LoadingSpinnerSmallComponent } from '../../../shared/ui/loading-spinner-small.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, SvgInjectDirective],
+  imports: [
+    CommonModule,
+    FormsModule,
+    SvgInjectDirective,
+    LoadingSpinnerSmallComponent,
+    ReactiveFormsModule,
+  ],
   templateUrl: './register.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {
-  name = '';
-  email = '';
-  password = '';
-  confirmPassword = '';
+  fb = inject(NonNullableFormBuilder);
+  registerForm = this.fb.group({
+    name: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        Validators.pattern(/^[a-zA-ZäöüÄÖÜß\s-]+$/),
+      ],
+    ],
+    email: ['', [Validators.required, Validators.email]],
+    password: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(72),
+        Validators.pattern(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+        ),
+      ],
+    ],
+    confirmPassword: ['', [Validators.required]],
+  });
   error: string | null = null;
   isLoading = signal(false);
   showPassword = signal(false);
@@ -32,41 +70,35 @@ export class RegisterComponent {
 
   async submit(): Promise<void> {
     this.error = null;
-    const nameOk =
-      this.name.trim().length >= 2 &&
-      this.name.trim().length <= 50 &&
-      /^[a-zA-ZäöüÄÖÜß\s-]+$/.test(this.name.trim());
-    if (!nameOk) {
+
+    if (!this.registerForm.controls.name.valid) {
       this.error = 'Bitte gib einen gültigen Namen an.';
       return;
     }
-    const emailOk = /.+@.+\..+/.test(this.email);
-    if (!emailOk) {
+
+    if (!this.registerForm.controls.email.valid) {
       this.error = 'Bitte gib eine gültige E-Mail-Adresse ein';
       return;
     }
-    const pw = this.password;
-    const pwOk =
-      pw.length >= 8 &&
-      pw.length <= 72 &&
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        pw
-      );
-    if (!pwOk) {
+
+    if (!this.registerForm.controls.password.valid) {
       this.error =
         'Das Passwort muss mind. 8 Zeichen und Groß-/Kleinbuchstaben, Zahl und Sonderzeichen enthalten.';
       return;
     }
-    if (this.password !== this.confirmPassword) {
+    if (
+      this.registerForm.controls.password.value !==
+      this.registerForm.controls.confirmPassword.value
+    ) {
       this.error = 'Die Passwörter stimmen nicht überein.';
       return;
     }
     this.isLoading.set(true);
     try {
       await this.auth.register({
-        name: this.name.trim(),
-        email: this.email.trim(),
-        password: this.password,
+        name: this.registerForm.controls.name.value.trim(),
+        email: this.registerForm.controls.email.value.trim(),
+        password: this.registerForm.controls.password.value,
       });
       await this.router.navigateByUrl('/login?registered=true');
     } catch (error) {

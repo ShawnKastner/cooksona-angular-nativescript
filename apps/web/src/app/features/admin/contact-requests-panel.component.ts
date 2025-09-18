@@ -14,6 +14,7 @@ import { Message } from '@cooksona/models/contact.models';
 import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
 import { PaginationComponent } from '../../shared/ui/pagination.component';
 import { toErrorMessage } from '../../shared/utils/error.utils';
+import { LoadingSpinnerSmallComponent } from '../../shared/ui/loading-spinner-small.component';
 
 type MessageFilter = 'all' | 'unread' | 'read' | 'answered';
 const PAGE_SIZE = 5;
@@ -27,6 +28,7 @@ const PAGE_SIZE = 5;
     SvgInjectDirective,
     DeleteConfirmModalComponent,
     PaginationComponent,
+    LoadingSpinnerSmallComponent,
   ],
   templateUrl: './contact-requests-panel.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

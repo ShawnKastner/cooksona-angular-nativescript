@@ -1,4 +1,9 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  signal,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { UserApiService } from '@cooksona/api';
@@ -13,7 +18,7 @@ import { toErrorMessage } from '../../../shared/utils/error.utils';
 })
 export class EmailVerificationComponent implements OnInit {
   status: 'pending' | 'success' | 'error' = 'pending';
-  message = '';
+  message = signal<string | null>(null);
 
   constructor(
     private route: ActivatedRoute,
@@ -37,18 +42,22 @@ export class EmailVerificationComponent implements OnInit {
       const res = await this.users.verifyEmail(token);
       if (res && res.ok) {
         this.status = 'success';
-        this.message =
-          'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.';
+        this.message.set(
+          'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.'
+        );
       } else {
         this.status = 'success';
-        this.message =
-          'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.';
+        this.message.set(
+          'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.'
+        );
       }
     } catch (error) {
       this.status = 'error';
-      this.message = toErrorMessage(
-        error,
-        'Der Verifizierungslink ist ungültig oder abgelaufen.'
+      this.message.set(
+        toErrorMessage(
+          error,
+          'Der Verifizierungslink ist ungültig oder abgelaufen.'
+        )
       );
     }
   }

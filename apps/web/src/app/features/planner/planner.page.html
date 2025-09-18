@@ -44,7 +44,7 @@
           </div>
         </div>
         <div class="mt-6 flex-grow">
-          @if(!activePlan()) {
+          @if(!activePlan() && !isLoading()) {
           <div
             class="text-center pt-12 flex flex-col items-center justify-center h-full"
           >

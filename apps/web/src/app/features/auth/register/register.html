@@ -3,6 +3,7 @@
     <form
       (ngSubmit)="submit()"
       class="bg-white shadow-soft-xl rounded-2xl px-8 md:px-10 pt-8 pb-10 border border-base-200/50"
+      [formGroup]="registerForm"
     >
       <div class="mb-8 text-center">
         <h1 class="text-3xl font-serif font-bold text-neutral">Registrieren</h1>
@@ -24,7 +25,7 @@
         <input
           id="name"
           name="name"
-          [(ngModel)]="name"
+          formControlName="name"
           class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl"
           placeholder="Dein Name"
         />
@@ -37,7 +38,7 @@
         <input
           id="email"
           name="email"
-          [(ngModel)]="email"
+          formControlName="email"
           type="email"
           class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl"
           placeholder="deine.email@example.com"
@@ -52,7 +53,7 @@
           <input
             id="password"
             name="password"
-            [(ngModel)]="password"
+            formControlName="password"
             [type]="showPassword() ? 'text' : 'password'"
             class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl"
             placeholder="Passwort"
@@ -81,7 +82,7 @@
           <input
             id="confirmPassword"
             name="confirmPassword"
-            [(ngModel)]="confirmPassword"
+            formControlName="confirmPassword"
             [type]="showPassword2() ? 'text' : 'password'"
             class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl"
             placeholder="Passwort wiederholen"
@@ -103,8 +104,11 @@
       <button
         type="submit"
         [disabled]="isLoading()"
-        class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-focus"
+        class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 px-4 rounded-xl disabled:bg-base-300 hover:bg-primary-focus"
       >
+        @if(isLoading()) {
+        <app-loading-spinner-small />
+        }
         <span class="w-5 h-5" [svgInject]="icons.UserPlus"></span>
         {{ isLoading() ? "Registrieren..." : "Registrieren" }}
       </button>

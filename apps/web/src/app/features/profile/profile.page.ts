@@ -328,16 +328,15 @@ export class ProfileComponent implements OnInit {
           typeof errObject.message === 'string'
             ? errObject.message
             : typeof errObject.error === 'string'
-              ? errObject.error
-              : '';
-        const statusRaw =
-          errObject.status ?? errObject.statusCode ?? undefined;
+            ? errObject.error
+            : '';
+        const statusRaw = errObject.status ?? errObject.statusCode ?? undefined;
         const status =
           typeof statusRaw === 'number'
             ? statusRaw
             : typeof statusRaw === 'string'
-              ? Number(statusRaw)
-              : undefined;
+            ? Number(statusRaw)
+            : undefined;
         if (status === 429 || /429|Too Many Requests/i.test(messageValue)) {
           this.cancelError =
             'Zu viele Anfragen an den Server. Bitte warte kurz und versuche es erneut.';
@@ -366,7 +365,10 @@ export class ProfileComponent implements OnInit {
       await this.auth
         .refreshCurrentUser()
         .catch((refreshError) =>
-          console.warn('Failed to refresh current user after reactivation', refreshError)
+          console.warn(
+            'Failed to refresh current user after reactivation',
+            refreshError
+          )
         );
       this.zone.run(() => {
         this.snackbar.success('Abonnement wurde reaktiviert.');

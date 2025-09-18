@@ -18,6 +18,7 @@ import {
 } from '@cooksona/models/plan.models';
 import { ListTree } from '@cooksona/constants/icons';
 import { toErrorMessage } from '../../shared/utils/error.utils';
+import { LoadingSpinnerSmallComponent } from '../../shared/ui/loading-spinner-small.component';
 
 interface CategoryBlock {
   category: string;
@@ -32,7 +33,7 @@ interface CategorizedResponse {
 @Component({
   selector: 'app-shopping-list',
   standalone: true,
-  imports: [CommonModule, SvgInjectDirective],
+  imports: [CommonModule, SvgInjectDirective, LoadingSpinnerSmallComponent],
   template: `
     <div class="bg-white p-2 md:p-4 rounded-2xl">
       @if(isProUser && !categorizedShoppingList) {
@@ -43,26 +44,7 @@ interface CategorizedResponse {
           class="inline-flex items-center gap-2 bg-secondary/20 text-secondary-focus font-semibold px-4 py-2 rounded-lg hover:bg-secondary/30 transition-colors disabled:opacity-50 disabled:cursor-wait"
         >
           @if(isSorting) {
-          <svg
-            class="animate-spin h-5 w-5"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            ></path>
-          </svg>
+          <app-loading-spinner-small />
           Sortiere... }@else {
           <span class="w-5 h-5" [svgInject]="icons.ListTree"></span>
           Nach Abteilung sortieren }

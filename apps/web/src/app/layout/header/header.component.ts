@@ -82,7 +82,10 @@ export class HeaderComponent {
       await this.router
         .navigateByUrl('/login')
         .catch((navigationError) =>
-          console.error('Redirect to login after logout failed', navigationError)
+          console.error(
+            'Redirect to login after logout failed',
+            navigationError
+          )
         );
     } catch (error) {
       this.snackbar.error(

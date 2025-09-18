@@ -292,7 +292,10 @@ export class InviteRedeemPage implements OnInit {
       await this.router
         .navigate(['/login'], { queryParams: { registered: 'invite' } })
         .catch((navigationError) =>
-          console.error('Redirect to login after invite redeem failed', navigationError)
+          console.error(
+            'Redirect to login after invite redeem failed',
+            navigationError
+          )
         );
     } catch (error) {
       this.error = toErrorMessage(
@@ -364,7 +367,10 @@ export class InviteRedeemPage implements OnInit {
     this.router
       .navigate(['/login'], { queryParams: { inviteError: 'used' } })
       .catch((navigationError) =>
-        console.error('Redirect to login after invite error failed', navigationError)
+        console.error(
+          'Redirect to login after invite error failed',
+          navigationError
+        )
       );
   }
 }

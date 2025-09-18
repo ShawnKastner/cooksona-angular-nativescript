@@ -308,7 +308,9 @@ export class CreateInviteModalComponent {
       description: raw.description.trim() || undefined,
     };
     if (!raw.isLifetime && raw.subscriptionEndsAt) {
-      payload.subscriptionEndsAt = new Date(raw.subscriptionEndsAt).toISOString();
+      payload.subscriptionEndsAt = new Date(
+        raw.subscriptionEndsAt
+      ).toISOString();
     }
     this.errorMsg = '';
     this.submitting = true;

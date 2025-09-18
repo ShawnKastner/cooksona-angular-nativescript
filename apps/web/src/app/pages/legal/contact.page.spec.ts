@@ -37,9 +37,7 @@ describe('ContactPage', () => {
   });
 
   it('shows error when message is empty', async () => {
-    const snackbar = TestBed.inject(
-      SnackbarService
-    ) as unknown as SnackbarStub;
+    const snackbar = TestBed.inject(SnackbarService) as unknown as SnackbarStub;
     await comp.handleSubmit();
     expect(snackbar.error).toHaveBeenCalled();
   });

@@ -15,8 +15,9 @@ export const protectedRouteGuard: CanActivateFn = (
   if (authService.isLoading) {
     const loadingRedirect =
       (route.data?.['loadingRedirect'] as string | undefined) ?? undefined;
+    // Prefer returning a UrlTree instead of imperative navigation from guards
     if (loadingRedirect) {
-      router.navigateByUrl(loadingRedirect);
+      return router.createUrlTree([loadingRedirect]);
     }
     return false;
   }
@@ -24,15 +25,15 @@ export const protectedRouteGuard: CanActivateFn = (
   // 2) User must be authenticated
   const user = authService.currentUser;
   if (!user) {
-    router.navigateByUrl('/');
-    return false;
+    // Redirect unauthenticated users to landing to avoid self-redirect loops on ''
+    return router.createUrlTree(['/landing']);
   }
 
   // 3) Optional role requirement
   const requiredRole = route.data?.['requiredRole'] as UserRole | undefined;
   if (requiredRole && user.role !== requiredRole) {
-    router.navigateByUrl('/');
-    return false;
+    // If user lacks role, send them to a safe public page
+    return router.createUrlTree(['/landing']);
   }
 
   return true;
