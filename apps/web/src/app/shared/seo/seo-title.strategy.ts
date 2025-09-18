@@ -11,53 +11,36 @@ export class SeoTitleStrategy extends TitleStrategy {
   }
 
   override updateTitle(routerState: RouterStateSnapshot): void {
-    const built = this.buildTitle(routerState);
-    if (built) {
-      const final = built.includes(this.suffix)
-        ? built
-        : `${built} – ${this.suffix}`;
-      this.title.setTitle(final);
-    } else {
-      this.title.setTitle(this.suffix);
+    const deepest = this.getDeepestData(routerState);
+    const built =
+      this.buildTitle(routerState) ?? (deepest?.['title'] as string | undefined);
+    const finalTitle = this.resolveTitle(built);
+
+    this.title.setTitle(finalTitle);
+    this.meta.updateTag({ property: 'og:title', content: finalTitle });
+    this.meta.updateTag({ name: 'twitter:title', content: finalTitle });
+    this.meta.updateTag({ property: 'og:type', content: 'website' });
+
+    if (!deepest) {
+      return;
     }
 
-    // Update meta tags from deepest active route data if provided
-    const deepest = this.getDeepestData(routerState);
-    if (deepest) {
-      const description = deepest['description'] as string | undefined;
-      const keywords = deepest['keywords'] as string | undefined;
-      const image = deepest['image'] as string | undefined;
+    const description = deepest['description'] as string | undefined;
+    const keywords = deepest['keywords'] as string | undefined;
+    const image = deepest['image'] as string | undefined;
 
-      if (description) {
-        this.meta.updateTag({ name: 'description', content: description });
-        this.meta.updateTag({
-          property: 'og:description',
-          content: description,
-        });
-        this.meta.updateTag({
-          name: 'twitter:description',
-          content: description,
-        });
-      }
-      if (keywords) {
-        this.meta.updateTag({ name: 'keywords', content: keywords });
-      }
-      if (built) {
-        const final = built.includes(this.suffix)
-          ? built
-          : `${built} – ${this.suffix}`;
-        this.meta.updateTag({ property: 'og:title', content: final });
-        this.meta.updateTag({ name: 'twitter:title', content: final });
-      }
-      if (image) {
-        this.meta.updateTag({ property: 'og:image', content: image });
-        this.meta.updateTag({ name: 'twitter:image', content: image });
-        this.meta.updateTag({
-          name: 'twitter:card',
-          content: 'summary_large_image',
-        });
-      }
-      this.meta.updateTag({ property: 'og:type', content: 'website' });
+    if (description) {
+      this.meta.updateTag({ name: 'description', content: description });
+      this.meta.updateTag({ property: 'og:description', content: description });
+      this.meta.updateTag({ name: 'twitter:description', content: description });
+    }
+    if (keywords) {
+      this.meta.updateTag({ name: 'keywords', content: keywords });
+    }
+    if (image) {
+      this.meta.updateTag({ property: 'og:image', content: image });
+      this.meta.updateTag({ name: 'twitter:image', content: image });
+      this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
     }
   }
 
@@ -71,5 +54,13 @@ export class SeoTitleStrategy extends TitleStrategy {
       if (route.data) data = route.data;
     }
     return data;
+  }
+
+  private resolveTitle(built: string | undefined | null): string {
+    if (!built) {
+      return this.suffix;
+    }
+
+    return built.includes(this.suffix) ? built : `${built} – ${this.suffix}`;
   }
 }

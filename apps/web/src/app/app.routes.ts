@@ -13,8 +13,8 @@ export const routes: Routes = [
     path: 'landing',
     canActivate: [authRedirectGuard],
     component: LandingComponent,
+    title: 'Essensplanung & Rezepte',
     data: {
-      title: 'Essensplanung & Rezepte',
       description:
         'CookSona ist die smarte Lösung für Essensplanung, Einkaufsliste, gesunde Rezepte, Nährwert-Analyse und Kochbuch. Spare Zeit, Geld und ernähre dich besser!',
       keywords:
@@ -30,7 +30,7 @@ export const routes: Routes = [
       import('./pages/invite-redeem/invite-redeem.page').then(
         (m) => m.InviteRedeemPage
       ),
-    data: { title: 'Einladung einlösen' },
+    title: 'Einladung einlösen',
   },
   { path: 'invite/redeem', redirectTo: '/login', pathMatch: 'full' },
 
@@ -39,37 +39,37 @@ export const routes: Routes = [
     path: 'login',
     canActivate: [authRedirectGuard],
     component: LoginComponent,
-    data: { title: 'Anmelden' },
+    title: 'Anmelden',
   },
   {
     path: 'register',
     canActivate: [authRedirectGuard],
     component: RegisterComponent,
-    data: { title: 'Registrieren' },
+    title: 'Registrieren',
   },
   {
     path: 'forgot-password',
     canActivate: [authRedirectGuard],
     component: ForgotPasswordComponent,
-    data: { title: 'Passwort vergessen' },
+    title: 'Passwort vergessen',
   },
   {
     path: 'reset-password',
     canActivate: [authRedirectGuard],
     component: ResetPasswordComponent,
-    data: { title: 'Passwort zurücksetzen' },
+    title: 'Passwort zurücksetzen',
   },
   {
     path: 'verify-email',
     canActivate: [authRedirectGuard],
     component: EmailVerificationComponent,
-    data: { title: 'E-Mail bestätigen' },
+    title: 'E-Mail bestätigen',
   },
   {
     path: 'email-verification',
     canActivate: [authRedirectGuard],
     component: EmailVerificationComponent,
-    data: { title: 'E-Mail bestätigen' },
+    title: 'E-Mail bestätigen',
   },
 
   // Protected pages - planner is the app root for authenticated users
@@ -78,8 +78,8 @@ export const routes: Routes = [
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
       import('./features/planner/planner.page').then((m) => m.PlannerComponent),
+    title: 'CookSona – Dein digitaler Essensplaner und Kochbuch',
     data: {
-      title: 'Planer',
       description:
         'Plane deine Mahlzeiten, erstelle Einkaufslisten und speichere Rezepte mit CookSona.',
     },
@@ -89,8 +89,8 @@ export const routes: Routes = [
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
       import('./features/profile/profile.page').then((m) => m.ProfileComponent),
+    title: 'Profil',
     data: {
-      title: 'Profil',
       description:
         'Dein persönliches Profil bei CookSona. Verwalte deine Daten, Einstellungen und Abonnements.',
     },
@@ -102,14 +102,14 @@ export const routes: Routes = [
       import('./features/cookbook/cookbook.page').then(
         (m) => m.CookbookComponent
       ),
-    data: { title: 'Kochbuch' },
+    title: 'Kochbuch',
   },
   {
     path: 'admin',
     canActivate: [protectedRouteGuard],
+    title: 'Admin',
     data: {
       requiredRole: 'admin' as const,
-      title: 'Admin',
       description:
         'Admin-Dashboard für Benutzer, Einladungen und Kontaktanfragen.',
     },
@@ -124,20 +124,20 @@ export const routes: Routes = [
     path: 'datenschutz',
     loadComponent: () =>
       import('./pages/legal/datenschutz.page').then((m) => m.DatenschutzPage),
-    data: { title: 'Datenschutz' },
+    title: 'Datenschutz',
   },
   {
     path: 'impressum',
     loadComponent: () =>
       import('./pages/legal/impressum.page').then((m) => m.ImpressumPage),
-    data: { title: 'Impressum' },
+    title: 'Impressum',
   },
   {
     path: 'contact',
     loadComponent: () =>
       import('./pages/legal/contact.page').then((m) => m.ContactPage),
+    title: 'Kontakt',
     data: {
-      title: 'Kontakt',
       description:
         'Fragen, Vorschläge oder Support? Kontaktiere das CookSona Team.',
     },
