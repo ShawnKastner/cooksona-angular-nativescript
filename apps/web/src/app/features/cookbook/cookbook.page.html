@@ -33,9 +33,7 @@
     <p class="font-bold">Ein Fehler ist aufgetreten</p>
     <p class="text-sm">{{ error() }}</p>
   </div>
-  }
-
-  @if (filteredCookbook().length > 0) {
+  } @if (filteredCookbook().length > 0) {
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
     @for (recipe of filteredCookbook(); track recipe.id) {
     <app-cookbook-card

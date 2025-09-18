@@ -358,5 +358,4 @@ export class InviteRedeemPage implements OnInit {
       .navigate(['/login'], { queryParams: { inviteError: 'used' } })
       .catch(() => {});
   }
-
 }

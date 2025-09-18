@@ -166,7 +166,9 @@ export class CookbookComponent implements OnInit {
     this.error.set(null);
     try {
       await this.cookbookApi.removeRecipeFromCookbook(recipeId);
-      this.cookbook.set(this.cookbook().filter((recipe) => recipe.id !== recipeId));
+      this.cookbook.set(
+        this.cookbook().filter((recipe) => recipe.id !== recipeId)
+      );
       return true;
     } catch (error) {
       this.error.set(

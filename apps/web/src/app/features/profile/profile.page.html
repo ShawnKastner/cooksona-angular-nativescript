@@ -292,16 +292,18 @@
             <span class="font-semibold">alle zugehörigen Daten</span>
             unwiderruflich löschen?
           </p>
-        <p class="text-error font-bold text-base">
-          Dieser Vorgang kann nicht rückgängig gemacht werden!
-        </p>
-      </div>
-      @if (deleteError) {
-      <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded">
-        {{ deleteError }}
-      </div>
-      }
-      <div class="flex flex-row-reverse gap-4 mt-6">
+          <p class="text-error font-bold text-base">
+            Dieser Vorgang kann nicht rückgängig gemacht werden!
+          </p>
+        </div>
+        @if (deleteError) {
+        <div
+          class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded"
+        >
+          {{ deleteError }}
+        </div>
+        }
+        <div class="flex flex-row-reverse gap-4 mt-6">
           <button
             class="px-6 py-2 rounded-lg font-bold bg-error text-white hover:bg-error/80 transition-colors shadow-soft"
             (click)="confirmDelete()"
@@ -326,11 +328,12 @@
       Meine Anfragen
     </h2>
     @if (requestsError) {
-    <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-4">
+    <div
+      class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 mb-4"
+    >
       {{ requestsError }}
     </div>
-    }
-    @if (loadingRequests) {
+    } @if (loadingRequests) {
     <div
       class="bg-base-100 rounded-xl p-12 text-center flex flex-col items-center justify-center"
     >
@@ -536,7 +539,11 @@
     <div class="flex justify-end gap-3">
       <button
         class="px-3 py-1.5 text-sm font-semibold rounded-lg border border-base-300 text-neutral hover:bg-base-200 transition-colors"
-        (click)="showReactivateModal = false; reactivateError = null; reactivateLoading = false"
+        (click)="
+          showReactivateModal = false;
+          reactivateError = null;
+          reactivateLoading = false
+        "
         [disabled]="reactivateLoading"
       >
         Abbrechen
@@ -546,7 +553,7 @@
         (click)="confirmReactivate()"
         [disabled]="reactivateLoading"
       >
-        {{ reactivateLoading ? 'Wird reaktiviert…' : 'Reaktivieren' }}
+        {{ reactivateLoading ? "Wird reaktiviert…" : "Reaktivieren" }}
       </button>
     </div>
   </div>
