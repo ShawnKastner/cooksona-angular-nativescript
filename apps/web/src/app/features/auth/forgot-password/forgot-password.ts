@@ -28,27 +28,30 @@ export class ForgotPasswordComponent {
   forgotPasswordForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
   });
-  message: string | null = null;
-  error: string | null = null;
+  message = signal<string | null>(null);
+  error = signal<string | null>(null);
   isLoading = signal(false);
   protected readonly icons = { Mail } as const;
 
   constructor(private readonly auth: AuthService) {}
 
   async submit() {
-    this.error = null;
-    this.message = null;
+    this.error.set(null);
+    this.message.set(null);
     this.isLoading.set(true);
     try {
       await this.auth.requestPasswordReset(
         this.forgotPasswordForm.controls.email.value
       );
-      this.message =
-        'Wenn die E-Mail existiert, wurde ein Link zum Zurücksetzen des Passworts versendet.';
+      this.message.set(
+        'Wenn die E-Mail existiert, wurde ein Link zum Zurücksetzen des Passworts versendet.'
+      );
     } catch (error) {
-      this.error = toErrorMessage(
-        error,
-        'Fehler beim Senden der E-Mail. Bitte versuche es später erneut.'
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Fehler beim Senden der E-Mail. Bitte versuche es später erneut.'
+        )
       );
     } finally {
       this.isLoading.set(false);

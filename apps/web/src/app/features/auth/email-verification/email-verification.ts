@@ -17,7 +17,7 @@ import { toErrorMessage } from '../../../shared/utils/error.utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmailVerificationComponent implements OnInit {
-  status: 'pending' | 'success' | 'error' = 'pending';
+  status = signal<'pending' | 'success' | 'error'>('pending');
   message = signal<string | null>(null);
 
   constructor(
@@ -37,22 +37,22 @@ export class EmailVerificationComponent implements OnInit {
         );
       return;
     }
-    this.status = 'pending';
+    this.status.set('pending');
     try {
       const res = await this.users.verifyEmail(token);
       if (res && res.ok) {
-        this.status = 'success';
+        this.status.set('success');
         this.message.set(
           'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.'
         );
       } else {
-        this.status = 'success';
+        this.status.set('success');
         this.message.set(
           'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.'
         );
       }
     } catch (error) {
-      this.status = 'error';
+      this.status.set('error');
       this.message.set(
         toErrorMessage(
           error,

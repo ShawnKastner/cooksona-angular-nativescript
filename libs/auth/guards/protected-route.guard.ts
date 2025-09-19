@@ -1,4 +1,3 @@
-// libs/core/auth/src/lib/guards/protected-route.guard.ts
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';

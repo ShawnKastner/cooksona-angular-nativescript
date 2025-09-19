@@ -57,7 +57,7 @@ export class RegisterComponent {
     ],
     confirmPassword: ['', [Validators.required]],
   });
-  error: string | null = null;
+  error = signal<string | null>(null);
   isLoading = signal(false);
   showPassword = signal(false);
   showPassword2 = signal(false);
@@ -69,28 +69,29 @@ export class RegisterComponent {
   ) {}
 
   async submit(): Promise<void> {
-    this.error = null;
+    this.error.set(null);
 
     if (!this.registerForm.controls.name.valid) {
-      this.error = 'Bitte gib einen gültigen Namen an.';
+      this.error.set('Bitte gib einen gültigen Namen an.');
       return;
     }
 
     if (!this.registerForm.controls.email.valid) {
-      this.error = 'Bitte gib eine gültige E-Mail-Adresse ein';
+      this.error.set('Bitte gib eine gültige E-Mail-Adresse ein');
       return;
     }
 
     if (!this.registerForm.controls.password.valid) {
-      this.error =
-        'Das Passwort muss mind. 8 Zeichen und Groß-/Kleinbuchstaben, Zahl und Sonderzeichen enthalten.';
+      this.error.set(
+        'Das Passwort muss mind. 8 Zeichen und Groß-/Kleinbuchstaben, Zahl und Sonderzeichen enthalten.'
+      );
       return;
     }
     if (
       this.registerForm.controls.password.value !==
       this.registerForm.controls.confirmPassword.value
     ) {
-      this.error = 'Die Passwörter stimmen nicht überein.';
+      this.error.set('Die Passwörter stimmen nicht überein.');
       return;
     }
     this.isLoading.set(true);
@@ -102,9 +103,11 @@ export class RegisterComponent {
       });
       await this.router.navigateByUrl('/login?registered=true');
     } catch (error) {
-      this.error = toErrorMessage(
-        error,
-        'Die Registrierung ist fehlgeschlagen. Bitte versuche es später erneut.'
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Die Registrierung ist fehlgeschlagen. Bitte versuche es später erneut.'
+        )
       );
     } finally {
       this.isLoading.set(false);

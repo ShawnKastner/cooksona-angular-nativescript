@@ -30,9 +30,9 @@ export class ResetPasswordComponent {
     password: ['', Validators.required],
     confirmPassword: ['', Validators.required],
   });
-  token: string | null = null;
-  error: string | null = null;
-  message: string | null = null;
+  token = signal<string | null>(null);
+  error = signal<string | null>(null);
+  message = signal<string | null>(null);
   isLoading = signal(false);
   showPassword = signal(false);
   showConfirmPassword = signal(false);
@@ -43,8 +43,8 @@ export class ResetPasswordComponent {
     private router: Router,
     private auth: AuthService
   ) {
-    this.token = this.route.snapshot.queryParamMap.get('token');
-    if (!this.token) {
+    this.token.set(this.route.snapshot.queryParamMap.get('token'));
+    if (!this.token()) {
       void this.router
         .navigate(['/login'])
         .catch((navigationError) =>
@@ -54,24 +54,27 @@ export class ResetPasswordComponent {
   }
 
   async submit(): Promise<void> {
-    this.error = null;
-    this.message = null;
-    if (!this.token) {
-      this.error = 'Kein Token gefunden. Bitte nutze den Link aus der E-Mail.';
+    this.error.set(null);
+    this.message.set(null);
+    const token = this.token();
+    if (!token) {
+      this.error.set(
+        'Kein Token gefunden. Bitte nutze den Link aus der E-Mail.'
+      );
       return;
     }
     if (this.resetPasswordForm.controls.password.value.length < 8) {
-      this.error = 'Das Passwort muss mindestens 8 Zeichen lang sein.';
+      this.error.set('Das Passwort muss mindestens 8 Zeichen lang sein.');
       return;
     }
     if (this.passwordsNotMatching()) {
-      this.error = 'Die Passwörter stimmen nicht überein.';
+      this.error.set('Die Passwörter stimmen nicht überein.');
       return;
     }
     this.isLoading.set(true);
     try {
       await this.auth.resetPassword(
-        this.token,
+        token,
         this.resetPasswordForm.controls.password.value
       );
       void this.router
@@ -80,9 +83,11 @@ export class ResetPasswordComponent {
           console.error('Navigation to login failed', navigationError)
         );
     } catch (error) {
-      this.error = toErrorMessage(
-        error,
-        'Fehler beim Zurücksetzen des Passworts. Der Link ist möglicherweise abgelaufen oder ungültig.'
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Fehler beim Zurücksetzen des Passworts. Der Link ist möglicherweise abgelaufen oder ungültig.'
+        )
       );
     } finally {
       this.isLoading.set(false);

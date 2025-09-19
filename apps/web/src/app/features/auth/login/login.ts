@@ -2,7 +2,6 @@ import {
   Component,
   OnInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   inject,
   signal,
 } from '@angular/core';
@@ -37,15 +36,14 @@ import { LoadingSpinnerSmallComponent } from '../../../shared/ui/loading-spinner
 })
 export class LoginComponent implements OnInit {
   fb = inject(NonNullableFormBuilder);
-  private readonly cdr = inject(ChangeDetectorRef);
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
   });
-  info: string | null = null;
-  error: string | null = null;
-  resendState: 'idle' | 'sending' | 'sent' | 'error' = 'idle';
-  resendError: string | null = null;
+  info = signal<string | null>(null);
+  error = signal<string | null>(null);
+  resendState = signal<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  resendError = signal<string | null>(null);
   showPassword = signal(false);
 
   protected readonly icons = { LogIn, Eye, EyeOff } as const;
@@ -60,23 +58,27 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     const params = this.route.snapshot.queryParamMap;
     if (params.get('registered') === 'true') {
-      this.info =
-        'Registrierung erfolgreich! Bitte prüfe deine E-Mails und bestätige deine Adresse.';
+      this.info.set(
+        'Registrierung erfolgreich! Bitte prüfe deine E-Mails und bestätige deine Adresse.'
+      );
       this.clearQueryParams();
     }
     if (params.get('registered') === 'invite') {
-      this.info =
-        'Account erfolgreich erstellt! Du kannst dich jetzt direkt einloggen.';
+      this.info.set(
+        'Account erfolgreich erstellt! Du kannst dich jetzt direkt einloggen.'
+      );
       this.clearQueryParams();
     }
     if (params.get('inviteError') === 'used') {
-      this.error =
-        'Dieser Einladungslink wurde bereits verwendet oder ist ungültig. Bitte fordere eine neue Einladung an oder logge dich direkt ein.';
+      this.error.set(
+        'Dieser Einladungslink wurde bereits verwendet oder ist ungültig. Bitte fordere eine neue Einladung an oder logge dich direkt ein.'
+      );
       this.clearQueryParams();
     }
     if (params.get('reset') === 'success') {
-      this.info =
-        'Dein Passwort wurde erfolgreich zurückgesetzt. Du kannst dich jetzt einloggen.';
+      this.info.set(
+        'Dein Passwort wurde erfolgreich zurückgesetzt. Du kannst dich jetzt einloggen.'
+      );
       this.clearQueryParams();
     }
   }
@@ -86,18 +88,15 @@ export class LoginComponent implements OnInit {
   }
 
   async submit(): Promise<void> {
-    this.error = null;
-    this.info = null;
-    this.markForCheck();
+    this.error.set(null);
+    this.info.set(null);
 
     if (!this.loginForm.controls.email.value) {
-      this.error = 'Bitte gib eine gültige E-Mail-Adresse ein';
-      this.markForCheck();
+      this.error.set('Bitte gib eine gültige E-Mail-Adresse ein');
       return;
     }
     if (!this.loginForm.controls.password.value) {
-      this.error = 'Bitte gib dein Passwort ein';
-      this.markForCheck();
+      this.error.set('Bitte gib dein Passwort ein');
       return;
     }
 
@@ -108,39 +107,37 @@ export class LoginComponent implements OnInit {
       });
       await this.router.navigateByUrl('/');
     } catch (error) {
-      this.error = toErrorMessage(
-        error,
-        'Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.'
+      this.error.set(
+        toErrorMessage(
+          error,
+          'Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.'
+        )
       );
-      this.markForCheck();
     }
   }
 
   async resendEmail(): Promise<void> {
-    this.resendError = null;
-    this.markForCheck();
+    this.resendError.set(null);
     if (!this.loginForm.controls.email.value) {
-      this.resendError = 'Bitte E-Mail angeben, um erneut zu senden.';
-      this.resendState = 'error';
-      this.markForCheck();
+      this.resendError.set('Bitte E-Mail angeben, um erneut zu senden.');
+      this.resendState.set('error');
       return;
     }
-    this.resendState = 'sending';
-    this.markForCheck();
+    this.resendState.set('sending');
     try {
       await this.api.post('/auth/resend-verification', {
         email: this.loginForm.controls.email.value,
       });
-      this.resendState = 'sent';
-      this.info = 'E-Mail wurde erneut versendet.';
-      this.markForCheck();
+      this.resendState.set('sent');
+      this.info.set('E-Mail wurde erneut versendet.');
     } catch (error) {
-      this.resendError = toErrorMessage(
-        error,
-        'Senden fehlgeschlagen. Bitte versuche es später erneut.'
+      this.resendError.set(
+        toErrorMessage(
+          error,
+          'Senden fehlgeschlagen. Bitte versuche es später erneut.'
+        )
       );
-      this.resendState = 'error';
-      this.markForCheck();
+      this.resendState.set('error');
     }
   }
 
@@ -166,12 +163,8 @@ export class LoginComponent implements OnInit {
 
   get shouldShowResend(): boolean {
     return (
-      this.error === 'Bitte bestätige zuerst deine E-Mail-Adresse.' &&
+      this.error() === 'Bitte bestätige zuerst deine E-Mail-Adresse.' &&
       !!this.loginForm.controls.email.value
     );
-  }
-
-  private markForCheck(): void {
-    this.cdr.markForCheck();
   }
 }

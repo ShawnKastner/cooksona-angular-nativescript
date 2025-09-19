@@ -23,7 +23,7 @@
     E-Mail Verifizierung
   </h2>
 
-  @if (status === 'pending') {
+  @if (status() === 'pending') {
   <div style="width: 100%; text-align: center; margin: 24px 0">
     <div
       class="loader"
@@ -41,7 +41,7 @@
       Deine E-Mail wird gerade bestätigt...
     </p>
   </div>
-  } @if (status === 'success') {
+  } @if (status() === 'success') {
   <div style="width: 100%; text-align: center; margin: 24px 0">
     <div style="font-size: 48px; color: #27ae60; margin-bottom: 8px">✓</div>
     <p
@@ -61,7 +61,7 @@
       Zum Login
     </button>
   </div>
-  } @if (status === 'error') {
+  } @if (status() === 'error') {
   <div style="width: 100%; text-align: center; margin: 24px 0">
     <div style="font-size: 48px; color: #e74c3c; margin-bottom: 8px">✗</div>
     <p style="color: #e74c3c; font-size: 18px; font-weight: 500">
