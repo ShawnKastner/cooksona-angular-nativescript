@@ -12,7 +12,7 @@ import {
   FormGroup,
   FormControl,
 } from '@angular/forms';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import {
   X,
   User as UserIcon,

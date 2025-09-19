@@ -114,7 +114,7 @@ export const routes: Routes = [
         'Admin-Dashboard für Benutzer, Einladungen und Kontaktanfragen.',
     },
     loadComponent: () =>
-      import('./features/admin/admin-dashboard.component').then(
+      import('./features/admin/admin-dashboard/admin-dashboard.component').then(
         (m) => m.AdminDashboardComponent
       ),
   },

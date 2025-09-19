@@ -1,13 +1,13 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { PaginationComponent } from '../../shared/ui/pagination.component';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { FormatDatePipe } from '../../shared/pipes/format-date.pipe';
+import { PaginationComponent } from '../../../shared/ui/pagination.component';
+import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
+import { FormatDatePipe } from '../../../shared/pipes/format-date.pipe';
 import { Shield, Clipboard, Trash } from '@cooksona/constants/icons';
 import { Invite } from '@cooksona/models/invite.models';
 import { InvitesApiService } from '@cooksona/api';
-import { CreateInviteModalComponent } from './create-invite-modal.component';
-import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
-import { toErrorMessage } from '../../shared/utils/error.utils';
+import { DeleteConfirmModalComponent } from '../../../shared/ui/modals/delete-confirm-modal.component';
+import { toErrorMessage } from '../../../shared/utils/error.utils';
+import { CreateInviteModalComponent } from '../modals/create-invite-modal.component';
 
 @Component({
   selector: 'app-invites-panel',
@@ -23,23 +23,23 @@ import { toErrorMessage } from '../../shared/utils/error.utils';
 })
 export class InvitesPanelComponent implements OnInit {
   private readonly invitesApi = inject(InvitesApiService);
+  INVITES_PER_PAGE = signal(5);
   error = signal<string | null>(null);
   success = signal<string | null>(null);
   invites = signal<Invite[]>([]);
   isLoadingInvites = signal(true);
   invitePage = signal(1);
-  readonly INVITES_PER_PAGE = 5;
   copiedInviteId = signal<string | null>(null);
   deleteInviteModalOpen = signal(false);
   deleteInviteId = signal<string | null>(null);
+  inviteOpen = signal(false);
   inviteTotalPages = computed(() =>
-    Math.ceil(this.invites().length / this.INVITES_PER_PAGE)
+    Math.ceil(this.invites().length / this.INVITES_PER_PAGE())
   );
   paginatedInvites = computed(() => {
-    const start = (this.invitePage() - 1) * this.INVITES_PER_PAGE;
-    return this.invites().slice(start, start + this.INVITES_PER_PAGE);
+    const start = (this.invitePage() - 1) * this.INVITES_PER_PAGE();
+    return this.invites().slice(start, start + this.INVITES_PER_PAGE());
   });
-  inviteOpen = signal(false);
 
   readonly icons = { Shield, Clipboard, Trash } as const;
 

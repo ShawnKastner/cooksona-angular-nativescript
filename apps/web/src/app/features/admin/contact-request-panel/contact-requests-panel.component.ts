@@ -1,5 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  FormsModule,
+  NonNullableFormBuilder,
+  Validators,
+} from '@angular/forms';
 import {
   Component,
   inject,
@@ -7,17 +11,16 @@ import {
   computed,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { ChevronDown, Inbox, Send, Trash } from '@cooksona/constants/icons';
 import { ContactApiService } from '@cooksona/api';
 import { Message } from '@cooksona/models/contact.models';
-import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
-import { PaginationComponent } from '../../shared/ui/pagination.component';
-import { toErrorMessage } from '../../shared/utils/error.utils';
-import { LoadingSpinnerSmallComponent } from '../../shared/ui/loading-spinner-small.component';
+import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
+import { LoadingSpinnerSmallComponent } from '../../../shared/ui/loading-spinner-small.component';
+import { DeleteConfirmModalComponent } from '../../../shared/ui/modals/delete-confirm-modal.component';
+import { PaginationComponent } from '../../../shared/ui/pagination.component';
+import { toErrorMessage } from '../../../shared/utils/error.utils';
 
 type MessageFilter = 'all' | 'unread' | 'read' | 'answered';
-const PAGE_SIZE = 5;
 
 @Component({
   selector: 'app-contact-requests-panel',
@@ -35,12 +38,16 @@ const PAGE_SIZE = 5;
 })
 export class ContactRequestsPanelComponent {
   private readonly contactApi = inject(ContactApiService);
+  private readonly fb = inject(NonNullableFormBuilder);
+  readonly replyForm = this.fb.group({
+    replyText: ['', Validators.required],
+  });
 
   icons = { ChevronDown, Inbox, Send, Trash } as const;
+  PAGE_SIZE = signal(5);
   loading = signal(false);
   messages = signal<Message[]>([]);
   expandedMessageId = signal<string | null>(null);
-  replyText = '';
   replyLoadingId = signal<string | null>(null);
   messageFilter = signal<MessageFilter>('all');
   currentPage = signal(1);
@@ -49,8 +56,8 @@ export class ContactRequestsPanelComponent {
   deleteTargetMessage = signal<string | undefined>(undefined);
   error = signal<string | null>(null);
   success = signal<string | null>(null);
+  filters = signal<MessageFilter[]>(['all', 'unread', 'read', 'answered']);
 
-  filters: MessageFilter[] = ['all', 'unread', 'read', 'answered'];
   requestTypeTranslations: Record<Message['requestType'], string> = {
     feature: 'Feature-Anfrage',
     support: 'Support-Anfrage',
@@ -107,15 +114,15 @@ export class ContactRequestsPanelComponent {
       this.messageFilter() === 'all'
         ? this.messages()
         : this.messages().filter((m) => m.status === this.messageFilter());
-    const start = (this.currentPage() - 1) * PAGE_SIZE;
-    return filtered.slice(start, start + PAGE_SIZE);
+    const start = (this.currentPage() - 1) * this.PAGE_SIZE();
+    return filtered.slice(start, start + this.PAGE_SIZE());
   });
   totalPages = computed(() => {
     const filtered =
       this.messageFilter() === 'all'
         ? this.messages()
         : this.messages().filter((m) => m.status === this.messageFilter());
-    return Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    return Math.max(1, Math.ceil(filtered.length / this.PAGE_SIZE()));
   });
 
   emptyMessageText(): string {
@@ -134,7 +141,7 @@ export class ContactRequestsPanelComponent {
   async toggleMessage(msg: Message): Promise<void> {
     const isExpanded = this.expandedMessageId() === msg.id;
     this.expandedMessageId.set(isExpanded ? null : msg.id);
-    this.replyText = '';
+    this.replyForm.reset();
     if (!isExpanded && msg.status === 'unread') {
       try {
         await this.contactApi.updateContactRequest(msg.id, { status: 'read' });
@@ -152,15 +159,15 @@ export class ContactRequestsPanelComponent {
   }
 
   async handleReply(msg: Message): Promise<void> {
-    if (!this.replyText.trim()) return;
+    if (!this.replyForm.valid) return;
     this.replyLoadingId.set(msg.id);
     this.error.set(null);
     try {
       await this.contactApi.updateContactRequest(msg.id, {
         status: 'answered',
-        reply: this.replyText.trim(),
+        reply: this.replyForm.get('replyText')?.value.trim(),
       });
-      this.replyText = '';
+      this.replyForm.reset();
       this.expandedMessageId.set(null);
       await this.fetchMessages();
       this.success.set('Antwort wurde gesendet.');

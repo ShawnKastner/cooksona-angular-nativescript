@@ -1,13 +1,13 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { UserApiService } from '@cooksona/api';
-import { FormatDatePipe } from '../../shared/pipes/format-date.pipe';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { FormatDatePipe } from '../../../shared/pipes/format-date.pipe';
+import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { User } from '@cooksona/models/user.models';
-import { PaginationComponent } from '../../shared/ui/pagination.component';
+import { PaginationComponent } from '../../../shared/ui/pagination.component';
 import { Pencil, Trash } from '@cooksona/constants/icons';
-import { EditUserModalComponent } from './edit-user-modal.component';
-import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal.component';
-import { toErrorMessage } from '../../shared/utils/error.utils';
+import { DeleteConfirmModalComponent } from '../../../shared/ui/modals/delete-confirm-modal.component';
+import { toErrorMessage } from '../../../shared/utils/error.utils';
+import { EditUserModalComponent } from '../modals/edit-user-modal.component';
 
 @Component({
   selector: 'app-users-panel',
@@ -31,13 +31,13 @@ export class UsersPanelComponent implements OnInit {
   deleteUserModalOpen = signal(false);
   deleteUserId = signal<string | null>(null);
   userPage = signal(1);
-  readonly USERS_PER_PAGE = 5;
+  USERS_PER_PAGE = signal(5);
   userTotalPages = computed(() =>
-    Math.ceil(this.users().length / this.USERS_PER_PAGE)
+    Math.ceil(this.users().length / this.USERS_PER_PAGE())
   );
   paginatedUsers = computed(() => {
-    const start = (this.userPage() - 1) * this.USERS_PER_PAGE;
-    return this.users().slice(start, start + this.USERS_PER_PAGE);
+    const start = (this.userPage() - 1) * this.USERS_PER_PAGE();
+    return this.users().slice(start, start + this.USERS_PER_PAGE());
   });
 
   readonly icons = { Pencil, Trash } as const;

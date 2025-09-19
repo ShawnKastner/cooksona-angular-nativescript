@@ -1,10 +1,10 @@
 import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { Shield, Users, Inbox } from '@cooksona/constants/icons';
-import { ContactRequestsPanelComponent } from './contact-requests-panel.component';
-import { InvitesPanelComponent } from './invites-panel.component';
-import { UsersPanelComponent } from './users-panel.component';
+import { InvitesPanelComponent } from '../invites-panel/invites-panel.component';
+import { UsersPanelComponent } from '../users-panel/users-panel.component';
+import { ContactRequestsPanelComponent } from '../contact-request-panel/contact-requests-panel.component';
 
 @Component({
   selector: 'app-admin-dashboard',

@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import {
   ReactiveFormsModule,
   Validators,
   FormGroup,
   FormControl,
 } from '@angular/forms';
-import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
+import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { X, Check } from '@cooksona/constants/icons';
 import { InvitesApiService } from '@cooksona/api';
 import {
@@ -14,7 +14,7 @@ import {
   Invite,
   InviteRole,
 } from '@cooksona/models/invite.models';
-import { toErrorMessage } from '../../shared/utils/error.utils';
+import { toErrorMessage } from '../../../shared/utils/error.utils';
 
 type InviteFormControls = {
   presetRole: FormControl<InviteRole>;
@@ -65,15 +65,15 @@ type CreateInvitePayload = {
             <span class="w-5 h-5" [svgInject]="icons.X"></span>
           </button>
         </header>
-        @if (errorMsg) {
+        @if (errorMsg()) {
         <div class="px-6 pt-4">
           <div
             class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm"
           >
-            {{ errorMsg }}
+            {{ errorMsg() }}
           </div>
         </div>
-        } @if (invite) {
+        } @if (invite()) {
         <div class="p-6 space-y-6">
           <div
             class="bg-green-100 border border-green-300 rounded-lg px-4 py-3 flex items-center gap-3"
@@ -95,15 +95,15 @@ type CreateInvitePayload = {
                 id="inviteLink"
                 type="text"
                 class="flex-1 border border-gray-200 bg-gray-50 rounded-xl px-4 py-2 text-gray-700 text-base font-mono"
-                [value]="inviteUrl(invite)"
+                [value]="inviteUrl(invite())"
                 readonly
                 disabled
               />
-              @if (!copied) {
+              @if (!copied()) {
               <button
                 type="button"
                 class="bg-yellow-200 text-yellow-900 font-bold px-4 py-2 rounded-xl transition-colors hover:bg-yellow-300"
-                (click)="handleCopy(invite)"
+                (click)="handleCopy(invite())"
               >
                 Kopieren
               </button>
@@ -210,7 +210,7 @@ type CreateInvitePayload = {
             </button>
             <button
               type="submit"
-              [disabled]="submitting || form.invalid"
+              [disabled]="submitting() || form.invalid"
               class="flex-1 px-4 py-2 rounded bg-primary text-white font-bold flex items-center justify-center gap-2"
             >
               <span class="w-4 h-4" [svgInject]="icons.Check"></span>
@@ -230,11 +230,13 @@ export class CreateInviteModalComponent {
   @Output() created = new EventEmitter<Invite>();
 
   form: FormGroup<InviteFormControls>;
-  invite: Invite | null = null;
-  copied = false;
+
+  errorMsg = signal('');
+  invite = signal<Invite | null>(null);
+  copied = signal(false);
+  submitting = signal(false);
+
   readonly icons = { X, Check } as const;
-  errorMsg = '';
-  submitting = false;
 
   constructor(private readonly invitesApi: InvitesApiService) {
     this.form = new FormGroup<InviteFormControls>({
@@ -269,25 +271,30 @@ export class CreateInviteModalComponent {
     });
   }
 
-  inviteUrl(inv: Invite): string {
-    return `${window.location.origin}/invite/redeem/${inv.token}`;
+  inviteUrl(inv: Invite | null): string {
+    return `${window.location.origin}/invite/redeem/${inv?.token}`;
   }
-  handleCopy(inv: Invite): void {
+
+  handleCopy(inv: Invite | null): void {
+    if (!inv) return;
     try {
-      this.errorMsg = '';
+      this.errorMsg.set('');
       navigator.clipboard.writeText(this.inviteUrl(inv));
-      this.copied = true;
+      this.copied.set(true);
     } catch (error) {
-      this.errorMsg = toErrorMessage(
-        error,
-        'Der Link konnte nicht kopiert werden. Bitte kopiere ihn manuell.'
+      this.errorMsg.set(
+        toErrorMessage(
+          error,
+          'Der Link konnte nicht kopiert werden. Bitte kopiere ihn manuell.'
+        )
       );
     }
   }
+
   resetForm(): void {
-    this.invite = null;
-    this.copied = false;
-    this.errorMsg = '';
+    this.invite.set(null);
+    this.copied.set(false);
+    this.errorMsg.set('');
     this.form.reset({
       presetRole: 'user',
       isLifetime: false,
@@ -312,8 +319,8 @@ export class CreateInviteModalComponent {
         raw.subscriptionEndsAt
       ).toISOString();
     }
-    this.errorMsg = '';
-    this.submitting = true;
+    this.errorMsg.set('');
+    this.submitting.set(true);
     try {
       // Server expects React-style fields; pass through as-is
       let created = await this.invitesApi.createInvite(
@@ -333,17 +340,19 @@ export class CreateInviteModalComponent {
         }
       }
       if (created) {
-        this.invite = created;
+        this.invite.set(created);
         this.created.emit(created);
-        this.errorMsg = '';
+        this.errorMsg.set('');
       }
     } catch (error) {
-      this.errorMsg = toErrorMessage(
-        error,
-        'Der Einladungslink konnte nicht erstellt werden. Bitte versuche es später erneut.'
+      this.errorMsg.set(
+        toErrorMessage(
+          error,
+          'Der Einladungslink konnte nicht erstellt werden. Bitte versuche es später erneut.'
+        )
       );
     } finally {
-      this.submitting = false;
+      this.submitting.set(false);
     }
   }
 }
