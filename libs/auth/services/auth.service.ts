@@ -176,7 +176,8 @@ export class AuthService {
     if (u.lifetimeSubscription) return true;
     const endsAt = u.subscriptionEndsAt ? new Date(u.subscriptionEndsAt) : null;
     const now = new Date();
-    if (u.subscriptionStatus === 'active') return true;
+    if (u.subscriptionStatus === 'active' && endsAt && endsAt > now)
+      return true;
     if (u.subscriptionStatus === 'canceled' && endsAt && endsAt > now)
       return true;
     if (u.subscriptionStatus === 'inactive' && endsAt && endsAt > now)

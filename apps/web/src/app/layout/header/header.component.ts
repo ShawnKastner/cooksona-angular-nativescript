@@ -3,6 +3,7 @@ import {
   ElementRef,
   HostListener,
   ChangeDetectionStrategy,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -16,7 +17,7 @@ import {
   MessageSquare,
 } from '@cooksona/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { SnackbarService } from '../../shared/ui/snackbar.service';
+import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 import { toErrorMessage } from '../../shared/utils/error.utils';
 
 @Component({
@@ -28,7 +29,7 @@ import { toErrorMessage } from '../../shared/utils/error.utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
-  isDropdownOpen = false;
+  isDropdownOpen = signal(false);
 
   readonly icons = {
     UtensilsCrossed,
@@ -53,17 +54,17 @@ export class HeaderComponent {
   @HostListener('document:mousedown', ['$event'])
   onDocClick(event: MouseEvent): void {
     const clickedInside = this.el.nativeElement.contains(event.target as Node);
-    if (!clickedInside && this.isDropdownOpen) {
-      this.isDropdownOpen = false;
+    if (!clickedInside && this.isDropdownOpen()) {
+      this.isDropdownOpen.set(false);
     }
   }
 
   toggleDropdown(): void {
-    this.isDropdownOpen = !this.isDropdownOpen;
+    this.isDropdownOpen.set(!this.isDropdownOpen());
   }
 
   closeDropdown(): void {
-    this.isDropdownOpen = false;
+    this.isDropdownOpen.set(false);
   }
 
   navigateTo(path: string): void {

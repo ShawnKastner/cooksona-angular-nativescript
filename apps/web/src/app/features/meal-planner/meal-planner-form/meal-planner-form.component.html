@@ -1,0 +1,363 @@
+<div
+  class="bg-white p-6 md:p-8 rounded-2xl shadow-soft-lg border border-base-200/80"
+>
+  <h2 class="text-3xl font-serif font-bold text-neutral mb-1">
+    Erstelle deinen Plan
+  </h2>
+  <p class="text-gray-500 mb-6">
+    Hallo {{ currentUserLabel || "Gast" }}, lass uns etwas Leckeres planen!
+  </p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-8">
+    <!-- Core Preferences -->
+    <div class="space-y-4">
+      <div>
+        <label for="diet" class="block text-sm font-bold text-neutral mb-2"
+          >Diät-Typ / Wünsche</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+          >
+            <span class="w-5 h-5 text-gray-400" [svgInject]="icons.Leaf"></span>
+          </div>
+          <input
+            id="diet"
+            type="text"
+            formControlName="diet"
+            placeholder="z.B. Vegetarisch, Glutenfrei"
+            class="w-full pl-12 pr-4 py-3 bg-base-200/60 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
+          />
+        </div>
+      </div>
+      <div>
+        <label for="allergies" class="block text-sm font-bold text-neutral mb-2"
+          >Allergien oder Abneigungen</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+          >
+            <span
+              class="w-5 h-5 text-gray-400"
+              [svgInject]="icons.ShieldBan"
+            ></span>
+          </div>
+          <input
+            id="allergies"
+            type="text"
+            formControlName="allergies"
+            placeholder="z.B. Erdnüsse, Schalentiere"
+            class="w-full pl-12 pr-4 py-3 bg-base-200/60 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Details -->
+    <div class="grid grid-cols-2 gap-x-4 gap-y-6">
+      <div>
+        <label for="people" class="block text-sm font-bold text-neutral mb-2"
+          >Personen</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+          >
+            <span
+              class="w-5 h-5 text-gray-400"
+              [svgInject]="icons.Users"
+            ></span>
+          </div>
+          <input
+            id="people"
+            type="number"
+            min="1"
+            max="10"
+            formControlName="people"
+            class="w-full pl-12 pr-4 py-3 bg-base-200/60 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
+          />
+        </div>
+        @if(form.get('people')?.invalid && form.get('people')?.touched) {
+        <p class="text-error text-xs mt-1">
+          Bitte eine Anzahl zwischen 1 und 10 wählen.
+        </p>
+        }
+      </div>
+      <div>
+        <label for="planDays" class="block text-sm font-bold text-neutral mb-2"
+          >Tage</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+          >
+            <span
+              class="w-5 h-5 text-gray-400"
+              [svgInject]="icons.CalendarDays"
+            ></span>
+          </div>
+          <input
+            id="planDays"
+            type="number"
+            min="1"
+            [max]="isProUser ? 14 : 3"
+            formControlName="planDays"
+            class="w-full pl-12 pr-4 py-3 bg-base-200/60 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
+          />
+        </div>
+        @if(showPlanDaysHint() && isProUser) {
+        <p class="text-xs text-error mt-1">
+          Maximal 14 Tage im Pro-Abo möglich.
+        </p>
+        }@else if(!isProUser) {
+        <p class="text-xs text-gray-500 mt-1">
+          Kostenlose Pläne sind auf max. 3 Tage begrenzt.
+          <span
+            (click)="showUpgradeModal.emit()"
+            class="text-secondary font-semibold cursor-pointer hover:underline"
+            >Upgrade für bis zu 14 Tage!</span
+          >
+        </p>
+        }
+      </div>
+      <div>
+        <label for="cookTime" class="block text-sm font-bold text-neutral mb-2"
+          >Max. Kochzeit</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+          >
+            <span
+              class="w-5 h-5 text-gray-400"
+              [svgInject]="icons.Clock"
+            ></span>
+          </div>
+          <select
+            id="cookTime"
+            formControlName="cookTime"
+            class="w-full bg-base-200/60 border-2 border-transparent rounded-xl transition-all duration-200 focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary py-3 pr-10 pl-12 appearance-none"
+          >
+            <option>15 Minuten</option>
+            <option>30 Minuten</option>
+            <option>45 Minuten</option>
+            <option>1 Stunde</option>
+          </select>
+          <div
+            class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
+          >
+            <span
+              class="w-5 h-5 text-gray-400"
+              [svgInject]="icons.ChevronDown"
+            ></span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label for="calories" class="block text-sm font-bold text-neutral mb-2"
+          >Kalorien (ca.)</label
+        >
+        <div class="relative">
+          <div
+            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+          >
+            <span
+              class="w-5 h-5 text-gray-400"
+              [svgInject]="icons.Flame"
+            ></span>
+          </div>
+          <input
+            id="calories"
+            type="number"
+            placeholder="z.B. 2000"
+            step="50"
+            formControlName="calories"
+            class="w-full pl-12 pr-4 py-3 bg-base-200/60 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
+          />
+        </div>
+        @if(form.get('calories')?.invalid && form.get('calories')?.touched) {
+        <p class="text-error text-xs mt-1">
+          Kalorien müssen zwischen 0 und 10000 liegen.
+        </p>
+        }
+      </div>
+    </div>
+
+    <!-- Meal Selection -->
+    <div>
+      <label class="block text-sm font-bold text-neutral mb-2"
+        >Mahlzeiten auswählen</label
+      >
+      <div formGroupName="meals" class="grid grid-cols-2 gap-3">
+        @for(meal of mealTypes; track meal) {
+        <label
+          class="flex items-center space-x-3 p-3 bg-base-100/60 rounded-xl has-[:checked]:bg-primary/10 has-[:checked]:ring-2 has-[:checked]:ring-primary transition-all cursor-pointer hover:bg-base-200/60"
+        >
+          <input type="checkbox" class="sr-only" [formControlName]="meal" />
+          <div
+            class="w-5 h-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all"
+            [ngClass]="
+              control('meals.' + meal)?.value
+                ? 'bg-primary border-primary'
+                : 'border-gray-400'
+            "
+          >
+            @if(control('meals.' + meal)?.value) {
+            <span
+              class="w-3.5 h-3.5 text-white"
+              [svgInject]="icons.Check"
+            ></span>
+            }
+          </div>
+          <span class="text-sm font-medium text-neutral">{{
+            mealTypeTranslations[meal]
+          }}</span>
+        </label>
+        }
+      </div>
+    </div>
+
+    <!-- Pro Settings -->
+    <div class="border-t border-base-200/80 pt-6 space-y-4">
+      <h3
+        class="font-serif font-bold text-xl text-neutral flex items-center gap-2"
+      >
+        <span
+          class="w-5 h-5 text-secondary"
+          [svgInject]="icons.Sparkles"
+        ></span>
+        Pro-Einstellungen
+      </h3>
+      <div
+        class="space-y-4"
+        [class.opacity-60]="!isProUser"
+        (click)="handleProFeatureClick()"
+      >
+        <div
+          class="flex justify-between items-center p-3 bg-base-100/60 rounded-xl"
+        >
+          <div class="flex items-center gap-3">
+            <span
+              class="w-5 h-5 text-gray-500"
+              [svgInject]="icons.BarChart2"
+            ></span>
+            <span class="font-semibold text-neutral text-sm"
+              >Nährwertanalyse</span
+            >
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              class="sr-only peer"
+              formControlName="enableNutritionAnalysis"
+            />
+            <div
+              class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"
+            ></div>
+            <div
+              class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"
+            ></div>
+          </label>
+        </div>
+        <div
+          class="flex justify-between items-center p-3 bg-base-100/60 rounded-xl"
+        >
+          <div class="flex items-center gap-3">
+            <span
+              class="w-5 h-5 text-gray-500"
+              [svgInject]="icons.Target"
+            ></span>
+            <span class="font-semibold text-neutral text-sm">Plan-Fokus</span>
+          </div>
+          <div class="max-w-[150px] relative">
+            <select
+              class="w-full bg-base-200/60 border-2 border-transparent rounded-xl py-1 pr-10 pl-3 text-sm focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary appearance-none"
+              formControlName="planFocus"
+            >
+              <option value="ausgewogen">Ausgewogen</option>
+              <option value="proteinreich">Proteinreich</option>
+              <option value="kohlenhydratarm">Kohlenhydratarm</option>
+              <option value="fettarm">Fettarm</option>
+            </select>
+            <div
+              class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
+            >
+              <span
+                class="w-5 h-5 text-gray-400"
+                [svgInject]="icons.ChevronDown"
+              ></span>
+            </div>
+          </div>
+        </div>
+        <div
+          class="flex justify-between items-center p-3 bg-base-100/60 rounded-xl"
+        >
+          <div class="flex items-center gap-3">
+            <span
+              class="w-5 h-5 text-gray-500"
+              [svgInject]="icons.Award"
+            ></span>
+            <span class="font-semibold text-neutral text-sm"
+              >Gourmet-Modus</span
+            >
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input
+              type="checkbox"
+              class="sr-only peer"
+              formControlName="gourmetMode"
+            />
+            <div
+              class="h-5 w-10 rounded-full bg-base-300 peer-checked:bg-primary transition-colors"
+            ></div>
+            <div
+              class="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5"
+            ></div>
+          </label>
+        </div>
+        @if(!isProUser) {
+        <div class="text-center text-sm pt-2">
+          <span
+            class="font-semibold text-secondary cursor-pointer hover:underline"
+            ><span
+              class="w-4 h-4 inline-block mr-1"
+              [svgInject]="icons.Sparkles"
+            ></span
+            >Upgrade für mehr Funktionen</span
+          >
+        </div>
+        }
+      </div>
+    </div>
+
+    @if(!isProUser) {
+    <div class="text-center text-sm text-gray-500 pt-2">
+      <p>
+        Du hast noch
+        <span class="font-bold text-neutral">{{ remainingRequests ?? 0 }}</span>
+        kostenlose Anfragen.
+      </p>
+      @if((remainingRequests ?? 0) <= 0) {
+      <p class="text-error font-semibold mt-1">
+        Upgrade auf Pro für unbegrenzte Anfragen!
+      </p>
+      }
+    </div>
+    }
+    <!-- Submit Button -->
+    <div class="pt-4">
+      <button
+        type="submit"
+        [disabled]="isLoading"
+        class="w-full flex items-center justify-center gap-3 bg-gradient-to-br from-primary to-primary-focus text-primary-content font-bold py-3.5 px-4 rounded-xl hover:shadow-soft-lg focus:outline-none focus:ring-4 focus:ring-primary/40 transition-all duration-300 disabled:bg-base-300 disabled:cursor-not-allowed disabled:shadow-none transform hover:-translate-y-0.5"
+      >
+        @if(isLoading) {
+        <app-loading-spinner-small />
+        Wird erstellt... }@else {
+        <span class="w-5 h-5" [svgInject]="icons.Sparkles"></span>
+        Meinen Plan erstellen }
+      </button>
+    </div>
+  </form>
+</div>

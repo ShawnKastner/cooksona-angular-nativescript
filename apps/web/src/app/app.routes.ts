@@ -27,7 +27,7 @@ export const routes: Routes = [
   {
     path: 'invite/redeem/:token',
     loadComponent: () =>
-      import('./pages/invite-redeem/invite-redeem.page').then(
+      import('./pages/invite-redeem/invite-redeem.component').then(
         (m) => m.InviteRedeemPage
       ),
     title: 'Einladung einlösen',
@@ -77,7 +77,9 @@ export const routes: Routes = [
     path: '',
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
-      import('./features/planner/planner.page').then((m) => m.PlannerComponent),
+      import('./features/meal-planner/planner/planner.component').then(
+        (m) => m.PlannerComponent
+      ),
     title: 'CookSona – Dein digitaler Essensplaner und Kochbuch',
     data: {
       description:
@@ -88,7 +90,9 @@ export const routes: Routes = [
     path: 'profile',
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
-      import('./features/profile/profile.page').then((m) => m.ProfileComponent),
+      import('./features/profile/profile.component').then(
+        (m) => m.ProfileComponent
+      ),
     title: 'Profil',
     data: {
       description:
@@ -99,7 +103,7 @@ export const routes: Routes = [
     path: 'cookbook',
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
-      import('./features/cookbook/cookbook.page').then(
+      import('./features/cookbook/cookbook.component').then(
         (m) => m.CookbookComponent
       ),
     title: 'Kochbuch',
@@ -123,19 +127,23 @@ export const routes: Routes = [
   {
     path: 'datenschutz',
     loadComponent: () =>
-      import('./pages/legal/datenschutz.page').then((m) => m.DatenschutzPage),
+      import('./pages/legal/privacy-policy.component').then(
+        (m) => m.DatenschutzPage
+      ),
     title: 'Datenschutz',
   },
   {
     path: 'impressum',
     loadComponent: () =>
-      import('./pages/legal/impressum.page').then((m) => m.ImpressumPage),
+      import('./pages/legal/imprint.component').then((m) => m.ImpressumPage),
     title: 'Impressum',
   },
   {
     path: 'contact',
     loadComponent: () =>
-      import('./pages/legal/contact.page').then((m) => m.ContactPage),
+      import('./pages/legal//contact/contact.component').then(
+        (m) => m.ContactComponent
+      ),
     title: 'Kontakt',
     data: {
       description:

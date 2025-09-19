@@ -5,9 +5,9 @@ import { FormatDatePipe } from '../../../shared/pipes/format-date.pipe';
 import { Shield, Clipboard, Trash } from '@cooksona/constants/icons';
 import { Invite } from '@cooksona/models/invite.models';
 import { InvitesApiService } from '@cooksona/api';
-import { DeleteConfirmModalComponent } from '../../../shared/ui/modals/delete-confirm-modal.component';
 import { toErrorMessage } from '../../../shared/utils/error.utils';
 import { CreateInviteModalComponent } from '../modals/create-invite-modal.component';
+import { DeleteConfirmModalComponent } from '../../../shared/ui/modals/delete-confirm-modal/delete-confirm-modal.component';
 
 @Component({
   selector: 'app-invites-panel',

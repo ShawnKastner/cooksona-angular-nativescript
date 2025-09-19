@@ -25,7 +25,6 @@ import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive
     SvgInjectDirective,
   ],
   templateUrl: './landing.component.html',
-  styleUrl: './landing.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingComponent {

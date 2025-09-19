@@ -5,9 +5,9 @@ import { SvgInjectDirective } from '../../../shared/directives/svg-inject.direct
 import { User } from '@cooksona/models/user.models';
 import { PaginationComponent } from '../../../shared/ui/pagination.component';
 import { Pencil, Trash } from '@cooksona/constants/icons';
-import { DeleteConfirmModalComponent } from '../../../shared/ui/modals/delete-confirm-modal.component';
 import { toErrorMessage } from '../../../shared/utils/error.utils';
 import { EditUserModalComponent } from '../modals/edit-user-modal.component';
+import { DeleteConfirmModalComponent } from '../../../shared/ui/modals/delete-confirm-modal/delete-confirm-modal.component';
 
 @Component({
   selector: 'app-users-panel',

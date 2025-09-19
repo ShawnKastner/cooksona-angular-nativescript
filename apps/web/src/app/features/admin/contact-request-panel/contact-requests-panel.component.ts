@@ -15,10 +15,10 @@ import { ChevronDown, Inbox, Send, Trash } from '@cooksona/constants/icons';
 import { ContactApiService } from '@cooksona/api';
 import { Message } from '@cooksona/models/contact.models';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
-import { LoadingSpinnerSmallComponent } from '../../../shared/ui/loading-spinner-small.component';
-import { DeleteConfirmModalComponent } from '../../../shared/ui/modals/delete-confirm-modal.component';
+import { LoadingSpinnerSmallComponent } from '../../../shared/ui/loading-spinner/loading-spinner-small.component';
 import { PaginationComponent } from '../../../shared/ui/pagination.component';
 import { toErrorMessage } from '../../../shared/utils/error.utils';
+import { DeleteConfirmModalComponent } from '../../../shared/ui/modals/delete-confirm-modal/delete-confirm-modal.component';
 
 type MessageFilter = 'all' | 'unread' | 'read' | 'answered';
 

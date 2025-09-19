@@ -1,0 +1,138 @@
+@if(loading()) {
+<div class="flex items-center justify-center py-10">
+  <div class="w-full max-w-md">
+    <div
+      class="bg-white shadow-soft-xl rounded-2xl px-8 md:px-10 pt-8 pb-10 border border-base-200/50 text-center"
+    >
+      <span class="text-lg text-gray-500">Lade Einladung ...</span>
+    </div>
+  </div>
+</div>
+}@else { @if(invite(); as currentInvite){
+<div class="flex items-center justify-center py-10">
+  <div class="w-full max-w-md">
+    <form
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+      class="bg-white shadow-soft-xl rounded-2xl px-8 md:px-10 pt-8 pb-10 border border-base-200/50"
+    >
+      <div class="mb-8 text-center">
+        <h1 class="text-4xl font-serif font-bold text-neutral">
+          Einladung annehmen
+        </h1>
+        <p class="text-gray-500 mt-2">
+          Erstelle deinen Account und starte direkt durch.
+        </p>
+      </div>
+
+      @if(error()) {
+      <div
+        class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-6"
+        role="alert"
+      >
+        <span class="block sm:inline">{{ error() }}</span>
+      </div>
+      }
+      <div class="mb-4">
+        <label class="block text-neutral text-sm font-bold mb-2" for="name">
+          Name
+        </label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          required
+          placeholder="Dein Name"
+          class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
+        />
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-neutral text-sm font-bold mb-2" for="email">
+          E-Mail
+        </label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          (input)="onEmailInput($event)"
+          required
+          placeholder="deine.email@example.com"
+          class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
+        />
+      </div>
+
+      <div class="mb-8">
+        <label class="block text-neutral text-sm font-bold mb-2" for="password">
+          Passwort
+        </label>
+        <div class="relative">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            required
+            placeholder="******************"
+            class="w-full px-4 py-3 bg-base-200 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
+          />
+          <button
+            type="button"
+            (click)="togglePasswordVisibility()"
+            class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500"
+            aria-label="Passwort anzeigen oder verbergen"
+          >
+            @if(!showPassword()) {
+            <span class="w-5 h-5" [svgInject]="icons.Eye"></span>
+            } @else {
+            <span class="w-5 h-5" [svgInject]="icons.EyeOff"></span>
+            }
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <button
+          type="submit"
+          [disabled]="form.invalid || submitting"
+          class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-focus focus:outline-none focus:ring-4 focus:ring-primary/40 transition-all duration-300 disabled:bg-base-300 disabled:shadow-none transform hover:-translate-y-0.5 shadow-soft"
+        >
+          Account erstellen
+        </button>
+      </div>
+
+      <div class="mt-8 text-center text-gray-500 text-sm">
+        Bereits ein Konto?
+        <a
+          class="font-bold text-primary hover:text-primary-focus cursor-pointer"
+          href="/login"
+          (click)="navigateToLogin($event)"
+        >
+          Hier anmelden
+        </a>
+      </div>
+
+      <div class="mt-8 text-center text-gray-500 text-sm">
+        Du wurdest eingeladen als
+        <b>{{
+          currentInvite.presetRole === "admin" ? "Administrator" : "Benutzer"
+        }}</b
+        >.<br />
+        @if(currentInvite.presetLifetimeSubscription){
+        <span class="text-green-600">
+          Dein Account erhält ein lebenslanges Abonnement.
+        </span>
+        } @if(!currentInvite.presetLifetimeSubscription &&
+        currentInvite.presetSubscriptionEndsAt){
+        <span class="text-blue-600">
+          Dein Abonnement läuft bis:
+          {{ formatDate(currentInvite.presetSubscriptionEndsAt) }}
+        </span>
+        } @if( !currentInvite.presetLifetimeSubscription &&
+        !currentInvite.presetSubscriptionEndsAt) {
+        <span class="text-gray-600"> Kein Abonnement hinterlegt. </span>
+        }
+      </div>
+    </form>
+  </div>
+</div>
+} }

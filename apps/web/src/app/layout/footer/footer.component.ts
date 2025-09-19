@@ -1,7 +1,7 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { CookieBannerComponent } from './cookie-banner.component';
+import { CookieBannerComponent } from './cookie-banner/cookie-banner.component';
 
 @Component({
   selector: 'app-footer',
@@ -12,13 +12,13 @@ import { CookieBannerComponent } from './cookie-banner.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FooterComponent {
-  showCookieSettings = false;
+  showCookieSettings = signal(false);
 
   openCookieSettings(): void {
-    this.showCookieSettings = true;
+    this.showCookieSettings.set(true);
   }
 
   closeCookieSettings(): void {
-    this.showCookieSettings = false;
+    this.showCookieSettings.set(false);
   }
 }

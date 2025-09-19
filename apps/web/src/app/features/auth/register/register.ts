@@ -16,7 +16,7 @@ import { SvgInjectDirective } from '../../../shared/directives/svg-inject.direct
 import { Router } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
 import { toErrorMessage } from '../../../shared/utils/error.utils';
-import { LoadingSpinnerSmallComponent } from '../../../shared/ui/loading-spinner-small.component';
+import { LoadingSpinnerSmallComponent } from '../../../shared/ui/loading-spinner/loading-spinner-small.component';
 
 @Component({
   selector: 'app-register',
