@@ -106,7 +106,7 @@
           >
             <h4 class="font-bold text-lg text-neutral">Monatlich</h4>
             <p class="text-2xl font-bold text-primary">
-              4.99€
+              {{ planDetails.monthly.value }}€
               <span class="text-base font-normal text-gray-500">/ Monat</span>
             </p>
           </div>
@@ -126,7 +126,7 @@
             </div>
             <h4 class="font-bold text-lg text-neutral">Jährlich</h4>
             <p class="text-2xl font-bold text-primary">
-              49.99€
+              {{ planDetails.yearly.value }}€
               <span class="text-base font-normal text-gray-500">/ Jahr</span>
             </p>
             <p class="text-sm text-green-600 font-semibold">Spare über 16%!</p>
@@ -159,14 +159,21 @@
         <div
           class="w-full max-w-[520px] mx-auto rounded-xl border border-gray-100 p-3 sm:p-4 text-center"
         >
-          <!-- Placeholder for PayPal Smart Button integration -->
-          <button
-            type="button"
-            (click)="handlePayPalSuccess()"
-            class="w-full bg-[#FFC439] text-black font-semibold py-2 rounded-md hover:brightness-95 transition"
-          >
-            Mit PayPal abonnieren
-          </button>
+          <div class="text-sm text-gray-600 mb-3">
+            {{ selectedPlanDetails().description }}
+          </div>
+          @if (paypalClientId) {
+          <app-paypal-subscription-smart-button
+            [planId]="selectedPlanDetails().planId"
+            [clientId]="paypalClientId"
+            (success)="handlePayPalSuccess()"
+            (error)="handlePayPalError($event)"
+          />
+          } @else {
+          <div class="text-sm text-red-600">
+            PayPal ist derzeit nicht verfügbar. Bitte versuche es später erneut.
+          </div>
+          }
         </div>
         @if (error()) {
         <div class="text-center text-red-600 mt-3">{{ error() }}</div>

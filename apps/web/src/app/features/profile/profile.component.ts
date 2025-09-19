@@ -34,6 +34,7 @@ import { Message } from '@cooksona/models/contact.models';
 import { User } from '@cooksona/models/user.models';
 import { toErrorMessage } from '../../shared/utils/error.utils';
 import { FormatDatePipe } from '../../shared/pipes/format-date.pipe';
+import { RealTimeService } from '../../shared/services/realtime.service';
 
 type ProfileFormModel = {
   name: FormControl<string>;
@@ -59,6 +60,7 @@ export class ProfileComponent implements OnInit {
   private readonly contactApi = inject(ContactApiService);
   private readonly api = inject(ApiService);
   private readonly snackbar = inject(SnackbarService);
+  private readonly rts = inject(RealTimeService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly zone = inject(NgZone);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -97,9 +99,9 @@ export class ProfileComponent implements OnInit {
   PAGE_SIZE = signal(5);
 
   ngOnInit(): void {
-    const u = this.auth.currentUser as User | null;
+    const user = this.auth.currentUser as User | null;
     this.form = this.fb.group<ProfileFormModel>({
-      name: this.fb.control<string>(u?.name ?? '', {
+      name: this.fb.control<string>(user?.name ?? '', {
         validators: [
           Validators.required,
           Validators.minLength(2),
@@ -107,7 +109,7 @@ export class ProfileComponent implements OnInit {
           Validators.pattern(/^[a-zA-ZäöüÄÖÜß\s-]+$/),
         ],
       }),
-      email: this.fb.control<string>(u?.email ?? '', {
+      email: this.fb.control<string>(user?.email ?? '', {
         validators: [
           Validators.required,
           Validators.email,
@@ -117,7 +119,7 @@ export class ProfileComponent implements OnInit {
     });
 
     // Load contact requests
-    if (u?.id) void this.loadRequests(u.id);
+    if (user?.id) void this.loadRequests(user.id);
 
     // If user later updates (rare), reflect in form
     this.auth.currentUser$
@@ -129,6 +131,21 @@ export class ProfileComponent implements OnInit {
           { emitEvent: false }
         );
       });
+
+    if (user?.id) {
+      this.rts.connect({ userId: user.id });
+      const off = this.rts.on<any>('user.updated', async (p) => {
+        const pid = (p?.user as any)?.id ?? p?.userId;
+        if (String(pid) !== String(user.id)) return;
+        try {
+          await this.auth.refreshCurrentUser();
+          this.zone.run(() => this.cdr.markForCheck());
+        } catch (e) {
+          console.warn('Failed to refresh after user.updated', e);
+        }
+      });
+      this.destroyRef.onDestroy(off);
+    }
   }
 
   // Helpers
@@ -203,7 +220,7 @@ export class ProfileComponent implements OnInit {
     const ended = !!this.endsAt && this.endsAt < this.now;
     const neverPro =
       !this.currentUserSnapshot?.subscriptionEndsAt &&
-      this.subStatus === 'active' &&
+      this.subStatus !== 'active' &&
       !this.isLifetime;
     return (
       (this.subStatus === 'canceled' && ended) ||
@@ -305,73 +322,27 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    const start = Date.now();
-    const maxTotalMs = 60_000;
-    const intervalMs = 5000;
-    while (Date.now() - start < maxTotalMs) {
-      try {
-        const user = await this.api.get<User>('/users/me');
-        if (user?.subscriptionStatus === 'canceled') {
-          this.cancelSuccess.set(true);
-          this.cancelLoading.set(false);
-          try {
-            await this.auth.refreshCurrentUser();
-          } catch (refreshError) {
-            console.warn(
-              'Failed to refresh current user after cancellation',
-              refreshError
-            );
-          }
-          setTimeout(() => {
-            this.showCancelModal.set(false);
-          }, 3000);
-          return;
-        }
-      } catch (error: unknown) {
-        const errObject =
-          typeof error === 'object' && error !== null
-            ? (error as {
-                message?: unknown;
-                error?: unknown;
-                status?: unknown;
-                statusCode?: unknown;
-              })
-            : {};
-        const messageValue =
-          typeof errObject.message === 'string'
-            ? errObject.message
-            : typeof errObject.error === 'string'
-            ? errObject.error
-            : '';
-        const statusRaw = errObject.status ?? errObject.statusCode ?? undefined;
-        const status =
-          typeof statusRaw === 'number'
-            ? statusRaw
-            : typeof statusRaw === 'string'
-            ? Number(statusRaw)
-            : undefined;
-        if (status === 429 || /429|Too Many Requests/i.test(messageValue)) {
-          this.cancelError.set(
-            'Zu viele Anfragen an den Server. Bitte warte kurz und versuche es erneut.'
-          );
-          this.cancelLoading.set(false);
-          return;
-        }
-        this.cancelError.set(
-          toErrorMessage(
-            error,
-            'Der Kündigungsstatus konnte nicht geprüft werden. Bitte versuche es später erneut.'
-          )
-        );
-        this.cancelLoading.set(false);
-        return;
-      }
-      await new Promise((r) => setTimeout(r, intervalMs));
+    // WebSocket-Confirm abwarten
+    const uid = (this.auth.currentUser as User | null)?.id;
+    try {
+      this.rts.connect({ userId: uid as any });
+      await this.rts.waitFor<any>('user.updated', {
+        filter: (p) => {
+          const pid = (p?.user as any)?.id ?? p?.userId;
+          return !uid || String(pid) === String(uid);
+        },
+        timeoutMs: 60000,
+      });
+      await this.auth.refreshCurrentUser();
+      this.cancelSuccess.set(true);
+      this.cancelLoading.set(false);
+      setTimeout(() => this.showCancelModal.set(false), 3000);
+    } catch (e) {
+      this.cancelError.set(
+        'Die Kündigung wurde angefragt, die Bestätigung steht noch aus. Bitte versuche es später erneut.'
+      );
+      this.cancelLoading.set(false);
     }
-    this.cancelError.set(
-      'Die Kündigung wurde angefragt, die Bestätigung steht noch aus. Bitte versuche es später erneut.'
-    );
-    this.cancelLoading.set(false);
   }
 
   async confirmReactivate(): Promise<void> {
@@ -379,14 +350,16 @@ export class ProfileComponent implements OnInit {
     this.reactivateLoading.set(true);
     try {
       await this.auth.reactivateSubscription();
-      await this.auth
-        .refreshCurrentUser()
-        .catch((refreshError) =>
-          console.warn(
-            'Failed to refresh current user after reactivation',
-            refreshError
-          )
-        );
+      const uid = (this.auth.currentUser as User | null)?.id;
+      this.rts.connect({ userId: uid as any });
+      await this.rts.waitFor<any>('user.updated', {
+        filter: (p) => {
+          const pid = (p?.user as any)?.id ?? p?.userId;
+          return !uid || String(pid) === String(uid);
+        },
+        timeoutMs: 60000,
+      });
+      await this.auth.refreshCurrentUser();
       this.zone.run(() => {
         this.snackbar.success('Abonnement wurde reaktiviert.');
         this.showReactivateModal.set(false);
