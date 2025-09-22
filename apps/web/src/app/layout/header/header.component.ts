@@ -15,6 +15,8 @@ import {
   BookHeart,
   Shield,
   MessageSquare,
+  Heart,
+  HeartPulse,
 } from '@cooksona/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
@@ -38,6 +40,7 @@ export class HeaderComponent {
     BookHeart,
     Shield,
     MessageSquare,
+    HeartPulse,
   } as const;
 
   constructor(

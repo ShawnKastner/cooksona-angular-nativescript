@@ -109,6 +109,15 @@ export const routes: Routes = [
     title: 'Kochbuch',
   },
   {
+    path: 'health',
+    canActivate: [protectedRouteGuard],
+    loadComponent: () =>
+      import('./features/health/health.component').then(
+        (m) => m.HealthComponent
+      ),
+    title: 'Health Hub',
+  },
+  {
     path: 'admin',
     canActivate: [protectedRouteGuard],
     title: 'Admin',
