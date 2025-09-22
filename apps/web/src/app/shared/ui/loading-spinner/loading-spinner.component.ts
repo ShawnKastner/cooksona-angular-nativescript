@@ -7,9 +7,10 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
   imports: [CommonModule],
   template: `
     <div
-      class="flex flex-col items-center justify-center bg-base-100/50 rounded-2xl border-2 border-dashed border-base-200"
+      class="flex flex-col items-center justify-center bg-base-100/50 rounded-2xl border-dashed border-base-200"
       [class.p-12]="!compact"
       [class.p-6]="compact"
+      [class.border-2]="!withOutBorder"
       role="status"
       aria-live="polite"
     >
@@ -37,4 +38,5 @@ export class LoadingSpinnerComponent {
   @Input() subLabel?: string;
   /** Compact mode: smaller spinner and no text */
   @Input() compact = false;
+  @Input() withOutBorder = false;
 }

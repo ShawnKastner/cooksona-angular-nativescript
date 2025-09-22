@@ -1,66 +1,71 @@
 <div class="max-w-6xl mx-auto">
-  <div
-    class="flex flex-col md:flex-row md:items-center md:justify-between mb-8"
-  >
-    <div class="mb-4 md:mb-0">
-      <h1
-        class="text-4xl font-serif font-bold text-neutral flex items-center gap-4"
+  <div class="flex flex-col md:flex-row gap-8">
+    <aside class="w-full md:w-64 flex-shrink-0">
+      <app-collection-sidebar
+        (collectionSelected)="handleCollectionChange($event)"
+        (collectionUpdated)="handleCollectionUpdated()"
+      />
+    </aside>
+
+    <main class="flex-1 min-w-0">
+      <div
+        class="flex flex-col md:flex-row md:items-center md:justify-between mb-8"
+      >
+        <div class="mb-4 md:mb-0">
+          <h1
+            class="text-4xl font-serif font-bold text-neutral flex items-center gap-4"
+          >
+            <span
+              class="w-10 h-10 text-primary"
+              [svgInject]="icons.BookHeart"
+            ></span>
+            Mein Kochbuch
+          </h1>
+          <p class="text-gray-500 mt-1">Deine Sammlung an Lieblingsrezepten.</p>
+        </div>
+        <div class="w-full md:w-auto md:max-w-sm">
+          <input
+            type="text"
+            placeholder="Rezepte durchsuchen..."
+            [value]="searchTerm()"
+            (input)="searchTerm.set($any($event.target).value)"
+            class="w-full px-4 py-3 bg-white border-2 border-base-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
+          />
+        </div>
+      </div>
+      @if(!loadRecipes()){ @if (cookbook().length > 0) {
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        @for (recipe of cookbook(); track recipe.id) {
+        <app-cookbook-card
+          [recipe]="recipe"
+          (onShowDetails)="handleShowRecipe(recipe)"
+          (onRemove)="requestRemoveRecipe(recipe)"
+          (onOpenTransformModal)="handleOpenTransformModal(recipe)"
+          (onAddToCollection)="requestAddToCollection(recipe)"
+        />
+        }
+      </div>
+      } @else {
+      <div
+        class="text-center py-16 bg-white rounded-2xl shadow-soft border border-base-200"
       >
         <span
-          class="w-10 h-10 text-primary"
+          class="mx-auto h-20 w-20 text-base-200 block"
           [svgInject]="icons.BookHeart"
         ></span>
-        Mein Kochbuch
-      </h1>
-      <p class="text-gray-500 mt-1">Deine Sammlung an Lieblingsrezepten.</p>
-    </div>
-    <div class="w-full md:w-auto md:max-w-sm">
-      <input
-        type="text"
-        placeholder="Rezepte durchsuchen..."
-        [value]="searchTerm()"
-        (input)="searchTerm.set($any($event.target).value)"
-        class="w-full px-4 py-3 bg-white border-2 border-base-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
-      />
-    </div>
+        <h2 class="mt-6 text-3xl font-serif font-bold text-neutral">
+          Dein Kochbuch ist leer
+        </h2>
+        <p class="mt-2 text-gray-500 max-w-sm mx-auto">
+          Füge Rezepte aus deinen Ernährungsplänen hinzu, indem du auf das
+          Herz-Icon klickst.
+        </p>
+      </div>
+      } } @else {
+      <app-loading-spinner [withOutBorder]="true" [label]="'Lade Rezepte...'" />
+      }
+    </main>
   </div>
-
-  @if (error()) {
-  <div
-    class="bg-red-100 border-l-4 border-error text-red-800 p-4 rounded-r-lg mb-6"
-    role="alert"
-  >
-    <p class="font-bold">Ein Fehler ist aufgetreten</p>
-    <p class="text-sm">{{ error() }}</p>
-  </div>
-  } @if (filteredCookbook().length > 0) {
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    @for (recipe of filteredCookbook(); track recipe.id) {
-    <app-cookbook-card
-      [recipe]="recipe"
-      (onShowDetails)="handleShowRecipe(recipe)"
-      (onRemove)="requestRemoveRecipe(recipe)"
-      (onOpenTransformModal)="handleOpenTransformModal(recipe)"
-    />
-    }
-  </div>
-  } @else {
-  <div
-    class="text-center py-16 bg-white rounded-2xl shadow-soft border border-base-200"
-  >
-    <span
-      class="mx-auto h-20 w-20 text-base-200 block"
-      [svgInject]="icons.BookHeart"
-    ></span>
-    <h2 class="mt-6 text-3xl font-serif font-bold text-neutral">
-      Dein Kochbuch ist leer
-    </h2>
-    <p class="mt-2 text-gray-500 max-w-sm mx-auto">
-      Füge Rezepte aus deinen Ernährungsplänen hinzu, indem du auf das Herz-Icon
-      klickst.
-    </p>
-  </div>
-  }
 </div>
 
 <!-- Modals -->
@@ -96,3 +101,11 @@
   (cancel)="cancelRemove()"
   (confirm)="confirmRemove()"
 ></app-delete-confirm-modal>
+
+<app-add-to-collection-modal
+  [open]="!!recipeToCategorize()"
+  [recipe]="recipeToCategorize()"
+  [collections]="collections()"
+  (close)="closeAddToCollection()"
+  (save)="handleSaveCollections($event)"
+></app-add-to-collection-modal>

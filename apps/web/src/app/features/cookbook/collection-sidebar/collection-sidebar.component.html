@@ -1,0 +1,119 @@
+<div class="bg-white p-4 rounded-2xl shadow-soft border border-base-200 h-full">
+  <h2 class="text-lg font-bold font-serif text-neutral p-2">Sammlungen</h2>
+  @if(loadCollections()) {
+  <app-loading-spinner [compact]="true" [withOutBorder]="true" />
+  } @else {
+  <nav class="mt-2 space-y-1">
+    <button
+      type="button"
+      (click)="select('all')"
+      [class]="
+        'w-full flex items-center gap-3 p-3 rounded-lg text-sm font-semibold transition-colors ' +
+        (selectedCollectionId() === 'all'
+          ? 'bg-primary/10 text-primary'
+          : 'text-neutral hover:bg-base-200/50')
+      "
+    >
+      <span class="w-5 h-5 flex-shrink-0" [svgInject]="icons.BookOpen"></span>
+      Alle Rezepte
+    </button>
+
+    <button
+      type="button"
+      (click)="select('uncategorized')"
+      [class]="
+        'w-full flex items-center gap-3 p-3 rounded-lg text-sm font-semibold transition-colors ' +
+        (selectedCollectionId() === 'uncategorized'
+          ? 'bg-primary/10 text-primary'
+          : 'text-neutral hover:bg-base-200/50')
+      "
+    >
+      <span class="w-5 h-5 flex-shrink-0" [svgInject]="icons.ListTree"></span>
+      Unkategorisiert
+    </button>
+
+    <hr class="my-2 border-base-200" />
+
+    @for (collection of collections(); track collection.id) {
+    <div class="group relative">
+      <button
+        type="button"
+        (click)="select(collection.id)"
+        [class]="
+          'w-full text-left flex items-center gap-3 p-3 rounded-lg text-sm font-semibold transition-colors ' +
+          (selectedCollectionId() === collection.id
+            ? 'bg-primary/10 text-primary'
+            : 'text-neutral hover:bg-base-200/50')
+        "
+      >
+        <span class="w-5 h-5 flex-shrink-0" [svgInject]="icons.ListTree"></span>
+        <span class="truncate flex-1">{{ collection.name }}</span>
+      </button>
+      <button
+        type="button"
+        (click)="openDeleteCollection(collection, $event)"
+        class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-error hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <span class="w-4 h-4" [svgInject]="icons.Trash"></span>
+      </button>
+    </div>
+    }
+  </nav>
+
+  <div class="mt-4 pt-4 border-t border-base-200">
+    @if (isCreating()) {
+    <div class="space-y-2">
+      <input
+        type="text"
+        required
+        [value]="newCollectionName()"
+        (input)="
+          newCollectionName.set(($any($event.target).value || '').slice(0, 80))
+        "
+        placeholder="Name der Sammlung"
+        class="w-full px-3 py-2 text-sm bg-base-100/60 border-2 border-base-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
+        autofocus
+      />
+      <div class="flex gap-2">
+        <button
+          type="button"
+          (click)="isCreating.set(false)"
+          class="flex-1 px-3 py-1.5 text-sm rounded-lg hover:bg-base-200"
+        >
+          Abbrechen
+        </button>
+        <button
+          type="button"
+          (click)="handleCreate()"
+          [disabled]="createLoading() || !newCollectionName().trim()"
+          class="flex-1 px-3 py-1.5 text-sm rounded-lg bg-primary text-white hover:bg-primary-focus disabled:bg-base-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          @if (createLoading()) {
+          <app-loading-spinner-small />
+          } Speichern
+        </button>
+      </div>
+    </div>
+    } @else {
+    <button
+      type="button"
+      (click)="isCreating.set(true)"
+      class="w-full flex items-center justify-center gap-2 p-2 rounded-lg text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
+    >
+      <span class="w-4 h-4" [svgInject]="icons.Plus"></span>
+      Neue Sammlung
+    </button>
+    }
+  </div>
+  }
+</div>
+
+<app-delete-confirm-modal
+  [open]="deleteModalOpen()"
+  [title]="'Kontaktanfrage löschen'"
+  [message]="'Möchtest du diese Anfrage wirklich löschen?'"
+  [details]="deleteTargetMessage() || ''"
+  [confirmText]="'Löschen'"
+  (cancel)="closeDeleteModal()"
+  (confirm)="confirmDelete()"
+/>

@@ -10,11 +10,17 @@ import {
 import { SvgInjectDirective } from '../../../directives/svg-inject.directive';
 import { FocusTrapDirective } from '../../focus-trap.directive';
 import { X, Trash } from '@cooksona/constants/icons';
+import { LoadingSpinnerSmallComponent } from '../../loading-spinner/loading-spinner-small.component';
 
 @Component({
   selector: 'app-delete-confirm-modal',
   standalone: true,
-  imports: [CommonModule, SvgInjectDirective, FocusTrapDirective],
+  imports: [
+    CommonModule,
+    SvgInjectDirective,
+    FocusTrapDirective,
+    LoadingSpinnerSmallComponent,
+  ],
   templateUrl: './delete-confirm-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -33,11 +39,15 @@ export class DeleteConfirmModalComponent {
   readonly icons = { X, Trash } as const;
 
   onOverlayClick(): void {
-    if (!this.busy) this.cancel.emit();
+    if (!this.busy) {
+      this.cancel.emit();
+    }
   }
 
   @HostListener('document:keydown.escape')
   onEsc(): void {
-    if (this.open && !this.busy) this.cancel.emit();
+    if (this.open && !this.busy) {
+      this.cancel.emit();
+    }
   }
 }
