@@ -27,7 +27,10 @@ export class SvgInjectDirective implements OnInit, OnDestroy {
   private observer?: MutationObserver;
   private svgEl?: SVGElement;
 
-  constructor(private el: ElementRef<HTMLElement>, private r: Renderer2) {}
+  constructor(
+    private el: ElementRef<HTMLElement>,
+    private r: Renderer2,
+  ) {}
 
   ngOnInit() {
     if (!this.svg) return;

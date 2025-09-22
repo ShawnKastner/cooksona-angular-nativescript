@@ -137,7 +137,7 @@ export class MealPlannerFormComponent implements OnChanges {
 
   constructor(
     private readonly fb: NonNullableFormBuilder,
-    public readonly auth: AuthService
+    public readonly auth: AuthService,
   ) {
     this.form = this.fb.group({
       diet: this.fb.control<string>(''),
@@ -172,13 +172,13 @@ export class MealPlannerFormComponent implements OnChanges {
       enableNutritionAnalysis: this.fb.control<boolean>(false),
       planFocus: this.fb.control<PlanFocusOption>(
         'ausgewogen',
-        Validators.required
+        Validators.required,
       ),
       gourmetMode: this.fb.control<boolean>(false),
     }) as PlannerForm;
 
     this.form.controls.planDays.valueChanges.subscribe(() =>
-      this.onPlanDaysChange()
+      this.onPlanDaysChange(),
     );
 
     // Ensure disabled/enabled states are consistent and validity is up-to-date
@@ -253,10 +253,10 @@ export class MealPlannerFormComponent implements OnChanges {
   // Overload to support dot-paths in template (e.g. 'meals.breakfast') and typed top-level keys
   control(path: string): AbstractControl | null;
   control<K extends keyof PlannerForm['controls']>(
-    key: K
+    key: K,
   ): PlannerForm['controls'][K];
   control(
-    arg: string | keyof PlannerForm['controls']
+    arg: string | keyof PlannerForm['controls'],
   ):
     | AbstractControl
     | PlannerForm['controls'][keyof PlannerForm['controls']]

@@ -55,7 +55,7 @@ export class ContactComponent {
   form: FormGroup<ContactFormModel> = this.fb.group<ContactFormModel>({
     requestType: this.fb.control<'feature' | 'support' | 'feedback' | 'other'>(
       'feature',
-      { validators: [Validators.required] }
+      { validators: [Validators.required] },
     ),
     message: this.fb.control<string>('', {
       validators: [Validators.required],
@@ -98,7 +98,7 @@ export class ContactComponent {
         });
       }
       this.snackbar.success(
-        'Vielen Dank! Wir melden uns so schnell wie möglich.'
+        'Vielen Dank! Wir melden uns so schnell wie möglich.',
       );
       // reset
       this.form.patchValue({ message: '', requestType: 'feature', email: '' });
@@ -108,8 +108,8 @@ export class ContactComponent {
       this.snackbar.error(
         toErrorMessage(
           error,
-          'Fehler beim Senden. Bitte versuchen Sie es später erneut.'
-        )
+          'Fehler beim Senden. Bitte versuchen Sie es später erneut.',
+        ),
       );
     } finally {
       this.isSending.set(false);

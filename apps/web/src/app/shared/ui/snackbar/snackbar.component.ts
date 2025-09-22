@@ -9,20 +9,22 @@ import { SnackbarService, SnackbarMessage } from './snackbar.service';
   imports: [CommonModule],
   template: `
     @if (msg) {
-    <div
-      class="fixed bottom-6 right-6 z-50 max-w-sm w-[min(90vw,28rem)] shadow-soft-xl"
-      [ngClass]="bgClass(msg.level)"
-      role="status"
-      aria-live="polite"
-    >
-      <div class="px-4 py-3 rounded-xl flex items-start gap-3">
-        <span
-          class="inline-block w-2 h-2 rounded-full mt-2"
-          [ngClass]="dotClass(msg.level)"
-        ></span>
-        <div class="text-sm font-semibold text-neutral-800">{{ msg.text }}</div>
+      <div
+        class="fixed bottom-6 right-6 z-50 max-w-sm w-[min(90vw,28rem)] shadow-soft-xl"
+        [ngClass]="bgClass(msg.level)"
+        role="status"
+        aria-live="polite"
+      >
+        <div class="px-4 py-3 rounded-xl flex items-start gap-3">
+          <span
+            class="inline-block w-2 h-2 rounded-full mt-2"
+            [ngClass]="dotClass(msg.level)"
+          ></span>
+          <div class="text-sm font-semibold text-neutral-800">
+            {{ msg.text }}
+          </div>
+        </div>
       </div>
-    </div>
     }
   `,
 })

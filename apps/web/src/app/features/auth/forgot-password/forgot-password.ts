@@ -41,17 +41,17 @@ export class ForgotPasswordComponent {
     this.isLoading.set(true);
     try {
       await this.auth.requestPasswordReset(
-        this.forgotPasswordForm.controls.email.value
+        this.forgotPasswordForm.controls.email.value,
       );
       this.message.set(
-        'Wenn die E-Mail existiert, wurde ein Link zum Zurücksetzen des Passworts versendet.'
+        'Wenn die E-Mail existiert, wurde ein Link zum Zurücksetzen des Passworts versendet.',
       );
     } catch (error) {
       this.error.set(
         toErrorMessage(
           error,
-          'Fehler beim Senden der E-Mail. Bitte versuche es später erneut.'
-        )
+          'Fehler beim Senden der E-Mail. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.isLoading.set(false);

@@ -1,100 +1,107 @@
 <div class="bg-white p-2 md:p-4 rounded-2xl">
-  @if(isProUser && !categorizedShoppingList) {
-  <div class="mb-4 text-right non-printable">
-    <button
-      (click)="handleSortList()"
-      [disabled]="isSorting()"
-      class="inline-flex items-center gap-2 bg-secondary/20 text-secondary-focus font-semibold px-4 py-2 rounded-lg hover:bg-secondary/30 transition-colors disabled:opacity-50 disabled:cursor-wait"
-    >
-      @if(isSorting()) {
-      <app-loading-spinner-small />
-      Sortiere... }@else {
-      <span class="w-5 h-5" [svgInject]="icons.ListTree"></span>
-      Nach Abteilung sortieren }
-    </button>
-  </div>
-  } @if(sortError()) {
-  <div
-    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4"
-    role="alert"
-  >
-    <span class="block sm:inline">{{ sortError() }}</span>
-  </div>
-  } @if(listError()) {
-  <div
-    class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4"
-    role="alert"
-  >
-    <span class="block sm:inline">{{ listError() }}</span>
-  </div>
-  } @if(list().length > 0) { @if(categorizedList()) {
-  <div class="space-y-6">
-    @for(cat of categorizedList(); track cat.category) {
-    <div>
-      <h3
-        class="font-serif font-bold text-xl text-primary border-b-2 border-primary/20 pb-2 mb-3"
+  @if (isProUser && !categorizedShoppingList) {
+    <div class="mb-4 text-right non-printable">
+      <button
+        (click)="handleSortList()"
+        [disabled]="isSorting()"
+        class="inline-flex items-center gap-2 bg-secondary/20 text-secondary-focus font-semibold px-4 py-2 rounded-lg hover:bg-secondary/30 transition-colors disabled:opacity-50 disabled:cursor-wait"
       >
-        {{ cat.category }}
-      </h3>
+        @if (isSorting()) {
+          <app-loading-spinner-small />
+          Sortiere...
+        } @else {
+          <span class="w-5 h-5" [svgInject]="icons.ListTree"></span>
+          Nach Abteilung sortieren
+        }
+      </button>
+    </div>
+  }
+  @if (sortError()) {
+    <div
+      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4"
+      role="alert"
+    >
+      <span class="block sm:inline">{{ sortError() }}</span>
+    </div>
+  }
+  @if (listError()) {
+    <div
+      class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4"
+      role="alert"
+    >
+      <span class="block sm:inline">{{ listError() }}</span>
+    </div>
+  }
+  @if (list().length > 0) {
+    @if (categorizedList()) {
+      <div class="space-y-6">
+        @for (cat of categorizedList(); track cat.category) {
+          <div>
+            <h3
+              class="font-serif font-bold text-xl text-primary border-b-2 border-primary/20 pb-2 mb-3"
+            >
+              {{ cat.category }}
+            </h3>
+            <div
+              id="shopping-list-grid"
+              class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1"
+            >
+              @for (item of cat.items; track item.id) {
+                <label
+                  class="flex items-center space-x-4 p-3 rounded-lg hover:bg-base-100/50 transition-colors cursor-pointer group"
+                >
+                  <input
+                    type="checkbox"
+                    [checked]="item.checked"
+                    (change)="handleToggle(item.id)"
+                    class="h-5 w-5 rounded-md border-gray-300 text-primary focus:ring-primary focus:ring-offset-2 cursor-pointer"
+                  />
+                  <span
+                    class="text-neutral group-hover:text-primary transition-colors"
+                    [ngClass]="item.checked ? 'line-through text-gray-400' : ''"
+                  >
+                    <span class="font-semibold">{{
+                      (item.amount + " " + item.unit).trim()
+                    }}</span>
+                    {{ item.name }}
+                  </span>
+                </label>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
       <div
         id="shopping-list-grid"
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1"
       >
-        @for(item of cat.items; track item.id) {
-        <label
-          class="flex items-center space-x-4 p-3 rounded-lg hover:bg-base-100/50 transition-colors cursor-pointer group"
-        >
-          <input
-            type="checkbox"
-            [checked]="item.checked"
-            (change)="handleToggle(item.id)"
-            class="h-5 w-5 rounded-md border-gray-300 text-primary focus:ring-primary focus:ring-offset-2 cursor-pointer"
-          />
-          <span
-            class="text-neutral group-hover:text-primary transition-colors"
-            [ngClass]="item.checked ? 'line-through text-gray-400' : ''"
+        @for (item of list(); track item.id) {
+          <label
+            class="flex items-center space-x-4 p-3 rounded-lg hover:bg-base-100/50 transition-colors cursor-pointer group"
           >
-            <span class="font-semibold">{{
-              (item.amount + " " + item.unit).trim()
-            }}</span>
-            {{ item.name }}
-          </span>
-        </label>
+            <input
+              type="checkbox"
+              [checked]="item.checked"
+              (change)="handleToggle(item.id)"
+              class="h-5 w-5 rounded-md border-gray-300 text-primary focus:ring-primary focus:ring-offset-2 cursor-pointer"
+            />
+            <span
+              class="text-neutral group-hover:text-primary transition-colors"
+              [ngClass]="item.checked ? 'line-through text-gray-400' : ''"
+            >
+              <span class="font-semibold">{{
+                (item.amount + " " + item.unit).trim()
+              }}</span>
+              {{ item.name }}
+            </span>
+          </label>
         }
       </div>
+    }
+  } @else {
+    <div class="bg-base-200 p-8 rounded-2xl text-center">
+      <p class="text-gray-500">Deine Einkaufsliste ist leer.</p>
     </div>
-    }
-  </div>
-  }@else {
-  <div
-    id="shopping-list-grid"
-    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1"
-  >
-    @for(item of list(); track item.id) {
-    <label
-      class="flex items-center space-x-4 p-3 rounded-lg hover:bg-base-100/50 transition-colors cursor-pointer group"
-    >
-      <input
-        type="checkbox"
-        [checked]="item.checked"
-        (change)="handleToggle(item.id)"
-        class="h-5 w-5 rounded-md border-gray-300 text-primary focus:ring-primary focus:ring-offset-2 cursor-pointer"
-      />
-      <span
-        class="text-neutral group-hover:text-primary transition-colors"
-        [ngClass]="item.checked ? 'line-through text-gray-400' : ''"
-      >
-        <span class="font-semibold">{{
-          (item.amount + " " + item.unit).trim()
-        }}</span>
-        {{ item.name }}
-      </span>
-    </label>
-    }
-  </div>
-  } }@else {
-  <div class="bg-base-200 p-8 rounded-2xl text-center">
-    <p class="text-gray-500">Deine Einkaufsliste ist leer.</p>
-  </div>
   }
 </div>

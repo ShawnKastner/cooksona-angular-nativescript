@@ -35,7 +35,7 @@ export class ApiService {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit = {},
   ): Promise<T | undefined> {
     const csrfToken = this.getCsrfToken();
     const init: RequestInit = {
@@ -158,7 +158,7 @@ export class ApiService {
   post<T>(
     endpoint: string,
     body: unknown,
-    init?: RequestInit
+    init?: RequestInit,
   ): Promise<T | undefined> {
     return this.request<T>(endpoint, {
       method: 'POST',
@@ -170,7 +170,7 @@ export class ApiService {
   put<T>(
     endpoint: string,
     body: unknown,
-    init?: RequestInit
+    init?: RequestInit,
   ): Promise<T | undefined> {
     return this.request<T>(endpoint, {
       method: 'PUT',
@@ -182,7 +182,7 @@ export class ApiService {
   patch<T>(
     endpoint: string,
     body: unknown,
-    init?: RequestInit
+    init?: RequestInit,
   ): Promise<T | undefined> {
     return this.request<T>(endpoint, {
       method: 'PATCH',
@@ -197,7 +197,7 @@ export class ApiService {
 
   // AI service wrappers (generic to avoid tight coupling)
   apiGenerateMealPlan<TOptions = unknown, TResult = unknown>(
-    options: TOptions
+    options: TOptions,
   ) {
     return this.post<TResult>('/ai/generate-plan', options);
   }
@@ -212,26 +212,26 @@ export class ApiService {
   }
 
   apiCategorizeShoppingList<TIngredient = unknown, TResult = unknown>(
-    ingredients: TIngredient[]
+    ingredients: TIngredient[],
   ) {
     return this.post<TResult>('/ai/categorize-list', { ingredients });
   }
 
   apiTransformRecipe<TRecipe = unknown, TResult = unknown>(
     recipe: TRecipe,
-    modification: string
+    modification: string,
   ) {
     return this.post<TResult>('/ai/transform-recipe', { recipe, modification });
   }
 
   apiGenerateLeftoverRecipe<TResult = unknown>(
     ingredients: string,
-    signal?: AbortSignal
+    signal?: AbortSignal,
   ) {
     return this.post<TResult>(
       '/ai/generate-leftover',
       { ingredients },
-      { signal }
+      { signal },
     );
   }
 }

@@ -28,7 +28,7 @@ export const routes: Routes = [
     path: 'invite/redeem/:token',
     loadComponent: () =>
       import('./pages/invite-redeem/invite-redeem.component').then(
-        (m) => m.InviteRedeemPage
+        (m) => m.InviteRedeemPage,
       ),
     title: 'Einladung einlösen',
   },
@@ -78,7 +78,7 @@ export const routes: Routes = [
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
       import('./features/meal-planner/planner/planner.component').then(
-        (m) => m.PlannerComponent
+        (m) => m.PlannerComponent,
       ),
     title: 'CookSona – Dein digitaler Essensplaner und Kochbuch',
     data: {
@@ -91,7 +91,7 @@ export const routes: Routes = [
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
       import('./features/profile/profile.component').then(
-        (m) => m.ProfileComponent
+        (m) => m.ProfileComponent,
       ),
     title: 'Profil',
     data: {
@@ -104,7 +104,7 @@ export const routes: Routes = [
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
       import('./features/cookbook/cookbook.component').then(
-        (m) => m.CookbookComponent
+        (m) => m.CookbookComponent,
       ),
     title: 'Kochbuch',
   },
@@ -113,7 +113,7 @@ export const routes: Routes = [
     canActivate: [protectedRouteGuard],
     loadComponent: () =>
       import('./features/health/health.component').then(
-        (m) => m.HealthComponent
+        (m) => m.HealthComponent,
       ),
     title: 'Health Hub',
   },
@@ -128,7 +128,7 @@ export const routes: Routes = [
     },
     loadComponent: () =>
       import('./features/admin/admin-dashboard/admin-dashboard.component').then(
-        (m) => m.AdminDashboardComponent
+        (m) => m.AdminDashboardComponent,
       ),
   },
 
@@ -137,7 +137,7 @@ export const routes: Routes = [
     path: 'datenschutz',
     loadComponent: () =>
       import('./pages/legal/privacy-policy.component').then(
-        (m) => m.DatenschutzPage
+        (m) => m.DatenschutzPage,
       ),
     title: 'Datenschutz',
   },
@@ -151,7 +151,7 @@ export const routes: Routes = [
     path: 'contact',
     loadComponent: () =>
       import('./pages/legal//contact/contact.component').then(
-        (m) => m.ContactComponent
+        (m) => m.ContactComponent,
       ),
     title: 'Kontakt',
     data: {

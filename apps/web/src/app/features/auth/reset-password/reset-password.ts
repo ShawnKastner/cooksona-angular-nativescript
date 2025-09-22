@@ -41,14 +41,14 @@ export class ResetPasswordComponent {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private auth: AuthService
+    private auth: AuthService,
   ) {
     this.token.set(this.route.snapshot.queryParamMap.get('token'));
     if (!this.token()) {
       void this.router
         .navigate(['/login'])
         .catch((navigationError) =>
-          console.error('Redirect to login failed', navigationError)
+          console.error('Redirect to login failed', navigationError),
         );
     }
   }
@@ -59,7 +59,7 @@ export class ResetPasswordComponent {
     const token = this.token();
     if (!token) {
       this.error.set(
-        'Kein Token gefunden. Bitte nutze den Link aus der E-Mail.'
+        'Kein Token gefunden. Bitte nutze den Link aus der E-Mail.',
       );
       return;
     }
@@ -75,19 +75,19 @@ export class ResetPasswordComponent {
     try {
       await this.auth.resetPassword(
         token,
-        this.resetPasswordForm.controls.password.value
+        this.resetPasswordForm.controls.password.value,
       );
       void this.router
         .navigate(['/login'], { queryParams: { reset: 'success' } })
         .catch((navigationError) =>
-          console.error('Navigation to login failed', navigationError)
+          console.error('Navigation to login failed', navigationError),
         );
     } catch (error) {
       this.error.set(
         toErrorMessage(
           error,
-          'Fehler beim Zurücksetzen des Passworts. Der Link ist möglicherweise abgelaufen oder ungültig.'
-        )
+          'Fehler beim Zurücksetzen des Passworts. Der Link ist möglicherweise abgelaufen oder ungültig.',
+        ),
       );
     } finally {
       this.isLoading.set(false);

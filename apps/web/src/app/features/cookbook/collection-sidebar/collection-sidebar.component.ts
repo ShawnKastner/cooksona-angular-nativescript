@@ -61,7 +61,7 @@ export class CollectionSidebarComponent implements OnInit {
       .catch((error) => {
         const msg = toErrorMessage(
           error,
-          'Deine Sammlungen konnten nicht geladen werden. Bitte versuche es später erneut.'
+          'Deine Sammlungen konnten nicht geladen werden. Bitte versuche es später erneut.',
         );
         this.snackbar.error(msg);
       })
@@ -90,12 +90,12 @@ export class CollectionSidebarComponent implements OnInit {
     } catch (error) {
       if ((error as any)?.statusCode === 409) {
         this.snackbar.error(
-          'Eine Sammlung mit diesem Namen existiert bereits. Bitte wähle einen anderen Namen.'
+          'Eine Sammlung mit diesem Namen existiert bereits. Bitte wähle einen anderen Namen.',
         );
       } else {
         const msg = toErrorMessage(
           error,
-          'Die Sammlung konnte nicht erstellt werden. Bitte versuche es später erneut.'
+          'Die Sammlung konnte nicht erstellt werden. Bitte versuche es später erneut.',
         );
         this.snackbar.error(msg);
       }
@@ -125,7 +125,7 @@ export class CollectionSidebarComponent implements OnInit {
       .catch((error) => {
         const msg = toErrorMessage(
           error,
-          'Die Sammlung konnte nicht gelöscht werden. Bitte versuche es später erneut.'
+          'Die Sammlung konnte nicht gelöscht werden. Bitte versuche es später erneut.',
         );
         this.snackbar.error(msg);
       })

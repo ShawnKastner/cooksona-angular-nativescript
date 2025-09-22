@@ -44,122 +44,128 @@
           </div>
         </div>
         <div class="mt-6 flex-grow">
-          @if(!activePlan() && !isLoading()) {
-          <div
-            class="text-center pt-12 flex flex-col items-center justify-center h-full"
-          >
-            <div class="relative w-full max-w-sm">
-              <div
-                class="absolute -top-4 -left-4 w-16 h-16 bg-primary/10 rounded-full animate-pulse"
-              ></div>
-              <div
-                class="absolute -bottom-4 -right-4 w-20 h-20 bg-secondary/10 rounded-full animate-pulse delay-75"
-              ></div>
-              <div
-                class="relative bg-white/50 backdrop-blur-sm p-8 rounded-2xl border-2 border-dashed border-base-300"
-              >
-                <span
-                  class="mx-auto h-16 w-16 text-base-300"
-                  [svgInject]="icons.UtensilsCrossed"
-                ></span>
-                <h2 class="mt-6 text-2xl font-serif font-bold text-neutral">
-                  Dein Ernährungsplan wartet
-                </h2>
-                <p class="mt-2 text-gray-500">
-                  Fülle links das Formular aus, um loszulegen, oder wähle einen
-                  Plan aus deinem Verlauf.
-                </p>
+          @if (!activePlan() && !isLoading()) {
+            <div
+              class="text-center pt-12 flex flex-col items-center justify-center h-full"
+            >
+              <div class="relative w-full max-w-sm">
+                <div
+                  class="absolute -top-4 -left-4 w-16 h-16 bg-primary/10 rounded-full animate-pulse"
+                ></div>
+                <div
+                  class="absolute -bottom-4 -right-4 w-20 h-20 bg-secondary/10 rounded-full animate-pulse delay-75"
+                ></div>
+                <div
+                  class="relative bg-white/50 backdrop-blur-sm p-8 rounded-2xl border-2 border-dashed border-base-300"
+                >
+                  <span
+                    class="mx-auto h-16 w-16 text-base-300"
+                    [svgInject]="icons.UtensilsCrossed"
+                  ></span>
+                  <h2 class="mt-6 text-2xl font-serif font-bold text-neutral">
+                    Dein Ernährungsplan wartet
+                  </h2>
+                  <p class="mt-2 text-gray-500">
+                    Fülle links das Formular aus, um loszulegen, oder wähle
+                    einen Plan aus deinem Verlauf.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-          } @if(isLoading()){
-          <app-loading-spinner
-            [label]="'Dein perfektes Menü wird kreiert...'"
-            [subLabel]="'Die KI arbeitet. Bitte habe einen Moment Geduld.'"
-          ></app-loading-spinner>
-          }@else if(error() && !swappingMealId()){
-          <div
-            class="bg-red-100 border-l-4 border-error text-red-800 p-4 rounded-r-lg non-printable"
-          >
-            <p class="font-bold">Ein Fehler ist aufgetreten</p>
-            <p class="text-sm">{{ error() }}</p>
-          </div>
           }
-          <div class="mt-2">
-            @if (activeTab() === 'current') { @if (activePlan(); as p) {
-            <div class="flex justify-between items-center mb-6">
-              <h2
-                class="text-4xl font-serif font-bold flex items-center gap-4 text-neutral"
-              >
-                <span
-                  class="w-10 h-10 text-primary"
-                  [svgInject]="icons.ChefHat"
-                ></span>
-                Dein Plan
-              </h2>
-              @if(isProUser()){
-              <button
-                (click)="print()"
-                class="non-printable flex items-center gap-2 bg-base-200 text-neutral px-4 py-2 rounded-xl hover:bg-base-300 transition-colors text-sm font-medium"
-              >
-                <span class="w-4 h-4" [svgInject]="icons.Printer"></span>
-                Drucken
-              </button>
-              }
-            </div>
-            @if(error() && swappingMealId()){
+          @if (isLoading()) {
+            <app-loading-spinner
+              [label]="'Dein perfektes Menü wird kreiert...'"
+              [subLabel]="'Die KI arbeitet. Bitte habe einen Moment Geduld.'"
+            ></app-loading-spinner>
+          } @else if (error() && !swappingMealId()) {
             <div
-              class="bg-red-100 border-l-4 border-error text-red-800 p-4 rounded-r-lg non-printable mb-4"
+              class="bg-red-100 border-l-4 border-error text-red-800 p-4 rounded-r-lg non-printable"
             >
-              <p class="font-bold">Tauschen fehlgeschlagen</p>
+              <p class="font-bold">Ein Fehler ist aufgetreten</p>
               <p class="text-sm">{{ error() }}</p>
             </div>
-            }
-            <app-meal-plan-display
-              [mealPlan]="p"
-              [favoriteRecipeIds]="favoriteRecipeIds()"
-              [isProUser]="isProUser()"
-              [swappingMealId]="swappingMealId()"
-              (showRecipe)="handleShowRecipe($event)"
-              (toggleFavorite)="handleToggleFavorite($event)"
-              (openTransformModal)="handleOpenTransformModal($event)"
-              (swapMeal)="handleSwapMeal($event)"
-            />
-            } } @if (activeTab() === 'shopping-list') { @if (activePlan(); as p)
-            {
-            <div class="flex justify-between items-center mb-6">
-              <h2
-                class="text-4xl font-serif font-bold flex items-center gap-4 text-neutral"
-              >
-                <span
-                  class="w-10 h-10 text-secondary"
-                  [svgInject]="icons.ShoppingBasket"
-                ></span>
-                Einkaufsliste
-              </h2>
-              @if(isProUser()){
-              <button
-                (click)="print()"
-                class="non-printable flex items-center gap-2 bg-base-200 text-neutral px-4 py-2 rounded-xl hover:bg-base-300 transition-colors text-sm font-medium"
-              >
-                <span class="w-4 h-4" [svgInject]="icons.Printer"></span>
-                Drucken
-              </button>
+          }
+          <div class="mt-2">
+            @if (activeTab() === "current") {
+              @if (activePlan(); as p) {
+                <div class="flex justify-between items-center mb-6">
+                  <h2
+                    class="text-4xl font-serif font-bold flex items-center gap-4 text-neutral"
+                  >
+                    <span
+                      class="w-10 h-10 text-primary"
+                      [svgInject]="icons.ChefHat"
+                    ></span>
+                    Dein Plan
+                  </h2>
+                  @if (isProUser()) {
+                    <button
+                      (click)="print()"
+                      class="non-printable flex items-center gap-2 bg-base-200 text-neutral px-4 py-2 rounded-xl hover:bg-base-300 transition-colors text-sm font-medium"
+                    >
+                      <span class="w-4 h-4" [svgInject]="icons.Printer"></span>
+                      Drucken
+                    </button>
+                  }
+                </div>
+                @if (error() && swappingMealId()) {
+                  <div
+                    class="bg-red-100 border-l-4 border-error text-red-800 p-4 rounded-r-lg non-printable mb-4"
+                  >
+                    <p class="font-bold">Tauschen fehlgeschlagen</p>
+                    <p class="text-sm">{{ error() }}</p>
+                  </div>
+                }
+                <app-meal-plan-display
+                  [mealPlan]="p"
+                  [favoriteRecipeIds]="favoriteRecipeIds()"
+                  [isProUser]="isProUser()"
+                  [swappingMealId]="swappingMealId()"
+                  (showRecipe)="handleShowRecipe($event)"
+                  (toggleFavorite)="handleToggleFavorite($event)"
+                  (openTransformModal)="handleOpenTransformModal($event)"
+                  (swapMeal)="handleSwapMeal($event)"
+                />
               }
-            </div>
-            <app-shopping-list
-              [planId]="p.id"
-              [shoppingList]="p.shoppingList"
-              [categorizedShoppingList]="p.categorizedShoppingList"
-              (categorized)="handleShoppingListCategorized($event)"
-            />
-            } } @if(activeTab() === 'history') {
-            <app-history
-              [plans]="mealPlanHistory()"
-              [activePlanId]="activePlanId()"
-              (selectPlan)="selectPlan($event)"
-              (deletePlan)="requestDeletePlan($event)"
-            ></app-history>
+            }
+            @if (activeTab() === "shopping-list") {
+              @if (activePlan(); as p) {
+                <div class="flex justify-between items-center mb-6">
+                  <h2
+                    class="text-4xl font-serif font-bold flex items-center gap-4 text-neutral"
+                  >
+                    <span
+                      class="w-10 h-10 text-secondary"
+                      [svgInject]="icons.ShoppingBasket"
+                    ></span>
+                    Einkaufsliste
+                  </h2>
+                  @if (isProUser()) {
+                    <button
+                      (click)="print()"
+                      class="non-printable flex items-center gap-2 bg-base-200 text-neutral px-4 py-2 rounded-xl hover:bg-base-300 transition-colors text-sm font-medium"
+                    >
+                      <span class="w-4 h-4" [svgInject]="icons.Printer"></span>
+                      Drucken
+                    </button>
+                  }
+                </div>
+                <app-shopping-list
+                  [planId]="p.id"
+                  [shoppingList]="p.shoppingList"
+                  [categorizedShoppingList]="p.categorizedShoppingList"
+                  (categorized)="handleShoppingListCategorized($event)"
+                />
+              }
+            }
+            @if (activeTab() === "history") {
+              <app-history
+                [plans]="mealPlanHistory()"
+                [activePlanId]="activePlanId()"
+                (selectPlan)="selectPlan($event)"
+                (deletePlan)="requestDeletePlan($event)"
+              ></app-history>
             }
           </div>
         </div>

@@ -35,40 +35,45 @@
     </button>
   </div>
 
-  @if(healthData() && selectedMetrics(); as sel) {
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-    <div class="md:col-span-2">
-      <app-health-dashboard
-        [healthData]="healthData()!"
-        [metrics]="selectedMetrics()!"
-        (updateProfile)="isOnboardingOpen.set(true)"
-        (openManualEntry)="isManualEntryOpen.set(true)"
-      ></app-health-dashboard>
+  @if (healthData() && selectedMetrics(); as sel) {
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="md:col-span-2">
+        <app-health-dashboard
+          [healthData]="healthData()!"
+          [metrics]="selectedMetrics()!"
+          (updateProfile)="isOnboardingOpen.set(true)"
+          (openManualEntry)="isManualEntryOpen.set(true)"
+        ></app-health-dashboard>
+      </div>
+      <div class="md:col-span-1">
+        <app-hydration-tracker
+          [currentIntake]="selectedMetrics()!.waterIntake"
+          (updateIntake)="handleWaterUpdate($event)"
+        ></app-hydration-tracker>
+      </div>
     </div>
-    <div class="md:col-span-1">
-      <app-hydration-tracker
-        [currentIntake]="selectedMetrics()!.waterIntake"
-        (updateIntake)="handleWaterUpdate($event)"
-      ></app-hydration-tracker>
-    </div>
-  </div>
-  } @else { @if(isLoading()) {
-  <div class="w-full h-64 flex items-center justify-center bg-transparent">
-    <div
-      class="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-primary"
-    ></div>
-  </div>
-  } @else if (!isOnboardingOpen()) {
-  <div class="text-center p-8 bg-white rounded-lg shadow-soft">
-    <p class="text-gray-500">
-      Gesundheitsdaten konnten nicht geladen werden. Bitte richte zuerst dein
-      Profil ein.
-    </p>
-    <button (click)="isOnboardingOpen.set(true)" class="mt-4 btn btn-primary">
-      Profil einrichten
-    </button>
-  </div>
-  } }
+  } @else {
+    @if (isLoading()) {
+      <div class="w-full h-64 flex items-center justify-center bg-transparent">
+        <div
+          class="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-primary"
+        ></div>
+      </div>
+    } @else if (!isOnboardingOpen()) {
+      <div class="text-center p-8 bg-white rounded-lg shadow-soft">
+        <p class="text-gray-500">
+          Gesundheitsdaten konnten nicht geladen werden. Bitte richte zuerst
+          dein Profil ein.
+        </p>
+        <button
+          (click)="isOnboardingOpen.set(true)"
+          class="mt-4 btn btn-primary"
+        >
+          Profil einrichten
+        </button>
+      </div>
+    }
+  }
 </div>
 
 <!-- Onboarding modal -->

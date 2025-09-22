@@ -1,4 +1,5 @@
 import { Component, input, output, signal } from '@angular/core';
+import { NgClass } from '@angular/common';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { icons } from '@cooksona/constants/icons';
 import type { UserProfile } from '@cooksona/models/health.models';
@@ -6,7 +7,7 @@ import type { UserProfile } from '@cooksona/models/health.models';
 @Component({
   selector: 'app-health-onboarding-modal',
   standalone: true,
-  imports: [SvgInjectDirective],
+  imports: [SvgInjectDirective, NgClass],
   templateUrl: './health-onboarding-modal.html',
 })
 export class HealthOnboardingModalComponent {

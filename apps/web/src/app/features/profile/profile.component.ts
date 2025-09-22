@@ -128,7 +128,7 @@ export class ProfileComponent implements OnInit {
         if (!user) return;
         this.form.patchValue(
           { name: user.name ?? '', email: user.email ?? '' },
-          { emitEvent: false }
+          { emitEvent: false },
         );
       });
 
@@ -240,8 +240,8 @@ export class ProfileComponent implements OnInit {
       this.requestsError.set(
         toErrorMessage(
           error,
-          'Die Nachrichten konnten nicht geladen werden. Bitte versuche es später erneut.'
-        )
+          'Die Nachrichten konnten nicht geladen werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.loadingRequests.set(false);
@@ -273,7 +273,7 @@ export class ProfileComponent implements OnInit {
       this.zone.run(() => {
         const msg = toErrorMessage(
           error,
-          'Aktualisierung fehlgeschlagen. Bitte versuche es später erneut.'
+          'Aktualisierung fehlgeschlagen. Bitte versuche es später erneut.',
         );
         this.saveError.set(msg);
         this.snackbar.error(msg);
@@ -315,8 +315,8 @@ export class ProfileComponent implements OnInit {
       this.cancelError.set(
         toErrorMessage(
           error,
-          'Kündigung fehlgeschlagen. Bitte versuche es später erneut.'
-        )
+          'Kündigung fehlgeschlagen. Bitte versuche es später erneut.',
+        ),
       );
       this.cancelLoading.set(false);
       return;
@@ -339,7 +339,7 @@ export class ProfileComponent implements OnInit {
       setTimeout(() => this.showCancelModal.set(false), 3000);
     } catch (e) {
       this.cancelError.set(
-        'Die Kündigung wurde angefragt, die Bestätigung steht noch aus. Bitte versuche es später erneut.'
+        'Die Kündigung wurde angefragt, die Bestätigung steht noch aus. Bitte versuche es später erneut.',
       );
       this.cancelLoading.set(false);
     }
@@ -371,8 +371,8 @@ export class ProfileComponent implements OnInit {
         this.reactivateError.set(
           toErrorMessage(
             error,
-            'Die Reaktivierung ist fehlgeschlagen. Bitte versuche es später erneut.'
-          )
+            'Die Reaktivierung ist fehlgeschlagen. Bitte versuche es später erneut.',
+          ),
         );
         this.reactivateLoading.set(false);
       });
@@ -389,8 +389,8 @@ export class ProfileComponent implements OnInit {
         this.deleteError.set(
           toErrorMessage(
             error,
-            'Das Profil konnte nicht gelöscht werden. Bitte versuche es später erneut.'
-          )
+            'Das Profil konnte nicht gelöscht werden. Bitte versuche es später erneut.',
+          ),
         );
         this.snackbar.error(this.deleteError());
         this.cdr.markForCheck();
@@ -412,7 +412,7 @@ export class ProfileComponent implements OnInit {
   get totalPages(): number {
     return Math.max(
       1,
-      Math.ceil(this.contactRequests().length / this.PAGE_SIZE())
+      Math.ceil(this.contactRequests().length / this.PAGE_SIZE()),
     );
   }
 

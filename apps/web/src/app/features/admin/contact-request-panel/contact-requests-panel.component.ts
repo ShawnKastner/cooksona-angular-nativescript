@@ -77,15 +77,15 @@ export class ContactRequestsPanelComponent {
       this.messages.set(
         (data ?? []).sort(
           (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        ),
       );
     } catch (error) {
       this.error.set(
         toErrorMessage(
           error,
-          'Die Kontaktanfragen konnten nicht geladen werden. Bitte versuche es später erneut.'
-        )
+          'Die Kontaktanfragen konnten nicht geladen werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.loading.set(false);
@@ -151,8 +151,8 @@ export class ContactRequestsPanelComponent {
         this.error.set(
           toErrorMessage(
             error,
-            'Die Nachricht konnte nicht als gelesen markiert werden. Bitte versuche es später erneut.'
-          )
+            'Die Nachricht konnte nicht als gelesen markiert werden. Bitte versuche es später erneut.',
+          ),
         );
       }
     }
@@ -176,8 +176,8 @@ export class ContactRequestsPanelComponent {
       this.error.set(
         toErrorMessage(
           error,
-          'Die Antwort konnte nicht gesendet werden. Bitte versuche es später erneut.'
-        )
+          'Die Antwort konnte nicht gesendet werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.replyLoadingId.set(null);
@@ -210,8 +210,8 @@ export class ContactRequestsPanelComponent {
       this.error.set(
         toErrorMessage(
           error,
-          'Die Nachricht konnte nicht gelöscht werden. Bitte versuche es später erneut.'
-        )
+          'Die Nachricht konnte nicht gelöscht werden. Bitte versuche es später erneut.',
+        ),
       );
     }
   }

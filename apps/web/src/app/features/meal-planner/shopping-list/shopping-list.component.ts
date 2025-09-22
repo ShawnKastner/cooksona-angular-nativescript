@@ -55,7 +55,7 @@ export class ShoppingListComponent implements OnChanges {
   constructor(
     private readonly auth: AuthService,
     private readonly api: ApiService,
-    private readonly plans: PlanApiService
+    private readonly plans: PlanApiService,
   ) {}
 
   get isProUser(): boolean {
@@ -69,7 +69,7 @@ export class ShoppingListComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     this.list.set([...(this.shoppingList ?? [])]);
     this.categorizedList.set(
-      this.fromRecord(this.categorizedShoppingList ?? null)
+      this.fromRecord(this.categorizedShoppingList ?? null),
     );
     this.isSorting.set(false);
     this.sortError.set(null);
@@ -80,13 +80,13 @@ export class ShoppingListComponent implements OnChanges {
     this.listError.set(null);
     const previousList = this.list().map((item) => ({ ...item }));
     const previousCategorized = this.cloneCategoryBlocks(
-      this.categorizedList()
+      this.categorizedList(),
     );
 
     this.list.set(
       this.list().map((i) =>
-        i.id === itemId ? { ...i, checked: !i.checked } : i
-      )
+        i.id === itemId ? { ...i, checked: !i.checked } : i,
+      ),
     );
 
     const currentCategorized = this.categorizedList();
@@ -96,16 +96,16 @@ export class ShoppingListComponent implements OnChanges {
         currentCategorized.map((cat) => ({
           category: cat.category,
           items: cat.items.map((i) =>
-            i.id === itemId ? { ...i, checked: !i.checked } : i
+            i.id === itemId ? { ...i, checked: !i.checked } : i,
           ),
-        }))
+        })),
       );
     }
 
     try {
       const updatedPlan = await this.plans.updateShoppingList(
         this.planId,
-        this.list()
+        this.list(),
       );
       if (!updatedPlan) {
         throw new Error('Die Einkaufsliste konnte nicht gespeichert werden.');
@@ -116,11 +116,11 @@ export class ShoppingListComponent implements OnChanges {
       if (this.categorizedList) {
         const categorizedPlan = await this.plans.saveCategorizedShoppingList(
           this.planId,
-          this.ensureCategorizedPayload(this.categorizedList())
+          this.ensureCategorizedPayload(this.categorizedList()),
         );
         if (!categorizedPlan) {
           throw new Error(
-            'Die kategorisierte Einkaufsliste konnte nicht gespeichert werden.'
+            'Die kategorisierte Einkaufsliste konnte nicht gespeichert werden.',
           );
         }
         latestPlan = categorizedPlan;
@@ -138,8 +138,8 @@ export class ShoppingListComponent implements OnChanges {
       this.listError.set(
         toErrorMessage(
           error,
-          'Die Änderungen konnten nicht gespeichert werden. Bitte versuche es später erneut.'
-        )
+          'Die Änderungen konnten nicht gespeichert werden. Bitte versuche es später erneut.',
+        ),
       );
     }
   }
@@ -149,11 +149,11 @@ export class ShoppingListComponent implements OnChanges {
     this.sortError.set(null);
     this.listError.set(null);
     const previousCategorized = this.cloneCategoryBlocks(
-      this.categorizedList()
+      this.categorizedList(),
     );
     try {
       const rawIngredients: Ingredient[] = this.list().map(
-        ({ name, amount, unit }) => ({ name, amount, unit })
+        ({ name, amount, unit }) => ({ name, amount, unit }),
       );
       const sortedRaw = await this.api.apiCategorizeShoppingList<
         Ingredient,
@@ -170,7 +170,7 @@ export class ShoppingListComponent implements OnChanges {
             (i) =>
               i.name === item.name &&
               i.amount === item.amount &&
-              i.unit === item.unit
+              i.unit === item.unit,
           );
           if (existing) {
             return { ...existing };
@@ -187,11 +187,11 @@ export class ShoppingListComponent implements OnChanges {
 
       const updatedPlan = await this.plans.saveCategorizedShoppingList(
         this.planId,
-        categoryBlocks
+        categoryBlocks,
       );
       if (!updatedPlan) {
         throw new Error(
-          'Die sortierte Einkaufsliste konnte nicht gespeichert werden.'
+          'Die sortierte Einkaufsliste konnte nicht gespeichert werden.',
         );
       }
       this.categorized.emit(updatedPlan);
@@ -205,8 +205,8 @@ export class ShoppingListComponent implements OnChanges {
       this.sortError.set(
         toErrorMessage(
           error,
-          'Die Liste konnte nicht sortiert werden. Bitte versuche es später erneut.'
-        )
+          'Die Liste konnte nicht sortiert werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.isSorting.set(false);
@@ -225,7 +225,7 @@ export class ShoppingListComponent implements OnChanges {
   }
 
   private ensureCategorizedPayload(
-    blocks: CategoryBlock[] | null
+    blocks: CategoryBlock[] | null,
   ): CategorizedShoppingList {
     const payload = this.toCategorizedShoppingList(blocks);
     if (!payload) {
@@ -235,7 +235,7 @@ export class ShoppingListComponent implements OnChanges {
   }
 
   private fromRecord(
-    record: CategorizedShoppingList | null
+    record: CategorizedShoppingList | null,
   ): CategoryBlock[] | null {
     if (!record) return null;
     return record.map((category) => ({
@@ -245,7 +245,7 @@ export class ShoppingListComponent implements OnChanges {
   }
 
   private cloneCategoryBlocks(
-    blocks: CategoryBlock[] | null
+    blocks: CategoryBlock[] | null,
   ): CategoryBlock[] | null {
     if (!blocks) return null;
     return blocks.map((category) => ({
@@ -255,7 +255,7 @@ export class ShoppingListComponent implements OnChanges {
   }
 
   private toCategorizedShoppingList(
-    blocks: CategoryBlock[] | null
+    blocks: CategoryBlock[] | null,
   ): CategorizedShoppingList | null {
     if (!blocks) return null;
     return blocks.map((category) => ({

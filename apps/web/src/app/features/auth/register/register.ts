@@ -51,7 +51,7 @@ export class RegisterComponent {
         Validators.minLength(8),
         Validators.maxLength(72),
         Validators.pattern(
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
         ),
       ],
     ],
@@ -65,7 +65,7 @@ export class RegisterComponent {
 
   constructor(
     private readonly auth: AuthService,
-    private readonly router: Router
+    private readonly router: Router,
   ) {}
 
   async submit(): Promise<void> {
@@ -83,7 +83,7 @@ export class RegisterComponent {
 
     if (!this.registerForm.controls.password.valid) {
       this.error.set(
-        'Das Passwort muss mind. 8 Zeichen und Groß-/Kleinbuchstaben, Zahl und Sonderzeichen enthalten.'
+        'Das Passwort muss mind. 8 Zeichen und Groß-/Kleinbuchstaben, Zahl und Sonderzeichen enthalten.',
       );
       return;
     }
@@ -106,8 +106,8 @@ export class RegisterComponent {
       this.error.set(
         toErrorMessage(
           error,
-          'Die Registrierung ist fehlgeschlagen. Bitte versuche es später erneut.'
-        )
+          'Die Registrierung ist fehlgeschlagen. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.isLoading.set(false);
@@ -124,7 +124,7 @@ export class RegisterComponent {
     this.router
       .navigate(['/login'])
       .catch((navigationError) =>
-        console.error('Navigation to login failed', navigationError)
+        console.error('Navigation to login failed', navigationError),
       );
   }
 }

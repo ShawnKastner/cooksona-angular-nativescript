@@ -53,15 +53,15 @@ import { icons } from '@cooksona/constants/icons';
           />
 
           @for (p of marks; track p) {
-          <line
-            [attr.x1]="20"
-            [attr.y1]="195 - p * 1.8"
-            [attr.x2]="30"
-            [attr.y2]="195 - p * 1.8"
-            stroke="currentColor"
-            class="text-base-300/80"
-            stroke-width="2"
-          />
+            <line
+              [attr.x1]="20"
+              [attr.y1]="195 - p * 1.8"
+              [attr.x2]="30"
+              [attr.y2]="195 - p * 1.8"
+              stroke="currentColor"
+              class="text-base-300/80"
+              stroke-width="2"
+            />
           }
         </svg>
 
@@ -74,11 +74,11 @@ import { icons } from '@cooksona/constants/icons';
         </div>
 
         @if (goalReached()) {
-        <div
-          class="absolute -top-2 -right-2 w-8 h-8 bg-success rounded-full flex items-center justify-center text-white animate-fade-in shadow-lg"
-        >
-          <span [svgInject]="icons.Check" class="w-5 h-5"></span>
-        </div>
+          <div
+            class="absolute -top-2 -right-2 w-8 h-8 bg-success rounded-full flex items-center justify-center text-white animate-fade-in shadow-lg"
+          >
+            <span [svgInject]="icons.Check" class="w-5 h-5"></span>
+          </div>
         }
       </div>
 
@@ -115,16 +115,16 @@ export class HydrationTrackerComponent {
   // Emit delta updates (+/- ml)
   updateIntake = output<number>();
   protected progress = computed(() =>
-    Math.min((this.currentIntake() / this.WATER_GOAL) * 100, 100)
+    Math.min((this.currentIntake() / this.WATER_GOAL) * 100, 100),
   );
   protected goalReached = computed(
-    () => this.currentIntake() >= this.WATER_GOAL
+    () => this.currentIntake() >= this.WATER_GOAL,
   );
   protected waterTopY = computed(() => 195 - this.progress() * 1.8);
   protected waterPath = computed(
     () =>
       `M 0 195 V ${this.waterTopY()} C 0 ${this.waterTopY() - 5}, 100 ${
         this.waterTopY() - 5
-      }, 100 ${this.waterTopY()} V 195 H 0 Z`
+      }, 100 ${this.waterTopY()} V 195 H 0 Z`,
   );
 }

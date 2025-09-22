@@ -34,7 +34,7 @@ export class HealthApiService {
   // POST /health/metrics
   updateMetricsForDate(
     date: Date,
-    updates: MetricUpdates
+    updates: MetricUpdates,
   ): Promise<HealthData | undefined> {
     return this.api.post<HealthData>('/health/metrics', {
       date: getDateString(date),

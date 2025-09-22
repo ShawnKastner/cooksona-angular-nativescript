@@ -10,7 +10,7 @@ const TEST_SVG =
   imports: [SvgInjectDirective],
   template: `
     @if (show) {
-    <span id="icon" [svgInject]="svg" class="w-5 h-5"></span>
+      <span id="icon" [svgInject]="svg" class="w-5 h-5"></span>
     }
   `,
 })

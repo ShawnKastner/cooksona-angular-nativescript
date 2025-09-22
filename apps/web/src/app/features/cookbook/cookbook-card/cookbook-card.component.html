@@ -19,27 +19,28 @@
       {{ recipe.name }}
     </h3>
     @if (recipe.servings) {
-    <div class="flex items-center gap-2 text-xs text-gray-500 mb-3 -mt-2">
-      <span class="w-4 h-4" [svgInject]="icons.Users"></span>
-      <span>
-        Für {{ recipe.servings }}
-        {{ recipe.servings! > 1 ? "Personen" : "Person" }}
-      </span>
-    </div>
+      <div class="flex items-center gap-2 text-xs text-gray-500 mb-3 -mt-2">
+        <span class="w-4 h-4" [svgInject]="icons.Users"></span>
+        <span>
+          Für {{ recipe.servings }}
+          {{ recipe.servings! > 1 ? "Personen" : "Person" }}
+        </span>
+      </div>
     }
     <p class="text-sm text-gray-500 mb-2">Zutaten:</p>
     <ul
       class="text-sm text-gray-600 space-y-1 h-24 overflow-hidden mask-gradient"
     >
       @for (item of recipe.ingredients.slice(0, 5); track item.name) {
-      <li class="truncate">
-        <span class="font-medium text-neutral">{{
-          (item.amount + " " + item.unit).trim()
-        }}</span>
-        {{ " " + item.name }}
-      </li>
-      } @if (recipe.ingredients.length > 5) {
-      <li class="text-gray-400">... und mehr</li>
+        <li class="truncate">
+          <span class="font-medium text-neutral">{{
+            (item.amount + " " + item.unit).trim()
+          }}</span>
+          {{ " " + item.name }}
+        </li>
+      }
+      @if (recipe.ingredients.length > 5) {
+        <li class="text-gray-400">... und mehr</li>
       }
     </ul>
   </div>
@@ -64,14 +65,14 @@
         <span class="w-5 h-5" [svgInject]="icons.FolderPlus"></span>
       </button>
       @if (isPro) {
-      <button
-        type="button"
-        (click)="onOpenTransformModal.emit()"
-        class="p-2 rounded-full text-gray-400 hover:bg-secondary/20 hover:text-secondary-focus transition-colors"
-        aria-label="Rezept anpassen"
-      >
-        <span class="w-5 h-5" [svgInject]="icons.Wand2"></span>
-      </button>
+        <button
+          type="button"
+          (click)="onOpenTransformModal.emit()"
+          class="p-2 rounded-full text-gray-400 hover:bg-secondary/20 hover:text-secondary-focus transition-colors"
+          aria-label="Rezept anpassen"
+        >
+          <span class="w-5 h-5" [svgInject]="icons.Wand2"></span>
+        </button>
       }
       <button
         type="button"

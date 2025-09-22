@@ -46,181 +46,186 @@ type CreateInvitePayload = {
   imports: [CommonModule, ReactiveFormsModule, SvgInjectDirective],
   template: `
     @if (open) {
-    <div
-      class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4"
-      (click)="close.emit()"
-    >
       <div
-        class="bg-base-100 rounded-2xl w-full max-w-lg relative"
-        (click)="$event.stopPropagation()"
+        class="fixed inset-0 bg-black bg-opacity-70 z-50 flex items-center justify-center p-4"
+        (click)="close.emit()"
       >
-        <header class="p-6 border-b flex items-center gap-2">
-          <h2 class="text-2xl font-serif font-bold">
-            Einladungslink erstellen
-          </h2>
-          <span class="text-gray-500 text-base"
-            >Konfiguriere einen neuen Einladungslink.</span
-          >
-          <button (click)="close.emit()" class="absolute top-6 right-6">
-            <span class="w-5 h-5" [svgInject]="icons.X"></span>
-          </button>
-        </header>
-        @if (errorMsg()) {
-        <div class="px-6 pt-4">
-          <div
-            class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm"
-          >
-            {{ errorMsg() }}
-          </div>
-        </div>
-        } @if (invite()) {
-        <div class="p-6 space-y-6">
-          <div
-            class="bg-green-100 border border-green-300 rounded-lg px-4 py-3 flex items-center gap-3"
-          >
-            <span
-              class="w-6 h-6 text-green-600"
-              [svgInject]="icons.Check"
-            ></span>
-            <span class="text-green-700 font-semibold"
-              >Einladungslink erfolgreich erstellt!</span
+        <div
+          class="bg-base-100 rounded-2xl w-full max-w-lg relative"
+          (click)="$event.stopPropagation()"
+        >
+          <header class="p-6 border-b flex items-center gap-2">
+            <h2 class="text-2xl font-serif font-bold">
+              Einladungslink erstellen
+            </h2>
+            <span class="text-gray-500 text-base"
+              >Konfiguriere einen neuen Einladungslink.</span
             >
-          </div>
-          <div class="space-y-2">
-            <label class="block text-base font-bold mb-1" for="inviteLink"
-              >Generierter Link:</label
-            >
-            <div class="flex gap-2 items-center">
-              <input
-                id="inviteLink"
-                type="text"
-                class="flex-1 border border-gray-200 bg-gray-50 rounded-xl px-4 py-2 text-gray-700 text-base font-mono"
-                [value]="inviteUrl(invite())"
-                readonly
-                disabled
-              />
-              @if (!copied()) {
-              <button
-                type="button"
-                class="bg-yellow-200 text-yellow-900 font-bold px-4 py-2 rounded-xl transition-colors hover:bg-yellow-300"
-                (click)="handleCopy(invite())"
-              >
-                Kopieren
-              </button>
-              } @else {
-              <button
-                type="button"
-                class="bg-green-600 text-white font-bold px-4 py-2 rounded-xl"
-                disabled
-              >
-                Kopiert!
-              </button>
-              }
-            </div>
-          </div>
-          <div class="pt-4">
-            <button
-              class="w-full bg-gray-100 text-gray-900 font-bold px-4 py-3 rounded-xl text-lg"
-              (click)="resetForm()"
-            >
-              Weiteren Link erstellen
+            <button (click)="close.emit()" class="absolute top-6 right-6">
+              <span class="w-5 h-5" [svgInject]="icons.X"></span>
             </button>
-          </div>
-        </div>
-        } @else {
-        <form [formGroup]="form" (ngSubmit)="submit()" class="p-6 space-y-6">
-          <div class="space-y-4">
-            <div>
-              <label class="block text-sm font-bold mb-1" for="presetRole"
-                >Rolle</label
+          </header>
+          @if (errorMsg()) {
+            <div class="px-6 pt-4">
+              <div
+                class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm"
               >
-              <select
-                id="presetRole"
-                formControlName="presetRole"
-                class="w-full border p-2 rounded"
-              >
-                <option value="user">Benutzer</option>
-                <option value="admin">Administrator</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-bold mb-1"
-                >Abo-Typ bei Registrierung</label
-              >
-              <div class="flex items-center gap-3 mb-2">
-                <input
-                  id="isLifetime"
-                  type="checkbox"
-                  formControlName="isLifetime"
-                />
-                <label for="isLifetime" class="text-sm">Lifetime</label>
+                {{ errorMsg() }}
               </div>
-              @if (!form.value.isLifetime) {
-              <div>
-                <label
-                  class="block text-xs font-medium mb-1"
-                  for="subscriptionEndsAt"
-                  >Enddatum</label
+            </div>
+          }
+          @if (invite()) {
+            <div class="p-6 space-y-6">
+              <div
+                class="bg-green-100 border border-green-300 rounded-lg px-4 py-3 flex items-center gap-3"
+              >
+                <span
+                  class="w-6 h-6 text-green-600"
+                  [svgInject]="icons.Check"
+                ></span>
+                <span class="text-green-700 font-semibold"
+                  >Einladungslink erfolgreich erstellt!</span
                 >
-                <input
-                  id="subscriptionEndsAt"
-                  type="datetime-local"
-                  formControlName="subscriptionEndsAt"
-                  class="w-full border p-2 rounded"
-                  [required]="!form.value.isLifetime"
-                />
               </div>
-              }
+              <div class="space-y-2">
+                <label class="block text-base font-bold mb-1" for="inviteLink"
+                  >Generierter Link:</label
+                >
+                <div class="flex gap-2 items-center">
+                  <input
+                    id="inviteLink"
+                    type="text"
+                    class="flex-1 border border-gray-200 bg-gray-50 rounded-xl px-4 py-2 text-gray-700 text-base font-mono"
+                    [value]="inviteUrl(invite())"
+                    readonly
+                    disabled
+                  />
+                  @if (!copied()) {
+                    <button
+                      type="button"
+                      class="bg-yellow-200 text-yellow-900 font-bold px-4 py-2 rounded-xl transition-colors hover:bg-yellow-300"
+                      (click)="handleCopy(invite())"
+                    >
+                      Kopieren
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="bg-green-600 text-white font-bold px-4 py-2 rounded-xl"
+                      disabled
+                    >
+                      Kopiert!
+                    </button>
+                  }
+                </div>
+              </div>
+              <div class="pt-4">
+                <button
+                  class="w-full bg-gray-100 text-gray-900 font-bold px-4 py-3 rounded-xl text-lg"
+                  (click)="resetForm()"
+                >
+                  Weiteren Link erstellen
+                </button>
+              </div>
             </div>
-            <div>
-              <label class="block text-sm font-bold mb-1" for="expiryDays"
-                >Gültigkeit</label
-              >
-              <input
-                id="expiryDays"
-                type="number"
-                min="1"
-                formControlName="expiryDays"
-                class="w-full border p-2 rounded"
-                placeholder="7 Tage"
-                required
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-bold mb-1" for="description"
-                >Beschreibung (optional)</label
-              >
-              <input
-                id="description"
-                type="text"
-                formControlName="description"
-                class="w-full border p-2 rounded"
-                maxlength="200"
-                placeholder="z.B. Max Mustermann, Testlink, ..."
-              />
-            </div>
-          </div>
-          <div class="flex gap-2 pt-4">
-            <button
-              type="button"
-              (click)="close.emit()"
-              class="flex-1 px-4 py-2 rounded bg-gray-200"
+          } @else {
+            <form
+              [formGroup]="form"
+              (ngSubmit)="submit()"
+              class="p-6 space-y-6"
             >
-              Abbrechen
-            </button>
-            <button
-              type="submit"
-              [disabled]="submitting() || form.invalid"
-              class="flex-1 px-4 py-2 rounded bg-primary text-white font-bold flex items-center justify-center gap-2"
-            >
-              <span class="w-4 h-4" [svgInject]="icons.Check"></span>
-              Link generieren
-            </button>
-          </div>
-        </form>
-        }
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-bold mb-1" for="presetRole"
+                    >Rolle</label
+                  >
+                  <select
+                    id="presetRole"
+                    formControlName="presetRole"
+                    class="w-full border p-2 rounded"
+                  >
+                    <option value="user">Benutzer</option>
+                    <option value="admin">Administrator</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-bold mb-1"
+                    >Abo-Typ bei Registrierung</label
+                  >
+                  <div class="flex items-center gap-3 mb-2">
+                    <input
+                      id="isLifetime"
+                      type="checkbox"
+                      formControlName="isLifetime"
+                    />
+                    <label for="isLifetime" class="text-sm">Lifetime</label>
+                  </div>
+                  @if (!form.value.isLifetime) {
+                    <div>
+                      <label
+                        class="block text-xs font-medium mb-1"
+                        for="subscriptionEndsAt"
+                        >Enddatum</label
+                      >
+                      <input
+                        id="subscriptionEndsAt"
+                        type="datetime-local"
+                        formControlName="subscriptionEndsAt"
+                        class="w-full border p-2 rounded"
+                        [required]="!form.value.isLifetime"
+                      />
+                    </div>
+                  }
+                </div>
+                <div>
+                  <label class="block text-sm font-bold mb-1" for="expiryDays"
+                    >Gültigkeit</label
+                  >
+                  <input
+                    id="expiryDays"
+                    type="number"
+                    min="1"
+                    formControlName="expiryDays"
+                    class="w-full border p-2 rounded"
+                    placeholder="7 Tage"
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-bold mb-1" for="description"
+                    >Beschreibung (optional)</label
+                  >
+                  <input
+                    id="description"
+                    type="text"
+                    formControlName="description"
+                    class="w-full border p-2 rounded"
+                    maxlength="200"
+                    placeholder="z.B. Max Mustermann, Testlink, ..."
+                  />
+                </div>
+              </div>
+              <div class="flex gap-2 pt-4">
+                <button
+                  type="button"
+                  (click)="close.emit()"
+                  class="flex-1 px-4 py-2 rounded bg-gray-200"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="submit"
+                  [disabled]="submitting() || form.invalid"
+                  class="flex-1 px-4 py-2 rounded bg-primary text-white font-bold flex items-center justify-center gap-2"
+                >
+                  <span class="w-4 h-4" [svgInject]="icons.Check"></span>
+                  Link generieren
+                </button>
+              </div>
+            </form>
+          }
+        </div>
       </div>
-    </div>
     }
   `,
 })
@@ -285,8 +290,8 @@ export class CreateInviteModalComponent {
       this.errorMsg.set(
         toErrorMessage(
           error,
-          'Der Link konnte nicht kopiert werden. Bitte kopiere ihn manuell.'
-        )
+          'Der Link konnte nicht kopiert werden. Bitte kopiere ihn manuell.',
+        ),
       );
     }
   }
@@ -316,7 +321,7 @@ export class CreateInviteModalComponent {
     };
     if (!raw.isLifetime && raw.subscriptionEndsAt) {
       payload.subscriptionEndsAt = new Date(
-        raw.subscriptionEndsAt
+        raw.subscriptionEndsAt,
       ).toISOString();
     }
     this.errorMsg.set('');
@@ -324,7 +329,7 @@ export class CreateInviteModalComponent {
     try {
       // Server expects React-style fields; pass through as-is
       let created = await this.invitesApi.createInvite(
-        payload as unknown as CreateInviteRequest
+        payload as unknown as CreateInviteRequest,
       );
       if (!created) {
         // Fallback: fetch latest invite if server responded without body
@@ -335,7 +340,7 @@ export class CreateInviteModalComponent {
             .sort(
               (a, b) =>
                 new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime()
+                new Date(a.createdAt).getTime(),
             )[0];
         }
       }
@@ -348,8 +353,8 @@ export class CreateInviteModalComponent {
       this.errorMsg.set(
         toErrorMessage(
           error,
-          'Der Einladungslink konnte nicht erstellt werden. Bitte versuche es später erneut.'
-        )
+          'Der Einladungslink konnte nicht erstellt werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.submitting.set(false);

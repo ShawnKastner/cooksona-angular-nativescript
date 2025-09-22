@@ -9,7 +9,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-family: 'Inter', Arial, sans-serif;
+    font-family: &quot;Inter&quot;, Arial, sans-serif;
   "
 >
   <h2
@@ -23,51 +23,53 @@
     E-Mail Verifizierung
   </h2>
 
-  @if (status() === 'pending') {
-  <div style="width: 100%; text-align: center; margin: 24px 0">
-    <div
-      class="loader"
-      style="
-        margin: 0 auto 16px;
-        width: 32px;
-        height: 32px;
-        border: 4px solid #eee;
-        border-top: 4px solid #3498db;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      "
-    ></div>
-    <p style="color: #888; font-size: 16px">
-      Deine E-Mail wird gerade bestätigt...
-    </p>
-  </div>
-  } @if (status() === 'success') {
-  <div style="width: 100%; text-align: center; margin: 24px 0">
-    <div style="font-size: 48px; color: #27ae60; margin-bottom: 8px">✓</div>
-    <p
-      style="
-        color: #27ae60;
-        font-size: 18px;
-        font-weight: 500;
-        margin-bottom: 8px;
-      "
-    >
-      {{ message() }}
-    </p>
-    <button
-      class="bg-primary text-primary-content px-4 py-2 rounded-lg hover:bg-primary-focus transition-all shadow-soft hover:shadow-soft-lg"
-      (click)="goToLogin()"
-    >
-      Zum Login
-    </button>
-  </div>
-  } @if (status() === 'error') {
-  <div style="width: 100%; text-align: center; margin: 24px 0">
-    <div style="font-size: 48px; color: #e74c3c; margin-bottom: 8px">✗</div>
-    <p style="color: #e74c3c; font-size: 18px; font-weight: 500">
-      {{ message() }}
-    </p>
-  </div>
+  @if (status() === "pending") {
+    <div style="width: 100%; text-align: center; margin: 24px 0">
+      <div
+        class="loader"
+        style="
+          margin: 0 auto 16px;
+          width: 32px;
+          height: 32px;
+          border: 4px solid #eee;
+          border-top: 4px solid #3498db;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        "
+      ></div>
+      <p style="color: #888; font-size: 16px">
+        Deine E-Mail wird gerade bestätigt...
+      </p>
+    </div>
+  }
+  @if (status() === "success") {
+    <div style="width: 100%; text-align: center; margin: 24px 0">
+      <div style="font-size: 48px; color: #27ae60; margin-bottom: 8px">✓</div>
+      <p
+        style="
+          color: #27ae60;
+          font-size: 18px;
+          font-weight: 500;
+          margin-bottom: 8px;
+        "
+      >
+        {{ message() }}
+      </p>
+      <button
+        class="bg-primary text-primary-content px-4 py-2 rounded-lg hover:bg-primary-focus transition-all shadow-soft hover:shadow-soft-lg"
+        (click)="goToLogin()"
+      >
+        Zum Login
+      </button>
+    </div>
+  }
+  @if (status() === "error") {
+    <div style="width: 100%; text-align: center; margin: 24px 0">
+      <div style="font-size: 48px; color: #e74c3c; margin-bottom: 8px">✗</div>
+      <p style="color: #e74c3c; font-size: 18px; font-weight: 500">
+        {{ message() }}
+      </p>
+    </div>
   }
 
   <style>

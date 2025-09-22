@@ -53,6 +53,6 @@ export class ProgressRingComponent {
   offset = computed(
     () =>
       this.circumference() -
-      ((this.progress() || 0) / 100) * this.circumference()
+      ((this.progress() || 0) / 100) * this.circumference(),
   );
 }

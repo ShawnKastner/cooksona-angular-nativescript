@@ -78,10 +78,10 @@
             class="w-full pl-12 pr-4 py-3 bg-base-200/60 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
           />
         </div>
-        @if(form.get('people')?.invalid && form.get('people')?.touched) {
-        <p class="text-error text-xs mt-1">
-          Bitte eine Anzahl zwischen 1 und 10 wählen.
-        </p>
+        @if (form.get("people")?.invalid && form.get("people")?.touched) {
+          <p class="text-error text-xs mt-1">
+            Bitte eine Anzahl zwischen 1 und 10 wählen.
+          </p>
         }
       </div>
       <div>
@@ -106,19 +106,19 @@
             class="w-full pl-12 pr-4 py-3 bg-base-200/60 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
           />
         </div>
-        @if(showPlanDaysHint() && isProUser) {
-        <p class="text-xs text-error mt-1">
-          Maximal 14 Tage im Pro-Abo möglich.
-        </p>
-        }@else if(!isProUser) {
-        <p class="text-xs text-gray-500 mt-1">
-          Kostenlose Pläne sind auf max. 3 Tage begrenzt.
-          <span
-            (click)="showUpgradeModal.emit()"
-            class="text-secondary font-semibold cursor-pointer hover:underline"
-            >Upgrade für bis zu 14 Tage!</span
-          >
-        </p>
+        @if (showPlanDaysHint() && isProUser) {
+          <p class="text-xs text-error mt-1">
+            Maximal 14 Tage im Pro-Abo möglich.
+          </p>
+        } @else if (!isProUser) {
+          <p class="text-xs text-gray-500 mt-1">
+            Kostenlose Pläne sind auf max. 3 Tage begrenzt.
+            <span
+              (click)="showUpgradeModal.emit()"
+              class="text-secondary font-semibold cursor-pointer hover:underline"
+              >Upgrade für bis zu 14 Tage!</span
+            >
+          </p>
         }
       </div>
       <div>
@@ -176,10 +176,10 @@
             class="w-full pl-12 pr-4 py-3 bg-base-200/60 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
           />
         </div>
-        @if(form.get('calories')?.invalid && form.get('calories')?.touched) {
-        <p class="text-error text-xs mt-1">
-          Kalorien müssen zwischen 0 und 10000 liegen.
-        </p>
+        @if (form.get("calories")?.invalid && form.get("calories")?.touched) {
+          <p class="text-error text-xs mt-1">
+            Kalorien müssen zwischen 0 und 10000 liegen.
+          </p>
         }
       </div>
     </div>
@@ -190,30 +190,30 @@
         >Mahlzeiten auswählen</label
       >
       <div formGroupName="meals" class="grid grid-cols-2 gap-3">
-        @for(meal of mealTypes; track meal) {
-        <label
-          class="flex items-center space-x-3 p-3 bg-base-100/60 rounded-xl has-[:checked]:bg-primary/10 has-[:checked]:ring-2 has-[:checked]:ring-primary transition-all cursor-pointer hover:bg-base-200/60"
-        >
-          <input type="checkbox" class="sr-only" [formControlName]="meal" />
-          <div
-            class="w-5 h-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all"
-            [ngClass]="
-              control('meals.' + meal)?.value
-                ? 'bg-primary border-primary'
-                : 'border-gray-400'
-            "
+        @for (meal of mealTypes; track meal) {
+          <label
+            class="flex items-center space-x-3 p-3 bg-base-100/60 rounded-xl has-[:checked]:bg-primary/10 has-[:checked]:ring-2 has-[:checked]:ring-primary transition-all cursor-pointer hover:bg-base-200/60"
           >
-            @if(control('meals.' + meal)?.value) {
-            <span
-              class="w-3.5 h-3.5 text-white"
-              [svgInject]="icons.Check"
-            ></span>
-            }
-          </div>
-          <span class="text-sm font-medium text-neutral">{{
-            mealTypeTranslations[meal]
-          }}</span>
-        </label>
+            <input type="checkbox" class="sr-only" [formControlName]="meal" />
+            <div
+              class="w-5 h-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all"
+              [ngClass]="
+                control('meals.' + meal)?.value
+                  ? 'bg-primary border-primary'
+                  : 'border-gray-400'
+              "
+            >
+              @if (control("meals." + meal)?.value) {
+                <span
+                  class="w-3.5 h-3.5 text-white"
+                  [svgInject]="icons.Check"
+                ></span>
+              }
+            </div>
+            <span class="text-sm font-medium text-neutral">{{
+              mealTypeTranslations[meal]
+            }}</span>
+          </label>
         }
       </div>
     </div>
@@ -316,34 +316,36 @@
             ></div>
           </label>
         </div>
-        @if(!isProUser) {
-        <div class="text-center text-sm pt-2">
-          <span
-            class="font-semibold text-secondary cursor-pointer hover:underline"
-            ><span
-              class="w-4 h-4 inline-block mr-1"
-              [svgInject]="icons.Sparkles"
-            ></span
-            >Upgrade für mehr Funktionen</span
-          >
-        </div>
+        @if (!isProUser) {
+          <div class="text-center text-sm pt-2">
+            <span
+              class="font-semibold text-secondary cursor-pointer hover:underline"
+              ><span
+                class="w-4 h-4 inline-block mr-1"
+                [svgInject]="icons.Sparkles"
+              ></span
+              >Upgrade für mehr Funktionen</span
+            >
+          </div>
         }
       </div>
     </div>
 
-    @if(!isProUser) {
-    <div class="text-center text-sm text-gray-500 pt-2">
-      <p>
-        Du hast noch
-        <span class="font-bold text-neutral">{{ remainingRequests ?? 0 }}</span>
-        kostenlose Anfragen.
-      </p>
-      @if((remainingRequests ?? 0) <= 0) {
-      <p class="text-error font-semibold mt-1">
-        Upgrade auf Pro für unbegrenzte Anfragen!
-      </p>
-      }
-    </div>
+    @if (!isProUser) {
+      <div class="text-center text-sm text-gray-500 pt-2">
+        <p>
+          Du hast noch
+          <span class="font-bold text-neutral">{{
+            remainingRequests ?? 0
+          }}</span>
+          kostenlose Anfragen.
+        </p>
+        @if ((remainingRequests ?? 0) <= 0) {
+          <p class="text-error font-semibold mt-1">
+            Upgrade auf Pro für unbegrenzte Anfragen!
+          </p>
+        }
+      </div>
     }
     <!-- Submit Button -->
     <div class="pt-4">
@@ -352,11 +354,13 @@
         [disabled]="isLoading"
         class="w-full flex items-center justify-center gap-3 bg-gradient-to-br from-primary to-primary-focus text-primary-content font-bold py-3.5 px-4 rounded-xl hover:shadow-soft-lg focus:outline-none focus:ring-4 focus:ring-primary/40 transition-all duration-300 disabled:bg-base-300 disabled:cursor-not-allowed disabled:shadow-none transform hover:-translate-y-0.5"
       >
-        @if(isLoading) {
-        <app-loading-spinner-small />
-        Wird erstellt... }@else {
-        <span class="w-5 h-5" [svgInject]="icons.Sparkles"></span>
-        Meinen Plan erstellen }
+        @if (isLoading) {
+          <app-loading-spinner-small />
+          Wird erstellt...
+        } @else {
+          <span class="w-5 h-5" [svgInject]="icons.Sparkles"></span>
+          Meinen Plan erstellen
+        }
       </button>
     </div>
   </form>

@@ -21,93 +21,93 @@
       </h1>
     </a>
     <div class="flex items-center gap-2">
-      @if(user$ | async; as user; ) {
-      <div class="relative">
-        <button
-          (click)="toggleDropdown()"
-          class="flex items-center gap-2 p-2 rounded-full hover:bg-base-200 transition-colors"
-        >
-          <span class="h-5 w-5 text-neutral" [svgInject]="icons.User"></span>
-          <span class="font-semibold text-sm hidden sm:inline">{{
-            user.name
-          }}</span>
-        </button>
-        @if(isDropdownOpen()) {
-        <div
-          class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-soft-lg py-2 border border-base-200"
-        >
-          <a
-            routerLink="/profile"
-            (click)="closeDropdown()"
-            class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
-          >
-            <span class="h-4 w-4" [svgInject]="icons.User"></span>
-            Profil
-          </a>
-          <a
-            routerLink="/health"
-            (click)="closeDropdown()"
-            class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
-          >
-            <span class="h-4 w-4" [svgInject]="icons.HeartPulse"></span>
-            Health Hub
-          </a>
-          <a
-            routerLink="/cookbook"
-            (click)="closeDropdown()"
-            class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
-          >
-            <span class="h-4 w-4" [svgInject]="icons.BookHeart"></span>
-            Mein Kochbuch
-          </a>
-          <div class="border-t border-base-200 my-1"></div>
-          <a
-            routerLink="/contact"
-            (click)="closeDropdown()"
-            class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
-          >
-            <span class="h-4 w-4" [svgInject]="icons.MessageSquare"></span>
-            Kontakt & Feedback
-          </a>
-          <div class="border-t border-base-200 my-1"></div>
-          @if(user.role === 'admin') {
-          <a
-            routerLink="/admin"
-            (click)="closeDropdown()"
-            class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
-          >
-            <span class="h-4 w-4" [svgInject]="icons.Shield"></span>
-            Admin
-          </a>
-          <div class="border-t border-base-200 my-1"></div>
-          }
+      @if (user$ | async; as user) {
+        <div class="relative">
           <button
-            (click)="logout()"
-            class="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-red-50 transition-colors"
+            (click)="toggleDropdown()"
+            class="flex items-center gap-2 p-2 rounded-full hover:bg-base-200 transition-colors"
           >
-            <span class="h-4 w-4" [svgInject]="icons.LogOut"></span>
-            Abmelden
+            <span class="h-5 w-5 text-neutral" [svgInject]="icons.User"></span>
+            <span class="font-semibold text-sm hidden sm:inline">{{
+              user.name
+            }}</span>
           </button>
+          @if (isDropdownOpen()) {
+            <div
+              class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-soft-lg py-2 border border-base-200"
+            >
+              <a
+                routerLink="/profile"
+                (click)="closeDropdown()"
+                class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
+              >
+                <span class="h-4 w-4" [svgInject]="icons.User"></span>
+                Profil
+              </a>
+              <a
+                routerLink="/health"
+                (click)="closeDropdown()"
+                class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
+              >
+                <span class="h-4 w-4" [svgInject]="icons.HeartPulse"></span>
+                Health Hub
+              </a>
+              <a
+                routerLink="/cookbook"
+                (click)="closeDropdown()"
+                class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
+              >
+                <span class="h-4 w-4" [svgInject]="icons.BookHeart"></span>
+                Mein Kochbuch
+              </a>
+              <div class="border-t border-base-200 my-1"></div>
+              <a
+                routerLink="/contact"
+                (click)="closeDropdown()"
+                class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
+              >
+                <span class="h-4 w-4" [svgInject]="icons.MessageSquare"></span>
+                Kontakt & Feedback
+              </a>
+              <div class="border-t border-base-200 my-1"></div>
+              @if (user.role === "admin") {
+                <a
+                  routerLink="/admin"
+                  (click)="closeDropdown()"
+                  class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
+                >
+                  <span class="h-4 w-4" [svgInject]="icons.Shield"></span>
+                  Admin
+                </a>
+                <div class="border-t border-base-200 my-1"></div>
+              }
+              <button
+                (click)="logout()"
+                class="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-red-50 transition-colors"
+              >
+                <span class="h-4 w-4" [svgInject]="icons.LogOut"></span>
+                Abmelden
+              </button>
+            </div>
+          }
         </div>
-        }
-      </div>
       } @else {
-      <div>
-        <a
-          routerLink="/login"
-          (click)="closeDropdown()"
-          class="text-neutral px-4 py-2 rounded-lg hover:bg-base-200 transition-colors text-sm font-medium cursor-pointer"
-        >
-          Anmelden
-        </a>
-        <a
-          routerLink="/register"
-          (click)="closeDropdown()"
-          class="bg-primary text-primary-content px-4 py-2 rounded-lg hover:bg-primary-focus transition-all shadow-soft hover:shadow-soft-lg"
-        >
-          Registrieren
-        </a>
-      </div>
+        <div>
+          <a
+            routerLink="/login"
+            (click)="closeDropdown()"
+            class="text-neutral px-4 py-2 rounded-lg hover:bg-base-200 transition-colors text-sm font-medium cursor-pointer"
+          >
+            Anmelden
+          </a>
+          <a
+            routerLink="/register"
+            (click)="closeDropdown()"
+            class="bg-primary text-primary-content px-4 py-2 rounded-lg hover:bg-primary-focus transition-all shadow-soft hover:shadow-soft-lg"
+          >
+            Registrieren
+          </a>
+        </div>
       }
     </div>
   </div>

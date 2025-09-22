@@ -91,12 +91,12 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
   readonly paypalClientId: string =
     (environment as { paypalClientId?: string }).paypalClientId ??
     (typeof window !== 'undefined'
-      ? (window as any).__PAYPAL_CLIENT_ID__ ??
+      ? ((window as any).__PAYPAL_CLIENT_ID__ ??
         (window as any).__COOKSONA_PAYPAL_CLIENT_ID__ ??
-        ''
+        '')
       : '');
   readonly selectedPlanDetails = computed(
-    () => this.planDetails[this.selectedPlan()]
+    () => this.planDetails[this.selectedPlan()],
   );
 
   private bodyOverflowPrev: string | null = null;
@@ -229,7 +229,7 @@ export class ProUpgradeModalComponent implements OnChanges, OnDestroy {
     } catch (refreshError) {
       console.warn(
         'Failed to refresh current user after PayPal confirmation',
-        refreshError
+        refreshError,
       );
     }
     this.setView('success');

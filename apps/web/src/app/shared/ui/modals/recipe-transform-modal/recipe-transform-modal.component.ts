@@ -88,7 +88,7 @@ export class RecipeTransformModalComponent implements OnChanges {
     try {
       const result = await this.api.apiTransformRecipe<Recipe, Recipe>(
         r,
-        this.modification()
+        this.modification(),
       );
       if (!result) throw new Error('Ein Fehler ist aufgetreten.');
       this.transformedRecipe.set(result);
@@ -96,8 +96,8 @@ export class RecipeTransformModalComponent implements OnChanges {
       this.error.set(
         toErrorMessage(
           error,
-          'Das Rezept konnte nicht angepasst werden. Bitte versuche es später erneut.'
-        )
+          'Das Rezept konnte nicht angepasst werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.isLoading.set(false);
@@ -115,7 +115,7 @@ export class RecipeTransformModalComponent implements OnChanges {
     this.successAction.set(
       action === 'updateInPlan'
         ? 'Plan aktualisiert!'
-        : 'Im Kochbuch gespeichert!'
+        : 'Im Kochbuch gespeichert!',
     );
     // Optional: self-close after brief success, parent may also close
     setTimeout(() => this.close.emit(), 2000);

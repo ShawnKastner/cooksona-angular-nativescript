@@ -106,7 +106,7 @@ export class LeftOverModalComponent implements OnChanges {
 
     if (!this.isProUser && this.getRemainingRequests() <= 0) {
       this.error.set(
-        `Dein Limit von ${this.FREE_USER_REQUEST_LIMIT()} Anfragen pro Monat ist erreicht. Bitte upgrade auf Pro für unbegrenzte Vorschläge.`
+        `Dein Limit von ${this.FREE_USER_REQUEST_LIMIT()} Anfragen pro Monat ist erreicht. Bitte upgrade auf Pro für unbegrenzte Vorschläge.`,
       );
       return;
     }
@@ -123,7 +123,7 @@ export class LeftOverModalComponent implements OnChanges {
     try {
       const result = await this.api.apiGenerateLeftoverRecipe<Recipe>(
         this.ingredients(),
-        this.abortController()?.signal
+        this.abortController()?.signal,
       );
       if (!result) throw new Error('Ein Fehler ist aufgetreten.');
       this.generatedRecipe.set(result);
@@ -135,8 +135,8 @@ export class LeftOverModalComponent implements OnChanges {
           this.error.set(
             toErrorMessage(
               error,
-              'Deine Anfrage konnte nicht verbucht werden. Bitte lade die Seite neu.'
-            )
+              'Deine Anfrage konnte nicht verbucht werden. Bitte lade die Seite neu.',
+            ),
           );
         }
       }
@@ -145,8 +145,8 @@ export class LeftOverModalComponent implements OnChanges {
       this.error.set(
         toErrorMessage(
           error,
-          'Die Resteverwertung ist fehlgeschlagen. Bitte versuche es später erneut.'
-        )
+          'Die Resteverwertung ist fehlgeschlagen. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.isLoading.set(false);

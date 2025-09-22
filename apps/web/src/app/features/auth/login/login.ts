@@ -52,32 +52,32 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private auth: AuthService,
-    private api: ApiService
+    private api: ApiService,
   ) {}
 
   ngOnInit(): void {
     const params = this.route.snapshot.queryParamMap;
     if (params.get('registered') === 'true') {
       this.info.set(
-        'Registrierung erfolgreich! Bitte prüfe deine E-Mails und bestätige deine Adresse.'
+        'Registrierung erfolgreich! Bitte prüfe deine E-Mails und bestätige deine Adresse.',
       );
       this.clearQueryParams();
     }
     if (params.get('registered') === 'invite') {
       this.info.set(
-        'Account erfolgreich erstellt! Du kannst dich jetzt direkt einloggen.'
+        'Account erfolgreich erstellt! Du kannst dich jetzt direkt einloggen.',
       );
       this.clearQueryParams();
     }
     if (params.get('inviteError') === 'used') {
       this.error.set(
-        'Dieser Einladungslink wurde bereits verwendet oder ist ungültig. Bitte fordere eine neue Einladung an oder logge dich direkt ein.'
+        'Dieser Einladungslink wurde bereits verwendet oder ist ungültig. Bitte fordere eine neue Einladung an oder logge dich direkt ein.',
       );
       this.clearQueryParams();
     }
     if (params.get('reset') === 'success') {
       this.info.set(
-        'Dein Passwort wurde erfolgreich zurückgesetzt. Du kannst dich jetzt einloggen.'
+        'Dein Passwort wurde erfolgreich zurückgesetzt. Du kannst dich jetzt einloggen.',
       );
       this.clearQueryParams();
     }
@@ -110,8 +110,8 @@ export class LoginComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.'
-        )
+          'Ein unbekannter Fehler ist aufgetreten. Bitte versuche es später erneut.',
+        ),
       );
     }
   }
@@ -134,8 +134,8 @@ export class LoginComponent implements OnInit {
       this.resendError.set(
         toErrorMessage(
           error,
-          'Senden fehlgeschlagen. Bitte versuche es später erneut.'
-        )
+          'Senden fehlgeschlagen. Bitte versuche es später erneut.',
+        ),
       );
       this.resendState.set('error');
     }
@@ -149,7 +149,7 @@ export class LoginComponent implements OnInit {
     this.router
       .navigate(['/register'])
       .catch((navigationError) =>
-        console.error('Navigation to register failed', navigationError)
+        console.error('Navigation to register failed', navigationError),
       );
   }
 
@@ -157,7 +157,7 @@ export class LoginComponent implements OnInit {
     this.router
       .navigate(['/forgot-password'])
       .catch((navigationError) =>
-        console.error('Navigation to forgot-password failed', navigationError)
+        console.error('Navigation to forgot-password failed', navigationError),
       );
   }
 

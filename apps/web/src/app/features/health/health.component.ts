@@ -59,14 +59,14 @@ export class HealthComponent {
   protected dayLabel = computed(() =>
     this.isToday()
       ? 'Heute'
-      : this.selectedDate().toLocaleDateString('de-DE', { weekday: 'long' })
+      : this.selectedDate().toLocaleDateString('de-DE', { weekday: 'long' }),
   );
   protected dateLabel = computed(() =>
     this.selectedDate().toLocaleDateString('de-DE', {
       day: '2-digit',
       month: 'long',
       year: 'numeric',
-    })
+    }),
   );
 
   protected todaysMetrics = computed<DailyMetrics>(() => {
@@ -104,7 +104,7 @@ export class HealthComponent {
       }
     } catch (e) {
       this.snackbar.error(
-        'Fehler beim Laden der Gesundheitsdaten. Bitte versuche es später erneut.'
+        'Fehler beim Laden der Gesundheitsdaten. Bitte versuche es später erneut.',
       );
     } finally {
       this.isLoading.set(false);
@@ -119,7 +119,7 @@ export class HealthComponent {
       this.isOnboardingOpen.set(false);
     } catch (e) {
       this.snackbar.error(
-        'Fehler beim Speichern des Profils. Bitte versuche es später erneut.'
+        'Fehler beim Speichern des Profils. Bitte versuche es später erneut.',
       );
     }
   }
@@ -130,12 +130,12 @@ export class HealthComponent {
         this.selectedDate(),
         {
           water: amountDelta,
-        }
+        },
       );
       if (updated) this.healthData.set(updated);
     } catch (e) {
       this.snackbar.error(
-        'Fehler beim Aktualisieren der Wasseraufnahme. Bitte versuche es später erneut.'
+        'Fehler beim Aktualisieren der Wasseraufnahme. Bitte versuche es später erneut.',
       );
     }
   }
@@ -146,13 +146,13 @@ export class HealthComponent {
         this.selectedDate(),
         {
           activityCalories: calories,
-        }
+        },
       );
       if (updated) this.healthData.set(updated);
       this.isManualEntryOpen.set(false);
     } catch (e) {
       this.snackbar.error(
-        'Fehler beim Speichern der Aktivität. Bitte versuche es später erneut.'
+        'Fehler beim Speichern der Aktivität. Bitte versuche es später erneut.',
       );
     }
   }
@@ -166,13 +166,13 @@ export class HealthComponent {
     try {
       const updated = await this.healthApi.updateMetricsForDate(
         this.selectedDate(),
-        data
+        data,
       );
       if (updated) this.healthData.set(updated);
       this.isManualEntryOpen.set(false);
     } catch (e) {
       this.snackbar.error(
-        'Fehler beim Speichern der Ernährung. Bitte versuche es später erneut.'
+        'Fehler beim Speichern der Ernährung. Bitte versuche es später erneut.',
       );
     }
   }

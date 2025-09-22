@@ -52,25 +52,25 @@ export class HealthDashboardComponent {
   protected totalCaloriesWithActivity = computed(() => {
     return Math.max(
       0,
-      Math.round(this.calorieGoal() + this.metrics().caloriesBurned)
+      Math.round(this.calorieGoal() + this.metrics().caloriesBurned),
     );
   });
 
   protected remainingCalories = computed(() => {
     return Math.round(
-      this.totalCaloriesWithActivity() - this.metrics().caloriesEaten
+      this.totalCaloriesWithActivity() - this.metrics().caloriesEaten,
     );
   });
 
   // Macro goals (C 40%, P 30%, F 30%)
   protected proteinGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.3) / 4)
+    Math.round((this.calorieGoal() * 0.3) / 4),
   );
   protected carbsGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.4) / 4)
+    Math.round((this.calorieGoal() * 0.4) / 4),
   );
   protected fatGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.3) / 9)
+    Math.round((this.calorieGoal() * 0.3) / 9),
   );
 
   // Progress percentages

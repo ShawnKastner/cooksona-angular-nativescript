@@ -32,7 +32,7 @@ export function getTodaysMetrics(healthData: HealthData): DailyMetrics {
 
 export function getMetricsForDate(
   healthData: HealthData,
-  date: Date
+  date: Date,
 ): DailyMetrics {
   const dateStr = getDateString(date);
   const metrics = healthData.dailyMetrics.find((m) => m.date === dateStr);

@@ -27,13 +27,13 @@ let paypalClientIdInUse: string | null = null;
 function ensurePayPalSdk(clientId: string): Promise<void> {
   if (typeof window === 'undefined' || typeof document === 'undefined') {
     return Promise.reject(
-      new Error('PayPal ist im aktuellen Kontext nicht verfügbar.')
+      new Error('PayPal ist im aktuellen Kontext nicht verfügbar.'),
     );
   }
 
   if (!clientId || clientId.trim().length === 0) {
     return Promise.reject(
-      new Error('PayPal-Konfiguration fehlt. Bitte kontaktiere den Support.')
+      new Error('PayPal-Konfiguration fehlt. Bitte kontaktiere den Support.'),
     );
   }
 
@@ -46,7 +46,7 @@ function ensurePayPalSdk(clientId: string): Promise<void> {
     if (paypalClientIdInUse && paypalClientIdInUse !== clientId) {
       // Remove any previous script tag and reset so we can load with the new client id
       const existing = document.querySelector<HTMLScriptElement>(
-        'script[data-paypal-sdk]'
+        'script[data-paypal-sdk]',
       );
       if (existing?.parentElement) existing.parentElement.removeChild(existing);
       window.paypal = undefined;
@@ -140,8 +140,8 @@ export class PayPalSubscriptionSmartButtonComponent
     if (!planId) {
       this.error.emit(
         new Error(
-          'Es wurde kein gültiger PayPal-Plan angegeben. Bitte später erneut versuchen.'
-        )
+          'Es wurde kein gültiger PayPal-Plan angegeben. Bitte später erneut versuchen.',
+        ),
       );
       return;
     }
@@ -156,8 +156,8 @@ export class PayPalSubscriptionSmartButtonComponent
     if (!window.paypal || !this.buttonContainer?.nativeElement) {
       this.error.emit(
         new Error(
-          'PayPal konnte nicht initialisiert werden. Bitte später erneut versuchen.'
-        )
+          'PayPal konnte nicht initialisiert werden. Bitte später erneut versuchen.',
+        ),
       );
       return;
     }

@@ -69,7 +69,7 @@ export class AddToCollectionModalComponent implements OnChanges {
 
       // Fetch AI suggestion list asynchronously and set when ready
       this.getStubbedSuggestions(this.recipe).then((suggestions) =>
-        this.aiSuggestions.set(suggestions.slice(0, 5))
+        this.aiSuggestions.set(suggestions.slice(0, 5)),
       );
     }
   }
@@ -90,7 +90,7 @@ export class AddToCollectionModalComponent implements OnChanges {
 
   addSuggestion(name: string): void {
     const existing = this.cookbookCollections().find(
-      (c) => c.name.toLowerCase() === name.toLowerCase()
+      (c) => c.name.toLowerCase() === name.toLowerCase(),
     );
     if (existing) {
       this.toggle(existing.id);
@@ -105,7 +105,7 @@ export class AddToCollectionModalComponent implements OnChanges {
     if (!name) return;
     if (
       this.cookbookCollections().some(
-        (c) => c.name.toLowerCase() === name.toLowerCase()
+        (c) => c.name.toLowerCase() === name.toLowerCase(),
       )
     ) {
       this.error.set('Eine Sammlung mit diesem Namen existiert bereits.');
@@ -149,7 +149,7 @@ export class AddToCollectionModalComponent implements OnChanges {
       return res ?? [];
     } catch (error) {
       this.kiSuggestError.set(
-        'Die KI-Vorschläge konnten nicht geladen werden.'
+        'Die KI-Vorschläge konnten nicht geladen werden.',
       );
       return [];
     } finally {
