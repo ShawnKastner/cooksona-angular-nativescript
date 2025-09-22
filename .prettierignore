@@ -3,3 +3,16 @@
 /coverage
 /.nx/cache
 /.nx/workspace-data
+node_modules
+
+# NativeScript build artifacts
+apps/mobile/platforms/
+apps/mobile/hooks/
+
+# App build outputs
+apps/**/dist
+
+# Lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

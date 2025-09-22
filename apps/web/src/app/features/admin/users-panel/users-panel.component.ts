@@ -33,7 +33,7 @@ export class UsersPanelComponent implements OnInit {
   userPage = signal(1);
   USERS_PER_PAGE = signal(5);
   userTotalPages = computed(() =>
-    Math.ceil(this.users().length / this.USERS_PER_PAGE())
+    Math.ceil(this.users().length / this.USERS_PER_PAGE()),
   );
   paginatedUsers = computed(() => {
     const start = (this.userPage() - 1) * this.USERS_PER_PAGE();
@@ -56,8 +56,8 @@ export class UsersPanelComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Benutzer konnten nicht geladen werden. Bitte versuche es später erneut.'
-        )
+          'Benutzer konnten nicht geladen werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.isLoadingUsers.set(false);
@@ -82,14 +82,14 @@ export class UsersPanelComponent implements OnInit {
   }
 
   async handleUpdateUser(
-    updated: Pick<User, 'id'> & Partial<User>
+    updated: Pick<User, 'id'> & Partial<User>,
   ): Promise<void> {
     this.error.set(null);
     try {
       const saved = await this.usersApi.updateUser(updated.id, updated);
       if (saved)
         this.users.set(
-          this.users().map((u) => (u.id === saved.id ? saved : u))
+          this.users().map((u) => (u.id === saved.id ? saved : u)),
         );
       this.editingUser.set(null);
       this.success.set('Benutzer wurde aktualisiert.');
@@ -98,8 +98,8 @@ export class UsersPanelComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Der Benutzer konnte nicht aktualisiert werden. Bitte versuche es später erneut.'
-        )
+          'Der Benutzer konnte nicht aktualisiert werden. Bitte versuche es später erneut.',
+        ),
       );
     }
   }
@@ -134,8 +134,8 @@ export class UsersPanelComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Der Benutzer konnte nicht gelöscht werden. Bitte versuche es später erneut.'
-        )
+          'Der Benutzer konnte nicht gelöscht werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.closeDeleteUserModal();

@@ -70,7 +70,7 @@ export class RecipeDetailModalComponent {
         document.body.classList.remove('print-active');
       }
       window.alert(
-        'Der Druck konnte nicht gestartet werden. Bitte nutze die Druckfunktion deines Browsers (z.B. Strg+P).'
+        'Der Druck konnte nicht gestartet werden. Bitte nutze die Druckfunktion deines Browsers (z.B. Strg+P).',
       );
     }
   }

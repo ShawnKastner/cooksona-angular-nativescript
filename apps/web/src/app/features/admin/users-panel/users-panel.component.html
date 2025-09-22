@@ -1,73 +1,79 @@
 <div>
   @if (isLoadingUsers()) {
-  <p>Lade Benutzer...</p>
-  } @if (error()) {
-  <div class="text-error bg-red-50 p-4 rounded-lg">{{ error() }}</div>
-  } @if (success()) {
-  <div class="text-green-700 bg-green-100 p-4 rounded-lg">{{ success() }}</div>
-  } @if (!isLoadingUsers() && !error()) {
-  <div class="overflow-x-auto">
-    <table class="min-w-full bg-white text-sm">
-      <thead class="bg-base-200/60">
-        <tr>
-          <th class="text-left font-semibold text-neutral p-3">Name</th>
-          <th class="text-left font-semibold text-neutral p-3">E-Mail</th>
-          <th class="text-left font-semibold text-neutral p-3">Rolle</th>
-          <th class="text-left font-semibold text-neutral p-3">Abo</th>
-          <th class="text-left font-semibold text-neutral p-3">
-            Registriert am
-          </th>
-          <th class="text-right font-semibold text-neutral p-3">Aktionen</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (user of paginatedUsers(); track user.id; let i = $index) {
-        <tr class="border-b border-base-200">
-          <td class="p-3 font-medium text-neutral">{{ user.name }}</td>
-          <td class="p-3 text-gray-600">{{ maskEmail(user.email) }}</td>
-          <td class="p-3 text-gray-600 capitalize">{{ user.role }}</td>
-          <td class="p-3">
-            {{
-              user.lifetimeSubscription
-                ? "Lifetime"
-                : user.subscriptionEndsAt
-                ? "Bis " + (user.subscriptionEndsAt | formatDate)
-                : "Kein Abo"
-            }}
-          </td>
-          <td class="p-3 text-gray-600">
-            {{ $any(user).createdAt | formatDate }}
-          </td>
-          <td class="p-3 text-right">
-            <div class="flex justify-end items-center gap-2">
-              <button
-                (click)="startEditUser(user)"
-                class="p-2 text-gray-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
-                title="Benutzer bearbeiten"
-              >
-                <span class="w-4 h-4" [svgInject]="icons.Pencil"></span>
-              </button>
-              <button
-                (click)="prepareDeleteUser(user)"
-                class="p-2 text-gray-500 hover:text-error hover:bg-error/10 rounded-full transition-colors"
-                title="Benutzer löschen"
-              >
-                <span class="w-4 h-4" [svgInject]="icons.Trash"></span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-  @if (userTotalPages() > 1) {
-  <app-pagination
-    [page]="userPage()"
-    [totalPages]="userTotalPages()"
-    (pageChange)="userPage.set($event)"
-  />
-  } }
+    <p>Lade Benutzer...</p>
+  }
+  @if (error()) {
+    <div class="text-error bg-red-50 p-4 rounded-lg">{{ error() }}</div>
+  }
+  @if (success()) {
+    <div class="text-green-700 bg-green-100 p-4 rounded-lg">
+      {{ success() }}
+    </div>
+  }
+  @if (!isLoadingUsers() && !error()) {
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white text-sm">
+        <thead class="bg-base-200/60">
+          <tr>
+            <th class="text-left font-semibold text-neutral p-3">Name</th>
+            <th class="text-left font-semibold text-neutral p-3">E-Mail</th>
+            <th class="text-left font-semibold text-neutral p-3">Rolle</th>
+            <th class="text-left font-semibold text-neutral p-3">Abo</th>
+            <th class="text-left font-semibold text-neutral p-3">
+              Registriert am
+            </th>
+            <th class="text-right font-semibold text-neutral p-3">Aktionen</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of paginatedUsers(); track user.id; let i = $index) {
+            <tr class="border-b border-base-200">
+              <td class="p-3 font-medium text-neutral">{{ user.name }}</td>
+              <td class="p-3 text-gray-600">{{ maskEmail(user.email) }}</td>
+              <td class="p-3 text-gray-600 capitalize">{{ user.role }}</td>
+              <td class="p-3">
+                {{
+                  user.lifetimeSubscription
+                    ? "Lifetime"
+                    : user.subscriptionEndsAt
+                      ? "Bis " + (user.subscriptionEndsAt | formatDate)
+                      : "Kein Abo"
+                }}
+              </td>
+              <td class="p-3 text-gray-600">
+                {{ $any(user).createdAt | formatDate }}
+              </td>
+              <td class="p-3 text-right">
+                <div class="flex justify-end items-center gap-2">
+                  <button
+                    (click)="startEditUser(user)"
+                    class="p-2 text-gray-500 hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                    title="Benutzer bearbeiten"
+                  >
+                    <span class="w-4 h-4" [svgInject]="icons.Pencil"></span>
+                  </button>
+                  <button
+                    (click)="prepareDeleteUser(user)"
+                    class="p-2 text-gray-500 hover:text-error hover:bg-error/10 rounded-full transition-colors"
+                    title="Benutzer löschen"
+                  >
+                    <span class="w-4 h-4" [svgInject]="icons.Trash"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (userTotalPages() > 1) {
+      <app-pagination
+        [page]="userPage()"
+        [totalPages]="userTotalPages()"
+        (pageChange)="userPage.set($event)"
+      />
+    }
+  }
 </div>
 
 <app-edit-user-modal

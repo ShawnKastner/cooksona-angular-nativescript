@@ -15,6 +15,8 @@ import {
   BookHeart,
   Shield,
   MessageSquare,
+  Heart,
+  HeartPulse,
 } from '@cooksona/constants/icons';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
@@ -38,13 +40,14 @@ export class HeaderComponent {
     BookHeart,
     Shield,
     MessageSquare,
+    HeartPulse,
   } as const;
 
   constructor(
     private readonly router: Router,
     private readonly auth: AuthService,
     private readonly el: ElementRef,
-    private readonly snackbar: SnackbarService
+    private readonly snackbar: SnackbarService,
   ) {}
 
   get user$() {
@@ -72,7 +75,7 @@ export class HeaderComponent {
     this.router
       .navigateByUrl(path)
       .catch((navigationError) =>
-        console.error('Header navigation failed', navigationError)
+        console.error('Header navigation failed', navigationError),
       );
   }
 
@@ -85,15 +88,15 @@ export class HeaderComponent {
         .catch((navigationError) =>
           console.error(
             'Redirect to login after logout failed',
-            navigationError
-          )
+            navigationError,
+          ),
         );
     } catch (error) {
       this.snackbar.error(
         toErrorMessage(
           error,
-          'Abmeldung fehlgeschlagen. Bitte versuche es später erneut.'
-        )
+          'Abmeldung fehlgeschlagen. Bitte versuche es später erneut.',
+        ),
       );
     }
   }

@@ -43,7 +43,7 @@ export class CookbookApiService {
   async getRecipeCollections(): Promise<CookbookCollection[]> {
     try {
       const collections = await this.api.get<CookbookCollection[]>(
-        '/cookbook/collections'
+        '/cookbook/collections',
       );
       return collections ?? [];
     } catch (error) {
@@ -55,7 +55,7 @@ export class CookbookApiService {
   async createRecipeCollection(name: string): Promise<CookbookCollection> {
     const newCollection = await this.api.post<CookbookCollection>(
       '/cookbook/collections',
-      { name }
+      { name },
     );
     if (!newCollection) {
       throw { message: 'Die Sammlung konnte nicht erstellt werden.' };
@@ -69,11 +69,11 @@ export class CookbookApiService {
 
   async renameRecipeCollection(
     collectionId: string,
-    newName: string
+    newName: string,
   ): Promise<CookbookCollection> {
     const updatedCollection = await this.api.put<CookbookCollection>(
       `/cookbook/collections/${collectionId}`,
-      { name: newName }
+      { name: newName },
     );
     if (!updatedCollection) {
       throw { message: 'Die Sammlung konnte nicht umbenannt werden.' };
@@ -83,11 +83,11 @@ export class CookbookApiService {
 
   async setRecipeToCollections(
     recipeId: string,
-    collectionIds: string[]
+    collectionIds: string[],
   ): Promise<Recipe> {
     const updated = await this.api.put<Recipe>(
       `/cookbook/recipes/${recipeId}/collections`,
-      { collectionIds }
+      { collectionIds },
     );
     if (!updated) {
       throw {
@@ -98,16 +98,16 @@ export class CookbookApiService {
   }
 
   async getCollectionsForRecipe(
-    recipeId?: string
+    recipeId?: string,
   ): Promise<CookbookCollection[]> {
     const collections = await this.api.get<CookbookCollection[]>(
-      `/cookbook/recipes/${recipeId}/collections`
+      `/cookbook/recipes/${recipeId}/collections`,
     );
     return collections ?? [];
   }
 
   async suggestRecipeCollections(
-    recipe: Recipe
+    recipe: Recipe,
   ): Promise<string[] | undefined> {
     const payload = {
       recipe: {

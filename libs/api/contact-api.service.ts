@@ -25,7 +25,7 @@ export class ContactApiService {
 
   updateContactRequest(
     id: string,
-    data: Partial<Pick<Message, 'status' | 'reply'>> & { userId?: string }
+    data: Partial<Pick<Message, 'status' | 'reply'>> & { userId?: string },
   ): Promise<Message | undefined> {
     return this.api.put<Message>(`/contact/${id}`, data);
   }

@@ -23,7 +23,7 @@ export class EmailVerificationComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private users: UserApiService
+    private users: UserApiService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -33,7 +33,7 @@ export class EmailVerificationComponent implements OnInit {
       this.router
         .navigate(['/login'])
         .catch((navigationError) =>
-          console.error('Redirect to login failed', navigationError)
+          console.error('Redirect to login failed', navigationError),
         );
       return;
     }
@@ -43,12 +43,12 @@ export class EmailVerificationComponent implements OnInit {
       if (res && res.ok) {
         this.status.set('success');
         this.message.set(
-          'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.'
+          'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.',
         );
       } else {
         this.status.set('success');
         this.message.set(
-          'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.'
+          'Deine E-Mail wurde erfolgreich bestätigt! Du kannst dich jetzt einloggen.',
         );
       }
     } catch (error) {
@@ -56,8 +56,8 @@ export class EmailVerificationComponent implements OnInit {
       this.message.set(
         toErrorMessage(
           error,
-          'Der Verifizierungslink ist ungültig oder abgelaufen.'
-        )
+          'Der Verifizierungslink ist ungültig oder abgelaufen.',
+        ),
       );
     }
   }
@@ -66,7 +66,7 @@ export class EmailVerificationComponent implements OnInit {
     this.router
       .navigate(['/login'])
       .catch((navigationError) =>
-        console.error('Navigation to login failed', navigationError)
+        console.error('Navigation to login failed', navigationError),
       );
   }
 }

@@ -32,7 +32,7 @@ export class FocusTrapDirective implements AfterViewInit {
     const nodes = Array.from(root.querySelectorAll<HTMLElement>(selector));
     return nodes.filter(
       (el) =>
-        !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length)
+        !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length),
     );
   }
 

@@ -30,7 +30,7 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
-      })
+      }),
     ),
     provideApiBaseUrl(environment.apiBaseUrl),
     { provide: TitleStrategy, useClass: SeoTitleStrategy },
@@ -41,7 +41,7 @@ export const appConfig: ApplicationConfig = {
         auth
           .refreshCurrentUser()
           .catch((error) =>
-            console.warn('Failed to refresh current user during init', error)
+            console.warn('Failed to refresh current user during init', error),
           ),
       deps: [AuthService],
     },

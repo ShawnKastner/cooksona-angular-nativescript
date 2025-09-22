@@ -101,7 +101,7 @@ export class PlannerComponent implements OnInit {
   // Derived
   activePlan = computed(
     () =>
-      this.mealPlanHistory().find((p) => p.id === this.activePlanId()) || null
+      this.mealPlanHistory().find((p) => p.id === this.activePlanId()) || null,
   );
 
   // Icons for template
@@ -140,14 +140,14 @@ export class PlannerComponent implements OnInit {
       if (plans.length > 0) this.activePlanId.set(plans[0].id);
       // Normalize recipe ids to strings for consistent Set membership checks
       this.favoriteRecipeIds.set(
-        new Set((cookbook ?? []).map((r) => String(r.id)))
+        new Set((cookbook ?? []).map((r) => String(r.id))),
       );
     } catch (error) {
       this.error.set(
         toErrorMessage(
           error,
-          'Deine Planungsdaten konnten nicht geladen werden. Bitte versuche es später erneut.'
-        )
+          'Deine Planungsdaten konnten nicht geladen werden. Bitte versuche es später erneut.',
+        ),
       );
     }
   }
@@ -163,8 +163,8 @@ export class PlannerComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Der Druck konnte nicht gestartet werden. Bitte verwende die Druckfunktion deines Browsers.'
-        )
+          'Der Druck konnte nicht gestartet werden. Bitte verwende die Druckfunktion deines Browsers.',
+        ),
       );
     }
   }
@@ -199,8 +199,8 @@ export class PlannerComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Plan konnte nicht gelöscht werden. Bitte versuche es später erneut.'
-        )
+          'Plan konnte nicht gelöscht werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.cancelDeletePlan();
@@ -222,7 +222,7 @@ export class PlannerComponent implements OnInit {
 
   handleShoppingListCategorized(updatedPlan: MealPlan): void {
     const updated = this.mealPlanHistory().map((p) =>
-      p.id === updatedPlan.id ? updatedPlan : p
+      p.id === updatedPlan.id ? updatedPlan : p,
     );
     this.mealPlanHistory.set(updated);
   }
@@ -236,7 +236,7 @@ export class PlannerComponent implements OnInit {
 
     if (!this.isProUser() && this.remainingRequests() <= 0) {
       this.error.set(
-        'Dein Freikontingent ist aufgebraucht. Upgrade erforderlich.'
+        'Dein Freikontingent ist aufgebraucht. Upgrade erforderlich.',
       );
       this.openUpgradeModal();
       return;
@@ -284,8 +284,8 @@ export class PlannerComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Der Plan konnte nicht erstellt werden. Bitte versuche es später erneut.'
-        )
+          'Der Plan konnte nicht erstellt werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.isLoading.set(false);
@@ -344,8 +344,8 @@ export class PlannerComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Das Rezept konnte nicht gespeichert werden. Bitte versuche es später erneut.'
-        )
+          'Das Rezept konnte nicht gespeichert werden. Bitte versuche es später erneut.',
+        ),
       );
     }
   }
@@ -382,8 +382,8 @@ export class PlannerComponent implements OnInit {
           error,
           isFav
             ? 'Der Favorit konnte nicht entfernt werden. Bitte versuche es später erneut.'
-            : 'Das Rezept konnte nicht als Favorit gespeichert werden. Bitte versuche es später erneut.'
-        )
+            : 'Das Rezept konnte nicht als Favorit gespeichert werden. Bitte versuche es später erneut.',
+        ),
       );
     }
   }
@@ -441,25 +441,25 @@ export class PlannerComponent implements OnInit {
         active.id,
         ev.dayName,
         ev.mealKey,
-        newRecipe
+        newRecipe,
       );
       if (updatedPlan) {
         this.mealPlanHistory.set(
           this.mealPlanHistory().map((p) =>
-            p.id === updatedPlan.id ? updatedPlan : p
-          )
+            p.id === updatedPlan.id ? updatedPlan : p,
+          ),
         );
       } else {
         throw new Error(
-          'Der Plan konnte nach dem Tausch nicht aktualisiert werden.'
+          'Der Plan konnte nach dem Tausch nicht aktualisiert werden.',
         );
       }
     } catch (error) {
       this.error.set(
         toErrorMessage(
           error,
-          'Der Austausch des Rezepts ist fehlgeschlagen. Bitte versuche es später erneut.'
-        )
+          'Der Austausch des Rezepts ist fehlgeschlagen. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.swappingMealId.set(null);
@@ -486,17 +486,17 @@ export class PlannerComponent implements OnInit {
         const updatedPlan = await this.planApi.updateRecipeInPlan(
           activeId,
           ev.originalRecipeId,
-          ev.transformedRecipe
+          ev.transformedRecipe,
         );
         if (!updatedPlan) {
           throw new Error(
-            'Der aktualisierte Plan wurde nicht gespeichert. Bitte versuche es erneut.'
+            'Der aktualisierte Plan wurde nicht gespeichert. Bitte versuche es erneut.',
           );
         }
         this.mealPlanHistory.set(
           this.mealPlanHistory().map((p) =>
-            p.id === activeId ? updatedPlan : p
-          )
+            p.id === activeId ? updatedPlan : p,
+          ),
         );
       } else if (ev.action === 'saveAsCopy') {
         await this.cookbookApi.addRecipeToCookbook(ev.transformedRecipe);

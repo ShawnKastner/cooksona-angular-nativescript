@@ -97,12 +97,12 @@ export class InviteRedeemPage implements OnInit {
         .catch((navigationError) =>
           console.error(
             'Redirect to login after invite redeem failed',
-            navigationError
-          )
+            navigationError,
+          ),
         );
     } catch (error) {
       this.error.set(
-        toErrorMessage(error, 'Ein unbekannter Fehler ist aufgetreten')
+        toErrorMessage(error, 'Ein unbekannter Fehler ist aufgetreten'),
       );
     } finally {
       this.submitting.set(false);
@@ -127,7 +127,7 @@ export class InviteRedeemPage implements OnInit {
     this.router
       .navigate(['/login'])
       .catch((navigationError) =>
-        console.error('Navigation to login failed', navigationError)
+        console.error('Navigation to login failed', navigationError),
       );
   }
 
@@ -149,7 +149,7 @@ export class InviteRedeemPage implements OnInit {
     try {
       const safeToken = encodeURIComponent(token);
       const invite = await this.api.get<InviteRedeemInfo>(
-        `/invites/redeem/${safeToken}`
+        `/invites/redeem/${safeToken}`,
       );
       if (!invite) {
         this.navigateToInviteError();
@@ -171,8 +171,8 @@ export class InviteRedeemPage implements OnInit {
       .catch((navigationError) =>
         console.error(
           'Redirect to login after invite error failed',
-          navigationError
-        )
+          navigationError,
+        ),
       );
   }
 }

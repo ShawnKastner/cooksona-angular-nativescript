@@ -8,7 +8,7 @@ import { ApiService } from '@cooksona/api';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(
-    null
+    null,
   );
   private readonly isLoadingSubject = new BehaviorSubject<boolean>(false);
 
@@ -59,7 +59,7 @@ export class AuthService {
     try {
       const resp = await this.api.post<User | { user: User }>(
         '/auth/login',
-        credentials
+        credentials,
       );
       const user: User | undefined = (resp as any)?.user ?? (resp as any);
       if (!user) {

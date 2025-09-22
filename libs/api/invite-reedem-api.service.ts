@@ -13,7 +13,7 @@ export class InviteRedeemApiService {
 
   redeemInvite<T = unknown>(
     token: string,
-    userData: InviteRedeemPayload
+    userData: InviteRedeemPayload,
   ): Promise<T | undefined> {
     const safeToken = encodeURIComponent(token);
     return this.api.post<T>(`/invites/redeem/${safeToken}`, userData);

@@ -2,7 +2,7 @@ import { Application, Color, Device, isIOS } from '@nativescript/core';
 
 export function setStatusBarColor(
   color: 'light' | 'dark',
-  tintColor?: string /* android only */
+  tintColor?: string /* android only */,
 ) {
   if (isIOS) {
     // ios status-bar background color is set via the .action-bar class
@@ -10,7 +10,7 @@ export function setStatusBarColor(
       color === 'light'
         ? UIStatusBarStyle.LightContent
         : UIStatusBarStyle.DarkContent,
-      false
+      false,
     );
   } else {
     const sdkVersion = parseInt(Device.sdkVersion);
@@ -23,13 +23,13 @@ export function setStatusBarColor(
       activity
         .getWindow()
         .clearFlags(
-          android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+          android.view.WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
         );
       activity
         .getWindow()
         .addFlags(
           android.view.WindowManager.LayoutParams
-            .FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS
+            .FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS,
         );
       activity.getWindow().setStatusBarColor(new Color(tintColor).android);
       if (sdkVersion >= 23) {

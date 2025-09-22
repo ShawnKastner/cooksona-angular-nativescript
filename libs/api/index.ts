@@ -7,3 +7,4 @@ export * from './invites-api.service';
 export * from './message-api.service';
 export * from './plan-api.service';
 export * from './user-api.service';
+export * from './health-api.service';

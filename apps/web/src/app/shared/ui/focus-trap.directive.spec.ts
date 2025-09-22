@@ -28,7 +28,7 @@ describe('FocusTrapDirective', () => {
   it('focuses first focusable element on init', (done) => {
     setTimeout(() => {
       const first = fixture.nativeElement.querySelector(
-        '#first'
+        '#first',
       ) as HTMLElement;
       expect(document.activeElement).toBe(first);
       done();
@@ -38,7 +38,7 @@ describe('FocusTrapDirective', () => {
   it('traps focus within container on tab and shift+tab', () => {
     const first = fixture.nativeElement.querySelector('#first') as HTMLElement;
     const second = fixture.nativeElement.querySelector(
-      '#second'
+      '#second',
     ) as HTMLElement;
     second.focus();
     const container = fixture.nativeElement.querySelector('[appfocustrap]');
@@ -47,7 +47,7 @@ describe('FocusTrapDirective', () => {
 
     first.focus();
     container.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true })
+      new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true }),
     );
     expect(document.activeElement).toBe(second);
   });

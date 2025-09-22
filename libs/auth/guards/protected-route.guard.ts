@@ -5,7 +5,7 @@ import { UserRole } from '../models/auth.models';
 
 // Enforces loading, authentication, and role-based access control
 export const protectedRouteGuard: CanActivateFn = (
-  route: ActivatedRouteSnapshot
+  route: ActivatedRouteSnapshot,
 ) => {
   const router = inject(Router);
   const authService = inject(AuthService);

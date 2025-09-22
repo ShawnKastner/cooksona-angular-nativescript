@@ -21,13 +21,13 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
         [class.w-12]="compact"
         [class.h-12]="compact"
       ></div>
-      @if(!compact){
-      <p class="mt-6 text-xl font-serif font-semibold text-neutral">
-        {{ label }}
-      </p>
-      <p class="text-sm text-gray-500 mt-1">
-        {{ subLabel }}
-      </p>
+      @if (!compact) {
+        <p class="mt-6 text-xl font-serif font-semibold text-neutral">
+          {{ label }}
+        </p>
+        <p class="text-sm text-gray-500 mt-1">
+          {{ subLabel }}
+        </p>
       }
     </div>
   `,

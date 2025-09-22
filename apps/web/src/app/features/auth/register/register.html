@@ -10,13 +10,13 @@
         <p class="text-gray-500 mt-2">Erstelle ein neues Konto.</p>
       </div>
 
-      @if(error()) {
-      <div
-        class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-6"
-        role="alert"
-      >
-        <span class="block sm:inline">{{ error() }}</span>
-      </div>
+      @if (error()) {
+        <div
+          class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative mb-6"
+          role="alert"
+        >
+          <span class="block sm:inline">{{ error() }}</span>
+        </div>
       }
       <div class="mb-4">
         <label class="block text-neutral text-sm font-bold mb-2" for="name"
@@ -63,10 +63,10 @@
             (click)="togglePassword()"
             class="absolute inset-y-0 right-2 px-2 flex items-center text-gray-500"
           >
-            @if(showPassword()) {
-            <span class="w-5 h-5" [svgInject]="icons.EyeOff"></span>
+            @if (showPassword()) {
+              <span class="w-5 h-5" [svgInject]="icons.EyeOff"></span>
             } @else {
-            <span class="w-5 h-5" [svgInject]="icons.Eye"></span>
+              <span class="w-5 h-5" [svgInject]="icons.Eye"></span>
             }
           </button>
         </div>
@@ -92,10 +92,10 @@
             (click)="togglePassword2()"
             class="absolute inset-y-0 right-2 px-2 flex items-center text-gray-500"
           >
-            @if(showPassword2()) {
-            <span class="w-5 h-5" [svgInject]="icons.EyeOff"></span>
+            @if (showPassword2()) {
+              <span class="w-5 h-5" [svgInject]="icons.EyeOff"></span>
             } @else {
-            <span class="w-5 h-5" [svgInject]="icons.Eye"></span>
+              <span class="w-5 h-5" [svgInject]="icons.Eye"></span>
             }
           </button>
         </div>
@@ -106,8 +106,8 @@
         [disabled]="isLoading()"
         class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 px-4 rounded-xl disabled:bg-base-300 hover:bg-primary-focus"
       >
-        @if(isLoading()) {
-        <app-loading-spinner-small />
+        @if (isLoading()) {
+          <app-loading-spinner-small />
         }
         <span class="w-5 h-5" [svgInject]="icons.UserPlus"></span>
         {{ isLoading() ? "Registrieren..." : "Registrieren" }}

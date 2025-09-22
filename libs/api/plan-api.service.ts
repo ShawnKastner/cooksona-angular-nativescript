@@ -23,7 +23,7 @@ export class PlanApiService {
   createPlanForUser(
     planData: Omit<MealPlan, 'id' | 'createdAt' | 'userId' | 'shoppingList'> & {
       shoppingList: Ingredient[];
-    }
+    },
   ): Promise<MealPlan | undefined> {
     return this.api.post<MealPlan>('/plans', planData);
   }
@@ -31,25 +31,25 @@ export class PlanApiService {
   // Delete a plan for a user
   deletePlanForUser(planIdToDelete: string): Promise<void | undefined> {
     return this.api.delete<void>(
-      `/plans/${encodeURIComponent(planIdToDelete)}`
+      `/plans/${encodeURIComponent(planIdToDelete)}`,
     );
   }
 
   saveCategorizedShoppingList(
     planId: string,
-    categorizedList: CategorizedShoppingList
+    categorizedList: CategorizedShoppingList,
   ): Promise<MealPlan | undefined> {
     return this.api.post<MealPlan>(
       `/plans/${encodeURIComponent(planId)}/categorized-shopping-list`,
       {
         categorizedList,
-      }
+      },
     );
   }
 
   updateShoppingList(
     planId: string,
-    shoppingList: ShoppingListItem[]
+    shoppingList: ShoppingListItem[],
   ): Promise<MealPlan | undefined> {
     return this.api.put<MealPlan>(`/plans/${encodeURIComponent(planId)}`, {
       shoppingList,
@@ -86,9 +86,8 @@ export class PlanApiService {
         if (!Number.isNaN(currentAmount) && !Number.isNaN(newAmount)) {
           consolidated[key].amount = String(currentAmount + newAmount);
         } else {
-          consolidated[
-            key
-          ].amount = `${consolidated[key].amount} + ${ing.amount}`;
+          consolidated[key].amount =
+            `${consolidated[key].amount} + ${ing.amount}`;
         }
       } else {
         consolidated[key] = {
@@ -116,7 +115,7 @@ export class PlanApiService {
   async updateRecipeInPlan(
     planId: string,
     originalRecipeId: string,
-    newRecipe: Recipe
+    newRecipe: Recipe,
   ): Promise<MealPlan | undefined> {
     const allPlans = await this.getPlansForUser();
     const planToUpdate = allPlans.find((p) => p.id === planId);
@@ -145,7 +144,7 @@ export class PlanApiService {
       nextPlan.shoppingList = this.recalculateShoppingList(nextPlan.days);
       return this.api.put<MealPlan>(
         `/plans/${encodeURIComponent(planId)}`,
-        nextPlan
+        nextPlan,
       );
     }
 
@@ -156,7 +155,7 @@ export class PlanApiService {
     planId: string,
     dayName: string,
     mealKey: string,
-    newRecipe: Recipe
+    newRecipe: Recipe,
   ): Promise<MealPlan | undefined> {
     const allPlans = await this.getPlansForUser();
     const planToUpdate = allPlans.find((p) => p.id === planId);
@@ -181,7 +180,7 @@ export class PlanApiService {
       nextPlan.shoppingList = this.recalculateShoppingList(nextPlan.days);
       return this.api.put<MealPlan>(
         `/plans/${encodeURIComponent(planId)}`,
-        nextPlan
+        nextPlan,
       );
     }
 

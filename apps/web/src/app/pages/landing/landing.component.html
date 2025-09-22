@@ -38,12 +38,12 @@
     <section
       class="max-w-4xl w-full mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-16"
     >
-      @for(feature of features;track feature; let i = $index){
-      <app-feature-card
-        [icon]="feature.icon"
-        [title]="feature.title"
-        [desc]="feature.desc"
-      />
+      @for (feature of features; track feature; let i = $index) {
+        <app-feature-card
+          [icon]="feature.icon"
+          [title]="feature.title"
+          [desc]="feature.desc"
+        />
       }
     </section>
 

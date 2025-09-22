@@ -1,6 +1,6 @@
 export function toErrorMessage(
   error: unknown,
-  fallbackMessage: string
+  fallbackMessage: string,
 ): string {
   if (!error) return fallbackMessage;
 
@@ -34,7 +34,7 @@ export function toErrorMessage(
     if (Array.isArray(messages)) {
       const joined = messages
         .map((value) =>
-          typeof value === 'string' ? value.trim() : toErrorMessage(value, '')
+          typeof value === 'string' ? value.trim() : toErrorMessage(value, ''),
         )
         .filter(Boolean)
         .join('\n');

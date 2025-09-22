@@ -22,7 +22,7 @@ describe('protectedRouteGuard', () => {
   it('blocks when loading', () => {
     auth.setLoading(true);
     const result = TestBed.runInInjectionContext(() =>
-      protectedRouteGuard({ data: {} } as any, {} as any)
+      protectedRouteGuard({ data: {} } as any, {} as any),
     );
     expect(result).toBeFalse();
   });
@@ -32,7 +32,7 @@ describe('protectedRouteGuard', () => {
     auth.setLoading(false);
     auth.setCurrentUser(null);
     const result = TestBed.runInInjectionContext(() =>
-      protectedRouteGuard({ data: {} } as any, {} as any)
+      protectedRouteGuard({ data: {} } as any, {} as any),
     );
     expect(result).toBeFalse();
     expect(navSpy).toHaveBeenCalledWith('/');
@@ -43,7 +43,10 @@ describe('protectedRouteGuard', () => {
     auth.setLoading(false);
     auth.setCurrentUser({ id: '1', role: 'user', email: 'u@example.com' });
     const result = TestBed.runInInjectionContext(() =>
-      protectedRouteGuard({ data: { requiredRole: 'admin' } } as any, {} as any)
+      protectedRouteGuard(
+        { data: { requiredRole: 'admin' } } as any,
+        {} as any,
+      ),
     );
     expect(result).toBeFalse();
     expect(navSpy).toHaveBeenCalledWith('/');
@@ -53,11 +56,14 @@ describe('protectedRouteGuard', () => {
     auth.setLoading(false);
     auth.setCurrentUser({ id: '1', role: 'admin', email: 'a@example.com' });
     const result1 = TestBed.runInInjectionContext(() =>
-      protectedRouteGuard({ data: {} } as any, {} as any)
+      protectedRouteGuard({ data: {} } as any, {} as any),
     );
     expect(result1).toBeTrue();
     const result2 = TestBed.runInInjectionContext(() =>
-      protectedRouteGuard({ data: { requiredRole: 'admin' } } as any, {} as any)
+      protectedRouteGuard(
+        { data: { requiredRole: 'admin' } } as any,
+        {} as any,
+      ),
     );
     expect(result2).toBeTrue();
   });

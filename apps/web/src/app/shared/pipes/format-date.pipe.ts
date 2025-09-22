@@ -5,7 +5,7 @@ import { formatDate as formatDateHelper } from '../utils/helper';
 export class FormatDatePipe implements PipeTransform {
   transform(
     value: Date | string | number | null | undefined,
-    emptyLabel = '-'
+    emptyLabel = '-',
   ): string {
     if (value === null || value === undefined || value === '')
       return emptyLabel;

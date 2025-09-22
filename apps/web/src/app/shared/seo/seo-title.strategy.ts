@@ -11,7 +11,10 @@ import {
 export class SeoTitleStrategy extends TitleStrategy {
   private readonly suffix = 'CookSona';
 
-  constructor(private readonly title: Title, private readonly meta: Meta) {
+  constructor(
+    private readonly title: Title,
+    private readonly meta: Meta,
+  ) {
     super();
   }
 

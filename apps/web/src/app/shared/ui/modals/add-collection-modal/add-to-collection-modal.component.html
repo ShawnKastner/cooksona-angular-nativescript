@@ -1,151 +1,157 @@
 @if (open && recipe) {
-<div
-  class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
-  (click)="close.emit()"
-  role="dialog"
-  aria-modal="true"
->
   <div
-    class="bg-base-100 rounded-2xl shadow-soft-xl w-full max-w-lg max-h-[90vh] flex flex-col border border-base-200"
-    (click)="$event.stopPropagation()"
-    appFocusTrap
+    class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+    (click)="close.emit()"
+    role="dialog"
+    aria-modal="true"
   >
-    <header
-      class="p-6 border-b border-base-200 flex items-start justify-between"
+    <div
+      class="bg-base-100 rounded-2xl shadow-soft-xl w-full max-w-lg max-h-[90vh] flex flex-col border border-base-200"
+      (click)="$event.stopPropagation()"
+      appFocusTrap
     >
-      <div>
-        <h2 class="text-2xl font-serif font-bold text-neutral">
-          Zu Sammlungen hinzufügen
-        </h2>
-        <p class="text-sm text-gray-500">Organisiere "{{ recipe!.name }}"</p>
-      </div>
-      <button
-        type="button"
-        class="p-2 rounded-full text-gray-400 hover:bg-base-200 hover:text-neutral transition-colors"
-        (click)="close.emit()"
-        aria-label="Schließen"
+      <header
+        class="p-6 border-b border-base-200 flex items-start justify-between"
       >
-        <span class="w-6 h-6" [svgInject]="icons.X"></span>
-      </button>
-    </header>
+        <div>
+          <h2 class="text-2xl font-serif font-bold text-neutral">
+            Zu Sammlungen hinzufügen
+          </h2>
+          <p class="text-sm text-gray-500">Organisiere "{{ recipe!.name }}"</p>
+        </div>
+        <button
+          type="button"
+          class="p-2 rounded-full text-gray-400 hover:bg-base-200 hover:text-neutral transition-colors"
+          (click)="close.emit()"
+          aria-label="Schließen"
+        >
+          <span class="w-6 h-6" [svgInject]="icons.X"></span>
+        </button>
+      </header>
 
-    <div class="p-6 overflow-y-auto space-y-6">
-      <!-- Existing Collections -->
-      <div>
-        <h3 class="font-semibold text-neutral mb-2">Meine Sammlungen</h3>
-        <div class="space-y-2 max-h-40 pr-2">
-          @if (cookbookCollections().length) { @for (collection of
-          cookbookCollections(); track collection.id) {
-          <label
-            class="flex items-center space-x-3 p-3 bg-base-100/60 rounded-xl has-[:checked]:bg-primary/10 has-[:checked]:ring-2 has-[:checked]:ring-primary transition-all cursor-pointer"
-          >
-            <input
-              type="checkbox"
-              class="sr-only"
-              [checked]="isSelected(collection.id)"
-              (change)="toggle(collection.id)"
-            />
-            <div
-              class="w-5 h-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all"
-              [ngClass]="
-                isSelected(collection.id)
-                  ? 'bg-primary border-primary'
-                  : 'border-gray-400'
-              "
-            >
-              @if (isSelected(collection.id)) {
-              <span
-                class="w-3.5 h-3.5 text-white stroke-[3]"
-                [svgInject]="icons.Check"
-              ></span>
+      <div class="p-6 overflow-y-auto space-y-6">
+        <!-- Existing Collections -->
+        <div>
+          <h3 class="font-semibold text-neutral mb-2">Meine Sammlungen</h3>
+          <div class="space-y-2 max-h-40 pr-2">
+            @if (cookbookCollections().length) {
+              @for (collection of cookbookCollections(); track collection.id) {
+                <label
+                  class="flex items-center space-x-3 p-3 bg-base-100/60 rounded-xl has-[:checked]:bg-primary/10 has-[:checked]:ring-2 has-[:checked]:ring-primary transition-all cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    class="sr-only"
+                    [checked]="isSelected(collection.id)"
+                    (change)="toggle(collection.id)"
+                  />
+                  <div
+                    class="w-5 h-5 rounded-md border-2 flex-shrink-0 flex items-center justify-center transition-all"
+                    [ngClass]="
+                      isSelected(collection.id)
+                        ? 'bg-primary border-primary'
+                        : 'border-gray-400'
+                    "
+                  >
+                    @if (isSelected(collection.id)) {
+                      <span
+                        class="w-3.5 h-3.5 text-white stroke-[3]"
+                        [svgInject]="icons.Check"
+                      ></span>
+                    }
+                  </div>
+                  <span class="text-sm font-medium text-neutral">{{
+                    collection.name
+                  }}</span>
+                </label>
+              }
+            } @else {
+              <p class="text-sm text-gray-400">
+                Noch keine Sammlungen erstellt.
+              </p>
+            }
+          </div>
+        </div>
+
+        <!-- AI Suggestions (stubbed) -->
+        <div>
+          <h3 class="font-semibold text-neutral mb-2 flex items-center gap-2">
+            <span
+              class="w-5 h-5 text-secondary"
+              [svgInject]="icons.Sparkles"
+            ></span>
+            KI-Vorschläge
+          </h3>
+          @if (isAiLoading()) {
+            <div class="flex items-center gap-2 text-sm text-gray-400">
+              <div
+                class="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"
+              ></div>
+              Suche nach Ideen...
+            </div>
+          } @else {
+            <div class="flex flex-wrap gap-2">
+              @for (name of aiSuggestions(); track name) {
+                <button
+                  type="button"
+                  (click)="addSuggestion(name)"
+                  class="px-3 py-1.5 bg-secondary/10 text-secondary-focus text-sm font-semibold rounded-full hover:bg-secondary/20 transition-colors"
+                >
+                  {{ name }}
+                </button>
               }
             </div>
-            <span class="text-sm font-medium text-neutral">{{
-              collection.name
-            }}</span>
-          </label>
-          } } @else {
-          <p class="text-sm text-gray-400">Noch keine Sammlungen erstellt.</p>
+          }
+          @if (kiSuggestError()) {
+            <p class="text-sm text-error mt-1">{{ kiSuggestError() }}</p>
+          }
+        </div>
+
+        <!-- Create New -->
+        <div>
+          <h3 class="font-semibold text-neutral mb-2">
+            Neue Sammlung erstellen
+          </h3>
+          <div class="flex gap-2">
+            <input
+              type="text"
+              [ngModel]="newCollectionName()"
+              (ngModelChange)="newCollectionName.set($event); error.set('')"
+              placeholder="Name der Sammlung"
+              class="flex-grow w-full px-4 py-2 bg-white border-2 border-base-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <button
+              type="button"
+              (click)="createAndSelect()"
+              class="p-2.5 bg-primary text-white rounded-xl hover:bg-primary-focus transition-colors"
+            >
+              <span class="w-5 h-5" [svgInject]="icons.Plus"></span>
+            </button>
+          </div>
+          @if (error()) {
+            <p class="text-sm text-error mt-1">{{ error() }}</p>
           }
         </div>
       </div>
 
-      <!-- AI Suggestions (stubbed) -->
-      <div>
-        <h3 class="font-semibold text-neutral mb-2 flex items-center gap-2">
-          <span
-            class="w-5 h-5 text-secondary"
-            [svgInject]="icons.Sparkles"
-          ></span>
-          KI-Vorschläge
-        </h3>
-        @if (isAiLoading()) {
-        <div class="flex items-center gap-2 text-sm text-gray-400">
-          <div
-            class="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"
-          ></div>
-          Suche nach Ideen...
-        </div>
-        } @else {
-        <div class="flex flex-wrap gap-2">
-          @for (name of aiSuggestions(); track name) {
-          <button
-            type="button"
-            (click)="addSuggestion(name)"
-            class="px-3 py-1.5 bg-secondary/10 text-secondary-focus text-sm font-semibold rounded-full hover:bg-secondary/20 transition-colors"
-          >
-            {{ name }}
-          </button>
-          }
-        </div>
-        } @if (kiSuggestError()) {
-        <p class="text-sm text-error mt-1">{{ kiSuggestError() }}</p>
-        }
-      </div>
-
-      <!-- Create New -->
-      <div>
-        <h3 class="font-semibold text-neutral mb-2">Neue Sammlung erstellen</h3>
-        <div class="flex gap-2">
-          <input
-            type="text"
-            [ngModel]="newCollectionName()"
-            (ngModelChange)="newCollectionName.set($event); error.set('')"
-            placeholder="Name der Sammlung"
-            class="flex-grow w-full px-4 py-2 bg-white border-2 border-base-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <button
-            type="button"
-            (click)="createAndSelect()"
-            class="p-2.5 bg-primary text-white rounded-xl hover:bg-primary-focus transition-colors"
-          >
-            <span class="w-5 h-5" [svgInject]="icons.Plus"></span>
-          </button>
-        </div>
-        @if (error()) {
-        <p class="text-sm text-error mt-1">{{ error() }}</p>
-        }
-      </div>
+      <footer
+        class="p-4 bg-base-200/50 border-t border-base-200 flex justify-end gap-3"
+      >
+        <button
+          type="button"
+          (click)="close.emit()"
+          class="px-6 py-2 font-semibold text-neutral rounded-lg hover:bg-base-300/50"
+        >
+          Abbrechen
+        </button>
+        <button
+          type="button"
+          (click)="saveSelections()"
+          class="px-6 py-2 font-semibold text-white bg-primary rounded-lg hover:bg-primary-focus"
+        >
+          Speichern
+        </button>
+      </footer>
     </div>
-
-    <footer
-      class="p-4 bg-base-200/50 border-t border-base-200 flex justify-end gap-3"
-    >
-      <button
-        type="button"
-        (click)="close.emit()"
-        class="px-6 py-2 font-semibold text-neutral rounded-lg hover:bg-base-300/50"
-      >
-        Abbrechen
-      </button>
-      <button
-        type="button"
-        (click)="saveSelections()"
-        class="px-6 py-2 font-semibold text-white bg-primary rounded-lg hover:bg-primary-focus"
-      >
-        Speichern
-      </button>
-    </footer>
   </div>
-</div>
 }

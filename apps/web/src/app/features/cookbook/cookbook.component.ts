@@ -87,8 +87,8 @@ export class CookbookComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Deine Kochbuch-Einträge konnten nicht geladen werden. Bitte versuche es später erneut.'
-        )
+          'Deine Kochbuch-Einträge konnten nicht geladen werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.loadRecipes.set(false);
@@ -156,11 +156,11 @@ export class CookbookComponent implements OnInit {
     let shouldCloseModal = signal(true);
     try {
       const newRecipe = await this.cookbookApi.addRecipeToCookbook(
-        ev.transformedRecipe
+        ev.transformedRecipe,
       );
       if (!newRecipe) {
         throw new Error(
-          'Das transformierte Rezept konnte nicht gespeichert werden.'
+          'Das transformierte Rezept konnte nicht gespeichert werden.',
         );
       }
       this.cookbook.set([newRecipe, ...this.cookbook()]);
@@ -169,8 +169,8 @@ export class CookbookComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Das Rezept konnte nicht gespeichert werden. Bitte versuche es später erneut.'
-        )
+          'Das Rezept konnte nicht gespeichert werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       if (shouldCloseModal()) {
@@ -184,15 +184,15 @@ export class CookbookComponent implements OnInit {
     try {
       await this.cookbookApi.removeRecipeFromCookbook(recipeId);
       this.cookbook.set(
-        this.cookbook().filter((recipe) => recipe.id !== recipeId)
+        this.cookbook().filter((recipe) => recipe.id !== recipeId),
       );
       return true;
     } catch (error) {
       this.error.set(
         toErrorMessage(
           error,
-          'Das Rezept konnte nicht entfernt werden. Bitte versuche es später erneut.'
-        )
+          'Das Rezept konnte nicht entfernt werden. Bitte versuche es später erneut.',
+        ),
       );
       return false;
     }
@@ -207,7 +207,7 @@ export class CookbookComponent implements OnInit {
     } catch (error) {
       const msg = toErrorMessage(
         error,
-        'Deine Sammlungen konnten nicht geladen werden. Bitte versuche es später erneut.'
+        'Deine Sammlungen konnten nicht geladen werden. Bitte versuche es später erneut.',
       );
       this.snackbar.error(msg);
     } finally {
@@ -245,17 +245,17 @@ export class CookbookComponent implements OnInit {
           .map(
             (idOrName) =>
               finalCollections.find(
-                (col) => col.id === idOrName || col.name === idOrName
-              )?.id
+                (col) => col.id === idOrName || col.name === idOrName,
+              )?.id,
           )
           .filter((v): v is string => Boolean(v));
 
         const updatedRecipe = await this.cookbookApi.setRecipeToCollections(
           recipe.id,
-          finalIds
+          finalIds,
         );
         this.cookbook.set(
-          this.cookbook().map((r) => (r.id === recipe.id ? updatedRecipe : r))
+          this.cookbook().map((r) => (r.id === recipe.id ? updatedRecipe : r)),
         );
 
         this.closeAddToCollection();
@@ -263,7 +263,7 @@ export class CookbookComponent implements OnInit {
       } catch (error) {
         const msg = toErrorMessage(
           error,
-          'Die Sammlungen konnten nicht gespeichert werden. Bitte versuche es später erneut.'
+          'Die Sammlungen konnten nicht gespeichert werden. Bitte versuche es später erneut.',
         );
         this.error.set(msg);
         this.snackbar.error(msg);

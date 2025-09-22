@@ -34,7 +34,7 @@ export class InvitesPanelComponent implements OnInit {
   deleteInviteId = signal<string | null>(null);
   inviteOpen = signal(false);
   inviteTotalPages = computed(() =>
-    Math.ceil(this.invites().length / this.INVITES_PER_PAGE())
+    Math.ceil(this.invites().length / this.INVITES_PER_PAGE()),
   );
   paginatedInvites = computed(() => {
     const start = (this.invitePage() - 1) * this.INVITES_PER_PAGE();
@@ -56,15 +56,15 @@ export class InvitesPanelComponent implements OnInit {
         .slice()
         .sort(
           (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
         );
       this.invites.set(sorted);
     } catch (error) {
       this.error.set(
         toErrorMessage(
           error,
-          'Einladungen konnten nicht geladen werden. Bitte versuche es später erneut.'
-        )
+          'Einladungen konnten nicht geladen werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.isLoadingInvites.set(false);
@@ -81,8 +81,8 @@ export class InvitesPanelComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Der Einladungslink konnte nicht kopiert werden. Bitte kopiere ihn manuell.'
-        )
+          'Der Einladungslink konnte nicht kopiert werden. Bitte kopiere ihn manuell.',
+        ),
       );
     }
   }
@@ -117,8 +117,8 @@ export class InvitesPanelComponent implements OnInit {
       this.error.set(
         toErrorMessage(
           error,
-          'Die Einladung konnte nicht gelöscht werden. Bitte versuche es später erneut.'
-        )
+          'Die Einladung konnte nicht gelöscht werden. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
       this.closeDeleteInviteModal();
