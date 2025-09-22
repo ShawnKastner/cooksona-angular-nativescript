@@ -44,10 +44,14 @@
       <div class="flex flex-row-reverse gap-3 mt-6">
         <button
           type="button"
-          class="px-6 py-2 rounded-lg font-bold bg-error text-white hover:bg-error/80 transition-colors shadow-soft disabled:opacity-60"
+          style="display: flex"
+          class="px-6 py-2 rounded-lg font-bold bg-error text-white hover:bg-error/80 transition-colors shadow-soft disabled:opacity-60 bg-base-300"
           (click)="confirm.emit()"
           [disabled]="busy"
         >
+          @if(busy) {
+          <app-loading-spinner-small />
+          }
           {{ confirmText || "Löschen" }}
         </button>
         <button

@@ -31,7 +31,7 @@
     <ul
       class="text-sm text-gray-600 space-y-1 h-24 overflow-hidden mask-gradient"
     >
-      @for (item of recipe.ingredients.slice(0, 5); track item) {
+      @for (item of recipe.ingredients.slice(0, 5); track item.name) {
       <li class="truncate">
         <span class="font-medium text-neutral">{{
           (item.amount + " " + item.unit).trim()
@@ -55,6 +55,14 @@
       Anleitung
     </button>
     <div class="flex items-center gap-1">
+      <button
+        type="button"
+        (click)="onAddToCollection.emit()"
+        class="p-2 rounded-full text-gray-400 hover:bg-primary/10 hover:text-primary transition-colors"
+        aria-label="Zu Sammlung hinzufügen"
+      >
+        <span class="w-5 h-5" [svgInject]="icons.FolderPlus"></span>
+      </button>
       @if (isPro) {
       <button
         type="button"

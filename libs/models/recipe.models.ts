@@ -15,3 +15,8 @@ export interface Recipe {
   nutrition?: NutritionInfo;
   instructions?: string[];
 }
+
+export interface CookbookCollection {
+  id: string;
+  name: string;
+}

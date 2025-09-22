@@ -3,19 +3,24 @@ import {
   OnInit,
   inject,
   signal,
-  computed,
   ChangeDetectionStrategy,
+  ViewChild,
+  effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { BookHeart } from '@cooksona/constants/icons';
 import { CookbookApiService } from '@cooksona/api';
-import { Recipe } from '@cooksona/models/recipe.models';
+import { CookbookCollection, Recipe } from '@cooksona/models/recipe.models';
 import { CookbookCardComponent } from './cookbook-card/cookbook-card.component';
 import { toErrorMessage } from '../../shared/utils/error.utils';
 import { DeleteConfirmModalComponent } from '../../shared/ui/modals/delete-confirm-modal/delete-confirm-modal.component';
 import { RecipeDetailModalComponent } from '../../shared/ui/modals/recipe-detail-modal/recipe-detail-modal.component';
 import { RecipeTransformModalComponent } from '../../shared/ui/modals/recipe-transform-modal/recipe-transform-modal.component';
+import { AddToCollectionModalComponent } from '../../shared/ui/modals/add-collection-modal/add-to-collection-modal.component';
+import { CollectionSidebarComponent } from './collection-sidebar/collection-sidebar.component';
+import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
+import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-cookbook-page',
@@ -27,14 +32,20 @@ import { RecipeTransformModalComponent } from '../../shared/ui/modals/recipe-tra
     RecipeDetailModalComponent,
     RecipeTransformModalComponent,
     DeleteConfirmModalComponent,
+    AddToCollectionModalComponent,
+    CollectionSidebarComponent,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './cookbook.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CookbookComponent implements OnInit {
   private readonly cookbookApi = inject(CookbookApiService);
+  private readonly snackbar = inject(SnackbarService);
+  @ViewChild(CollectionSidebarComponent) sidebar?: CollectionSidebarComponent;
 
   // State
+  loadRecipes = signal(false);
   cookbook = signal<Recipe[]>([]);
   searchTerm = signal('');
   error = signal<string | null>(null);
@@ -45,17 +56,32 @@ export class CookbookComponent implements OnInit {
   recipeToTransform = signal<Recipe | null>(null);
   deleteModalOpen = signal(false);
   recipePendingDelete = signal<Recipe | null>(null);
+  recipeToCategorize = signal<Recipe | null>(null);
+
+  recipeCollections = signal<Record<string, string[]>>({});
+  selectedCollectionId = signal<string>('all');
+  loadingCollections = signal(false);
+
+  collections = signal<CookbookCollection[]>([]);
 
   readonly icons = { BookHeart } as const;
 
-  async ngOnInit(): Promise<void> {
-    await this.loadCookbook();
+  constructor() {
+    effect(() => {
+      const id = this.selectedCollectionId();
+      this.loadCookbook(id === 'all' ? undefined : id);
+    });
   }
 
-  private async loadCookbook(): Promise<void> {
+  async ngOnInit(): Promise<void> {
+    this.getCollections();
+  }
+
+  private async loadCookbook(collectionId?: string): Promise<void> {
     this.error.set(null);
+    this.loadRecipes.set(true);
     try {
-      const recipes = await this.cookbookApi.getCookbookForUser();
+      const recipes = await this.cookbookApi.getCookbookForUser(collectionId);
       this.cookbook.set(recipes ?? []);
     } catch (error) {
       this.error.set(
@@ -64,6 +90,8 @@ export class CookbookComponent implements OnInit {
           'Deine Kochbuch-Einträge konnten nicht geladen werden. Bitte versuche es später erneut.'
         )
       );
+    } finally {
+      this.loadRecipes.set(false);
     }
   }
 
@@ -125,7 +153,7 @@ export class CookbookComponent implements OnInit {
     action: 'updateInPlan' | 'saveAsCopy';
   }): Promise<void> {
     this.error.set(null);
-    let shouldCloseModal = true;
+    let shouldCloseModal = signal(true);
     try {
       const newRecipe = await this.cookbookApi.addRecipeToCookbook(
         ev.transformedRecipe
@@ -137,7 +165,7 @@ export class CookbookComponent implements OnInit {
       }
       this.cookbook.set([newRecipe, ...this.cookbook()]);
     } catch (error) {
-      shouldCloseModal = false;
+      shouldCloseModal.set(false);
       this.error.set(
         toErrorMessage(
           error,
@@ -145,22 +173,11 @@ export class CookbookComponent implements OnInit {
         )
       );
     } finally {
-      if (shouldCloseModal) {
+      if (shouldCloseModal()) {
         this.handleCloseTransformModal();
       }
     }
   }
-
-  filteredCookbook = computed(() => {
-    const term = this.searchTerm().trim().toLowerCase();
-    const list = this.cookbook();
-    if (!term) return list;
-    return list.filter(
-      (recipe) =>
-        recipe.name.toLowerCase().includes(term) ||
-        recipe.ingredients.some((ing) => ing.name.toLowerCase().includes(term))
-    );
-  });
 
   private async removeRecipe(recipeId: string): Promise<boolean> {
     this.error.set(null);
@@ -179,5 +196,88 @@ export class CookbookComponent implements OnInit {
       );
       return false;
     }
+  }
+
+  async getCollections(): Promise<CookbookCollection[]> {
+    this.loadingCollections.set(true);
+    try {
+      const cols = await this.cookbookApi.getRecipeCollections();
+      this.collections.set(cols);
+      return this.collections();
+    } catch (error) {
+      const msg = toErrorMessage(
+        error,
+        'Deine Sammlungen konnten nicht geladen werden. Bitte versuche es später erneut.'
+      );
+      this.snackbar.error(msg);
+    } finally {
+      this.loadingCollections.set(false);
+    }
+    return this.collections();
+  }
+
+  requestAddToCollection(recipe: Recipe): void {
+    this.recipeToCategorize.set(recipe);
+  }
+
+  closeAddToCollection(): void {
+    this.recipeToCategorize.set(null);
+  }
+
+  handleSaveCollections(ev: {
+    recipe: Recipe;
+    selectedIds: string[];
+    newCollections: Omit<CookbookCollection, 'id'>[];
+  }): void {
+    const { recipe, selectedIds, newCollections } = ev;
+    (async () => {
+      try {
+        let finalCollections = [...this.collections()];
+
+        for (const c of newCollections) {
+          const created = await this.cookbookApi.createRecipeCollection(c.name);
+          finalCollections.push(created);
+        }
+        this.collections.set(finalCollections);
+        this.sidebar?.getCollections();
+
+        const finalIds = selectedIds
+          .map(
+            (idOrName) =>
+              finalCollections.find(
+                (col) => col.id === idOrName || col.name === idOrName
+              )?.id
+          )
+          .filter((v): v is string => Boolean(v));
+
+        const updatedRecipe = await this.cookbookApi.setRecipeToCollections(
+          recipe.id,
+          finalIds
+        );
+        this.cookbook.set(
+          this.cookbook().map((r) => (r.id === recipe.id ? updatedRecipe : r))
+        );
+
+        this.closeAddToCollection();
+        this.snackbar.success('Sammlungen aktualisiert.');
+      } catch (error) {
+        const msg = toErrorMessage(
+          error,
+          'Die Sammlungen konnten nicht gespeichert werden. Bitte versuche es später erneut.'
+        );
+        this.error.set(msg);
+        this.snackbar.error(msg);
+      }
+    })();
+  }
+
+  // Sidebar event handlers
+  handleCollectionChange(id: string): void {
+    this.selectedCollectionId.set(id);
+  }
+
+  handleCollectionUpdated(): void {
+    // Refresh collections so any sidebar changes reflect in modal inputs immediately
+    this.getCollections();
   }
 }
