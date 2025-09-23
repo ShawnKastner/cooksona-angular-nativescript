@@ -1,0 +1,164 @@
+<GridLayout
+  rows="auto,*,auto"
+  iosOverflowSafeArea="true"
+  class="flex flex-col h-full bg-base-100 no-scrollbar px-6 pt-6"
+>
+  <!-- Header -->
+  <StackLayout row="0" class="text-center mb-8" horizontalAlignment="center">
+    <Image
+      src="~/assets/images/logo.ico"
+      class="w-12 h-12 text-primary mx-auto mb-3"
+    ></Image>
+    <Label
+      text="Willkommen zurück"
+      class="text-3xl font-serif font-bold text-neutral"
+    ></Label>
+    <Label
+      text="Melde dich an, um fortzufahren"
+      class="text-gray-500 mt-1"
+    ></Label>
+  </StackLayout>
+
+  <!-- Form (statisch) -->
+  <ScrollView class="space-y-4" row="1">
+    <StackLayout class="space-y-4" width="90%" horizontalAlignment="center">
+      <!-- Email -->
+      <StackLayout class="flex justify-between items-center">
+        <Label
+          class="block text-sm font-bold text-neutral mb-1.5"
+          text="E-Mail"
+        ></Label>
+        <TextField
+          class="w-full px-4 py-2.5 bg-base-200 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 text-neutral"
+          hint="you@example.com"
+          autocapitalizationType="none"
+          keyboardType="email"
+          returnKeyType="next"
+        >
+        </TextField>
+        <!-- Example error message (static) -->
+        <!-- <Label class="error" text="Bitte gib eine gültige E-Mail ein."></Label> -->
+      </StackLayout>
+
+      <!-- Password -->
+      <StackLayout class="flex justify-between items-center mb-1.5">
+        <FlexboxLayout
+          flexDirection="row"
+          justifyContent="space-between"
+          alignItems="center"
+          width="100%"
+        >
+          <Label
+            text="Passwort"
+            class="block text-sm font-bold text-neutral mb-1.5"
+          ></Label>
+
+          <StackLayout
+            class="flex justify-between items-center mb-1.5"
+            horizontalAlignment="center"
+          >
+            <Label
+              text="Passwort vergessen?"
+              class="text-xs font-semibold text-primary hover:underline"
+              (tap)="goToForgotPassword()"
+            ></Label>
+          </StackLayout>
+        </FlexboxLayout>
+        <TextField
+          class="w-full px-4 py-2.5 bg-base-200 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 text-neutral"
+          hint="••••••••"
+          secure="true"
+          returnKeyType="done"
+        >
+        </TextField>
+        <!-- <Label class="error" text="Mindestens 6 Zeichen."></Label> -->
+      </StackLayout>
+
+      <FlexboxLayout
+        flexDirection="row"
+        justifyContent="center"
+        alignItems="center"
+        (tap)="onLoginTap()"
+        class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-focus transition-all duration-300"
+      >
+        <svg:SVGImage
+          [src]="icons.LogIn | svgToDataUri: 'white'"
+          class="w-5 h-5 mr-2"
+        ></svg:SVGImage>
+        <Label text="Anmelden" class="text-white font-bold"></Label>
+      </FlexboxLayout>
+
+      <GridLayout columns="*,auto,*" class="my-3" verticalAlignment="center">
+        <StackLayout
+          col="0"
+          height="1"
+          width="100%"
+          class="bg-base-200"
+          backgroundColor="#E5E7EB"
+        >
+        </StackLayout>
+        <Label
+          col="1"
+          text="oder"
+          class="px-2 text-gray-500 bg-base-100"
+          backgroundColor="#FFFFFF"
+        ></Label>
+        <StackLayout
+          col="2"
+          height="1"
+          width="100%"
+          class="bg-base-200"
+          backgroundColor="#E5E7EB"
+        >
+        </StackLayout>
+      </GridLayout>
+
+      <FlexboxLayout
+        flexDirection="row"
+        alignItems="center"
+        justifyContent="center"
+        (tap)="googleSignIn()"
+        class="w-full bg-white border border-base-300 rounded-xl py-3 px-4 gap-3 active:opacity-90"
+      >
+        <svg:SVGImage
+          [src]="icons.Google | svgToDataUri"
+          class="w-5 h-5 mr-2"
+        ></svg:SVGImage>
+        <Label
+          text="Mit Google anmelden"
+          class="text-neutral font-semibold"
+        ></Label>
+      </FlexboxLayout>
+
+      <FlexboxLayout
+        flexDirection="row"
+        justifyContent="center"
+        alignItems="center"
+        (tap)="appleSignIn()"
+        class="w-full flex items-center justify-center gap-3 bg-neutral text-white font-bold py-2.5 px-4 rounded-xl hover:bg-neutral/80 transition-all duration-300"
+      >
+        <svg:SVGImage
+          [src]="icons.Apple | svgToDataUri: 'white'"
+          class="w-5 h-5 mr-2"
+        ></svg:SVGImage>
+        <Label text="Mit Apple anmelden" class="text-white font-bold"></Label>
+      </FlexboxLayout>
+    </StackLayout>
+  </ScrollView>
+
+  <!-- Footer  -->
+  <FlexboxLayout
+    row="2"
+    justifyContent="center"
+    alignItems="center"
+    class="pt-1 pb-4"
+    (tap)="goToRegister()"
+  >
+    <Label text="Noch kein Konto?" class="text-gray-500 text-sm"></Label>
+    <Label
+      text=" Jetzt registrieren"
+      class="text-primary text-sm font-semibold hover:underline"
+      (tap)="goToRegister()"
+    ></Label>
+  </FlexboxLayout>
+</GridLayout>

@@ -1,0 +1,4 @@
+platform :ios, '13.0'
+
+# This file augments the NativeScript-generated Podfile.
+# You can add further CocoaPods configuration here if needed.
