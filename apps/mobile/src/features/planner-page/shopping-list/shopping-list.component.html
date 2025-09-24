@@ -1,0 +1,24 @@
+<GridLayout rows="*" class="bg-base-100" iosOverflowSafeArea="false">
+  <StackLayout
+    row="0"
+    verticalAlignment="center"
+    horizontalAlignment="center"
+    class="flex flex-col items-center justify-center h-full text-center text-gray-400 p-8 bg-base-100"
+  >
+    <svg:SVGImage
+      [src]="icons.ClipboardList | svgToDataUri: '#F1F0EE'"
+      class="w-20 h-20"
+    ></svg:SVGImage>
+    <Label class="mt-4 text-xl font-serif font-bold text-neutral"
+      >Leere Liste</Label
+    >
+    <Label textWrap="true">
+      <FormattedString>
+        <Span
+          class="mt-1 text-sm"
+          text="Erstelle einen Plan, um deine Einkaufsliste hier zu sehen."
+        ></Span>
+      </FormattedString>
+    </Label>
+  </StackLayout>
+</GridLayout>

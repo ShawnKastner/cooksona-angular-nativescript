@@ -6,12 +6,20 @@ import {
   TopTabsComponent,
 } from '../../layout/ui/top-tabs/top-tabs.component';
 import { MealPlannerComponent } from './meal-planner/meal-planner.component';
+import { ShoppingListComponent } from './shopping-list/shopping-list.component';
+import { HistoryComponent } from './history/history.component';
 
 @Component({
   selector: 'ns-planner-page',
   standalone: true,
   templateUrl: './planner-page.component.html',
-  imports: [NativeScriptCommonModule, TopTabsComponent, MealPlannerComponent],
+  imports: [
+    NativeScriptCommonModule,
+    TopTabsComponent,
+    MealPlannerComponent,
+    ShoppingListComponent,
+    HistoryComponent,
+  ],
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class PlannerPageComponent {

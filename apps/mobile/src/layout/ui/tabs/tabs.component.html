@@ -79,5 +79,24 @@
       ></svg:SVGImage>
       <Label text="Health"></Label>
     </StackLayout>
+
+    <!-- Item 3 -->
+    <StackLayout
+      (tap)="select(3)"
+      class="flex flex-col items-center justify-center transition-colors"
+      [ngClass]="{
+        'text-primary': selectedIndex === 2,
+        'text-gray-400': selectedIndex !== 2,
+      }"
+    >
+      <svg:SVGImage
+        [src]="
+          icons.User
+            | svgToDataUri: (selectedIndex === 2 ? '#10B981' : '#9CA3AF')
+        "
+        class="w-6 h-6 mb-1"
+      ></svg:SVGImage>
+      <Label text="Profil"></Label>
+    </StackLayout>
   </FlexboxLayout>
 </GridLayout>

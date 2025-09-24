@@ -8,24 +8,17 @@
     [inactiveColor]="'#9CA3AF'"
   ></ns-top-tabs>
 
-  <GridLayout
-    row="1"
-    [visibility]="selected === 'plan' ? 'visible' : 'collapse'"
-  >
-    <ns-meal-planner></ns-meal-planner>
-  </GridLayout>
-
-  <GridLayout
-    row="1"
-    [visibility]="selected === 'list' ? 'visible' : 'collapse'"
-  >
-    <Label text="Einkaufsliste" class="p-4 text-xl"></Label>
-  </GridLayout>
-
-  <GridLayout
-    row="1"
-    [visibility]="selected === 'history' ? 'visible' : 'collapse'"
-  >
-    <Label text="Verlauf" class="p-4 text-xl"></Label>
-  </GridLayout>
+  @if (selected === "plan") {
+    <GridLayout row="1">
+      <ns-meal-planner></ns-meal-planner>
+    </GridLayout>
+  } @else if (selected === "list") {
+    <GridLayout row="1">
+      <ns-shopping-list></ns-shopping-list>
+    </GridLayout>
+  } @else if (selected === "history") {
+    <GridLayout row="1">
+      <ns-history></ns-history>
+    </GridLayout>
+  }
 </GridLayout>
