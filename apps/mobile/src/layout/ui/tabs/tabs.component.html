@@ -1,0 +1,83 @@
+<GridLayout rows="*, auto" iosOverflowSafeArea="false">
+  <!-- Content area -->
+  @switch (selectedIndex) {
+    @case (0) {
+      <GridLayout row="0" class="items-center justify-center">
+        <ns-planner-page></ns-planner-page>
+      </GridLayout>
+    }
+    @case (1) {
+      <GridLayout row="0" class="items-center justify-center">
+        <Label text="Second Tab Content" class="text-base-100 text-xl"></Label>
+      </GridLayout>
+    }
+    @case (2) {
+      <GridLayout row="0" class="items-center justify-center">
+        <Label text="Third Tab Content" class="text-base-100 text-xl"></Label>
+      </GridLayout>
+    }
+  }
+
+  <!-- Bottom navigation bar -->
+  <FlexboxLayout
+    row="1"
+    class="h-20 bg-base-100 flex-shrink-0 flex items-center justify-around border-t border-base-200 rounded-b-[30px]"
+  >
+    <!-- Item 0 -->
+    <StackLayout
+      (tap)="select(0)"
+      class="flex flex-col items-center justify-center transition-colors"
+      [ngClass]="{
+        'text-primary': selectedIndex === 0,
+        'text-gray-400': selectedIndex !== 0,
+      }"
+    >
+      <svg:SVGImage
+        [src]="
+          icons.UtensilsCrossed
+            | svgToDataUri: (selectedIndex === 0 ? '#10B981' : '#9CA3AF')
+        "
+        class="w-6 h-6 mb-1"
+      ></svg:SVGImage>
+      <Label text="Planer"></Label>
+    </StackLayout>
+
+    <!-- Item 1 -->
+    <StackLayout
+      (tap)="select(1)"
+      class="flex flex-col items-center justify-center transition-colors"
+      [ngClass]="{
+        'text-primary': selectedIndex === 1,
+        'text-gray-400': selectedIndex !== 1,
+      }"
+    >
+      <svg:SVGImage
+        [src]="
+          icons.BookHeart
+            | svgToDataUri: (selectedIndex === 1 ? '#10B981' : '#9CA3AF')
+        "
+        class="w-6 h-6 mb-1"
+      ></svg:SVGImage>
+      <Label text="Kochbuch"></Label>
+    </StackLayout>
+
+    <!-- Item 2 -->
+    <StackLayout
+      (tap)="select(2)"
+      class="flex flex-col items-center justify-center transition-colors"
+      [ngClass]="{
+        'text-primary': selectedIndex === 2,
+        'text-gray-400': selectedIndex !== 2,
+      }"
+    >
+      <svg:SVGImage
+        [src]="
+          icons.HeartPulse
+            | svgToDataUri: (selectedIndex === 2 ? '#10B981' : '#9CA3AF')
+        "
+        class="w-6 h-6 mb-1"
+      ></svg:SVGImage>
+      <Label text="Health"></Label>
+    </StackLayout>
+  </FlexboxLayout>
+</GridLayout>

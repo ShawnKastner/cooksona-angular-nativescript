@@ -3,10 +3,11 @@ import { ReactiveFormsModule } from '@angular/forms';
 import {
   NativeScriptCommonModule,
   NativeScriptFormsModule,
+  NativeScriptRouterModule,
+  RouterExtensions,
 } from '@nativescript/angular';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { Apple, Google, LogIn } from '@cooksona/constants/icons';
-import { Router, RouterModule } from '@angular/router';
 import { Page } from '@nativescript/core';
 
 @Component({
@@ -17,15 +18,15 @@ import { Page } from '@nativescript/core';
     ReactiveFormsModule,
     NativeScriptFormsModule,
     SvgToDataUriPipe,
-    RouterModule,
+    NativeScriptRouterModule,
   ],
   schemas: [NO_ERRORS_SCHEMA],
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
   constructor(
-    private router: Router,
     private page: Page,
+    private routerExt: RouterExtensions,
   ) {
     // Hide native navigation bar on this screen (removes the blue iOS back arrow)
     this.page.actionBarHidden = true;
@@ -39,6 +40,8 @@ export class LoginComponent {
   onLoginTap() {
     // TODO: wire up actual login action
     console.log('Login tapped');
+    // navigate to home and clear history to remove the iOS back button
+    this.routerExt.navigate(['/home'], { clearHistory: true });
   }
 
   googleSignIn() {
@@ -55,10 +58,10 @@ export class LoginComponent {
     // Navigate to the register screen
     console.log('Tapped');
 
-    this.router.navigateByUrl('/register');
+    this.routerExt.navigateByUrl('/register');
   }
 
   goToForgotPassword() {
-    this.router.navigateByUrl('/forgot-password');
+    this.routerExt.navigateByUrl('/forgot-password');
   }
 }

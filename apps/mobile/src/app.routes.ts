@@ -24,4 +24,10 @@ export const routes: Routes = [
         (m) => m.ForgotPasswordComponent,
       ),
   },
+  {
+    path: 'home',
+    loadComponent: () =>
+      import('./layout/ui/tabs/tabs.component').then((m) => m.TabsComponent),
+    /* canActivate: [protectedRouteGuard], */
+  },
 ];
