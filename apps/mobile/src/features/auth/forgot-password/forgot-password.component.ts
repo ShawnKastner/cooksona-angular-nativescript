@@ -1,13 +1,14 @@
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { Page } from '@nativescript/core';
+import { RouterModule } from '@angular/router';
 import {
   NativeScriptCommonModule,
   NativeScriptFormsModule,
+  RouterExtensions,
 } from '@nativescript/angular';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { Mail } from '@cooksona/constants/icons';
+import { Page } from '@nativescript/core';
 
 @Component({
   selector: 'ns-forgot-password',
@@ -26,15 +27,14 @@ export class ForgotPasswordComponent {
   icons = { Mail } as const;
 
   constructor(
-    private router: Router,
+    private routerExt: RouterExtensions,
     private page: Page,
   ) {
-    // Hide native nav bar for custom header UI
     this.page.actionBarHidden = true;
   }
 
   goBack() {
-    this.router.navigateByUrl('/login');
+    this.routerExt.navigateByUrl('/login', { clearHistory: true });
   }
 
   resetPassword() {

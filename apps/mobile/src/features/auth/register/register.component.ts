@@ -3,10 +3,11 @@ import { ReactiveFormsModule } from '@angular/forms';
 import {
   NativeScriptCommonModule,
   NativeScriptFormsModule,
+  RouterExtensions,
 } from '@nativescript/angular';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { Apple, Google, UserPlus } from '@cooksona/constants/icons';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { Page } from '@nativescript/core';
 
 @Component({
@@ -24,10 +25,9 @@ import { Page } from '@nativescript/core';
 })
 export class RegisterComponent {
   constructor(
-    private router: Router,
+    private routerExt: RouterExtensions,
     private page: Page,
   ) {
-    // Hide native navigation bar on this screen (removes the blue iOS back arrow)
     this.page.actionBarHidden = true;
   }
   icons = {
@@ -58,6 +58,6 @@ export class RegisterComponent {
 
   goToLogin() {
     // Navigate back to login
-    this.router.navigateByUrl('/login');
+    this.routerExt.navigateByUrl('/login', { clearHistory: true });
   }
 }

@@ -23,6 +23,8 @@ import {
 } from '@cooksona/constants/icons';
 import { PlanApiService } from '@cooksona/api';
 
+type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+
 @Component({
   selector: 'ns-meal-plan-form',
   templateUrl: './meal-plan-form.component.html',
@@ -57,7 +59,7 @@ export class MealPlanFormComponent implements AfterViewInit {
 
   form!: FormGroup;
 
-  mealTypeTranslations = signal({
+  mealTypeTranslations = signal<Record<MealType, string>>({
     breakfast: 'Frühstück',
     lunch: 'Mittagessen',
     dinner: 'Abendessen',
@@ -66,8 +68,28 @@ export class MealPlanFormComponent implements AfterViewInit {
 
   focusOptions = signal(['ausgewogen', 'proteinreich', 'kohlenhydratarm']);
 
-  get mealKeys(): string[] {
-    return Object.keys(this.mealTypeTranslations());
+  constructor(
+    private params: ModalDialogParams,
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef,
+  ) {
+    this.form = this.fb.group({
+      diet: [''],
+      allergies: [''],
+      people: [2],
+      planDays: [7],
+      meals: this.fb.group({
+        breakfast: [true],
+        lunch: [true],
+        dinner: [true],
+        snack: [false],
+      }),
+      planFocusIndex: [0],
+    });
+  }
+
+  get mealKeys(): MealType[] {
+    return Object.keys(this.mealTypeTranslations()) as MealType[];
   }
 
   clampNumber(value: number, min: number, max: number): number {
@@ -105,26 +127,6 @@ export class MealPlanFormComponent implements AfterViewInit {
 
   close() {
     this.params.closeCallback();
-  }
-
-  constructor(
-    private params: ModalDialogParams,
-    private fb: FormBuilder,
-    private cdr: ChangeDetectorRef,
-  ) {
-    this.form = this.fb.group({
-      diet: [''],
-      allergies: [''],
-      people: [2],
-      planDays: [7],
-      meals: this.fb.group({
-        breakfast: [true],
-        lunch: [true],
-        dinner: [true],
-        snack: [false],
-      }),
-      planFocusIndex: [0],
-    });
   }
 
   ngAfterViewInit(): void {

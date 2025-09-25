@@ -21,7 +21,12 @@
 
   <!-- Form (statisch) -->
   <ScrollView class="space-y-4" row="1">
-    <StackLayout class="space-y-4" width="90%" horizontalAlignment="center">
+    <StackLayout
+      class="space-y-4"
+      width="90%"
+      horizontalAlignment="center"
+      [formGroup]="form"
+    >
       <!-- Email -->
       <StackLayout class="flex justify-between items-center">
         <Label
@@ -29,7 +34,8 @@
           text="E-Mail"
         ></Label>
         <TextField
-          class="w-full px-4 py-2.5 bg-base-200 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 text-neutral"
+          formControlName="email"
+          class="w-full px-4 py-2.5 bg-base-200 border-2 border-transparent rounded-lg transition-all duration-200 text-neutral"
           hint="you@example.com"
           autocapitalizationType="none"
           keyboardType="email"
@@ -37,7 +43,16 @@
         >
         </TextField>
         <!-- Example error message (static) -->
-        <!-- <Label class="error" text="Bitte gib eine gültige E-Mail ein."></Label> -->
+        @if (mailError()) {
+          <Label textWrap="true" [text]="mailError()">
+            <FormattedString>
+              <Span
+                class="text-red-500 text-sm mt-1"
+                [text]="mailError()"
+              ></Span>
+            </FormattedString>
+          </Label>
+        }
       </StackLayout>
 
       <!-- Password -->
@@ -65,13 +80,29 @@
           </StackLayout>
         </FlexboxLayout>
         <TextField
-          class="w-full px-4 py-2.5 bg-base-200 border-2 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 text-neutral"
+          formControlName="password"
+          class="w-full px-4 py-2.5 bg-base-200 border-2 border-transparent rounded-lg transition-all duration-200 text-neutral"
           hint="••••••••"
           secure="true"
           returnKeyType="done"
         >
         </TextField>
-        <!-- <Label class="error" text="Mindestens 6 Zeichen."></Label> -->
+        @if (passwordError()) {
+          <Label textWrap="true" [text]="passwordError()">
+            <FormattedString>
+              <Span
+                class="text-red-500 text-sm mt-1"
+                [text]="passwordError()"
+              ></Span>
+            </FormattedString>
+          </Label>
+        } @else if (error()) {
+          <Label textWrap="true" [text]="error()">
+            <FormattedString>
+              <Span class="text-red-500 text-sm mt-1" [text]="error()"></Span>
+            </FormattedString>
+          </Label>
+        }
       </StackLayout>
 
       <FlexboxLayout

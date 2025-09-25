@@ -46,13 +46,30 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSAppTransportSecurity</key>
-  	<dict>
+	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 		<key>NSAllowsArbitraryLoadsForMedia</key>
 		<true/>
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
 		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>192.168.178.163</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
 	</dict>
 </dict>
 </plist>
