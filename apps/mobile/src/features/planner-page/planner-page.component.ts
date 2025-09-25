@@ -1,4 +1,4 @@
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { BookOpen, ChefHat, ClipboardList } from '@cooksona/constants/icons';
 import {
@@ -23,7 +23,7 @@ import { HistoryComponent } from './history/history.component';
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class PlannerPageComponent {
-  selected: 'plan' | 'list' | 'history' = 'plan';
+  selected = signal<'plan' | 'list' | 'history'>('plan');
 
   tabs: TopTab[] = [
     { key: 'plan', label: 'Mein Plan', iconSvg: ChefHat },

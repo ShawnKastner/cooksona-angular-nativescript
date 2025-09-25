@@ -1,4 +1,4 @@
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { PlannerPageComponent } from '../../../features/planner-page/planner-page.component';
 import {
@@ -18,7 +18,7 @@ import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
   styles: [``],
 })
 export class TabsComponent {
-  selectedIndex = 0;
+  selectedIndex = signal(0);
 
   icons = {
     UtensilsCrossed,
@@ -27,9 +27,7 @@ export class TabsComponent {
     User,
   } as const;
 
-  constructor() {}
-
   select(index: number) {
-    this.selectedIndex = index;
+    this.selectedIndex.set(index);
   }
 }

@@ -1,6 +1,6 @@
-<GridLayout rows="*, auto" iosOverflowSafeArea="false">
+<GridLayout rows="*, auto" iosOverflowSafeArea="true" class="bg-base-100">
   <!-- Content area -->
-  @switch (selectedIndex) {
+  @switch (selectedIndex()) {
     @case (0) {
       <GridLayout row="0" class="items-center justify-center">
         <ns-planner-page></ns-planner-page>
@@ -28,14 +28,14 @@
       (tap)="select(0)"
       class="flex flex-col items-center justify-center transition-colors"
       [ngClass]="{
-        'text-primary': selectedIndex === 0,
-        'text-gray-400': selectedIndex !== 0,
+        'border-primary text-primary': selectedIndex() === 0,
+        'text-gray-400': selectedIndex() !== 0,
       }"
     >
       <svg:SVGImage
         [src]="
           icons.UtensilsCrossed
-            | svgToDataUri: (selectedIndex === 0 ? '#10B981' : '#9CA3AF')
+            | svgToDataUri: (selectedIndex() === 0 ? '#4A6C6F' : '#9CA3AF')
         "
         class="w-6 h-6 mb-1"
       ></svg:SVGImage>
@@ -47,14 +47,14 @@
       (tap)="select(1)"
       class="flex flex-col items-center justify-center transition-colors"
       [ngClass]="{
-        'text-primary': selectedIndex === 1,
-        'text-gray-400': selectedIndex !== 1,
+        'border-primary text-primary': selectedIndex() === 1,
+        'text-gray-400': selectedIndex() !== 1,
       }"
     >
       <svg:SVGImage
         [src]="
           icons.BookHeart
-            | svgToDataUri: (selectedIndex === 1 ? '#10B981' : '#9CA3AF')
+            | svgToDataUri: (selectedIndex() === 1 ? '#4A6C6F' : '#9CA3AF')
         "
         class="w-6 h-6 mb-1"
       ></svg:SVGImage>
@@ -66,14 +66,14 @@
       (tap)="select(2)"
       class="flex flex-col items-center justify-center transition-colors"
       [ngClass]="{
-        'text-primary': selectedIndex === 2,
-        'text-gray-400': selectedIndex !== 2,
+        'border-primary text-primary': selectedIndex() === 2,
+        'text-gray-400': selectedIndex() !== 2,
       }"
     >
       <svg:SVGImage
         [src]="
           icons.HeartPulse
-            | svgToDataUri: (selectedIndex === 2 ? '#10B981' : '#9CA3AF')
+            | svgToDataUri: (selectedIndex() === 2 ? '#4A6C6F' : '#9CA3AF')
         "
         class="w-6 h-6 mb-1"
       ></svg:SVGImage>
@@ -85,14 +85,14 @@
       (tap)="select(3)"
       class="flex flex-col items-center justify-center transition-colors"
       [ngClass]="{
-        'text-primary': selectedIndex === 2,
-        'text-gray-400': selectedIndex !== 2,
+        'border-primary text-primary': selectedIndex() === 3,
+        'text-gray-400': selectedIndex() !== 3,
       }"
     >
       <svg:SVGImage
         [src]="
           icons.User
-            | svgToDataUri: (selectedIndex === 2 ? '#10B981' : '#9CA3AF')
+            | svgToDataUri: (selectedIndex() === 3 ? '#4A6C6F' : '#9CA3AF')
         "
         class="w-6 h-6 mb-1"
       ></svg:SVGImage>

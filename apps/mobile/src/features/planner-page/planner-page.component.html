@@ -3,20 +3,20 @@
   <ns-top-tabs
     row="0"
     [tabs]="tabs"
-    [(selected)]="selected"
+    [selected]="selected()"
     [activeColor]="'#4A6C6F'"
     [inactiveColor]="'#9CA3AF'"
   ></ns-top-tabs>
 
-  @if (selected === "plan") {
+  @if (selected() === "plan") {
     <GridLayout row="1">
       <ns-meal-planner></ns-meal-planner>
     </GridLayout>
-  } @else if (selected === "list") {
+  } @else if (selected() === "list") {
     <GridLayout row="1">
       <ns-shopping-list></ns-shopping-list>
     </GridLayout>
-  } @else if (selected === "history") {
+  } @else if (selected() === "history") {
     <GridLayout row="1">
       <ns-history></ns-history>
     </GridLayout>

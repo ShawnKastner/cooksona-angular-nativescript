@@ -2,13 +2,13 @@
   <FlexboxLayout
     class="px-4 bg-base-100 h-20 items-center gap-4 border-b border-base-200 flex-shrink-0"
   >
-    @for (tab of tabs; track tab; let i = $index) {
+    @for (tab of tabs(); track tab; let i = $index) {
       <StackLayout
         horizontalAlignment="center"
         class="flex-1 flex flex-col items-center gap-1 pb-2 border-b-2 transition-colors"
         [ngClass]="{
-          'border-primary text-primary': selected === tab.key,
-          'border-transparent text-gray-400': selected !== tab.key,
+          'border-primary text-primary': selected() === tab.key,
+          'border-transparent text-gray-400': selected() !== tab.key,
         }"
         (tap)="onSelect(tab)"
       >
@@ -17,7 +17,7 @@
           [src]="
             tab.iconSvg
               | svgToDataUri
-                : (selected === tab.key ? activeColor : inactiveColor)
+                : (selected() === tab.key ? activeColor() : inactiveColor())
           "
           class="w-5 h-5"
         ></svg:SVGImage>

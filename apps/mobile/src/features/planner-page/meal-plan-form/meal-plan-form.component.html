@@ -1,0 +1,229 @@
+<GridLayout
+  rows="auto,*,auto"
+  class="absolute inset-0 bg-base-100 z-20 flex flex-col"
+  iosOverflowSafeArea="true"
+>
+  <!-- Header -->
+  <GridLayout
+    row="0"
+    columns="*,auto"
+    class="p-4 items-center border-b border-base-200 flex-shrink-0"
+  >
+    <Label
+      col="0"
+      class="text-lg font-bold text-neutral"
+      text="Neuen Plan erstellen"
+    ></Label>
+    <FlexboxLayout col="1" (tap)="close()" class="p-1">
+      <svg:SVGImage
+        [src]="icons.X | svgToDataUri: '#6B7280'"
+        class="w-6 h-6 text-gray-500"
+      ></svg:SVGImage>
+    </FlexboxLayout>
+  </GridLayout>
+
+  <!-- Form Content -->
+  <ScrollView row="1" class="flex-grow overflow-y-auto p-4 space-y-6">
+    <StackLayout
+      [formGroup]="form"
+      class="flex-grow overflow-y-auto p-4 space-y-6"
+    >
+      <!-- Section: Grundlagen -->
+      <StackLayout>
+        <Label class="font-bold text-neutral mb-2" text="Grundlagen"></Label>
+        <StackLayout class="bg-white p-3 rounded-lg space-y-3">
+          <!-- Diet -->
+          <GridLayout columns="*,*" class="items-center">
+            <StackLayout
+              col="0"
+              orientation="horizontal"
+              class="items-center gap-2"
+            >
+              <svg:SVGImage
+                [src]="icons.Leaf | svgToDataUri: '#9CA3AF'"
+                class="w-4 h-4"
+              ></svg:SVGImage>
+              <Label
+                class="text-sm font-semibold text-neutral"
+                text="Diät-Wünsche"
+              ></Label>
+            </StackLayout>
+            <TextField
+              col="1"
+              formControlName="diet"
+              hint="z.B. Vegan"
+              class="text-right bg-transparent text-sm"
+              horizontalAlignment="stretch"
+              editable="true"
+              textAlignment="right"
+              color="#2c3e50"
+              placeholderColor="#9CA3AF"
+              returnKeyType="done"
+            >
+            </TextField>
+          </GridLayout>
+          <StackLayout class="h-px bg-base-200"></StackLayout>
+          <!-- Allergies -->
+          <GridLayout columns="*,*" class="items-center">
+            <StackLayout
+              col="0"
+              orientation="horizontal"
+              class="items-center gap-2"
+            >
+              <svg:SVGImage
+                [src]="icons.ShieldBan | svgToDataUri: '#9CA3AF'"
+                class="w-4 h-4"
+              ></svg:SVGImage>
+              <Label
+                class="text-sm font-semibold text-neutral"
+                text="Allergien"
+              ></Label>
+            </StackLayout>
+            <TextField
+              col="1"
+              formControlName="allergies"
+              hint="z.B. Nüsse"
+              class="text-right bg-transparent text-sm"
+              horizontalAlignment="stretch"
+              editable="true"
+              textAlignment="right"
+              color="#2c3e50"
+              placeholderColor="#9CA3AF"
+              returnKeyType="done"
+            >
+            </TextField>
+          </GridLayout>
+        </StackLayout>
+      </StackLayout>
+
+      <!-- Section: Details -->
+      <StackLayout>
+        <Label class="font-bold text-neutral mb-2" text="Details"></Label>
+        <StackLayout class="bg-white p-3 rounded-lg space-y-3">
+          <!-- People -->
+          <GridLayout columns="*,*" class="items-center">
+            <StackLayout
+              col="0"
+              orientation="horizontal"
+              class="items-center gap-2"
+            >
+              <svg:SVGImage
+                [src]="icons.Users | svgToDataUri: '#9CA3AF'"
+                class="w-4 h-4"
+              ></svg:SVGImage>
+              <Label
+                class="text-sm font-semibold text-neutral"
+                text="Personen"
+              ></Label>
+            </StackLayout>
+            <TextField
+              col="1"
+              keyboardType="number"
+              formControlName="people"
+              (blur)="onPeopleBlur()"
+              class="text-right bg-transparent text-sm"
+              horizontalAlignment="stretch"
+              editable="true"
+              textAlignment="right"
+              color="#2c3e50"
+              placeholderColor="#9CA3AF"
+            ></TextField>
+          </GridLayout>
+          <StackLayout class="h-px bg-base-200"></StackLayout>
+          <!-- Days -->
+          <GridLayout columns="*,*" class="items-center">
+            <StackLayout
+              col="0"
+              orientation="horizontal"
+              class="items-center gap-2"
+            >
+              <svg:SVGImage
+                [src]="icons.CalendarDays | svgToDataUri: '#9CA3AF'"
+                class="w-4 h-4"
+              ></svg:SVGImage>
+              <Label
+                class="text-sm font-semibold text-neutral"
+                text="Tage"
+              ></Label>
+            </StackLayout>
+            <TextField
+              col="1"
+              keyboardType="number"
+              formControlName="planDays"
+              (blur)="onPlanDaysBlur()"
+              class="text-right bg-transparent text-sm"
+              horizontalAlignment="stretch"
+              editable="true"
+              textAlignment="right"
+              color="#2c3e50"
+              placeholderColor="#9CA3AF"
+            ></TextField>
+          </GridLayout>
+        </StackLayout>
+      </StackLayout>
+
+      <!-- Section: Mahlzeiten -->
+      <StackLayout>
+        <Label class="font-bold text-neutral mb-2" text="Mahlzeiten"></Label>
+        <StackLayout class="bg-white p-3 rounded-lg" formGroupName="meals">
+          <StackLayout class="space-y-2">
+            @for (key of mealKeys; track key) {
+              <StackLayout class="p-1">
+                <GridLayout columns="*,auto" class="items-center">
+                  <Label
+                    col="0"
+                    class="text-sm font-semibold text-neutral"
+                    [text]="mealTypeTranslations()[key]"
+                  ></Label>
+                  <Switch col="1" [formControlName]="key"></Switch>
+                </GridLayout>
+              </StackLayout>
+            }
+          </StackLayout>
+        </StackLayout>
+      </StackLayout>
+
+      <!-- Section: Pro Einstellungen -->
+      <StackLayout>
+        <StackLayout orientation="horizontal" class="items-center gap-1 mb-2">
+          <svg:SVGImage
+            [src]="icons.Sparkles | svgToDataUri: '#EAB308'"
+            class="w-4 h-4"
+          ></svg:SVGImage>
+          <Label
+            class="font-bold text-neutral"
+            text="Pro-Einstellungen"
+          ></Label>
+        </StackLayout>
+        <StackLayout class="bg-white p-3 rounded-lg">
+          <GridLayout columns="*,auto" class="items-center">
+            <Label
+              col="0"
+              class="text-sm font-semibold text-neutral"
+              text="Plan-Fokus"
+            ></Label>
+            <ListPicker
+              col="1"
+              [items]="focusOptions()"
+              [selectedIndex]="form.get('planFocusIndex')?.value"
+              (selectedIndexChange)="
+                form.get('planFocusIndex')?.setValue($event)
+              "
+              class="text-right bg-transparent text-sm"
+            ></ListPicker>
+          </GridLayout>
+        </StackLayout>
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+
+  <!-- Footer -->
+  <StackLayout row="2" class="p-4 border-t border-base-200">
+    <FlexboxLayout
+      class="w-full bg-primary text-white font-bold py-3 px-4 rounded-xl items-center justify-center active:opacity-90"
+      (tap)="handleSubmit()"
+    >
+      <Label class="text-white font-bold" text="Plan erstellen"></Label>
+    </FlexboxLayout>
+  </StackLayout>
+</GridLayout>
