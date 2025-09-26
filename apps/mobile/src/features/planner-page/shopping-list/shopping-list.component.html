@@ -1,5 +1,5 @@
 <ScrollView>
-  <GridLayout rows="auto" class="bg-base-100" iosOverflowSafeArea="false">
+  <GridLayout rows="auto,*" class="bg-base-100" iosOverflowSafeArea="false">
     @if (!shoppingList()) {
       <StackLayout
         row="0"
@@ -24,7 +24,31 @@
         </Label>
       </StackLayout>
     } @else {
-      <StackLayout row="0" verticalAlignment="top" class="p-4 space-y-4">
+      @if (isUserPro() && !isCategorized()) {
+        <FlexboxLayout
+          flexDirection="row"
+          justifyContent="center"
+          alignItems="center"
+          (tap)="!isSorting() && sortByDepartment()"
+          class="p-4 flex items-center justify-center gap-2 bg-secondary/20 text-secondary-focus font-bold py-3 rounded-xl hover:bg-secondary/30 transition-colors"
+          [class.opacity-50]="isSorting()"
+        >
+          @if (isSorting()) {
+            <ActivityIndicator busy="true" class="mr-2"></ActivityIndicator>
+            <Label text="Sortiere..."></Label>
+          } @else {
+            <svg:SVGImage
+              [src]="icons.ListTree | svgToDataUri: '#CA8A04'"
+              class="w-5 h-5 mr-2"
+            ></svg:SVGImage>
+            <Label text="Nach Abteilung sortieren"></Label>
+          }
+        </FlexboxLayout>
+      }
+      @if (sortError()) {
+        <Label class="text-red-600 p-4" [text]="sortError()"></Label>
+      }
+      <StackLayout row="1" verticalAlignment="top" class="p-4 space-y-4">
         @for (cat of shoppingList(); track cat.category) {
           <StackLayout class="mb-4" verticalAlignment="top">
             <!-- Header with chevron -->

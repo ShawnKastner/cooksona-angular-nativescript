@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { PlanApiService } from '@cooksona/api';
-import { MealPlan, ShoppingListItem } from '@cooksona/models';
+import { ApiService, PlanApiService } from '@cooksona/api';
+import { MealPlan, ShoppingListItem, Ingredient } from '@cooksona/models';
 
 export interface CategoryBlockUi {
   category: string;
@@ -10,6 +10,7 @@ export interface CategoryBlockUi {
 @Injectable()
 export class PlannerStore {
   private readonly planApi = inject(PlanApiService);
+  private readonly apiService = inject(ApiService);
 
   // State
   readonly loading = signal(false);
@@ -42,6 +43,16 @@ export class PlannerStore {
       ];
     }
     return null;
+  });
+
+  // Whether the active plan has a categorized shopping list
+  readonly isCategorized = computed<boolean>(() => {
+    const plan = this.activePlan();
+    return !!(
+      plan &&
+      plan.categorizedShoppingList &&
+      plan.categorizedShoppingList.length
+    );
   });
 
   async load(): Promise<void> {
@@ -148,6 +159,69 @@ export class PlannerStore {
       // Revert on failure
       console.error('Failed to persist shopping item toggle', e);
       this.plans.set(currentPlans);
+    }
+  }
+
+  // Categorize the active plan's shopping list (flat) into departments and persist
+  async categorizeActiveShoppingList(): Promise<boolean> {
+    const plan = this.activePlan();
+    if (!plan) return false;
+
+    if (!plan.shoppingList || !plan.shoppingList.length) return false;
+
+    try {
+      const categorized = await this.apiService.apiCategorizeShoppingList<
+        Ingredient,
+        Array<{ category: string; items: Ingredient[] }>
+      >(
+        plan.shoppingList.map(({ name, amount, unit }) => ({
+          name,
+          amount,
+          unit,
+        })),
+      );
+      if (!categorized || !categorized.length) {
+        throw new Error('Die Liste konnte nicht sortiert werden.');
+      }
+
+      const categorizedWithRefs = categorized.map(({ category, items }) => ({
+        category,
+        items: items.map((ing) => {
+          const m = plan.shoppingList.find(
+            (i) =>
+              i.name === ing.name &&
+              i.amount === ing.amount &&
+              i.unit === ing.unit,
+          );
+          return m
+            ? { ...m }
+            : {
+                id:
+                  crypto?.randomUUID?.() ??
+                  `id_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                checked: false,
+                ...ing,
+              };
+        }),
+      }));
+
+      const updated = await this.planApi.saveCategorizedShoppingList(
+        plan.id,
+        categorizedWithRefs,
+      );
+      if (!updated) {
+        throw new Error(
+          'Die sortierte Einkaufsliste konnte nicht gespeichert werden.',
+        );
+      }
+
+      // Replace the plan in store
+      const next = this.plans().map((p) => (p.id === updated.id ? updated : p));
+      this.plans.set(next);
+      return true;
+    } catch (e) {
+      console.error('Failed to categorize shopping list', e);
+      throw e;
     }
   }
 }
