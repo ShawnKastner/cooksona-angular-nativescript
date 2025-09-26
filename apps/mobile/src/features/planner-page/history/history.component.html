@@ -1,24 +1,52 @@
-<GridLayout rows="*" class="bg-base-100" iosOverflowSafeArea="false">
-  <StackLayout
-    row="0"
-    verticalAlignment="center"
-    horizontalAlignment="center"
-    class="flex flex-col items-center justify-center h-full text-center text-gray-400 p-8 bg-base-100"
-  >
-    <svg:SVGImage
-      [src]="icons.BookOpen | svgToDataUri: '#F1F0EE'"
-      class="w-20 h-20"
-    ></svg:SVGImage>
-    <Label class="mt-4 text-xl font-serif font-bold text-neutral"
-      >Kein Verlauf</Label
-    >
-    <Label textWrap="true">
-      <FormattedString>
-        <Span
-          class="mt-1 text-sm"
-          text="Deine erstellten Pläne werden hier angezeigt."
-        ></Span>
-      </FormattedString>
-    </Label>
-  </StackLayout>
-</GridLayout>
+<ScrollView>
+  <GridLayout rows="auto" class="bg-base-100">
+    @if (!plans() || plans().length === 0) {
+      <StackLayout
+        row="0"
+        verticalAlignment="center"
+        horizontalAlignment="center"
+        class="flex flex-col items-center justify-center h-full text-center text-gray-400 p-8 bg-base-100"
+      >
+        <svg:SVGImage
+          [src]="icons.BookOpen | svgToDataUri: '#F1F0EE'"
+          class="w-20 h-20"
+        ></svg:SVGImage>
+        <Label class="mt-4 text-xl font-serif font-bold text-neutral"
+          >Kein Verlauf</Label
+        >
+        <Label textWrap="true">
+          <FormattedString>
+            <Span
+              class="mt-1 text-sm"
+              text="Deine erstellten Pläne werden hier angezeigt."
+            ></Span>
+          </FormattedString>
+        </Label>
+      </StackLayout>
+    } @else {
+      <StackLayout row="0" class="p-4 space-y-3">
+        @for (p of plans(); track p.id) {
+          <StackLayout
+            class="p-3 rounded-xl border border-base-200 bg-base-100"
+          >
+            <StackLayout
+              (tap)="onPlanSelect(p)"
+              class="w-full text-left bg-white p-4 rounded-xl shadow-soft border border-base-200"
+            >
+              <StackLayout>
+                <Label
+                  class="font-bold text-neutral"
+                  [text]="'Plan vom ' + formatDate(p.createdAt)"
+                ></Label>
+                <Label
+                  class="text-sm text-gray-500"
+                  [text]="getDaysCount(p) + ' Tage'"
+                ></Label>
+              </StackLayout>
+            </StackLayout>
+          </StackLayout>
+        }
+      </StackLayout>
+    }
+  </GridLayout>
+</ScrollView>

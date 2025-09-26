@@ -1,24 +1,63 @@
-<GridLayout rows="auto,*" iosOverflowSafeArea="false">
-  <!-- Top Tabs -->
-  <ns-top-tabs
-    row="0"
-    [tabs]="tabs"
-    [selected]="selected()"
-    [activeColor]="'#4A6C6F'"
-    [inactiveColor]="'#9CA3AF'"
-  ></ns-top-tabs>
+<ScrollView>
+  <GridLayout rows="auto,*, auto" iosOverflowSafeArea="false" class="h-full">
+    <!-- Top Tabs -->
+    <ns-top-tabs
+      row="0"
+      [tabs]="tabs"
+      [(selected)]="selected"
+      [activeColor]="'#4A6C6F'"
+      [inactiveColor]="'#9CA3AF'"
+    ></ns-top-tabs>
 
-  @if (selected() === "plan") {
-    <GridLayout row="1">
-      <ns-meal-planner></ns-meal-planner>
-    </GridLayout>
-  } @else if (selected() === "list") {
-    <GridLayout row="1">
-      <ns-shopping-list></ns-shopping-list>
-    </GridLayout>
-  } @else if (selected() === "history") {
-    <GridLayout row="1">
-      <ns-history></ns-history>
-    </GridLayout>
-  }
-</GridLayout>
+    @if (selected() === "plan") {
+      <GridLayout row="1">
+        <ns-meal-planner (openRecipe)="onOpenRecipe($event)"></ns-meal-planner>
+      </GridLayout>
+    } @else if (selected() === "list") {
+      <GridLayout row="1">
+        <ns-shopping-list></ns-shopping-list>
+      </GridLayout>
+    } @else if (selected() === "history") {
+      <GridLayout row="1">
+        <ns-history (selectPlan)="onPlanSelected($event)"></ns-history>
+      </GridLayout>
+    }
+
+    @if (banner()) {
+      <StackLayout row="2" class="mt-12 mx-4 absolute bottom-0">
+        <Label
+          [text]="banner()!.text"
+          class="text-center px-3 py-2 rounded-lg"
+          [class]="
+            banner()!.type === 'success'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-red-100 text-red-800'
+          "
+        ></Label>
+      </StackLayout>
+    }
+  </GridLayout>
+</ScrollView>
+
+@if (showRecipeSheet()) {
+  <ns-recipe-detail-view
+    [recipe]="selectedRecipe()"
+    (close)="closeRecipeSheet()"
+  ></ns-recipe-detail-view>
+}
+
+@if (!showRecipeSheet()) {
+  <FlexboxLayout
+    (tap)="openMealPlanForm()"
+    verticalAlignment="bottom"
+    horizontalAlignment="right"
+    marginRight="24"
+    marginBottom="24"
+    class="absolute bottom-6 right-6 w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white shadow-lg transform active:scale-95 transition-transform z-10"
+  >
+    <svg:SVGImage
+      [src]="icons.Plus | svgToDataUri: 'white'"
+      class="w-7 h-7"
+    ></svg:SVGImage>
+  </FlexboxLayout>
+}

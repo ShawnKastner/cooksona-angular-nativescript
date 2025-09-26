@@ -1,0 +1,100 @@
+<GridLayout
+  rows="auto,*,auto"
+  class="absolute inset-0 bg-base-100 z-30 flex flex-col animate-fade-in0"
+>
+  <GridLayout
+    row="0"
+    columns="auto,*"
+    class="p-4 flex items-center space-x-3 border-b border-base-200 flex-shrink-00"
+  >
+    <svg:SVGImage
+      verticalAlignment="top"
+      (tap)="closeDetailView()"
+      [src]="icons.ArrowLeft | svgToDataUri: '#6B7280'"
+      class="w-6 h-6"
+    ></svg:SVGImage>
+    <Label textWrap="true" col="1">
+      <FormattedString>
+        <Span
+          [text]="recipe()?.name"
+          class="text-lg font-bold text-neutral truncate"
+        ></Span>
+      </FormattedString>
+    </Label>
+  </GridLayout>
+  <ScrollView row="1">
+    <StackLayout class="flex-grow overflow-y-auto p-4 space-y-6">
+      <StackLayout
+        class="list-disc list-inside space-y-1 text-sm text-neutral bg-white p-4 rounded-lg border border-base-200"
+      >
+        <Label
+          class="font-bold text-lg text-neutral mb-2"
+          text="Zutaten"
+        ></Label>
+        @for (ingredient of recipe()?.ingredients; track ingredient) {
+          <Label
+            class="font-semibold"
+            [text]="
+              '• ' + ingredient.amount + ingredient.unit + ' ' + ingredient.name
+            "
+          ></Label>
+        }
+      </StackLayout>
+      <StackLayout
+        class="space-y-1 text-sm text-neutral bg-white p-4 rounded-lg border border-base-200"
+      >
+        <Label
+          class="font-bold text-lg text-neutral mb-2"
+          text="Zubereitung"
+        ></Label>
+        @for (step of recipe()?.instructions; track step; let i = $index) {
+          <GridLayout columns="auto,*" rows="auto" class="py-1">
+            <Label
+              col="0"
+              class="font-semibold text-neutral mr-2"
+              [text]="i + 1 + '.'"
+              verticalAlignment="top"
+            ></Label>
+            <Label
+              col="1"
+              class="leading-relaxed text-neutral"
+              [text]="step"
+              textWrap="true"
+              verticalAlignment="top"
+            ></Label>
+          </GridLayout>
+        }
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+  <FlexboxLayout
+    row="2"
+    justifyContent="space-around"
+    class="p-4 border-t border-base-200 grid grid-cols-2 space-x-3 flex-shrink-0"
+  >
+    <FlexboxLayout
+      flexDirection="row"
+      justifyContent="center"
+      alignItems="center"
+      class="flex w-full items-center justify-center gap-2 bg-base-200 text-neutral font-bold py-3 rounded-xl"
+    >
+      <svg:SVGImage
+        [src]="icons.Shuffle | svgToDataUri"
+        class="w-5 h-5 mr-2"
+      ></svg:SVGImage>
+      <Label text="Tauschen"></Label>
+    </FlexboxLayout>
+    <FlexboxLayout
+      flexDirection="row"
+      justifyContent="center"
+      alignItems="center"
+      class="flex w-full items-center justify-center gap-2 bg-secondary/20 text-secondary-focus font-bold py-3 rounded-xl"
+    >
+      <svg:SVGImage
+        [src]="icons.Wand2 | svgToDataUri: '#CA8A04'"
+        class="w-5 h-5 mr-2"
+      ></svg:SVGImage>
+      <Label text="Anpassen"></Label>
+    </FlexboxLayout>
+  </FlexboxLayout>
+</GridLayout>

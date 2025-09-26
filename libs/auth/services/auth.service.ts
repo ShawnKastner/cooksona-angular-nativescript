@@ -74,6 +74,45 @@ export class AuthService {
     }
   }
 
+  // Mobile-specific login that returns tokens in response
+  async loginNative(credentials: {
+    email: string;
+    password: string;
+  }): Promise<AuthUser> {
+    this.setLoading(true);
+    try {
+      const resp = await this.api.post<
+        | {
+            user: User;
+            accessToken?: string;
+            refreshToken?: string;
+            csrfToken?: string;
+          }
+        | undefined
+      >('/auth/login-native', credentials);
+
+      const user = (resp as any)?.user as User | undefined;
+      if (!user) {
+        throw {
+          message: 'Login fehlgeschlagen. Bitte erneut versuchen.',
+        } as const;
+      }
+
+      // Persist tokens in ApiService for mobile Authorization + refresh-native
+      const accessToken = (resp as any)?.accessToken as string | undefined;
+      const refreshToken = (resp as any)?.refreshToken as string | undefined;
+      const csrfToken = (resp as any)?.csrfToken as string | undefined;
+      (this.api as any).setTokens?.({ accessToken, refreshToken, csrfToken });
+
+      // Optionally store tokens for native-only flows (if you later add Authorization header usage)
+      // For now we primarily set current user for app state
+      this.setCurrentUser(user);
+      return user;
+    } finally {
+      this.setLoading(false);
+    }
+  }
+
   async register(payload: {
     name: string;
     email: string;

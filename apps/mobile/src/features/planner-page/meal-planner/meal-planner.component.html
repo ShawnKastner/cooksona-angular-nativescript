@@ -1,40 +1,85 @@
-<GridLayout rows="*" iosOverflowSafeArea="false">
-  <StackLayout
-    row="0"
-    verticalAlignment="center"
-    horizontalAlignment="center"
-    class="flex flex-col items-center justify-center h-full text-center text-gray-400 p-8 bg-base-100"
-  >
-    <svg:SVGImage
-      [src]="icons.ChefHat | svgToDataUri: '#F1F0EE'"
-      class="w-20 h-20"
-    ></svg:SVGImage>
-    <Label class="mt-4 text-xl font-serif font-bold text-neutral"
-      >Plane deine Woche</Label
-    >
-    <Label textWrap="true">
-      <FormattedString>
-        <Span class="mt-1 text-sm" text="Klicke auf das"></Span>
-        <Span class="text-primary font-bold mx-1" text=" + "></Span>
-        <Span
-          class="mt-1 text-sm"
-          text="Symbol, um deinen ersten Essensplan zu erstellen."
-        ></Span>
-      </FormattedString>
-    </Label>
-  </StackLayout>
-</GridLayout>
-
-<FlexboxLayout
-  (tap)="openMealPlanForm()"
-  verticalAlignment="bottom"
-  horizontalAlignment="right"
-  marginRight="24"
-  marginBottom="24"
-  class="absolute bottom-6 right-6 w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white shadow-lg transform active:scale-95 transition-transform z-10"
->
-  <svg:SVGImage
-    [src]="icons.Plus | svgToDataUri: 'white'"
-    class="w-7 h-7"
-  ></svg:SVGImage>
-</FlexboxLayout>
+<ScrollView>
+  <GridLayout rows="*" iosOverflowSafeArea="false">
+    @if (!activePlan()) {
+      <StackLayout
+        row="0"
+        verticalAlignment="center"
+        horizontalAlignment="center"
+        class="flex flex-col items-center justify-center h-full text-center text-gray-400 p-8 bg-base-100"
+      >
+        <svg:SVGImage
+          [src]="icons.ChefHat | svgToDataUri: '#F1F0EE'"
+          class="w-20 h-20"
+        ></svg:SVGImage>
+        <Label class="mt-4 text-xl font-serif font-bold text-neutral"
+          >Plane deine Woche</Label
+        >
+        <Label textWrap="true">
+          <FormattedString>
+            <Span class="mt-1 text-sm" text="Klicke auf das"></Span>
+            <Span class="text-primary font-bold mx-1" text=" + "></Span>
+            <Span
+              class="mt-1 text-sm"
+              text="Symbol, um deinen ersten Essensplan zu erstellen."
+            ></Span>
+          </FormattedString>
+        </Label>
+      </StackLayout>
+    } @else {
+      <StackLayout row="0" class="p-4 space-y-3">
+        @for (day of activePlan()?.days; track day) {
+          <StackLayout
+            class="bg-white rounded-xl shadow-soft border border-base-200 overflow-hidden"
+          >
+            <Button
+              class="w-full flex justify-between items-center p-4 text-left"
+            >
+              <FormattedString>
+                <Span
+                  [text]="day.day"
+                  class="font-bold text-lg text-neutral"
+                ></Span>
+              </FormattedString>
+            </Button>
+            <StackLayout class="p-4 border-t border-base-200 space-y-3">
+              @for (mealKey of mealKeys; track mealKey) {
+                @if (getMeal(day, mealKey); as meal) {
+                  <FlexboxLayout
+                    (tap)="openDetailView(meal)"
+                    class="w-full space-x-3 text-left bg-base-100 p-3 rounded-lg flex items-center gap-4 hover:bg-base-200/50 transition-colors"
+                  >
+                    <FlexboxLayout
+                      class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0"
+                    >
+                      <svg:SVGImage
+                        [src]="
+                          mealIcon(mealKey)
+                            | svgToDataUri: getColorForIcon(mealKey)
+                        "
+                        class="w-7 h-7"
+                      ></svg:SVGImage>
+                    </FlexboxLayout>
+                    <StackLayout>
+                      <Label
+                        class="font-bold text-sm text-neutral capitalize"
+                        [text]="mealTranslation(mealKey)"
+                      ></Label>
+                      <Label textWrap="true">
+                        <FormattedString>
+                          <Span
+                            class="text-xs text-gray-500"
+                            [text]="meal.name"
+                          ></Span>
+                        </FormattedString>
+                      </Label>
+                    </StackLayout>
+                  </FlexboxLayout>
+                }
+              }
+            </StackLayout>
+          </StackLayout>
+        }
+      </StackLayout>
+    }
+  </GridLayout> </ScrollView
+>0

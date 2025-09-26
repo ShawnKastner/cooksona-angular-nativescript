@@ -71,7 +71,7 @@ export class LoginComponent {
     }
 
     try {
-      await this.authService.login({
+      await this.authService.loginNative({
         email: (this.form.controls['email'].value || '').trim(),
         password: this.form.controls['password'].value,
       });

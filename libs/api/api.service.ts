@@ -12,6 +12,33 @@ export class ApiService {
   private isRefreshing = false;
   private refreshSubscribers: Array<() => void> = [];
 
+  // Token-based (native) auth support
+  private accessToken: string | null = null;
+  private refreshToken: string | null = null;
+  private csrfTokenMem: string | null = null;
+
+  /**
+   * Set or clear tokens for native auth flow. If tokens are present, ApiService
+   * will use Authorization: Bearer and refresh via /auth/refresh-native.
+   */
+  setTokens(
+    tokens: {
+      accessToken?: string | null;
+      refreshToken?: string | null;
+      csrfToken?: string | null;
+    } | null,
+  ): void {
+    if (!tokens) {
+      this.accessToken = null;
+      this.refreshToken = null;
+      this.csrfTokenMem = null;
+      return;
+    }
+    this.accessToken = tokens.accessToken ?? this.accessToken ?? null;
+    this.refreshToken = tokens.refreshToken ?? this.refreshToken ?? null;
+    this.csrfTokenMem = tokens.csrfToken ?? this.csrfTokenMem ?? null;
+  }
+
   private onRefreshed(): void {
     this.refreshSubscribers.forEach((cb) => cb());
     this.refreshSubscribers = [];
@@ -30,6 +57,8 @@ export class ApiService {
   }
 
   private getCsrfToken(): string {
+    // Prefer memory token when set via native login
+    if (this.csrfTokenMem) return this.csrfTokenMem;
     return this.getCookie('csrfToken');
   }
 
@@ -47,6 +76,14 @@ export class ApiService {
         ...(options.headers as Record<string, string> | undefined),
       },
     };
+
+    // If we have an access token (native flow), attach it
+    if (this.accessToken) {
+      (init.headers as Record<string, string>) = {
+        ...(init.headers as Record<string, string>),
+        Authorization: `Bearer ${this.accessToken}`,
+      };
+    }
 
     const url = `${this.baseUrl}${endpoint}`;
     let response: Response;
@@ -66,33 +103,64 @@ export class ApiService {
       } else if (!this.isRefreshing) {
         this.isRefreshing = true;
         try {
-          const refreshResp = await fetch(`${this.baseUrl}/auth/refresh`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-              ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
-            },
-          });
-          if (!refreshResp.ok) {
-            // capture backend error but prefer handling below
-            let errBody: unknown;
-            try {
-              errBody = await refreshResp.json();
-            } catch {
-              errBody = undefined;
+          if (this.refreshToken) {
+            // Native token refresh flow
+            const refreshResp = await fetch(
+              `${this.baseUrl}/auth/refresh-native`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-refresh-token': this.refreshToken,
+                },
+              },
+            );
+            if (!refreshResp.ok) {
+              let errBody: unknown;
+              try {
+                errBody = await refreshResp.json();
+              } catch {
+                errBody = undefined;
+              }
+              throw { status: refreshResp.status, body: errBody };
             }
-            throw { status: refreshResp.status, body: errBody };
+            const data = (await refreshResp.json()) as any;
+            this.setTokens({
+              accessToken: data?.accessToken ?? null,
+              refreshToken: data?.refreshToken ?? this.refreshToken,
+              csrfToken: data?.csrfToken ?? null,
+            });
+          } else {
+            // Cookie-based refresh flow (web / legacy)
+            const refreshResp = await fetch(`${this.baseUrl}/auth/refresh`, {
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+                ...(csrfToken ? { 'X-CSRF-Token': csrfToken } : {}),
+              },
+            });
+            if (!refreshResp.ok) {
+              let errBody: unknown;
+              try {
+                errBody = await refreshResp.json();
+              } catch {
+                errBody = undefined;
+              }
+              throw { status: refreshResp.status, body: errBody };
+            }
           }
 
           this.isRefreshing = false;
           this.onRefreshed();
-          // retry original request
+          // retry original request (with possibly new Authorization header)
           response = await fetch(url, init);
         } catch (error: any) {
           this.isRefreshing = false;
           // Only redirect when real 401 from refresh
           if (error?.status === 401) {
+            // clear tokens on hard auth failure
+            this.setTokens(null);
             this.router.navigateByUrl('/login').catch(() => {});
           }
           return Promise.reject(error);

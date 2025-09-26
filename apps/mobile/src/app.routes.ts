@@ -36,4 +36,20 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./layout/ui/tabs/tabs.component').then((m) => m.TabsComponent),
   },
+  {
+    path: 'recipe/:id',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/planner-page/recipe-detail-view/recipe-detail-view.component'
+      ).then((m) => m.RecipeDetailViewComponent),
+  },
+  {
+    path: 'recipe',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/planner-page/recipe-detail-view/recipe-detail-view.component'
+      ).then((m) => m.RecipeDetailViewComponent),
+  },
 ];

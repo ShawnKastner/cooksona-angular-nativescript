@@ -1,24 +1,100 @@
-<GridLayout rows="*" class="bg-base-100" iosOverflowSafeArea="false">
-  <StackLayout
-    row="0"
-    verticalAlignment="center"
-    horizontalAlignment="center"
-    class="flex flex-col items-center justify-center h-full text-center text-gray-400 p-8 bg-base-100"
-  >
-    <svg:SVGImage
-      [src]="icons.ClipboardList | svgToDataUri: '#F1F0EE'"
-      class="w-20 h-20"
-    ></svg:SVGImage>
-    <Label class="mt-4 text-xl font-serif font-bold text-neutral"
-      >Leere Liste</Label
-    >
-    <Label textWrap="true">
-      <FormattedString>
-        <Span
-          class="mt-1 text-sm"
-          text="Erstelle einen Plan, um deine Einkaufsliste hier zu sehen."
-        ></Span>
-      </FormattedString>
-    </Label>
-  </StackLayout>
-</GridLayout>
+<ScrollView>
+  <GridLayout rows="auto" class="bg-base-100" iosOverflowSafeArea="false">
+    @if (!shoppingList()) {
+      <StackLayout
+        row="0"
+        verticalAlignment="center"
+        horizontalAlignment="center"
+        class="flex flex-col items-center justify-center h-full text-center text-gray-400 p-8 bg-base-100"
+      >
+        <svg:SVGImage
+          [src]="icons.ClipboardList | svgToDataUri: '#F1F0EE'"
+          class="w-20 h-20"
+        ></svg:SVGImage>
+        <Label class="mt-4 text-xl font-serif font-bold text-neutral"
+          >Leere Liste</Label
+        >
+        <Label textWrap="true">
+          <FormattedString>
+            <Span
+              class="mt-1 text-sm"
+              text="Erstelle einen Plan, um deine Einkaufsliste hier zu sehen."
+            ></Span>
+          </FormattedString>
+        </Label>
+      </StackLayout>
+    } @else {
+      <StackLayout row="0" verticalAlignment="top" class="p-4 space-y-4">
+        @for (cat of shoppingList(); track cat.category) {
+          <StackLayout class="mb-4" verticalAlignment="top">
+            <!-- Header with chevron -->
+            <GridLayout
+              columns="*, auto"
+              (tap)="toggleCategory(cat.category)"
+              class="mb-2"
+            >
+              <Label
+                col="0"
+                class="font-bold text-lg text-primary"
+                [text]="cat.category"
+              ></Label>
+              <Label
+                col="1"
+                class="text-lg text-primary"
+                [text]="isCollapsed(cat.category) ? '›' : '⌄'"
+              ></Label>
+            </GridLayout>
+
+            <!-- Items body -->
+            @if (!isCollapsed(cat.category)) {
+              <StackLayout
+                verticalAlignment="top"
+                horizontalAlignment="stretch"
+                class="bg-white p-3 rounded-xl shadow-soft border border-base-200 space-y-2"
+              >
+                @for (item of cat.items; track item.id) {
+                  <GridLayout
+                    (tap)="toggleItem(cat.category, item)"
+                    columns="24,*"
+                    class="flex items-center gap-3 p-1.5 rounded-md"
+                  >
+                    <CheckBox
+                      style="font-size: 18"
+                      #CB1
+                      [checked]="item.checked"
+                    >
+                    </CheckBox>
+                    <Label
+                      col="1"
+                      class="text-neutral"
+                      verticalAlignment="center"
+                    >
+                      <FormattedString>
+                        <Span
+                          class="text-sm text-neutral"
+                          [text]="(item.amount + ' ' + item.unit).trim() + ' '"
+                          [textDecoration]="
+                            item.checked ? 'line-through' : 'none'
+                          "
+                          [color]="item.checked ? '#9CA3AF' : '#111827'"
+                        ></Span>
+                        <Span
+                          class="font-semibold"
+                          [text]="item.name"
+                          [textDecoration]="
+                            item.checked ? 'line-through' : 'none'
+                          "
+                          [color]="item.checked ? '#9CA3AF' : '#111827'"
+                        ></Span>
+                      </FormattedString>
+                    </Label>
+                  </GridLayout>
+                }
+              </StackLayout>
+            }
+          </StackLayout>
+        }
+      </StackLayout>
+    }
+  </GridLayout>
+</ScrollView>
