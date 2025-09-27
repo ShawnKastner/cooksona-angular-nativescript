@@ -12,6 +12,7 @@ import { AppComponent } from './app.component';
 import { provideApiBaseUrl } from '@cooksona/api';
 import { environment } from './environments/environment';
 import { AuthService } from '@cooksona/auth';
+import { MobileTokenService } from './core/mobile-token.service';
 
 registerElement(
   'SVGImage',
@@ -35,11 +36,18 @@ runNativeScriptAngularApp({
         {
           provide: APP_INITIALIZER,
           multi: true,
-          deps: [AuthService],
-          useFactory: (auth: AuthService) => () =>
-            auth
-              .refreshCurrentUser()
-              .catch((e) => console.warn('Auth init refresh failed', e)),
+          deps: [AuthService, MobileTokenService],
+          useFactory: (auth: AuthService, tokens: MobileTokenService) => () => {
+            // Bridge: allow AuthService.logout() to clear mobile tokens without direct import
+            AuthService.registerMobileTokenClear(() => tokens.clear());
+            // 1) hydrate tokens from device storage
+            tokens.hydrate();
+            // 2) try to refresh user silently; on hard failure, clear tokens once
+            return auth.refreshCurrentUser().catch((e) => {
+              console.warn('Auth init refresh failed', e);
+              tokens.clear();
+            });
+          },
         },
       ],
     }),

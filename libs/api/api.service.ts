@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { Router } from '@angular/router';
 import { API_BASE_URL } from './tokens';
 
@@ -17,6 +18,14 @@ export class ApiService {
   private refreshToken: string | null = null;
   private csrfTokenMem: string | null = null;
 
+  // Observable token stream so platform apps can persist/rehydrate
+  private readonly tokensSubject = new BehaviorSubject<{
+    accessToken: string | null;
+    refreshToken: string | null;
+    csrfToken: string | null;
+  } | null>(null);
+  readonly tokens$ = this.tokensSubject.asObservable();
+
   /**
    * Set or clear tokens for native auth flow. If tokens are present, ApiService
    * will use Authorization: Bearer and refresh via /auth/refresh-native.
@@ -32,11 +41,21 @@ export class ApiService {
       this.accessToken = null;
       this.refreshToken = null;
       this.csrfTokenMem = null;
+      this.tokensSubject.next({
+        accessToken: null,
+        refreshToken: null,
+        csrfToken: null,
+      });
       return;
     }
     this.accessToken = tokens.accessToken ?? this.accessToken ?? null;
     this.refreshToken = tokens.refreshToken ?? this.refreshToken ?? null;
     this.csrfTokenMem = tokens.csrfToken ?? this.csrfTokenMem ?? null;
+    this.tokensSubject.next({
+      accessToken: this.accessToken,
+      refreshToken: this.refreshToken,
+      csrfToken: this.csrfTokenMem,
+    });
   }
 
   private onRefreshed(): void {

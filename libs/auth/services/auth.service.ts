@@ -1,9 +1,9 @@
-// libs/core/auth/src/lib/services/auth.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthUser, UserRole } from '../models/auth.models';
 import { User } from '@cooksona/models/user.models';
 import { ApiService } from '@cooksona/api';
+let mobileClearPersistedTokens: (() => void) | null = null;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -40,16 +40,58 @@ export class AuthService {
     this.isLoadingSubject.next(loading);
   }
 
+  // Normalize backend or network errors into a predictable shape and rethrow
+  private fail(context: string, err: any, fallback: string): never {
+    // Extract message from common shapes
+    const fromArray = (arr: any): string | null =>
+      Array.isArray(arr) && arr.length ? String(arr[0]) : null;
+    const fromMessages = (m: any): string | null => {
+      if (!m) return null;
+      if (typeof m === 'string') return m;
+      if (Array.isArray(m)) return fromArray(m);
+      if (typeof m === 'object') {
+        // often { field: [msg] } or { message: '...' }
+        if (m.message && typeof m.message === 'string') return m.message;
+        const values = Object.values(m);
+        const first = values.find((v) => typeof v === 'string') ?? values[0];
+        return fromArray(first) ?? (typeof first === 'string' ? first : null);
+      }
+      return null;
+    };
+
+    const message =
+      (err?.message && String(err.message)) ||
+      fromMessages(err?.messages) ||
+      fromMessages(err?.error) ||
+      fromMessages(err?.body) ||
+      fallback;
+
+    // Log technical details for diagnostics without leaking to UI
+    console.warn(`[AuthService] ${context} failed`, err);
+    throw { message, context, cause: err } as const;
+  }
+
   // Simple logout stub to be called from web header
   logout(): void {
     // best-effort server logout, then clear local state
     try {
       void this.api.post('/auth/logout', {});
-    } catch {}
+    } catch (e) {
+      console.warn('[AuthService] logout server call failed', e);
+    }
     this.setCurrentUser(null);
+    try {
+      mobileClearPersistedTokens?.();
+    } catch (e) {
+      console.warn('[AuthService] mobile token clear failed', e);
+    }
   }
 
   constructor(private readonly api: ApiService) {}
+  // Lazy bridge to avoid hard dependency on mobile layer
+  static registerMobileTokenClear(fn: () => void) {
+    mobileClearPersistedTokens = fn;
+  }
 
   async login(credentials: {
     email: string;
@@ -63,12 +105,20 @@ export class AuthService {
       );
       const user: User | undefined = (resp as any)?.user ?? (resp as any);
       if (!user) {
-        throw {
-          message: 'Login fehlgeschlagen. Bitte erneut versuchen.',
-        } as const;
+        return this.fail(
+          'login',
+          resp,
+          'Login fehlgeschlagen. Bitte erneut versuchen.',
+        );
       }
       this.setCurrentUser(user);
       return user;
+    } catch (e) {
+      return this.fail(
+        'login',
+        e,
+        'Login fehlgeschlagen. Bitte erneut versuchen.',
+      );
     } finally {
       this.setLoading(false);
     }
@@ -93,21 +143,42 @@ export class AuthService {
 
       const user = (resp as any)?.user as User | undefined;
       if (!user) {
-        throw {
-          message: 'Login fehlgeschlagen. Bitte erneut versuchen.',
-        } as const;
+        return this.fail(
+          'loginNative',
+          resp,
+          'Login fehlgeschlagen. Bitte erneut versuchen.',
+        );
       }
 
       // Persist tokens in ApiService for mobile Authorization + refresh-native
-      const accessToken = (resp as any)?.accessToken as string | undefined;
-      const refreshToken = (resp as any)?.refreshToken as string | undefined;
-      const csrfToken = (resp as any)?.csrfToken as string | undefined;
-      (this.api as any).setTokens?.({ accessToken, refreshToken, csrfToken });
+      try {
+        const accessToken = (resp as any)?.accessToken as string | undefined;
+        const refreshToken = (resp as any)?.refreshToken as string | undefined;
+        const csrfToken = (resp as any)?.csrfToken as string | undefined;
+        (this.api as any).setTokens?.({ accessToken, refreshToken, csrfToken });
+        if (!refreshToken && !accessToken) {
+          console.warn(
+            '[AuthService] loginNative response missing tokens; relying on cookies if available',
+          );
+        }
+      } catch (e) {
+        return this.fail(
+          'loginNative.setTokens',
+          e,
+          'Sichere Anmeldung fehlgeschlagen. Bitte erneut versuchen.',
+        );
+      }
 
       // Optionally store tokens for native-only flows (if you later add Authorization header usage)
       // For now we primarily set current user for app state
       this.setCurrentUser(user);
       return user;
+    } catch (e) {
+      return this.fail(
+        'loginNative',
+        e,
+        'Login fehlgeschlagen. Bitte überprüfe deine Zugangsdaten.',
+      );
     } finally {
       this.setLoading(false);
     }
@@ -122,6 +193,12 @@ export class AuthService {
     try {
       // Convention: backend returns created user or message; we don't auto-login
       await this.api.post('/auth/register', payload);
+    } catch (e) {
+      return this.fail(
+        'register',
+        e,
+        'Registrierung fehlgeschlagen. Bitte Eingaben prüfen und erneut versuchen.',
+      );
     } finally {
       this.setLoading(false);
     }
@@ -131,6 +208,12 @@ export class AuthService {
     this.setLoading(true);
     try {
       await this.api.post('/auth/reset-password', { token, password });
+    } catch (e) {
+      return this.fail(
+        'resetPassword',
+        e,
+        'Passwort-Zurücksetzung fehlgeschlagen. Bitte Link und Eingaben prüfen.',
+      );
     } finally {
       this.setLoading(false);
     }
@@ -141,6 +224,12 @@ export class AuthService {
     try {
       // Align with React service path
       await this.api.post('/auth/request-password-reset', { email });
+    } catch (e) {
+      return this.fail(
+        'requestPasswordReset',
+        e,
+        'Anfrage zur Passwort-Zurücksetzung fehlgeschlagen.',
+      );
     } finally {
       this.setLoading(false);
     }
@@ -152,7 +241,9 @@ export class AuthService {
       const user = await this.api.get<User>('/users/me');
       if (user) this.setCurrentUser(user);
       return user ?? null;
-    } catch {
+    } catch (e) {
+      // On refresh failure, consider user unauthenticated; log for diagnostics
+      console.warn('[AuthService] refreshCurrentUser failed', e);
       this.setCurrentUser(null);
       return null;
     } finally {
@@ -161,46 +252,97 @@ export class AuthService {
   }
 
   async updateProfile(data: { name?: string; email?: string }): Promise<void> {
-    const updated = await this.api.put<User>('/users/me', data);
-    if (updated) this.setCurrentUser(updated);
+    try {
+      const updated = await this.api.put<User>('/users/me', data);
+      if (updated) this.setCurrentUser(updated);
+    } catch (e) {
+      return this.fail(
+        'updateProfile',
+        e,
+        'Profilaktualisierung fehlgeschlagen. Bitte Eingaben prüfen.',
+      );
+    }
   }
 
   async deleteAccount(): Promise<void> {
-    await this.api.delete<void>('/users/me');
-    this.logout();
+    try {
+      await this.api.delete<void>('/users/me');
+      this.logout();
+    } catch (e) {
+      return this.fail(
+        'deleteAccount',
+        e,
+        'Löschen des Kontos fehlgeschlagen. Bitte später erneut versuchen.',
+      );
+    }
   }
 
   async upgradeToPro(planType: string): Promise<void> {
-    const updated = await this.api.post<User>('/subscription/upgrade', {
-      planType,
-    });
-    if (updated) this.setCurrentUser(updated);
+    try {
+      const updated = await this.api.post<User>('/subscription/upgrade', {
+        planType,
+      });
+      if (updated) this.setCurrentUser(updated);
+    } catch (e) {
+      return this.fail(
+        'upgradeToPro',
+        e,
+        'Upgrade fehlgeschlagen. Bitte Zahlungsmethode prüfen oder später erneut versuchen.',
+      );
+    }
   }
 
   async cancelSubscription(): Promise<void> {
     const u = this.currentUser as User | null;
     const subId = (u as any)?.paypalSubscriptionId as string | undefined;
     if (!subId) return;
-    await this.api.post('/paypal/cancel-subscription', {
-      subscriptionId: subId,
-    });
-    // Best-effort refresh
-    await this.refreshCurrentUser();
+    try {
+      await this.api.post('/paypal/cancel-subscription', {
+        subscriptionId: subId,
+      });
+      // Best-effort refresh
+      await this.refreshCurrentUser();
+    } catch (e) {
+      return this.fail(
+        'cancelSubscription',
+        e,
+        'Kündigung fehlgeschlagen. Bitte später erneut versuchen.',
+      );
+    }
   }
 
   async reactivateSubscription(): Promise<void> {
     const u = this.currentUser as User | null;
     const subId = (u as any)?.paypalSubscriptionId as string | undefined;
     if (!subId) return;
-    await this.api.post('/paypal/reactivate-subscription', {
-      subscriptionId: subId,
-    });
-    await this.refreshCurrentUser();
+    try {
+      await this.api.post('/paypal/reactivate-subscription', {
+        subscriptionId: subId,
+      });
+      await this.refreshCurrentUser();
+    } catch (e) {
+      return this.fail(
+        'reactivateSubscription',
+        e,
+        'Reaktivierung fehlgeschlagen. Bitte später erneut versuchen.',
+      );
+    }
   }
 
   async consumeRequest(): Promise<void> {
-    const updated = await this.api.post<User>('/users/me/consume-request', {});
-    if (updated) this.setCurrentUser(updated);
+    try {
+      const updated = await this.api.post<User>(
+        '/users/me/consume-request',
+        {},
+      );
+      if (updated) this.setCurrentUser(updated);
+    } catch (e) {
+      return this.fail(
+        'consumeRequest',
+        e,
+        'Aktion fehlgeschlagen. Bitte später erneut versuchen.',
+      );
+    }
   }
 
   isProUser(): boolean {
