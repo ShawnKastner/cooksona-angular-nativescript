@@ -15,6 +15,7 @@ import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { Apple, Google, LogIn } from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { Page } from '@nativescript/core';
+import { SignIn } from '@nativescript/apple-sign-in';
 
 @Component({
   selector: 'ns-login',
@@ -37,6 +38,8 @@ export class LoginComponent {
   error = signal<string | null>(null);
   mailError = signal<string | null>(null);
   passwordError = signal<string | null>(null);
+
+  supportedApple = signal(SignIn.isSupported());
 
   icons = {
     LogIn,

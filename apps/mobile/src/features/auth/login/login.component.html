@@ -161,6 +161,7 @@
         ></Label>
       </FlexboxLayout>
 
+      @if(supportedApple()) {
       <FlexboxLayout
         flexDirection="row"
         justifyContent="center"
@@ -174,6 +175,7 @@
         ></svg:SVGImage>
         <Label text="Mit Apple anmelden" class="text-white font-bold"></Label>
       </FlexboxLayout>
+    }
     </StackLayout>
   </ScrollView>
 
