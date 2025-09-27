@@ -16,7 +16,7 @@
     <Label textWrap="true" col="1">
       <FormattedString>
         <Span
-          [text]="recipe()?.name"
+          [text]="displayRecipe()?.name"
           class="text-lg font-bold text-neutral truncate"
         ></Span>
       </FormattedString>
@@ -31,7 +31,7 @@
           class="font-bold text-lg text-neutral mb-2"
           text="Zutaten"
         ></Label>
-        @for (ingredient of recipe()?.ingredients; track ingredient) {
+        @for (ingredient of displayRecipe()?.ingredients; track ingredient) {
           <Label
             class="font-semibold"
             [text]="
@@ -52,7 +52,11 @@
           class="font-bold text-lg text-neutral mb-2"
           text="Zubereitung"
         ></Label>
-        @for (step of recipe()?.instructions; track step; let i = $index) {
+        @for (
+          step of displayRecipe()?.instructions;
+          track step;
+          let i = $index
+        ) {
           <GridLayout columns="auto,*" rows="auto" class="py-1">
             <Label
               col="0"

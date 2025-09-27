@@ -10,6 +10,7 @@ import {
   ModalDialogService,
   NativeScriptCommonModule,
 } from '@nativescript/angular';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   BookOpen,
   ChefHat,
@@ -26,7 +27,6 @@ import { HistoryComponent } from './history/history.component';
 import { PlannerStore } from './planner.store';
 import { MealPlanFormComponent } from './meal-plan-form/meal-plan-form.component';
 import { SvgToDataUriPipe } from '../../utils/svg-to-data-uri.pipe';
-import { RecipeDetailViewComponent } from './recipe-detail-view/recipe-detail-view.component';
 import { Recipe } from '@cooksona/models';
 
 @Component({
@@ -40,19 +40,19 @@ import { Recipe } from '@cooksona/models';
     ShoppingListComponent,
     HistoryComponent,
     SvgToDataUriPipe,
-    RecipeDetailViewComponent,
   ],
   providers: [PlannerStore],
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class PlannerPageComponent implements OnInit {
   private readonly store = inject(PlannerStore);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   selected = signal<'plan' | 'list' | 'history'>('plan');
   isGenerating = signal(false);
 
   banner = signal<{ type: 'success' | 'error'; text: string } | null>(null);
-  showRecipeSheet = signal(false);
-  selectedRecipe = signal<Recipe | null>(null);
+  // legacy sheet state removed in favor of router
 
   tabs: TopTab[] = [
     { key: 'plan', label: 'Mein Plan', iconSvg: ChefHat },
@@ -114,16 +114,11 @@ export class PlannerPageComponent implements OnInit {
   // open recipe detail sheet from child
   onOpenRecipe(recipe: Recipe | null) {
     if (recipe && recipe.id) {
-      this.selectedRecipe.set(recipe);
-      this.showRecipeSheet.set(true);
-    } else {
-      this.selectedRecipe.set(null);
-      this.showRecipeSheet.set(false);
+      // Navigate to child route under tabs: /home/recipe/:id and pass state
+      this.router.navigate(['../recipe', recipe.id], {
+        relativeTo: this.route,
+        state: { recipe },
+      });
     }
-  }
-
-  // close handler for sheet
-  closeRecipeSheet() {
-    this.showRecipeSheet.set(false);
   }
 }

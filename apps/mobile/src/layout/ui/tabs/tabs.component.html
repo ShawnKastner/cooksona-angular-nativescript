@@ -1,22 +1,8 @@
 <GridLayout rows="*, auto" iosOverflowSafeArea="true" class="bg-base-100">
   <!-- Content area -->
-  @switch (selectedIndex()) {
-    @case (0) {
-      <GridLayout row="0" class="items-center justify-center">
-        <ns-planner-page></ns-planner-page>
-      </GridLayout>
-    }
-    @case (1) {
-      <GridLayout row="0" class="items-center justify-center">
-        <Label text="Second Tab Content" class="text-base-100 text-xl"></Label>
-      </GridLayout>
-    }
-    @case (2) {
-      <GridLayout row="0" class="items-center justify-center">
-        <Label text="Third Tab Content" class="text-base-100 text-xl"></Label>
-      </GridLayout>
-    }
-  }
+  <GridLayout row="0" class="items-center justify-center">
+    <router-outlet></router-outlet>
+  </GridLayout>
 
   <!-- Bottom navigation bar -->
   <FlexboxLayout

@@ -64,25 +64,16 @@
   </GridLayout>
 </ScrollView>
 
-@if (showRecipeSheet()) {
-  <ns-recipe-detail-view
-    [recipe]="selectedRecipe()"
-    (close)="closeRecipeSheet()"
-  ></ns-recipe-detail-view>
-}
-
-@if (!showRecipeSheet()) {
-  <FlexboxLayout
-    (tap)="openMealPlanForm()"
-    verticalAlignment="bottom"
-    horizontalAlignment="right"
-    marginRight="24"
-    marginBottom="24"
-    class="absolute bottom-6 right-6 w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white shadow-lg transform active:scale-95 transition-transform z-10"
-  >
-    <svg:SVGImage
-      [src]="icons.Plus | svgToDataUri: 'white'"
-      class="w-7 h-7"
-    ></svg:SVGImage>
-  </FlexboxLayout>
-}
+<FlexboxLayout
+  (tap)="openMealPlanForm()"
+  verticalAlignment="bottom"
+  horizontalAlignment="right"
+  marginRight="24"
+  marginBottom="24"
+  class="absolute bottom-6 right-6 w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white shadow-lg transform active:scale-95 transition-transform z-10"
+>
+  <svg:SVGImage
+    [src]="icons.Plus | svgToDataUri: 'white'"
+    class="w-7 h-7"
+  ></svg:SVGImage>
+</FlexboxLayout>

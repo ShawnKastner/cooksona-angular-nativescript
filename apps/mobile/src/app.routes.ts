@@ -35,21 +35,43 @@ export const routes: Routes = [
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>
       import('./layout/ui/tabs/tabs.component').then((m) => m.TabsComponent),
-  },
-  {
-    path: 'recipe/:id',
-    canActivate: [mobileProtectedRouteGuard],
-    loadComponent: () =>
-      import(
-        './features/planner-page/recipe-detail-view/recipe-detail-view.component'
-      ).then((m) => m.RecipeDetailViewComponent),
-  },
-  {
-    path: 'recipe',
-    canActivate: [mobileProtectedRouteGuard],
-    loadComponent: () =>
-      import(
-        './features/planner-page/recipe-detail-view/recipe-detail-view.component'
-      ).then((m) => m.RecipeDetailViewComponent),
+    children: [
+      { path: '', redirectTo: 'plan', pathMatch: 'full' },
+      {
+        path: 'plan',
+        loadComponent: () =>
+          import('./features/planner-page/planner-page.component').then(
+            (m) => m.PlannerPageComponent,
+          ),
+      },
+      {
+        path: 'cookbook',
+        loadComponent: () =>
+          import('./features/placeholder/cookbook.component').then(
+            (m) => m.CookbookComponent,
+          ),
+      },
+      {
+        path: 'health',
+        loadComponent: () =>
+          import('./features/placeholder/health.component').then(
+            (m) => m.HealthComponent,
+          ),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/placeholder/profile.component').then(
+            (m) => m.ProfileComponent,
+          ),
+      },
+      {
+        path: 'recipe/:id',
+        loadComponent: () =>
+          import(
+            './features/planner-page/recipe-detail-view/recipe-detail-view.component'
+          ).then((m) => m.RecipeDetailViewComponent),
+      },
+    ],
   },
 ];
