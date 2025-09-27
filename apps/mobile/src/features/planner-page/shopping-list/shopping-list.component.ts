@@ -1,9 +1,4 @@
-import {
-  Component,
-  inject,
-  NO_ERRORS_SCHEMA,
-  signal,
-} from '@angular/core';
+import { Component, inject, NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { ClipboardList, ListTree } from '@cooksona/constants/icons';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { NativeScriptCommonModule } from '@nativescript/angular';

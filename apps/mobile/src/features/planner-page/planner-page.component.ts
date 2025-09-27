@@ -48,6 +48,7 @@ import { Recipe } from '@cooksona/models';
 export class PlannerPageComponent implements OnInit {
   private readonly store = inject(PlannerStore);
   selected = signal<'plan' | 'list' | 'history'>('plan');
+  isGenerating = signal(false);
 
   banner = signal<{ type: 'success' | 'error'; text: string } | null>(null);
   showRecipeSheet = signal(false);
@@ -87,13 +88,24 @@ export class PlannerPageComponent implements OnInit {
 
   async openMealPlanForm() {
     try {
-      await this.modalService.showModal(MealPlanFormComponent, {
+      const options = await this.modalService.showModal(MealPlanFormComponent, {
         viewContainerRef: this.vcRef,
         context: {},
         fullscreen: true,
         animated: true,
         stretched: true,
       });
+      if (options) {
+        this.isGenerating.set(true);
+        try {
+          await this.store.generatePlan(options);
+          this.selected.set('plan');
+        } catch (e) {
+          this.showBanner('error', 'Der Plan konnte nicht erstellt werden.');
+        } finally {
+          this.isGenerating.set(false);
+        }
+      }
     } catch (e) {
       console.error('Failed to open meal plan form modal', e);
     }

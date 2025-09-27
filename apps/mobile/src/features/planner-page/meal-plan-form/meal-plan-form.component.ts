@@ -22,8 +22,10 @@ import {
   X,
 } from '@cooksona/constants/icons';
 import { PlanApiService } from '@cooksona/api';
+import { PlannerOptions } from '@cooksona/models';
+import { PlannerStore } from '../planner.store';
 
-type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
 
 @Component({
   selector: 'ns-meal-plan-form',
@@ -47,6 +49,7 @@ type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 })
 export class MealPlanFormComponent implements AfterViewInit {
   private readonly planApi = inject(PlanApiService);
+  private readonly store = inject(PlannerStore);
 
   icons = {
     X,
@@ -64,9 +67,17 @@ export class MealPlanFormComponent implements AfterViewInit {
     lunch: 'Mittagessen',
     dinner: 'Abendessen',
     snack: 'Snack',
+    dessert: 'Dessert',
   });
 
-  focusOptions = signal(['ausgewogen', 'proteinreich', 'kohlenhydratarm']);
+  private readonly Focus = undefined as unknown as NonNullable<
+    PlannerOptions['planFocus']
+  >;
+  focusOptions = signal<NonNullable<PlannerOptions['planFocus']>[]>([
+    'ausgewogen',
+    'proteinreich',
+    'kohlenhydratarm',
+  ]);
 
   constructor(
     private params: ModalDialogParams,
@@ -78,11 +89,13 @@ export class MealPlanFormComponent implements AfterViewInit {
       allergies: [''],
       people: [2],
       planDays: [7],
+      cookTime: ['30 Minuten'],
       meals: this.fb.group({
         breakfast: [true],
         lunch: [true],
         dinner: [true],
         snack: [false],
+        dessert: [false],
       }),
       planFocusIndex: [0],
     });
@@ -109,18 +122,19 @@ export class MealPlanFormComponent implements AfterViewInit {
     if (clamped !== v.planDays) this.form.patchValue({ planDays: clamped });
   }
 
-  handleSubmit() {
+  async handleSubmit() {
     this.onPeopleBlur();
     this.onPlanDaysBlur();
     const v = this.form.value as any;
-    const result = {
+    const result: PlannerOptions = {
       diet: v.diet ?? '',
       allergies: v.allergies ?? '',
       people: Number(v.people ?? 1),
       planDays: Number(v.planDays ?? 7),
+      cookTime: v.cookTime ?? '30 Minuten',
       meals: v.meals ?? {},
-      planFocus:
-        this.focusOptions()[v.planFocusIndex ?? 0] ?? this.focusOptions()[0],
+      planFocus: (this.focusOptions()[v.planFocusIndex ?? 0] ??
+        this.focusOptions()[0]) as NonNullable<PlannerOptions['planFocus']>,
     };
     this.params.closeCallback(result);
   }

@@ -11,7 +11,32 @@
 
     @if (selected() === "plan") {
       <GridLayout row="1">
-        <ns-meal-planner (openRecipe)="onOpenRecipe($event)"></ns-meal-planner>
+        @if (!isGenerating()) {
+          <ns-meal-planner
+            (openRecipe)="onOpenRecipe($event)"
+          ></ns-meal-planner>
+        } @else {
+          <StackLayout
+            row="1"
+            class="flex flex-col items-center justify-center h-full text-center p-8"
+          >
+            <ActivityIndicator
+              busy="true"
+              width="64"
+              height="64"
+              color="#4A6C6F"
+              iosIndicatorViewStyle="large"
+            ></ActivityIndicator>
+            <Label
+              class="mt-6 text-xl font-serif font-bold text-neutral"
+              text="Dein perfektes Menü wird kreiert..."
+            ></Label>
+            <Label
+              class="mt-1 text-sm text-gray-500"
+              text="Die KI arbeitet. Bitte habe einen Moment Geduld."
+            ></Label>
+          </StackLayout>
+        }
       </GridLayout>
     } @else if (selected() === "list") {
       <GridLayout row="1">

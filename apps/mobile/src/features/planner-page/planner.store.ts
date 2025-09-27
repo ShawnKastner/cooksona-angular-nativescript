@@ -1,6 +1,13 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { ApiService, PlanApiService } from '@cooksona/api';
-import { MealPlan, ShoppingListItem, Ingredient } from '@cooksona/models';
+import { AuthService } from '@cooksona/auth';
+import {
+  MealPlan,
+  ShoppingListItem,
+  Ingredient,
+  PlannerOptions,
+} from '@cooksona/models';
+import { DailyPlan } from '@cooksona/models/plan.models';
 
 export interface CategoryBlockUi {
   category: string;
@@ -11,6 +18,7 @@ export interface CategoryBlockUi {
 export class PlannerStore {
   private readonly planApi = inject(PlanApiService);
   private readonly apiService = inject(ApiService);
+  private readonly auth = inject(AuthService);
 
   // State
   readonly loading = signal(false);
@@ -159,6 +167,85 @@ export class PlannerStore {
       // Revert on failure
       console.error('Failed to persist shopping item toggle', e);
       this.plans.set(currentPlans);
+    }
+  }
+
+  // Generate a new plan via AI and persist it, updating store state
+  async generatePlan(options: PlannerOptions): Promise<MealPlan | null> {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const isPro = this.auth.isProUser();
+      const remaining = this.auth.getRemainingRequests();
+      if (!isPro && remaining <= 0) {
+        throw new Error(
+          'Dein Freikontingent ist aufgebraucht. Upgrade erforderlich.',
+        );
+      }
+
+      const baseMeals = {
+        breakfast: !!options.meals?.breakfast,
+        lunch: !!options.meals?.lunch,
+        dinner: !!options.meals?.dinner,
+        snack: !!options.meals?.snack,
+        dessert: !!options.meals?.dessert,
+      } as PlannerOptions['meals'];
+
+      const planOptions: PlannerOptions = {
+        ...options,
+        planDays: Math.max(1, Math.min(options.planDays ?? 1, isPro ? 14 : 3)),
+        planFocus: options.planFocus ?? 'ausgewogen',
+        enableNutritionAnalysis: isPro
+          ? (options.enableNutritionAnalysis ?? true)
+          : false,
+        gourmetMode: options.gourmetMode ?? false,
+        meals: baseMeals,
+        calories:
+          isPro && (options.enableNutritionAnalysis ?? true)
+            ? Number.isFinite(options.calories as number)
+              ? (options.calories as number)
+              : 2000
+            : undefined,
+      };
+
+      const planData = await this.apiService.apiGenerateMealPlan<
+        PlannerOptions,
+        { days: DailyPlan[]; shoppingList: Ingredient[] }
+      >(planOptions);
+
+      if (!planData) {
+        throw new Error('Plan konnte nicht generiert werden.');
+      }
+
+      const newPlan = await this.planApi.createPlanForUser({
+        options: planOptions,
+        days: planData.days,
+        shoppingList: planData.shoppingList,
+      });
+
+      if (!newPlan) {
+        throw new Error('Der Plan konnte nicht gespeichert werden.');
+      }
+
+      // Prepend and set active
+      const updated = [newPlan, ...this.plans()];
+      this.plans.set(updated);
+      this.activePlanId.set(newPlan.id);
+      if (!isPro) {
+        // Best-effort request consumption to keep counters in sync
+        try {
+          await this.auth.consumeRequest();
+        } catch {}
+      }
+      return newPlan;
+    } catch (e: any) {
+      this.error.set(
+        e?.message ??
+          'Der Plan konnte nicht erstellt werden. Bitte später erneut versuchen.',
+      );
+      throw e;
+    } finally {
+      this.loading.set(false);
     }
   }
 
