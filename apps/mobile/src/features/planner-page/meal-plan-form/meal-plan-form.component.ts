@@ -2,7 +2,6 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
-  inject,
   NO_ERRORS_SCHEMA,
   signal,
 } from '@angular/core';
@@ -21,9 +20,9 @@ import {
   Users,
   X,
 } from '@cooksona/constants/icons';
-import { PlanApiService } from '@cooksona/api';
 import { PlannerOptions } from '@cooksona/models';
-import { PlannerStore } from '../planner.store';
+import { isIOS } from '@nativescript/core';
+import { action } from '@nativescript/core/ui/dialogs';
 
 type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
 
@@ -48,9 +47,6 @@ type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
   ],
 })
 export class MealPlanFormComponent implements AfterViewInit {
-  private readonly planApi = inject(PlanApiService);
-  private readonly store = inject(PlannerStore);
-
   icons = {
     X,
     Leaf,
@@ -59,6 +55,7 @@ export class MealPlanFormComponent implements AfterViewInit {
     CalendarDays,
     Sparkles,
   } as const;
+  isIOS = signal(isIOS);
 
   form!: FormGroup;
 
@@ -87,8 +84,8 @@ export class MealPlanFormComponent implements AfterViewInit {
     this.form = this.fb.group({
       diet: [''],
       allergies: [''],
-      people: [2],
-      planDays: [7],
+      people: [],
+      planDays: [],
       cookTime: ['30 Minuten'],
       meals: this.fb.group({
         breakfast: [true],
@@ -99,6 +96,31 @@ export class MealPlanFormComponent implements AfterViewInit {
       }),
       planFocusIndex: [0],
     });
+  }
+
+  get selectedPlanFocus(): string {
+    const idx = this.form.get('planFocusIndex')?.value ?? 0;
+    return this.focusOptions()[idx] ?? this.focusOptions()[0];
+  }
+
+  async choosePlanFocus() {
+    const options = {
+      title: 'Plan-Fokus',
+      message: 'Bitte auswählen',
+      cancelButtonText: 'Abbrechen',
+      actions: this.focusOptions(),
+    } as const;
+    try {
+      const result = (await action(options)) as string | undefined;
+      if (!result) return;
+      const idx = this.focusOptions().indexOf(result as any);
+      if (idx >= 0) {
+        this.form.get('planFocusIndex')?.setValue(idx);
+        this.cdr.detectChanges();
+      }
+    } catch {
+      // ignore dialog errors/cancel
+    }
   }
 
   get mealKeys(): MealType[] {
