@@ -89,4 +89,13 @@ export class RecipeDetailViewComponent {
       console.warn('[RecipeDetail] navigate back failed', e);
     }
   }
+
+  navigateToTransformRecipe() {
+    const recipe = this.displayRecipe();
+    if (recipe) {
+      this.router.navigate(['/home', 'transform-recipe', recipe.id], {
+        state: { recipe },
+      });
+    }
+  }
 }

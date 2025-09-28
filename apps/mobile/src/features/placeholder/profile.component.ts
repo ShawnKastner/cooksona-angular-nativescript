@@ -12,7 +12,9 @@ import { Router } from '@angular/router';
     <ScrollView>
       <StackLayout class="p-6 space-y-6">
         <Label text="Profil" class="text-2xl font-bold text-neutral"></Label>
-        <StackLayout class="bg-white p-4 rounded-xl border border-base-200 space-y-2">
+        <StackLayout
+          class="bg-white p-4 rounded-xl border border-base-200 space-y-2"
+        >
           <Label class="text-sm text-gray-500" text="Angemeldet als"></Label>
           <Label class="text-base font-semibold" [text]="userLabel"></Label>
         </StackLayout>

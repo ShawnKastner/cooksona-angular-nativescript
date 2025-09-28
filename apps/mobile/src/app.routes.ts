@@ -72,6 +72,13 @@ export const routes: Routes = [
             './features/planner-page/recipe-detail-view/recipe-detail-view.component'
           ).then((m) => m.RecipeDetailViewComponent),
       },
+      {
+        path: 'transform-recipe/:id',
+        loadComponent: () =>
+          import(
+            './features/planner-page/transform-recipe/transform-recipe.component'
+          ).then((m) => m.TransformRecipeComponent),
+      },
     ],
   },
 ];

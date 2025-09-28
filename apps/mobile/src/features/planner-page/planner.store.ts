@@ -1,11 +1,12 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { ApiService, PlanApiService } from '@cooksona/api';
+import { ApiService, CookbookApiService, PlanApiService } from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
 import {
   MealPlan,
   ShoppingListItem,
   Ingredient,
   PlannerOptions,
+  Recipe,
 } from '@cooksona/models';
 import { DailyPlan } from '@cooksona/models/plan.models';
 
@@ -19,6 +20,7 @@ export class PlannerStore {
   private readonly planApi = inject(PlanApiService);
   private readonly apiService = inject(ApiService);
   private readonly auth = inject(AuthService);
+  private readonly cookbookApi = inject(CookbookApiService, { optional: true });
 
   // State
   readonly loading = signal(false);
@@ -309,6 +311,120 @@ export class PlannerStore {
     } catch (e) {
       console.error('Failed to categorize shopping list', e);
       throw e;
+    }
+  }
+
+  /**
+   * Transform a recipe via AI and optionally update the active plan.
+   * - recipe: original recipe to transform
+   * - modification: user prompt / modification text
+   * - action: 'updateInPlan' | 'saveAsCopy' (for saveAsCopy this method returns the transformed recipe)
+   * - originalRecipeId: optional override id used when updating plan
+   */
+  async transformRecipe(
+    recipe: Recipe,
+    modification: string,
+    action: 'updateInPlan' | 'saveAsCopy' = 'saveAsCopy',
+    originalRecipeId?: string,
+  ): Promise<Recipe | null> {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const isPro = this.auth.isProUser();
+      const remaining = this.auth.getRemainingRequests();
+      if (!isPro && remaining <= 0) {
+        throw new Error(
+          'Dein Freikontingent ist aufgebraucht. Upgrade erforderlich.',
+        );
+      }
+
+      const transformed = await this.apiService.apiTransformRecipe<
+        Recipe,
+        Recipe
+      >(recipe, modification);
+      if (!transformed) {
+        throw new Error('Rezept-Anpassung fehlgeschlagen.');
+      }
+
+      if (action === 'updateInPlan') {
+        const activeId = this.activePlanId();
+        if (!activeId) {
+          throw new Error('Kein aktiver Plan vorhanden.');
+        }
+        // Persist update via PlanApiService
+        const updatedPlan = await this.planApi.updateRecipeInPlan(
+          activeId,
+          originalRecipeId ?? recipe.id,
+          transformed,
+        );
+        if (updatedPlan) {
+          // replace plan in store
+          const next = this.plans().map((p) =>
+            p.id === updatedPlan.id ? updatedPlan : p,
+          );
+          this.plans.set(next);
+        } else {
+          throw new Error('Der aktualisierte Plan wurde nicht gespeichert.');
+        }
+      }
+
+      return transformed;
+    } catch (e: any) {
+      this.error.set(e?.message ?? 'Rezept-Anpassung fehlgeschlagen.');
+      throw e;
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /**
+   * Persist a transformed recipe.
+   * - If updateInPlan === true: update the recipe inside the active plan (persist via PlanApiService)
+   * - Otherwise: save as a new recipe in the user's cookbook (if CookbookApiService available)
+   */
+  async saveTransformedRecipe(
+    transformed: Recipe,
+    opts?: {
+      updateInPlan?: boolean;
+      planId?: string; // optional override
+      originalRecipeId?: string; // id to replace in plan
+    },
+  ): Promise<Recipe | null> {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      if (opts?.updateInPlan) {
+        const planId = opts.planId ?? this.activePlanId();
+        if (!planId) throw new Error('Kein aktiver Plan vorhanden.');
+        const updatedPlan = await this.planApi.updateRecipeInPlan(
+          planId,
+          opts.originalRecipeId ?? transformed.id,
+          transformed,
+        );
+        if (!updatedPlan)
+          throw new Error('Plan-Aktualisierung fehlgeschlagen.');
+        const next = this.plans().map((p) =>
+          p.id === updatedPlan.id ? updatedPlan : p,
+        );
+        this.plans.set(next);
+        return transformed;
+      }
+
+      // Save as copy to cookbook if service available
+      if (this.cookbookApi?.addRecipeToCookbook) {
+        const saved = await this.cookbookApi.addRecipeToCookbook(transformed);
+        return saved ?? transformed;
+      }
+
+      // Fallback: nothing to persist server-side, return transformed
+      return transformed;
+    } catch (e: any) {
+      this.error.set(
+        e?.message ?? 'Speichern des angepassten Rezepts fehlgeschlagen.',
+      );
+      throw e;
+    } finally {
+      this.loading.set(false);
     }
   }
 }
