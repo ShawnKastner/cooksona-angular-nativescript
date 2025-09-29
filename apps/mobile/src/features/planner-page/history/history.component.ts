@@ -38,6 +38,7 @@ export class HistoryComponent {
   onPlanSelect(plan: MealPlan) {
     // Set the selected plan as active in the shared store
     this.store.activePlanId.set(plan.id);
+    console.log('Selected plan id=', plan.id);
     this.selectPlan.emit(true);
   }
 }

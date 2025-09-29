@@ -41,7 +41,6 @@ import { Recipe } from '@cooksona/models';
     HistoryComponent,
     SvgToDataUriPipe,
   ],
-  providers: [PlannerStore],
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class PlannerPageComponent implements OnInit {

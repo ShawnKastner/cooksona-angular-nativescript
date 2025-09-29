@@ -15,7 +15,7 @@ export interface CategoryBlockUi {
   items: ShoppingListItem[];
 }
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class PlannerStore {
   private readonly planApi = inject(PlanApiService);
   private readonly apiService = inject(ApiService);
@@ -27,6 +27,9 @@ export class PlannerStore {
   readonly error = signal<string | null>(null);
   readonly plans = signal<MealPlan[]>([]);
   readonly activePlanId = signal<string | null>(null);
+
+  mealPlanHistory = signal<MealPlan[]>([]);
+  favoriteRecipeIds = signal<Set<string>>(new Set());
 
   // Derived
   readonly activePlan = computed(() => {
@@ -54,6 +57,23 @@ export class PlannerStore {
     }
     return null;
   });
+
+  private updatePlanInStores(updated: MealPlan) {
+    const nextPlans = this.plans().map((p) =>
+      p.id === updated.id ? updated : p,
+    );
+
+    this.plans.set(nextPlans);
+
+    const nextHist = this.mealPlanHistory().map((p) =>
+      p.id === updated.id ? updated : p,
+    );
+    this.mealPlanHistory.set(nextHist);
+  }
+
+  setActivePlan(planId: string | null) {
+    this.activePlanId.set(planId);
+  }
 
   // Whether the active plan has a categorized shopping list
   readonly isCategorized = computed<boolean>(() => {
@@ -314,13 +334,6 @@ export class PlannerStore {
     }
   }
 
-  /**
-   * Transform a recipe via AI and optionally update the active plan.
-   * - recipe: original recipe to transform
-   * - modification: user prompt / modification text
-   * - action: 'updateInPlan' | 'saveAsCopy' (for saveAsCopy this method returns the transformed recipe)
-   * - originalRecipeId: optional override id used when updating plan
-   */
   async transformRecipe(
     recipe: Recipe,
     modification: string,
@@ -377,47 +390,46 @@ export class PlannerStore {
     }
   }
 
-  /**
-   * Persist a transformed recipe.
-   * - If updateInPlan === true: update the recipe inside the active plan (persist via PlanApiService)
-   * - Otherwise: save as a new recipe in the user's cookbook (if CookbookApiService available)
-   */
   async saveTransformedRecipe(
-    transformed: Recipe,
-    opts?: {
-      updateInPlan?: boolean;
-      planId?: string; // optional override
-      originalRecipeId?: string; // id to replace in plan
-    },
-  ): Promise<Recipe | null> {
+    originalRecipeId: string,
+    transformedRecipe: Recipe,
+    action: 'updateInPlan' | 'saveAsCopy',
+    planId?: string, // optional override
+  ): Promise<void> {
     this.loading.set(true);
     this.error.set(null);
     try {
-      if (opts?.updateInPlan) {
-        const planId = opts.planId ?? this.activePlanId();
-        if (!planId) throw new Error('Kein aktiver Plan vorhanden.');
+      const activeId = planId ?? this.activePlanId(); // use override if provided
+      console.log('Active plan id=', activeId);
+      const currentFavorites = new Set(this.favoriteRecipeIds());
+      if (action === 'updateInPlan') {
+        if (!activeId) {
+          throw new Error('Kein aktiver Plan vorhanden.');
+        }
         const updatedPlan = await this.planApi.updateRecipeInPlan(
-          planId,
-          opts.originalRecipeId ?? transformed.id,
-          transformed,
+          activeId,
+          originalRecipeId,
+          transformedRecipe,
         );
-        if (!updatedPlan)
-          throw new Error('Plan-Aktualisierung fehlgeschlagen.');
-        const next = this.plans().map((p) =>
-          p.id === updatedPlan.id ? updatedPlan : p,
-        );
-        this.plans.set(next);
-        return transformed;
-      }
+        if (!updatedPlan) {
+          throw new Error(
+            'Der aktualisierte Plan wurde nicht gespeichert. Bitte versuche es erneut.',
+          );
+        }
 
-      // Save as copy to cookbook if service available
-      if (this.cookbookApi?.addRecipeToCookbook) {
-        const saved = await this.cookbookApi.addRecipeToCookbook(transformed);
-        return saved ?? transformed;
-      }
+        // update both lists so UI stays consistent
+        this.updatePlanInStores(updatedPlan);
 
-      // Fallback: nothing to persist server-side, return transformed
-      return transformed;
+        // ensure activePlanId points to the updated plan
+        if (this.activePlanId() !== updatedPlan.id) {
+          this.activePlanId.set(updatedPlan.id);
+        }
+      } else if (action === 'saveAsCopy') {
+        await this.cookbookApi?.addRecipeToCookbook(transformedRecipe);
+        const updatedFavorites = new Set(currentFavorites);
+        updatedFavorites.add(transformedRecipe.id);
+        this.favoriteRecipeIds.set(updatedFavorites);
+      }
     } catch (e: any) {
       this.error.set(
         e?.message ?? 'Speichern des angepassten Rezepts fehlgeschlagen.',
