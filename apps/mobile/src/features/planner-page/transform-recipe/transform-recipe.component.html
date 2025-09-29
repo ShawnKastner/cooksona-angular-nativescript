@@ -180,13 +180,14 @@
           [isEnabled]="!isTransforming()"
           class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 rounded-xl disabled:bg-base-300"
         >
-          <svg:SVGImage
-            [src]="icons.Sparkles | svgToDataUri: 'white'"
-            class="w-5 h-5 mr-2"
-          ></svg:SVGImage>
           @if (!isTransforming()) {
+            <svg:SVGImage
+              [src]="icons.Sparkles | svgToDataUri: 'white'"
+              class="w-5 h-5 mr-2"
+            ></svg:SVGImage>
             <Label text="Transformieren"></Label>
           } @else {
+            <ActivityIndicator busy="true" class="mr-2"></ActivityIndicator>
             <Label text="Transformieren..."></Label>
           }
         </FlexboxLayout>
@@ -197,12 +198,17 @@
             flexDirection="row"
             justifyContent="center"
             alignItems="center"
-            class="w-1/2 mr-2 flex items-center justify-center bg-secondary/20 text-secondary-focus font-bold py-3 rounded-xl"
+            [isEnabled]="!isSaving()"
+            class="w-1/2 mr-2 flex items-center justify-center bg-secondary/20 text-secondary-focus font-bold py-3 rounded-xl disabled:bg-base-300"
           >
-            <svg:SVGImage
-              [src]="icons.BookHeart | svgToDataUri: '#CA8A04'"
-              class="w-5 h-5 mr-2"
-            ></svg:SVGImage>
+            @if (!isSaving()) {
+              <svg:SVGImage
+                [src]="icons.BookHeart | svgToDataUri: '#CA8A04'"
+                class="w-5 h-5 mr-2"
+              ></svg:SVGImage>
+            } @else {
+              <ActivityIndicator busy="true" class="mr-2"></ActivityIndicator>
+            }
             <Label text="Kochbuch"></Label>
           </FlexboxLayout>
           <FlexboxLayout
@@ -210,12 +216,17 @@
             flexDirection="row"
             justifyContent="center"
             alignItems="center"
+            [isEnabled]="!isSaving()"
             class="w-1/2 flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 rounded-xl disabled:bg-base-300"
           >
-            <svg:SVGImage
-              [src]="icons.Check | svgToDataUri: 'white'"
-              class="w-5 h-5 mr-2"
-            ></svg:SVGImage>
+            @if (!isSaving()) {
+              <svg:SVGImage
+                [src]="icons.Check | svgToDataUri: 'white'"
+                class="w-5 h-5 mr-2"
+              ></svg:SVGImage>
+            } @else {
+              <ActivityIndicator busy="true" class="mr-2"></ActivityIndicator>
+            }
             <Label text="Übernehmen"></Label>
           </FlexboxLayout>
         </FlexboxLayout>

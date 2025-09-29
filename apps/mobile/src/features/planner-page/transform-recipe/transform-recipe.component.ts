@@ -25,10 +25,13 @@ import { PlannerStore } from '../planner.store';
 export class TransformRecipeComponent {
   private readonly plannerStore = inject(PlannerStore);
 
+  isSaving = signal(false);
+
   recipeToTransform = signal(<Recipe | null>null);
   transformatedRecipe = signal<Recipe | null>(null);
   isTransforming = this.plannerStore.loading;
   form!: FormGroup;
+
   constructor(
     private router: RouterExtensions,
     private fb: FormBuilder,
@@ -84,7 +87,7 @@ export class TransformRecipeComponent {
   async saveTransformedRecipe(action: 'saveAsCopy' | 'updateInPlan') {
     const transformedRecipe = this.transformatedRecipe();
     const originalId = this.recipeToTransform()?.id;
-
+    this.isSaving.set(true);
     if (!transformedRecipe || !originalId) {
       return;
     }
@@ -102,6 +105,8 @@ export class TransformRecipeComponent {
       }
     } catch (error) {
       console.error('Error saving transformed recipe:', error);
+    } finally {
+      this.isSaving.set(false);
     }
   }
 
