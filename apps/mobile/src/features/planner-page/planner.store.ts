@@ -400,7 +400,7 @@ export class PlannerStore {
     this.error.set(null);
     try {
       const activeId = planId ?? this.activePlanId(); // use override if provided
-      console.log('Active plan id=', activeId);
+
       const currentFavorites = new Set(this.favoriteRecipeIds());
       if (action === 'updateInPlan') {
         if (!activeId) {
