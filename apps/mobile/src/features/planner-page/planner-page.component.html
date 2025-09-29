@@ -26,7 +26,8 @@
               height="64"
               color="#4A6C6F"
               iosIndicatorViewStyle="large"
-            ></ActivityIndicator>
+            >
+            </ActivityIndicator>
             <Label
               class="mt-6 text-xl font-serif font-bold text-neutral"
               text="Dein perfektes Menü wird kreiert..."
@@ -49,7 +50,11 @@
     }
 
     @if (banner()) {
-      <StackLayout row="2" class="mt-12 mx-4 absolute bottom-0">
+      <StackLayout row="2" class="p-4 space-y-3 absolute bottom-0">
+        <FlexboxLayout
+          class="w-full text-left bg-white p-4 rounded-xl shadow-soft border border-base-200"
+        >
+        </FlexboxLayout>
         <Label
           [text]="banner()!.text"
           class="text-center px-3 py-2 rounded-lg"
@@ -59,6 +64,26 @@
               : 'bg-red-100 text-red-800'
           "
         ></Label>
+      </StackLayout>
+    }
+
+    @if (planSelectedBanner()) {
+      <StackLayout
+        row="2"
+        class="p-4 absolute bottom-0"
+        horizontalAlignment="center"
+      >
+        <FlexboxLayout
+          justifyContent="center"
+          alignItems="center"
+          class="p-4 space-x-1 absolute bottom-0 bg-neutral text-white px-2 py-4 rounded-full text-sm font-semibold z-50 shadow-lg flex items-center"
+        >
+          <svg:SVGImage
+            [src]="icons.Check | svgToDataUri: 'white'"
+            class="w-4 h-4"
+          ></svg:SVGImage>
+          <Label [text]="planSelectedBanner()!.text"></Label>
+        </FlexboxLayout>
       </StackLayout>
     }
   </GridLayout>

@@ -13,6 +13,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   BookOpen,
+  Check,
   ChefHat,
   ClipboardList,
   Plus,
@@ -51,6 +52,7 @@ export class PlannerPageComponent implements OnInit {
   isGenerating = signal(false);
 
   banner = signal<{ type: 'success' | 'error'; text: string } | null>(null);
+  planSelectedBanner = signal<{ text: string } | null>(null);
   // legacy sheet state removed in favor of router
 
   tabs: TopTab[] = [
@@ -61,6 +63,7 @@ export class PlannerPageComponent implements OnInit {
 
   icons = {
     Plus,
+    Check,
   } as const;
 
   constructor(
@@ -75,7 +78,17 @@ export class PlannerPageComponent implements OnInit {
 
   onPlanSelected(_: boolean) {
     this.selected.set('plan');
-    this.showBanner('success', 'Plan ausgewählt');
+    this.showPlanSelectedBanner(this.store.currentPlanDate());
+  }
+
+  private showPlanSelectedBanner(date: string | null) {
+    if (!date) return;
+
+    const formatted = this.formatDate(date);
+    this.planSelectedBanner.set({ text: `Plan vom ${formatted} geladen` });
+    setTimeout(() => {
+      this.planSelectedBanner.set(null);
+    }, 1500);
   }
 
   private showBanner(type: 'success' | 'error', text: string) {
@@ -83,6 +96,14 @@ export class PlannerPageComponent implements OnInit {
     setTimeout(() => {
       this.banner.set(null);
     }, 1500);
+  }
+
+  formatDate(dateStr: string): string {
+    const d = new Date(dateStr);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}.${month}.${year}`;
   }
 
   async openMealPlanForm() {

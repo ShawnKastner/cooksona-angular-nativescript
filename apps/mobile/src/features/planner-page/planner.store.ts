@@ -36,6 +36,19 @@ export class PlannerStore {
   readonly plans = signal<MealPlan[]>([]);
   readonly activePlanId = signal<string | null>(null);
 
+  // Derive the current plan's creation date from the active plan so it's
+  // always available to consumers without having to set it manually.
+  readonly currentPlanDate = computed<string | null>(() => {
+    const plan = this.activePlan();
+    if (!plan) return null;
+    // createdAt may come as string — normalize to Date
+    try {
+      return plan.createdAt;
+    } catch {
+      return null;
+    }
+  });
+
   mealPlanHistory = signal<MealPlan[]>([]);
   favoriteRecipeIds = signal<Set<string>>(new Set());
   swappingMealId = signal<string | null>(null);
