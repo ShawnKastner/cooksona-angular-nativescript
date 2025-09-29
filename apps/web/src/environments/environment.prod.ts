@@ -1,10 +1,14 @@
+// Read runtime config if present (injected via /env.js)
+const runtime: any = (globalThis as any).__env || {};
+
 export const environment = {
   production: true,
-  apiBaseUrl: '/api',
-  paypalClientId:
-    'AWO5FlZk426Gbi5dapSMsFLyKzdxGdCdmovml4_NLqIwWcBJypn7LHCcBE7k8KKiXepnaQcEc6mta1OZ',
+  // For dev domain behind proxy, default to relative '/api'
+  apiBaseUrl: runtime.apiBaseUrl ?? '/api',
+  paypalClientId: runtime.paypalClientId ?? '',
   socket: {
-    url: 'http://localhost:3000',
-    path: '/socket.io',
+    // Prefer same-origin sockets via nginx proxy; can be empty string to use current origin
+    url: runtime.socket?.url ?? '',
+    path: runtime.socket?.path ?? '/socket.io',
   },
 };
