@@ -110,13 +110,14 @@ export class PlannerPageComponent implements OnInit {
     }
   }
 
-  // open recipe detail sheet from child
-  onOpenRecipe(recipe: Recipe | null) {
-    if (recipe && recipe.id) {
-      // Navigate to child route under tabs: /home/recipe/:id and pass state
-      this.router.navigate(['../recipe', recipe.id], {
+  // open recipe detail sheet from child with context
+  onOpenRecipe(
+    ev: { recipe: Recipe; dayName: string; mealKey: string } | null,
+  ) {
+    if (ev && ev.recipe && ev.recipe.id) {
+      this.router.navigate(['../recipe', ev.recipe.id], {
         relativeTo: this.route,
-        state: { recipe },
+        state: { recipe: ev.recipe, dayName: ev.dayName, mealKey: ev.mealKey },
       });
     }
   }

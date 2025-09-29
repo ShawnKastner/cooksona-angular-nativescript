@@ -14,6 +14,14 @@ export interface CategoryBlockUi {
   category: string;
   items: ShoppingListItem[];
 }
+type MealField = Exclude<keyof DailyPlan, 'day'>;
+const MEAL_FIELDS: MealField[] = [
+  'breakfast',
+  'lunch',
+  'dinner',
+  'snack',
+  'dessert',
+];
 
 @Injectable({ providedIn: 'root' })
 export class PlannerStore {
@@ -30,6 +38,7 @@ export class PlannerStore {
 
   mealPlanHistory = signal<MealPlan[]>([]);
   favoriteRecipeIds = signal<Set<string>>(new Set());
+  swappingMealId = signal<string | null>(null);
 
   // Derived
   readonly activePlan = computed(() => {
@@ -437,6 +446,79 @@ export class PlannerStore {
       throw e;
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  async handleSwapMeal(
+    dayName: string,
+    mealKey: string,
+    recipe: Recipe,
+  ): Promise<void> {
+    const user = this.auth.currentUser;
+    const active = this.activePlan();
+    if (!user || !active) {
+      this.error.set('Plan konnte nicht gefunden werden.');
+      return;
+    }
+    this.swappingMealId.set(recipe.id);
+    this.error.set(null);
+
+    try {
+      const day = active.days.find((d) => d.day === dayName);
+      if (!day) throw new Error('Tag nicht im Plan gefunden.');
+
+      const otherMealNames = MEAL_FIELDS.map((key) => day[key])
+        .filter((meal): meal is Recipe => !!meal)
+        .map((meal) => meal.name);
+
+      const recipeHadNutrition = !!recipe.nutrition;
+      const newRecipe = await this.apiService.apiGenerateSingleMeal<
+        PlannerOptions,
+        Recipe
+      >({
+        planOptions: active.options ?? {
+          people: 2,
+          planDays: 7,
+          cookTime: '30 Minuten',
+          meals: {
+            breakfast: true,
+            lunch: true,
+            dinner: true,
+            snack: false,
+            dessert: false,
+          },
+          enableNutritionAnalysis: false,
+          planFocus: 'ausgewogen',
+          gourmetMode: false,
+        },
+        mealType: mealKey,
+        otherMealNames,
+        recipeHadNutrition,
+      });
+
+      if (!newRecipe)
+        throw new Error('Neues Rezept konnte nicht generiert werden.');
+
+      const updatedPlan = await this.planApi.swapMealInPlan(
+        active.id,
+        dayName,
+        mealKey,
+        newRecipe,
+      );
+      if (updatedPlan) {
+        // Update both primary plans and history to keep views in sync
+        this.updatePlanInStores(updatedPlan);
+      } else {
+        throw new Error(
+          'Der Plan konnte nach dem Tausch nicht aktualisiert werden.',
+        );
+      }
+    } catch (error) {
+      this.error.set(
+        'Der Austausch des Rezepts ist fehlgeschlagen. Bitte versuche es später erneut.',
+      );
+    } finally {
+      this.swappingMealId.set(null);
     }
   }
 }
