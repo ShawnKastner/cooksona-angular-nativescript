@@ -36,14 +36,9 @@ export class TransformRecipeComponent {
     const nav = this.router.router.currentNavigation();
     const state = (nav?.extras?.state as any) ?? {};
     const recipeFromState = state.recipe as Recipe | undefined;
-    const planIdFromState = state.planId as string | undefined;
 
     if (recipeFromState) {
       this.recipeToTransform.set(recipeFromState);
-    }
-    // Wenn die Seite mit planId geöffnet wurde, setze die aktive Plan-ID im Store
-    if (planIdFromState) {
-      this.plannerStore.setActivePlan(planIdFromState);
     }
 
     this.form = this.fb.group({
@@ -94,26 +89,17 @@ export class TransformRecipeComponent {
       return;
     }
     try {
-      // pass the active plan id explicitly and await the save
       const activePlanId = this.plannerStore.activePlanId();
-      console.log(
-        'Saving transformed recipe, planId=',
-        activePlanId,
-        'originalId=',
-        originalId,
-      );
-      if (!activePlanId) {
-        console.error('No active plan id available; aborting updateInPlan');
-        // TODO: Show user warning
-        return;
+
+      if (activePlanId) {
+        await this.plannerStore.saveTransformedRecipe(
+          originalId,
+          transformedRecipe,
+          action,
+          activePlanId,
+        );
+        await this.router.navigate(['/home', 'plan']);
       }
-      await this.plannerStore.saveTransformedRecipe(
-        originalId,
-        transformedRecipe,
-        action,
-        activePlanId,
-      );
-      await this.router.navigate(['/home', 'plan']);
     } catch (error) {
       console.error('Error saving transformed recipe:', error);
     }

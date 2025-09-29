@@ -8,6 +8,7 @@
     class="p-4 flex items-center space-x-3 border-b border-base-200 flex-shrink-00"
   >
     <svg:SVGImage
+      (tap)="goBack()"
       verticalAlignment="top"
       [src]="icons.ArrowLeft | svgToDataUri: '#6B7280'"
       class="w-6 h-6"
