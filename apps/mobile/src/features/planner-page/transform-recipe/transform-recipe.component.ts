@@ -1,6 +1,12 @@
 import { Component, inject, NO_ERRORS_SCHEMA, signal } from '@angular/core';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
-import { ArrowLeft, Check, Sparkles, Wand2 } from '@cooksona/constants/icons';
+import {
+  ArrowLeft,
+  BookHeart,
+  Check,
+  Sparkles,
+  Wand2,
+} from '@cooksona/constants/icons';
 import { Recipe } from '@cooksona/models';
 import {
   NativeScriptFormsModule,
@@ -50,6 +56,7 @@ export class TransformRecipeComponent {
     Sparkles,
     Wand2,
     Check,
+    BookHeart,
   };
 
   suggestionChips = signal([
@@ -79,7 +86,7 @@ export class TransformRecipeComponent {
     }
   }
 
-  async saveTransformedRecipe() {
+  async saveTransformedRecipe(action: 'saveAsCopy' | 'updateInPlan') {
     const transformedRecipe = this.transformatedRecipe();
     const originalId = this.recipeToTransform()?.id;
 
@@ -103,7 +110,7 @@ export class TransformRecipeComponent {
       await this.plannerStore.saveTransformedRecipe(
         originalId,
         transformedRecipe,
-        'updateInPlan',
+        action,
         activePlanId,
       );
       await this.router.navigate(['/home', 'plan']);
