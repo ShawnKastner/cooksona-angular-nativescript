@@ -23,7 +23,6 @@ export class TransformRecipeComponent {
   transformatedRecipe = signal<Recipe | null>(null);
   isTransforming = this.plannerStore.loading;
   form!: FormGroup;
-
   constructor(
     private router: RouterExtensions,
     private fb: FormBuilder,
@@ -32,7 +31,6 @@ export class TransformRecipeComponent {
     const state = (nav?.extras?.state as any) ?? {};
     const recipeFromState = state.recipe as Recipe | undefined;
     const planIdFromState = state.planId as string | undefined;
-    const originalIdFromState = state.originalRecipeId as string | undefined;
 
     if (recipeFromState) {
       this.recipeToTransform.set(recipeFromState);
