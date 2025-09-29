@@ -34,7 +34,11 @@ export class MealPlannerComponent {
   private readonly auth = inject(AuthService);
   private readonly cookbookApi = inject(CookbookApiService);
   private readonly store = inject(PlannerStore);
-  openRecipe = output<Recipe | null>();
+  openRecipe = output<{
+    recipe: Recipe;
+    dayName: string;
+    mealKey: MealKey;
+  } | null>();
 
   openAddMealPlan = signal(false);
 
@@ -45,6 +49,7 @@ export class MealPlannerComponent {
 
   plans = this.store.plans;
   activePlan = this.store.activePlan;
+  swappingMealId = this.store.swappingMealId;
 
   constructor() {}
 
@@ -111,7 +116,11 @@ export class MealPlannerComponent {
     }
   }
 
-  openDetailView(meal?: Recipe) {
-    this.openRecipe.emit(meal ?? null);
+  openDetailView(dayName: string, mealKey: MealKey, meal?: Recipe) {
+    if (meal) {
+      this.openRecipe.emit({ recipe: meal, dayName, mealKey });
+    } else {
+      this.openRecipe.emit(null);
+    }
   }
 }

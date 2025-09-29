@@ -1,11 +1,12 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { ApiService, PlanApiService } from '@cooksona/api';
+import { ApiService, CookbookApiService, PlanApiService } from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
 import {
   MealPlan,
   ShoppingListItem,
   Ingredient,
   PlannerOptions,
+  Recipe,
 } from '@cooksona/models';
 import { DailyPlan } from '@cooksona/models/plan.models';
 
@@ -13,18 +14,31 @@ export interface CategoryBlockUi {
   category: string;
   items: ShoppingListItem[];
 }
+type MealField = Exclude<keyof DailyPlan, 'day'>;
+const MEAL_FIELDS: MealField[] = [
+  'breakfast',
+  'lunch',
+  'dinner',
+  'snack',
+  'dessert',
+];
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class PlannerStore {
   private readonly planApi = inject(PlanApiService);
   private readonly apiService = inject(ApiService);
   private readonly auth = inject(AuthService);
+  private readonly cookbookApi = inject(CookbookApiService, { optional: true });
 
   // State
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly plans = signal<MealPlan[]>([]);
   readonly activePlanId = signal<string | null>(null);
+
+  mealPlanHistory = signal<MealPlan[]>([]);
+  favoriteRecipeIds = signal<Set<string>>(new Set());
+  swappingMealId = signal<string | null>(null);
 
   // Derived
   readonly activePlan = computed(() => {
@@ -52,6 +66,23 @@ export class PlannerStore {
     }
     return null;
   });
+
+  private updatePlanInStores(updated: MealPlan) {
+    const nextPlans = this.plans().map((p) =>
+      p.id === updated.id ? updated : p,
+    );
+
+    this.plans.set(nextPlans);
+
+    const nextHist = this.mealPlanHistory().map((p) =>
+      p.id === updated.id ? updated : p,
+    );
+    this.mealPlanHistory.set(nextHist);
+  }
+
+  setActivePlan(planId: string | null) {
+    this.activePlanId.set(planId);
+  }
 
   // Whether the active plan has a categorized shopping list
   readonly isCategorized = computed<boolean>(() => {
@@ -309,6 +340,185 @@ export class PlannerStore {
     } catch (e) {
       console.error('Failed to categorize shopping list', e);
       throw e;
+    }
+  }
+
+  async transformRecipe(
+    recipe: Recipe,
+    modification: string,
+    action: 'updateInPlan' | 'saveAsCopy' = 'saveAsCopy',
+    originalRecipeId?: string,
+  ): Promise<Recipe | null> {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const isPro = this.auth.isProUser();
+      const remaining = this.auth.getRemainingRequests();
+      if (!isPro && remaining <= 0) {
+        throw new Error(
+          'Dein Freikontingent ist aufgebraucht. Upgrade erforderlich.',
+        );
+      }
+
+      const transformed = await this.apiService.apiTransformRecipe<
+        Recipe,
+        Recipe
+      >(recipe, modification);
+      if (!transformed) {
+        throw new Error('Rezept-Anpassung fehlgeschlagen.');
+      }
+
+      if (action === 'updateInPlan') {
+        const activeId = this.activePlanId();
+        if (!activeId) {
+          throw new Error('Kein aktiver Plan vorhanden.');
+        }
+        // Persist update via PlanApiService
+        const updatedPlan = await this.planApi.updateRecipeInPlan(
+          activeId,
+          originalRecipeId ?? recipe.id,
+          transformed,
+        );
+        if (updatedPlan) {
+          // replace plan in store
+          const next = this.plans().map((p) =>
+            p.id === updatedPlan.id ? updatedPlan : p,
+          );
+          this.plans.set(next);
+        } else {
+          throw new Error('Der aktualisierte Plan wurde nicht gespeichert.');
+        }
+      }
+
+      return transformed;
+    } catch (e: any) {
+      this.error.set(e?.message ?? 'Rezept-Anpassung fehlgeschlagen.');
+      throw e;
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async saveTransformedRecipe(
+    originalRecipeId: string,
+    transformedRecipe: Recipe,
+    action: 'updateInPlan' | 'saveAsCopy',
+    planId?: string, // optional override
+  ): Promise<void> {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const activeId = planId ?? this.activePlanId(); // use override if provided
+
+      const currentFavorites = new Set(this.favoriteRecipeIds());
+      if (action === 'updateInPlan') {
+        if (!activeId) {
+          throw new Error('Kein aktiver Plan vorhanden.');
+        }
+        const updatedPlan = await this.planApi.updateRecipeInPlan(
+          activeId,
+          originalRecipeId,
+          transformedRecipe,
+        );
+        if (!updatedPlan) {
+          throw new Error(
+            'Der aktualisierte Plan wurde nicht gespeichert. Bitte versuche es erneut.',
+          );
+        }
+
+        // update both lists so UI stays consistent
+        this.updatePlanInStores(updatedPlan);
+
+        // ensure activePlanId points to the updated plan
+        if (this.activePlanId() !== updatedPlan.id) {
+          this.activePlanId.set(updatedPlan.id);
+        }
+      } else if (action === 'saveAsCopy') {
+        await this.cookbookApi?.addRecipeToCookbook(transformedRecipe);
+        const updatedFavorites = new Set(currentFavorites);
+        updatedFavorites.add(transformedRecipe.id);
+        this.favoriteRecipeIds.set(updatedFavorites);
+      }
+    } catch (e: any) {
+      this.error.set(
+        e?.message ?? 'Speichern des angepassten Rezepts fehlgeschlagen.',
+      );
+      throw e;
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  async handleSwapMeal(
+    dayName: string,
+    mealKey: string,
+    recipe: Recipe,
+  ): Promise<void> {
+    const user = this.auth.currentUser;
+    const active = this.activePlan();
+    if (!user || !active) {
+      this.error.set('Plan konnte nicht gefunden werden.');
+      return;
+    }
+    this.swappingMealId.set(recipe.id);
+    this.error.set(null);
+
+    try {
+      const day = active.days.find((d) => d.day === dayName);
+      if (!day) throw new Error('Tag nicht im Plan gefunden.');
+
+      const otherMealNames = MEAL_FIELDS.map((key) => day[key])
+        .filter((meal): meal is Recipe => !!meal)
+        .map((meal) => meal.name);
+
+      const recipeHadNutrition = !!recipe.nutrition;
+      const newRecipe = await this.apiService.apiGenerateSingleMeal<
+        PlannerOptions,
+        Recipe
+      >({
+        planOptions: active.options ?? {
+          people: 2,
+          planDays: 7,
+          cookTime: '30 Minuten',
+          meals: {
+            breakfast: true,
+            lunch: true,
+            dinner: true,
+            snack: false,
+            dessert: false,
+          },
+          enableNutritionAnalysis: false,
+          planFocus: 'ausgewogen',
+          gourmetMode: false,
+        },
+        mealType: mealKey,
+        otherMealNames,
+        recipeHadNutrition,
+      });
+
+      if (!newRecipe)
+        throw new Error('Neues Rezept konnte nicht generiert werden.');
+
+      const updatedPlan = await this.planApi.swapMealInPlan(
+        active.id,
+        dayName,
+        mealKey,
+        newRecipe,
+      );
+      if (updatedPlan) {
+        // Update both primary plans and history to keep views in sync
+        this.updatePlanInStores(updatedPlan);
+      } else {
+        throw new Error(
+          'Der Plan konnte nach dem Tausch nicht aktualisiert werden.',
+        );
+      }
+    } catch (error) {
+      this.error.set(
+        'Der Austausch des Rezepts ist fehlgeschlagen. Bitte versuche es später erneut.',
+      );
+    } finally {
+      this.swappingMealId.set(null);
     }
   }
 }

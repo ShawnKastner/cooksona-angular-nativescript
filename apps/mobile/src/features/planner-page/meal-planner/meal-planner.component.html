@@ -45,34 +45,52 @@
               @for (mealKey of mealKeys; track mealKey) {
                 @if (getMeal(day, mealKey); as meal) {
                   <FlexboxLayout
-                    (tap)="openDetailView(meal)"
-                    class="w-full space-x-3 text-left bg-base-100 p-3 rounded-lg flex items-center gap-4 hover:bg-base-200/50 transition-colors"
+                    (tap)="openDetailView(day.day, mealKey, meal)"
+                    class="relative w-full space-x-3 text-left bg-base-100 p-3 rounded-lg flex items-center gap-4 hover:bg-base-200/50 transition-colors"
                   >
-                    <FlexboxLayout
-                      class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0"
-                    >
-                      <svg:SVGImage
-                        [src]="
-                          mealIcon(mealKey)
-                            | svgToDataUri: getColorForIcon(mealKey)
-                        "
-                        class="w-7 h-7"
-                      ></svg:SVGImage>
-                    </FlexboxLayout>
-                    <StackLayout>
-                      <Label
-                        class="font-bold text-sm text-neutral capitalize"
-                        [text]="mealTranslation(mealKey)"
-                      ></Label>
-                      <Label textWrap="true">
-                        <FormattedString>
-                          <Span
-                            class="text-xs text-gray-500"
-                            [text]="meal.name"
-                          ></Span>
-                        </FormattedString>
-                      </Label>
-                    </StackLayout>
+                    @if (swappingMealId() === meal.id) {
+                      <FlexboxLayout
+                        flexDirection="row"
+                        class="absolute w-full h-full inset-0 bg-white/70 rounded-lg flex flex-col items-center justify-center"
+                      >
+                        <ActivityIndicator
+                          busy="true"
+                          iosIndicatorViewStyle="small"
+                          class="w-8 h-8 mr-2 flex"
+                          color="#4A6C6F"
+                        ></ActivityIndicator>
+                        <Label
+                          class="text-xs font-semibold text-neutral"
+                          text="Tausche..."
+                        ></Label>
+                      </FlexboxLayout>
+                    } @else {
+                      <FlexboxLayout
+                        class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0"
+                      >
+                        <svg:SVGImage
+                          [src]="
+                            mealIcon(mealKey)
+                              | svgToDataUri: getColorForIcon(mealKey)
+                          "
+                          class="w-7 h-7"
+                        ></svg:SVGImage>
+                      </FlexboxLayout>
+                      <StackLayout>
+                        <Label
+                          class="font-bold text-sm text-neutral capitalize"
+                          [text]="mealTranslation(mealKey)"
+                        ></Label>
+                        <Label textWrap="true">
+                          <FormattedString>
+                            <Span
+                              class="text-xs text-gray-500"
+                              [text]="meal.name"
+                            ></Span>
+                          </FormattedString>
+                        </Label>
+                      </StackLayout>
+                    }
                   </FlexboxLayout>
                 }
               }
@@ -81,5 +99,5 @@
         }
       </StackLayout>
     }
-  </GridLayout> </ScrollView
->0
+  </GridLayout>
+</ScrollView>
