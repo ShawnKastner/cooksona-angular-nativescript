@@ -34,8 +34,6 @@ export class ShoppingListComponent {
     ListTree,
   } as const;
 
-  async ngOnInit() {}
-
   async sortByDepartment() {
     if (this.isSorting()) return;
     this.isSorting.set(true);

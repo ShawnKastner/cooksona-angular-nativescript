@@ -25,24 +25,26 @@
       </StackLayout>
     } @else {
       @if (isUserPro() && !isCategorized()) {
-        <FlexboxLayout
-          flexDirection="row"
-          justifyContent="center"
-          alignItems="center"
-          (tap)="!isSorting() && sortByDepartment()"
-          class="p-4 flex items-center justify-center gap-2 bg-secondary/20 text-secondary-focus font-bold py-3 rounded-xl hover:bg-secondary/30 transition-colors"
-          [class.opacity-50]="isSorting()"
-        >
-          @if (isSorting()) {
-            <ActivityIndicator busy="true" class="mr-2"></ActivityIndicator>
-            <Label text="Sortiere..."></Label>
-          } @else {
-            <svg:SVGImage
-              [src]="icons.ListTree | svgToDataUri: '#CA8A04'"
-              class="w-5 h-5 mr-2"
-            ></svg:SVGImage>
-            <Label text="Nach Abteilung sortieren"></Label>
-          }
+        <FlexboxLayout class="flex justify-end px-1 mr-2">
+          <FlexboxLayout
+            flexDirection="row"
+            justifyContent="center"
+            alignItems="center"
+            (tap)="!isSorting() && sortByDepartment()"
+            class="flex items-center gap-2 bg-secondary/20 text-secondary-focus font-semibold px-3 py-1.5 rounded-lg hover:bg-secondary/30 transition-colors text-xs"
+            [class.opacity-50]="isSorting()"
+          >
+            @if (isSorting()) {
+              <ActivityIndicator busy="true" class="mr-2"></ActivityIndicator>
+              <Label text="Sortiere..."></Label>
+            } @else {
+              <svg:SVGImage
+                [src]="icons.ListTree | svgToDataUri: '#CA8A04'"
+                class="w-4 h-4 mr-2"
+              ></svg:SVGImage>
+              <Label text="Nach Abteilung sortieren"></Label>
+            }
+          </FlexboxLayout>
         </FlexboxLayout>
       }
       @if (sortError()) {
