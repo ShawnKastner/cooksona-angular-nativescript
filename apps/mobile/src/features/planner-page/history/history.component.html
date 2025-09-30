@@ -26,7 +26,7 @@
     } @else {
       <StackLayout row="0" class="p-4 space-y-3">
         @for (plan of plans(); track plan.id) {
-          <StackLayout 
+          <StackLayout
             (tap)="onPlanSelect(plan)"
             class="w-full text-left bg-white p-4 rounded-xl box-shadow-1 border border-base-200"
           >

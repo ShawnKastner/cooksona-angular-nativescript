@@ -13,7 +13,7 @@ export type TopTabKey = string;
 export interface TopTab {
   key: TopTabKey;
   label: string;
-  iconSvg: string;
+  iconSvg?: string;
   disabled?: boolean;
 }
 

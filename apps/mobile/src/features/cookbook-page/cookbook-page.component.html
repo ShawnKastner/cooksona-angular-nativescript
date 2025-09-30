@@ -1,0 +1,19 @@
+<ScrollView>
+    <GridLayout rows="auto,*" iosOverflowSafeArea="false" class="h-full">
+        <!-- Top Tabs -->
+        <ns-top-tabs row="0" [tabs]="tabs" [(selected)]="selected" [activeColor]="'#4A6C6F'"
+            [inactiveColor]="'#9CA3AF'"></ns-top-tabs>
+        <StackLayout row="1" class="flex-grow overflow-y-auto p-4 space-y-4">
+            <StackLayout class="bg-white box-shadow-1 border-2 border-base-200 rounded-full">
+                <SearchBar #sb class="w-full text-neutral" textFieldHintColor="#9CA3AF"
+                    textFieldBackgroundColor="#F9FAFB" hint="Rezepte suchen..."></SearchBar>
+            </StackLayout>
+            <StackLayout>
+                <ns-collections></ns-collections>
+            </StackLayout>
+            <StackLayout>
+                <ns-recipes></ns-recipes>
+            </StackLayout>
+        </StackLayout>
+    </GridLayout>
+</ScrollView>

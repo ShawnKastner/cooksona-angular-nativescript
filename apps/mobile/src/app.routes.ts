@@ -47,8 +47,8 @@ export const routes: Routes = [
       {
         path: 'cookbook',
         loadComponent: () =>
-          import('./features/placeholder/cookbook.component').then(
-            (m) => m.CookbookComponent,
+          import('./features/cookbook-page/cookbook-page.component').then(
+            (m) => m.CookbookPageComponent,
           ),
       },
       {
