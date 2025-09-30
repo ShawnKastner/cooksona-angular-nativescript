@@ -1,34 +1,52 @@
 <ScrollView>
-    <!-- Flex container that wraps children so we can show two cards per row -->
-    <FlexboxLayout flexWrap="wrap" justifyContent="space-between">
-        @for(recipe of recipesInCookbook(); track recipe.id) {
-        <!-- Each card is ~48% width so two fit per row with space-between -->
-        <FlexboxLayout (tap)="openRecipe(recipe)" style="width: 48%; margin-bottom: 16px;"
-            class="bg-white rounded-xl box-shadow-1 border border-base-200 overflow-hidden" flexDirection="column">
-            <StackLayout class="text-left flex-grow p-3">
-                <Label textWrap="true" class="leading-tight h-10 mb-2">
-                    <FormattedString>
-                        <Span class="font-bold text-sm text-neutral" [text]="recipe.name"></Span>
-                    </FormattedString>
+  <FlexboxLayout flexWrap="wrap" justifyContent="space-between">
+    @for (recipe of recipesInCookbook(); track recipe.id) {
+      <FlexboxLayout
+        (tap)="openRecipe(recipe)"
+        style="width: 48%"
+        class="bg-white rounded-xl box-shadow-1 border border-base-200 overflow-hidden mb-2"
+        flexDirection="column"
+      >
+        <StackLayout class="text-left flex-grow p-3">
+          <Label textWrap="true" class="leading-tight h-10 mb-2">
+            <FormattedString>
+              <Span
+                class="font-bold text-sm text-neutral"
+                [text]="recipe.name"
+              ></Span>
+            </FormattedString>
+          </Label>
+          <StackLayout class="h-20">
+            <Label
+              class="text-xs font-semibold text-gray-400 mb-1"
+              text="Zutaten:"
+            ></Label>
+            @for (
+              ingredient of (recipe.ingredients || []).slice(0, 3);
+              track ingredient.name
+            ) {
+              <GridLayout columns="auto,*" rows="auto">
+                <Label
+                  class="text-xs text-gray-600"
+                  col="0"
+                  [text]="'- '"
+                ></Label>
+                <Label col="1">
+                  <FormattedString>
+                    <Span
+                      class="text-xs text-gray-600"
+                      [text]="ingredient.name"
+                    ></Span>
+                  </FormattedString>
                 </Label>
-                <StackLayout class="h-20">
-                    <Label class="text-xs font-semibold text-gray-400 mb-1" text="Zutaten:"></Label>
-                    @for(ingredient of (recipe.ingredients || []).slice(0,3); track ingredient.name) {
-                    <GridLayout columns="auto,*" rows="auto">
-                        <Label class="text-xs text-gray-600" col="0"  [text]="'- '"></Label>
-                        <Label col="1">
-                        <FormattedString>
-                            <Span class="text-xs text-gray-600" [text]="ingredient.name"></Span>
-                        </FormattedString>
-                    </Label>
-                    </GridLayout>
-                    }
-                    @if (recipe.ingredients && recipe.ingredients.length > 3) {
-                    <Label class="text-xs text-gray-400">... und mehr</Label>
-                    }
-                </StackLayout>
-            </StackLayout>
-        </FlexboxLayout>
-        }
-    </FlexboxLayout>
+              </GridLayout>
+            }
+            @if (recipe.ingredients && recipe.ingredients.length > 3) {
+              <Label class="text-xs text-gray-400">... und mehr</Label>
+            }
+          </StackLayout>
+        </StackLayout>
+      </FlexboxLayout>
+    }
+  </FlexboxLayout>
 </ScrollView>

@@ -34,7 +34,9 @@ export class CookbookStore {
       const data = await this.cookbookApi.getCookbookForUser(collectionId);
       this.recipes.set(data ?? []);
       // ensure favorites set is populated
-      const ids = new Set((await this.cookbookApi.getCookbookRecipeIds()) ?? []);
+      const ids = new Set(
+        (await this.cookbookApi.getCookbookRecipeIds()) ?? [],
+      );
       this.favoriteRecipeIds.set(ids);
       // load collections too
       const cols = await this.cookbookApi.getRecipeCollections();
@@ -71,7 +73,9 @@ export class CookbookStore {
     this.error.set(null);
     try {
       await this.cookbookApi.removeRecipeFromCookbook(recipeId);
-      const next = this.recipes().filter((r) => String(r.id) !== String(recipeId));
+      const next = this.recipes().filter(
+        (r) => String(r.id) !== String(recipeId),
+      );
       this.recipes.set(next);
       const fav = new Set(this.favoriteRecipeIds());
       fav.delete(String(recipeId));
@@ -106,7 +110,9 @@ export class CookbookStore {
       if (isFav) revert.add(String(recipeId));
       else revert.delete(String(recipeId));
       this.favoriteRecipeIds.set(revert);
-      this.error.set(e?.message ?? 'Favoriten konnten nicht aktualisiert werden');
+      this.error.set(
+        e?.message ?? 'Favoriten konnten nicht aktualisiert werden',
+      );
       throw e;
     }
   }
@@ -137,7 +143,8 @@ export class CookbookStore {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const suggestions = await this.cookbookApi.suggestRecipeCollections(recipe);
+      const suggestions =
+        await this.cookbookApi.suggestRecipeCollections(recipe);
       return suggestions;
     } catch (e: any) {
       this.error.set(e?.message ?? 'Vorschläge konnten nicht geladen werden');
@@ -153,11 +160,18 @@ export class CookbookStore {
     try {
       // Gate behind pro/quota like planner if needed
       const isPro = !!this.auth?.isProUser?.();
-      if (!isPro && this.auth?.getRemainingRequests && this.auth.getRemainingRequests() <= 0) {
+      if (
+        !isPro &&
+        this.auth?.getRemainingRequests &&
+        this.auth.getRemainingRequests() <= 0
+      ) {
         throw new Error('Nicht genügend Anfragen übrig. Bitte upgraden.');
       }
 
-      const transformed = await this.api.apiTransformRecipe(recipe, modification);
+      const transformed = await this.api.apiTransformRecipe(
+        recipe,
+        modification,
+      );
       return transformed as Recipe;
     } catch (e: any) {
       this.error.set(e?.message ?? 'Rezept-Transformation fehlgeschlagen');

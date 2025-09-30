@@ -1,5 +1,6 @@
 <GridLayout rows="auto" iosOverflowSafeArea="false">
   <FlexboxLayout
+    [horizontalAlignment]="compact() ? 'left' : ''"
     class="px-4 bg-base-100 h-20 items-center gap-4 border-b border-base-200 flex-shrink-0"
   >
     @for (tab of tabs(); track tab; let i = $index) {

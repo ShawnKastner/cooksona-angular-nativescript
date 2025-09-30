@@ -29,6 +29,7 @@ export class TopTabsComponent {
   selected = model<TopTabKey>('');
   progress = input<number>(0);
   selectedChange = output<TopTabKey>();
+  compact = input<boolean>(false);
 
   // Farben für Icons
   activeColor = input<string>('#0EA5E9'); // z. B. sky-500

@@ -31,7 +31,7 @@ import { RecipesComponent } from './recipes/recipes.component';
     NativeScriptFormsModule,
     TopTabsComponent,
     CollectionsComponent,
-    RecipesComponent
+    RecipesComponent,
   ],
   schemas: [NO_ERRORS_SCHEMA],
   styles: `
