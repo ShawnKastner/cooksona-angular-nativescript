@@ -25,24 +25,20 @@
       </StackLayout>
     } @else {
       <StackLayout row="0" class="p-4 space-y-3">
-        @for (p of plans(); track p.id) {
+        @for (plan of plans(); track plan.id) {
           <StackLayout
-            class="p-3 rounded-xl border border-base-200 bg-base-100"
+            (tap)="onPlanSelect(plan)"
+            class="w-full text-left bg-white p-4 rounded-xl shadow-soft border border-base-200"
           >
-            <StackLayout
-              (tap)="onPlanSelect(p)"
-              class="w-full text-left bg-white p-4 rounded-xl shadow-soft border border-base-200"
-            >
-              <StackLayout>
-                <Label
-                  class="font-bold text-neutral"
-                  [text]="'Plan vom ' + formatDate(p.createdAt)"
-                ></Label>
-                <Label
-                  class="text-sm text-gray-500"
-                  [text]="getDaysCount(p) + ' Tage'"
-                ></Label>
-              </StackLayout>
+            <StackLayout>
+              <Label
+                class="font-bold text-neutral"
+                [text]="'Plan vom ' + formatDate(plan.createdAt)"
+              ></Label>
+              <Label
+                class="text-sm text-gray-500"
+                [text]="getDaysCount(plan) + ' Tage'"
+              ></Label>
             </StackLayout>
           </StackLayout>
         }

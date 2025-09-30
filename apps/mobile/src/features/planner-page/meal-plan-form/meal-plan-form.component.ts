@@ -4,16 +4,23 @@ import {
   Component,
   NO_ERRORS_SCHEMA,
   signal,
+  ViewChild,
 } from '@angular/core';
 import {
   ModalDialogParams,
   NativeScriptCommonModule,
   NativeScriptFormsModule,
 } from '@nativescript/angular';
-import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import {
   CalendarDays,
+  ErrorCircle,
   Leaf,
   ShieldBan,
   Sparkles,
@@ -43,6 +50,16 @@ type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
         background-color: #4a6c6f;
         off-background-color: #9ca3af;
       }
+
+      .input-row {
+        border-bottom-width: 1px;
+        border-bottom-color: #9ca3af;
+        padding-bottom: 8px;
+      }
+
+      .input-row.input-invalid {
+        border-bottom-color: #ef4444;
+      }
     `,
   ],
 })
@@ -54,10 +71,12 @@ export class MealPlanFormComponent implements AfterViewInit {
     Users,
     CalendarDays,
     Sparkles,
+    ErrorCircle,
   } as const;
   isIOS = signal(isIOS);
 
   form!: FormGroup;
+  @ViewChild('formScroll', { static: false }) formScroll: any;
 
   mealTypeTranslations = signal<Record<MealType, string>>({
     breakfast: 'Frühstück',
@@ -84,9 +103,9 @@ export class MealPlanFormComponent implements AfterViewInit {
     this.form = this.fb.group({
       diet: [''],
       allergies: [''],
-      people: [],
-      planDays: [],
-      cookTime: ['30 Minuten'],
+      people: ['', Validators.required],
+      planDays: ['', Validators.required],
+      cookTime: ['30 Minuten', Validators.required],
       meals: this.fb.group({
         breakfast: [true],
         lunch: [true],
@@ -94,7 +113,9 @@ export class MealPlanFormComponent implements AfterViewInit {
         snack: [false],
         dessert: [false],
       }),
+      nutritionAnalysis: [false],
       planFocusIndex: [0],
+      gourmetMode: [false],
     });
   }
 
@@ -140,25 +161,67 @@ export class MealPlanFormComponent implements AfterViewInit {
 
   onPlanDaysBlur() {
     const v = this.form.value;
-    const clamped = this.clampNumber(Number(v.planDays ?? 0), 1, 7);
+    const clamped = this.clampNumber(Number(v.planDays ?? 0), 1, 14);
     if (clamped !== v.planDays) this.form.patchValue({ planDays: clamped });
   }
 
   async handleSubmit() {
+    if (!this.form.valid) {
+      this.markAllTouched(this.form);
+
+      await this.focusFirstInvalid();
+      return;
+    }
+
     this.onPeopleBlur();
     this.onPlanDaysBlur();
     const v = this.form.value as any;
     const result: PlannerOptions = {
       diet: v.diet ?? '',
       allergies: v.allergies ?? '',
-      people: Number(v.people ?? 1),
-      planDays: Number(v.planDays ?? 7),
+      people: Number(v.people ?? 2),
+      planDays: Number(v.planDays ?? 14),
       cookTime: v.cookTime ?? '30 Minuten',
       meals: v.meals ?? {},
       planFocus: (this.focusOptions()[v.planFocusIndex ?? 0] ??
         this.focusOptions()[0]) as NonNullable<PlannerOptions['planFocus']>,
     };
     this.params.closeCallback(result);
+  }
+
+  private markAllTouched(group: FormGroup) {
+    Object.keys(group.controls).forEach((key) => {
+      const control: any = group.get(key);
+      if (control.controls) {
+        // nested group
+        this.markAllTouched(control as FormGroup);
+      } else {
+        control.markAsTouched();
+      }
+    });
+
+    this.cdr.detectChanges();
+  }
+
+  private async focusFirstInvalid() {
+    // order of preference
+    const candidates = ['people', 'planDays'];
+    for (const name of candidates) {
+      const control = this.form.get(name);
+      if (control && control.invalid) {
+        try {
+          const scroll: any = this.formScroll;
+          if (scroll && scroll.nativeElement) {
+            const view = scroll.nativeElement.getViewById(name) as any;
+            if (view && typeof view.focus === 'function') {
+              await new Promise((r) => setTimeout(r, 50));
+              view.focus();
+            }
+          }
+        } catch {}
+        return;
+      }
+    }
   }
 
   close() {

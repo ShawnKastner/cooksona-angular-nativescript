@@ -427,6 +427,17 @@ export const ArrowLeft = `
     <path d="M19 12H5" />
   </svg>`;
 
+export const ErrorCircle = `
+  <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 8V12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 16.0195V16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="12" cy="12" r="10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
 export const icons = {
   ChefHat,
   ShoppingBasket,
@@ -484,6 +495,7 @@ export const icons = {
   Google,
   Apple,
   ArrowLeft,
+  ErrorCircle,
 };
 
 export type IconName = keyof typeof icons;
