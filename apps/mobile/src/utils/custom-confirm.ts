@@ -1,4 +1,4 @@
-import { isIOS } from '@nativescript/core';
+import { isIOS, Application } from '@nativescript/core';
 
 export interface CustomConfirmOptions {
   title: string;
@@ -65,10 +65,10 @@ export function showCustomConfirm(
       // Android - use standard confirm dialog
       // Note: Android's AlertDialog color customization is more complex
       // For now, fall back to default behavior
-      const alertDialog = new android.app.AlertDialog.Builder(
-        (global as any).androidApp.foregroundActivity ||
-          (global as any).androidApp.startActivity,
-      );
+      const context =
+        Application.android.foregroundActivity ||
+        Application.android.startActivity;
+      const alertDialog = new android.app.AlertDialog.Builder(context);
 
       alertDialog.setTitle(options.title);
       alertDialog.setMessage(options.message);
