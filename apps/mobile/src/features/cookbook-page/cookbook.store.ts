@@ -68,6 +68,33 @@ export class CookbookStore {
     }
   }
 
+  async updateRecipe(recipe: Recipe): Promise<Recipe | undefined> {
+    this.loading.set(true);
+    this.error.set(null);
+    try {
+      const recipeId = String(recipe.id);
+
+      const updated = await this.cookbookApi.updateRecipeInCookbook(
+        recipeId,
+        recipe,
+      );
+      if (updated) {
+        // Update the recipe in the list
+        const next = this.recipes().map((r) =>
+          String(r.id) === String(updated.id) ? updated : r,
+        );
+        this.recipes.set(next);
+      }
+
+      return updated;
+    } catch (e: any) {
+      this.error.set(e?.message ?? 'Fehler beim Aktualisieren des Rezepts');
+      throw e;
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
   async removeRecipe(recipeId: string): Promise<void> {
     this.loading.set(true);
     this.error.set(null);

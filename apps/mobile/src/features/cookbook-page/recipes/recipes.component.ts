@@ -29,7 +29,7 @@ export class RecipesComponent {
 
       this.router.navigate(['../recipe', recipe.id], {
         relativeTo: this.route,
-        state: { recipe: recipe },
+        state: { recipe: recipe, source: 'cookbook' },
       });
     }
   }

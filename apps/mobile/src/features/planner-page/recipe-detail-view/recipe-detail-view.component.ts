@@ -8,12 +8,13 @@ import {
   computed,
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { ArrowLeft, Shuffle, Wand2 } from '@cooksona/constants/icons';
+import { ArrowLeft, Shuffle, Users, Wand2 } from '@cooksona/constants/icons';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { Recipe } from '@cooksona/models';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlannerStore } from '../planner.store';
 import { DailyPlan } from '@cooksona/models';
+import { CookbookStore } from '../../cookbook-page/cookbook.store';
 
 @Component({
   selector: 'ns-recipe-detail-view',
@@ -29,16 +30,22 @@ export class RecipeDetailViewComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly store = inject(PlannerStore, { optional: true });
+  private readonly cookbookStore = inject(CookbookStore, { optional: true });
 
   private readonly routeRecipe = signal<Recipe | null>(null);
   readonly displayRecipe = computed(() => this.recipe() ?? this.routeRecipe());
   private readonly dayName = signal<string | null>(null);
   private readonly mealKey = signal<string | null>(null);
+  private readonly source = signal<'mealPlan' | 'cookbook'>('mealPlan');
+
+  // Computed property to determine if swap button should be shown
+  readonly showSwapButton = computed(() => this.source() === 'mealPlan');
 
   icons = {
     ArrowLeft,
     Shuffle,
     Wand2,
+    Users,
   } as const;
 
   constructor() {
@@ -53,6 +60,16 @@ export class RecipeDetailViewComponent {
       const stateKey = (nav?.extras?.state as any)?.mealKey as
         | string
         | undefined;
+      const stateSource = (nav?.extras?.state as any)?.source as
+        | 'cookbook'
+        | 'mealPlan'
+        | undefined;
+
+      // Set the source based on navigation state
+      if (stateSource) {
+        this.source.set(stateSource);
+      }
+
       if (stateRecipe) {
         this.routeRecipe.set(stateRecipe);
         if (stateDay) this.dayName.set(stateDay);
@@ -136,7 +153,7 @@ export class RecipeDetailViewComponent {
     const recipe = this.displayRecipe();
     if (recipe) {
       this.router.navigate(['/home', 'transform-recipe', recipe.id], {
-        state: { recipe },
+        state: { recipe, source: this.source() },
       });
     }
   }

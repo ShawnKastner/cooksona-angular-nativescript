@@ -192,32 +192,15 @@
           }
         </FlexboxLayout>
       } @else {
-        <FlexboxLayout justifyContent="space-around">
-          <FlexboxLayout
-            (tap)="saveTransformedRecipe('saveAsCopy')"
-            flexDirection="row"
-            justifyContent="center"
-            alignItems="center"
-            [isEnabled]="!isSaving()"
-            class="w-1/2 mr-2 flex items-center justify-center bg-secondary/20 text-secondary-focus font-bold py-3 rounded-xl disabled:bg-base-300"
-          >
-            @if (!isSaving()) {
-              <svg:SVGImage
-                [src]="icons.BookHeart | svgToDataUri: '#CA8A04'"
-                class="w-5 h-5 mr-2"
-              ></svg:SVGImage>
-            } @else {
-              <ActivityIndicator busy="true" class="mr-2"></ActivityIndicator>
-            }
-            <Label text="Kochbuch"></Label>
-          </FlexboxLayout>
+        @if (source() === "cookbook") {
+          <!-- Cookbook context: single button to update recipe in cookbook -->
           <FlexboxLayout
             (tap)="saveTransformedRecipe('updateInPlan')"
             flexDirection="row"
             justifyContent="center"
             alignItems="center"
             [isEnabled]="!isSaving()"
-            class="w-1/2 flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 rounded-xl disabled:bg-base-300"
+            class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 rounded-xl disabled:bg-base-300"
           >
             @if (!isSaving()) {
               <svg:SVGImage
@@ -227,9 +210,49 @@
             } @else {
               <ActivityIndicator busy="true" class="mr-2"></ActivityIndicator>
             }
-            <Label text="Übernehmen"></Label>
+            <Label text="Im Kochbuch speichern"></Label>
           </FlexboxLayout>
-        </FlexboxLayout>
+        } @else {
+          <!-- Meal plan context: two buttons for different actions -->
+          <FlexboxLayout justifyContent="space-around">
+            <FlexboxLayout
+              (tap)="saveTransformedRecipe('saveAsCopy')"
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              [isEnabled]="!isSaving()"
+              class="w-1/2 mr-2 flex items-center justify-center bg-secondary/20 text-secondary-focus font-bold py-3 rounded-xl disabled:bg-base-300"
+            >
+              @if (!isSaving()) {
+                <svg:SVGImage
+                  [src]="icons.BookHeart | svgToDataUri: '#CA8A04'"
+                  class="w-5 h-5 mr-2"
+                ></svg:SVGImage>
+              } @else {
+                <ActivityIndicator busy="true" class="mr-2"></ActivityIndicator>
+              }
+              <Label text="Kochbuch"></Label>
+            </FlexboxLayout>
+            <FlexboxLayout
+              (tap)="saveTransformedRecipe('updateInPlan')"
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              [isEnabled]="!isSaving()"
+              class="w-1/2 flex items-center justify-center gap-2 bg-primary text-white font-bold py-3 rounded-xl disabled:bg-base-300"
+            >
+              @if (!isSaving()) {
+                <svg:SVGImage
+                  [src]="icons.Check | svgToDataUri: 'white'"
+                  class="w-5 h-5 mr-2"
+                ></svg:SVGImage>
+              } @else {
+                <ActivityIndicator busy="true" class="mr-2"></ActivityIndicator>
+              }
+              <Label text="Übernehmen"></Label>
+            </FlexboxLayout>
+          </FlexboxLayout>
+        }
       }
     </StackLayout>
   </StackLayout>
