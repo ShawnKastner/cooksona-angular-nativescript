@@ -80,16 +80,6 @@ jobs:
           source: deploy/docker-compose.dev.yml,docker-compose.frontend.deploy.yml,.deployinfo
           target: $HOME/app-dev/
 
-      - name: Copy nginx ssl config (optional)
-        if: ${{ secrets.COPY_SSL_CONF == 'true' }}
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: deploy/nginx/ssl-dev.conf
-          target: $HOME/app-dev/
-
       - name: Deploy frontend only
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -102,16 +92,6 @@ jobs:
             cd $HOME/app-dev
             docker compose -f docker-compose.dev.yml -f docker-compose.frontend.deploy.yml pull frontend-dev
             docker compose -f docker-compose.dev.yml -f docker-compose.frontend.deploy.yml up -d --no-build --remove-orphans frontend-dev
-
-      - name: Reload host nginx (optional, requires sudo)
-        if: ${{ secrets.RELOAD_NGINX == 'true' }}
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            sudo nginx -t && sudo nginx -s reload || true
 
       - name: Cleanup runner workspace and docker
         if: always()
