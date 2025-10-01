@@ -1,27 +1,43 @@
 <Label class="font-bold text-sm text-neutral mb-2" text="Sammlungen"></Label>
-<FlexboxLayout
-  class="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar"
->
-  <Button
-    (tap)="selectCollection('all')"
-    text="Alle"
-    class="px-3 py-1 text-sm rounded-full whitespace-nowrap"
-    [class]="
-      selectedCollectionId() === 'all'
-        ? 'bg-primary text-white'
-        : 'text-neutral'
-    "
-  ></Button>
-  @for (col of cookbookCollection(); track col.id) {
+<ScrollView orientation="horizontal" class="w-full">
+  <FlexboxLayout
+    class="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar"
+  >
     <Button
-      (tap)="selectCollection(col.id)"
-      [text]="col.name"
+      (tap)="selectCollection('all')"
+      text="Alle"
       class="px-3 py-1 text-sm rounded-full whitespace-nowrap"
       [class]="
-        selectedCollectionId() === col.id
+        selectedCollectionId() === 'all'
           ? 'bg-primary text-white'
           : 'text-neutral'
       "
     ></Button>
-  }
-</FlexboxLayout>
+    @for (col of cookbookCollection(); track col.id) {
+      <Button
+        (tap)="selectCollection(col.id)"
+        (longPress)="onCollectionLongPress(col)"
+        [text]="col.name"
+        class="px-3 py-1 text-sm rounded-full whitespace-nowrap"
+        [class]="
+          selectedCollectionId() === col.id
+            ? 'bg-primary text-white'
+            : 'text-neutral'
+        "
+      ></Button>
+    }
+    <FlexboxLayout
+      class="flex items-center gap-1 px-3 py-1 text-sm rounded-full whitespace-nowrap bg-base-200/50"
+    >
+      <svg:SVGImage
+        [src]="icons.Plus | svgToDataUri"
+        class="w-4 h-4"
+      ></svg:SVGImage>
+      <Button
+        (tap)="openNewCollectionModal()"
+        text="Neu"
+        class="text-neutral"
+      ></Button>
+    </FlexboxLayout>
+  </FlexboxLayout>
+</ScrollView>
