@@ -99,7 +99,16 @@ jobs:
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
             export FRONTEND_IMAGE="${REGISTRY_LC}/frontend:${GIT_SHA}"
             cd $HOME/app-dev
+            
+            # Stop and remove any existing frontend-dev container (old React app)
+            docker stop frontend-dev 2>/dev/null || true
+            docker rm frontend-dev 2>/dev/null || true
+            
+            # Pull new image
             docker compose -f deploy/docker-compose.dev.yml -f docker-compose.frontend.deploy.yml pull frontend-dev
+            
+            # Stop old compose-managed services (if any) and start new one
+            docker compose -f deploy/docker-compose.dev.yml -f docker-compose.frontend.deploy.yml down frontend-dev 2>/dev/null || true
             docker compose -f deploy/docker-compose.dev.yml -f docker-compose.frontend.deploy.yml up -d --no-build --remove-orphans frontend-dev
 
       - name: Cleanup runner workspace and docker
