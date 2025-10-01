@@ -45,11 +45,12 @@ jobs:
 
       - name: Prepare deploy variables
         run: |
-          echo "REGISTRY_LC=${REGISTRY,,}" >> $GITHUB_ENV
+          REGISTRY_LC="${REGISTRY,,}"
+          echo "REGISTRY_LC=${REGISTRY_LC}" >> $GITHUB_ENV
           echo "GIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
           echo "REMOTE_DIR=$HOME/app-dev" >> $GITHUB_ENV
           echo "SERVICE=frontend-dev" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE=${REGISTRY_LC}/frontend:${GIT_SHA}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${REGISTRY_LC}/frontend:${{ github.sha }}" >> $GITHUB_ENV
 
       - name: Create deploy override
         run: |
@@ -82,19 +83,24 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: deploy/docker-compose.dev.yml,docker-compose.frontend.deploy.yml,.deployinfo
           target: $HOME/app-dev/
+          overwrite: true
 
       - name: Deploy frontend only
         uses: appleboy/ssh-action@v1.0.0
+        env:
+          REGISTRY_LC: ${{ env.REGISTRY_LC }}
+          GIT_SHA: ${{ github.sha }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: REGISTRY_LC,GIT_SHA
           script: |
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-            export FRONTEND_IMAGE=${FRONTEND_IMAGE}
+            export FRONTEND_IMAGE="${REGISTRY_LC}/frontend:${GIT_SHA}"
             cd $HOME/app-dev
-            docker compose -f docker-compose.dev.yml -f docker-compose.frontend.deploy.yml pull frontend-dev
-            docker compose -f docker-compose.dev.yml -f docker-compose.frontend.deploy.yml up -d --no-build --remove-orphans frontend-dev
+            docker compose -f deploy/docker-compose.dev.yml -f docker-compose.frontend.deploy.yml pull frontend-dev
+            docker compose -f deploy/docker-compose.dev.yml -f docker-compose.frontend.deploy.yml up -d --no-build --remove-orphans frontend-dev
 
       - name: Cleanup runner workspace and docker
         if: always()
