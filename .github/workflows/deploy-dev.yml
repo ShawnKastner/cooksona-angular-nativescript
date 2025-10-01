@@ -1,0 +1,130 @@
+name: Deploy Dev
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Which part to deploy
+        required: true
+        default: frontend
+        type: choice
+        options:
+          - frontend
+
+jobs:
+  deploy-frontend:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'frontend'
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io/${{ github.repository }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build frontend image
+        run: |
+          docker build -f apps/web/Dockerfile \
+            --build-arg API_URL=${{ secrets.API_URL }} \
+            --build-arg PAYPAL_CLIENT_ID=${{ secrets.PAYPAL_CLIENT_ID }} \
+            --build-arg SOCKET_URL=${{ secrets.SOCKET_URL }} \
+            --build-arg SOCKET_PATH=${{ secrets.SOCKET_PATH }} \
+            -t ${REGISTRY,,}/frontend:${{ github.sha }} .
+
+      - name: Push image
+        run: docker push ${REGISTRY,,}/frontend:${{ github.sha }}
+
+      - name: Prepare deploy variables
+        run: |
+          echo "REGISTRY_LC=${REGISTRY,,}" >> $GITHUB_ENV
+          echo "GIT_SHA=${{ github.sha }}" >> $GITHUB_ENV
+          echo "REMOTE_DIR=$HOME/app-dev" >> $GITHUB_ENV
+          echo "SERVICE=frontend-dev" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=${REGISTRY_LC}/frontend:${GIT_SHA}" >> $GITHUB_ENV
+
+      - name: Create deploy override
+        run: |
+          REGISTRY_LC="${REGISTRY,,}"
+          GIT_SHA="${{ github.sha }}"
+          printf "%s\n" \
+          "services:" \
+          "  frontend-dev:" \
+          "    image: ${REGISTRY_LC}/frontend:${GIT_SHA}" \
+          > docker-compose.frontend.deploy.yml
+
+      - name: Create deploy info
+        run: |
+          echo "{\"deployedAt\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"git_sha\": \"${{ github.sha }}\" }" > .deployinfo
+
+      - name: Ensure remote dir exists
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p $HOME/app-dev
+
+      - name: Copy compose base, override and info
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: deploy/docker-compose.dev.yml,docker-compose.frontend.deploy.yml,.deployinfo
+          target: $HOME/app-dev/
+
+      - name: Copy nginx ssl config (optional)
+        if: ${{ secrets.COPY_SSL_CONF == 'true' }}
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: deploy/nginx/ssl-dev.conf
+          target: $HOME/app-dev/
+
+      - name: Deploy frontend only
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            export FRONTEND_IMAGE=${FRONTEND_IMAGE}
+            cd $HOME/app-dev
+            docker compose -f docker-compose.dev.yml -f docker-compose.frontend.deploy.yml pull frontend-dev
+            docker compose -f docker-compose.dev.yml -f docker-compose.frontend.deploy.yml up -d --no-build --remove-orphans frontend-dev
+
+      - name: Reload host nginx (optional, requires sudo)
+        if: ${{ secrets.RELOAD_NGINX == 'true' }}
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo nginx -t && sudo nginx -s reload || true
+
+      - name: Cleanup runner workspace and docker
+        if: always()
+        run: |
+          echo "--- cleanup: docker builder cache, dangling images/volumes ---"
+          docker builder prune -af || true
+          docker images -f "dangling=true" -q | xargs -r docker rmi || true
+          docker volume ls -qf dangling=true | xargs -r docker volume rm || true
+          echo "--- cleanup: system prune (safe, best-effort) ---"
+          docker system prune -af --volumes || true
+          echo "--- cleanup: remove workspace and tool cache ---"
+          [ -n "${GITHUB_WORKSPACE:-}" ] && rm -rf "$GITHUB_WORKSPACE"/* || true
+          [ -d "/home/actionsrunner/_work/_temp" ] && rm -rf /home/actionsrunner/_work/_temp/* || true
+          [ -d "/home/actionsrunner/_work/_tool" ] && rm -rf /home/actionsrunner/_work/_tool/* || true
+          echo "cleanup done"
+

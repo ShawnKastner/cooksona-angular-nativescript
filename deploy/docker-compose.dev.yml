@@ -1,0 +1,19 @@
+services:
+  frontend-dev:
+    container_name: frontend-dev
+    image: ghcr.io/OWNER/REPO/frontend:latest
+    restart: unless-stopped
+    networks:
+      - proxy
+    # No ports needed; reached via reverse proxy on the 'proxy' network
+
+networks:
+  proxy:
+    external: true
+    name: proxy
+
+# Notes:
+# - The backend and database are assumed to run separately on the same 'proxy' network
+#   with service names 'backend-dev' and 'db-dev'. The outer nginx reverse-proxy (host)
+#   connects to 'frontend-dev:80' and 'backend-dev:3000'.
+
