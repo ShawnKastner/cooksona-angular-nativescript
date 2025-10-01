@@ -30,7 +30,6 @@ export class RecipeDetailViewComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly store = inject(PlannerStore, { optional: true });
-  private readonly cookbookStore = inject(CookbookStore, { optional: true });
 
   private readonly routeRecipe = signal<Recipe | null>(null);
   readonly displayRecipe = computed(() => this.recipe() ?? this.routeRecipe());
@@ -142,10 +141,18 @@ export class RecipeDetailViewComponent {
       console.warn('[RecipeDetail] close output emit failed', e);
     }
     // Prefer router back to keep URL in sync
-    try {
-      this.router.navigate(['/home', 'plan']);
-    } catch (e) {
-      console.warn('[RecipeDetail] navigate back failed', e);
+    if (this.source() === 'cookbook') {
+      try {
+        this.router.navigate(['/home', 'cookbook']);
+      } catch (e) {
+        console.warn('[RecipeDetail] navigate back failed', e);
+      }
+    } else {
+      try {
+        this.router.navigate(['/home', 'plan']);
+      } catch (e) {
+        console.warn('[RecipeDetail] navigate back failed', e);
+      }
     }
   }
 

@@ -35,6 +35,8 @@ export class CollectionsComponent {
 
   cookbookCollection = this.cookbookStore.collections;
 
+  loading = this.cookbookStore.loading;
+
   icons = {
     Plus,
   };

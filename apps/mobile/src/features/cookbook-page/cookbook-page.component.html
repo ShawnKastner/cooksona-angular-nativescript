@@ -14,11 +14,11 @@
         class="bg-white box-shadow-1 border-2 border-base-200 rounded-full"
       >
         <SearchBar
-          #sb
           class="w-full text-neutral"
           textFieldHintColor="#9CA3AF"
           textFieldBackgroundColor="#F9FAFB"
           hint="Rezepte suchen..."
+          (loaded)="onSearchBarLoaded($event)"
         ></SearchBar>
       </StackLayout>
       <StackLayout>

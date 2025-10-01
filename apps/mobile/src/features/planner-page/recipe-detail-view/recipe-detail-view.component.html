@@ -32,8 +32,8 @@
       <Label
         class="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5"
         [text]="
-          displayRecipe()?.servings +
-          (displayRecipe()?.servings > 1 ? ' Personen' : ' Person')
+          (displayRecipe()?.servings ?? 0) +
+          ((displayRecipe()?.servings ?? 0) > 1 ? ' Personen' : ' Person')
         "
       ></Label>
     </FlexboxLayout>

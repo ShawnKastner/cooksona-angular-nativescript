@@ -114,8 +114,6 @@ export class TransformRecipeComponent {
     }
     try {
       if (this.source() === 'cookbook') {
-        // For cookbook: always update the recipe in the cookbook
-        // Keep the original ID to maintain reference
         const recipeToSave = { ...transformedRecipe, id: originalId };
         await this.cookbookStore.updateRecipe(recipeToSave);
 

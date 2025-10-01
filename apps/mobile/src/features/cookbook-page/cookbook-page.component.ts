@@ -16,11 +16,11 @@ import {
   TopTab,
   TopTabsComponent,
 } from '../../layout/ui/top-tabs/top-tabs.component';
-import { isIOS } from '@nativescript/core';
-import { CookbookCollection } from '@cooksona/models';
+import { isIOS, SearchBar } from '@nativescript/core';
 import { CookbookStore } from './cookbook.store';
 import { CollectionsComponent } from './collections/collections.component';
 import { RecipesComponent } from './recipes/recipes.component';
+import { ios } from '@nativescript/core/utils';
 
 @Component({
   selector: 'ns-cookbook-page',
@@ -43,11 +43,11 @@ import { RecipesComponent } from './recipes/recipes.component';
     }
   `,
 })
-export class CookbookPageComponent implements AfterViewInit, OnInit {
-  @ViewChild('sb', { static: true }) sb!: ElementRef<any>;
+export class CookbookPageComponent implements OnInit {
   private readonly cookbookStore = inject(CookbookStore);
 
   selected = signal<'own-cookbook'>('own-cookbook');
+  loading = this.cookbookStore.loading;
 
   tabs: TopTab[] = [{ key: 'own-cookbook', label: 'Mein Kochbuch' }];
   icons = {} as const;
@@ -56,15 +56,15 @@ export class CookbookPageComponent implements AfterViewInit, OnInit {
     await this.cookbookStore.load();
   }
 
-  ngAfterViewInit() {
+  onSearchBarLoaded(args: any) {
     if (isIOS) {
-      const iosBar = this.sb.nativeElement.ios as UISearchBar;
+      const searchBar = args.object as SearchBar;
+      const iosBar = searchBar.ios as UISearchBar;
 
-      // Remove the black background
+      // Remove the black background immediately when SearchBar loads
       iosBar.backgroundImage = UIImage.new();
       iosBar.barTintColor = UIColor.clearColor;
-
-      (iosBar as any).searchBarStyle = 2;
+      iosBar.searchBarStyle = 2; // UISearchBarStyleMinimal
 
       if (iosBar.searchTextField) {
         iosBar.searchTextField.backgroundColor = UIColor.clearColor;
