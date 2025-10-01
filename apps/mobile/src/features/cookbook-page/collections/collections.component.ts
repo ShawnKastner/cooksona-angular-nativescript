@@ -16,6 +16,7 @@ import { NewCollectionModalComponent } from './collection-modal/collection-modal
 import { CookbookApiService } from '@cooksona/api';
 import { CookbookCollection } from '@cooksona/models';
 import { action } from '@nativescript/core/ui/dialogs';
+import { showCustomConfirm } from '../../../utils/custom-confirm';
 
 @Component({
   selector: 'ns-collections',
@@ -131,13 +132,14 @@ export class CollectionsComponent {
 
   async deleteCollection(collection: CookbookCollection) {
     try {
-      const confirmed = await action({
+      const confirmed = await showCustomConfirm({
+        title: 'Sammlung löschen',
         message: `Möchtest du die Sammlung "${collection.name}" wirklich löschen?`,
+        okButtonText: 'Löschen',
         cancelButtonText: 'Abbrechen',
-        actions: ['Löschen'],
       });
 
-      if (confirmed === 'Löschen') {
+      if (confirmed) {
         try {
           await this.cookbookApi.deleteRecipeCollection(collection.id);
         } catch (apiError: any) {
