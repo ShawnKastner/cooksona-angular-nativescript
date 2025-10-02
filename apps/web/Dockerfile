@@ -10,16 +10,21 @@ RUN npm ci
 COPY . .
 
 # Inject runtime config (from build args) into public/env.js
+# Note: API_URL should be relative (/api) because nginx handles the routing
 ARG API_URL=/api
 ARG PAYPAL_CLIENT_ID=
 ARG SOCKET_URL=
 ARG SOCKET_PATH=/socket.io
 RUN apk add --no-cache gettext && \
-    export API_URL="$API_URL" PAYPAL_CLIENT_ID="$PAYPAL_CLIENT_ID" SOCKET_URL="$SOCKET_URL" SOCKET_PATH="$SOCKET_PATH" && \
-    envsubst < apps/web/public/env.template.js > apps/web/public/env.js
+    export API_URL="${API_URL:-/api}" PAYPAL_CLIENT_ID="${PAYPAL_CLIENT_ID}" SOCKET_URL="${SOCKET_URL}" SOCKET_PATH="${SOCKET_PATH:-/socket.io}" && \
+    envsubst < apps/web/public/env.template.js > apps/web/public/env.js && \
+    echo "=== Generated env.js (API_URL should be /api for nginx routing) ===" && \
+    cat apps/web/public/env.js
 
 # Build the web app (production build, suitable for dev domain, uses runtime config)
-RUN npx nx build web --configuration=production
+RUN npx nx build web --configuration=production && \
+    echo "=== env.js in build output ===" && \
+    cat dist/cooksona-angular/browser/env.js
 
 # Debug: List build output to verify
 RUN echo "=== Build output ===" && \
