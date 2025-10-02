@@ -5,7 +5,6 @@ window.__env = {
   paypalClientId: "${PAYPAL_CLIENT_ID:-}",
   socket: {
     url: "${SOCKET_URL:-}",
-    path: "${SOCKET_PATH:-/socket.io}"
-  }
+    path: "${SOCKET_PATH:-/socket.io}",
+  },
 };
-

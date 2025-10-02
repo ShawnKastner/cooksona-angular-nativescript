@@ -21,14 +21,23 @@ RUN apk add --no-cache gettext && \
 # Build the web app (production build, suitable for dev domain, uses runtime config)
 RUN npx nx build web --configuration=production
 
+# Debug: List build output to verify
+RUN echo "=== Build output ===" && \
+    ls -la dist/ && \
+    ls -la dist/cooksona-angular/ || echo "Build output not found!"
+
 ## Runtime image
-FROM nginx:1.27-alpine AS runtime
+FROM nginx:alpine AS runtime
 
 # Copy a simple nginx config with SPA fallback
 COPY apps/web/docker/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy built assets
-COPY --from=build /workspace/dist/cooksona-angular/ /usr/share/nginx/html/
+# Copy built assets from the build stage (NOTE: Angular outputs to /browser subdirectory)
+COPY --from=build /workspace/dist/cooksona-angular/browser/ /usr/share/nginx/html/
+
+# Verify files were copied (for debugging)
+RUN echo "=== Nginx html directory ===" && \
+    ls -la /usr/share/nginx/html/
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
