@@ -44,8 +44,7 @@ export class RecipesComponent {
     if (recipe && recipe.id) {
       this.cookbookStore.setActiveRecipe(String(recipe.id));
 
-      this.router.navigate(['../recipe', recipe.id], {
-        relativeTo: this.route,
+      this.router.navigate(['/recipe', recipe.id], {
         state: { recipe: recipe, source: 'cookbook' },
       });
     }

@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
+import { Page } from '@nativescript/core';
 
 export type TopTabKey = string;
 
@@ -34,6 +35,10 @@ export class TopTabsComponent {
   // Farben für Icons
   activeColor = input<string>('#0EA5E9'); // z. B. sky-500
   inactiveColor = input<string>('#94A3B8'); // slate-400
+
+  constructor(private page: Page) {
+    this.page.actionBarHidden = true;
+  }
 
   onSelect(tab: TopTab) {
     if (tab.disabled) return;

@@ -7,14 +7,17 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { NativeScriptCommonModule } from '@nativescript/angular';
+import {
+  NativeScriptCommonModule,
+  RouterExtensions,
+} from '@nativescript/angular';
 import { ArrowLeft, Shuffle, Users, Wand2 } from '@cooksona/constants/icons';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { Recipe } from '@cooksona/models';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlannerStore } from '../planner.store';
 import { DailyPlan } from '@cooksona/models';
-import { CookbookStore } from '../../cookbook-page/cookbook.store';
+import { Page } from '@nativescript/core';
 
 @Component({
   selector: 'ns-recipe-detail-view',
@@ -29,6 +32,7 @@ export class RecipeDetailViewComponent {
 
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly routerExt = inject(RouterExtensions);
   private readonly store = inject(PlannerStore, { optional: true });
 
   private readonly routeRecipe = signal<Recipe | null>(null);
@@ -47,7 +51,9 @@ export class RecipeDetailViewComponent {
     Users,
   } as const;
 
-  constructor() {
+  constructor(private page: Page) {
+    this.page.actionBarHidden = true;
+
     const nav = this.router.currentNavigation();
     try {
       const stateRecipe = (nav?.extras?.state as any)?.recipe as
@@ -140,16 +146,16 @@ export class RecipeDetailViewComponent {
     } catch (e) {
       console.warn('[RecipeDetail] close output emit failed', e);
     }
-    // Prefer router back to keep URL in sync
+    // Navigate back to the appropriate tab page with clearHistory
     if (this.source() === 'cookbook') {
       try {
-        this.router.navigate(['/home', 'cookbook']);
+        this.routerExt.navigate(['/home/cookbook'], { clearHistory: true });
       } catch (e) {
         console.warn('[RecipeDetail] navigate back failed', e);
       }
     } else {
       try {
-        this.router.navigate(['/home', 'plan']);
+        this.routerExt.navigate(['/home/plan'], { clearHistory: true });
       } catch (e) {
         console.warn('[RecipeDetail] navigate back failed', e);
       }
@@ -159,7 +165,7 @@ export class RecipeDetailViewComponent {
   navigateToTransformRecipe() {
     const recipe = this.displayRecipe();
     if (recipe) {
-      this.router.navigate(['/home', 'transform-recipe', recipe.id], {
+      this.router.navigate(['/transform-recipe', recipe.id], {
         state: { recipe, source: this.source() },
       });
     }

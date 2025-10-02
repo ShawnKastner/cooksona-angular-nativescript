@@ -136,8 +136,7 @@ export class PlannerPageComponent implements OnInit {
     ev: { recipe: Recipe; dayName: string; mealKey: string } | null,
   ) {
     if (ev && ev.recipe && ev.recipe.id) {
-      this.router.navigate(['../recipe', ev.recipe.id], {
-        relativeTo: this.route,
+      this.router.navigate(['/recipe', ev.recipe.id], {
         state: { recipe: ev.recipe, dayName: ev.dayName, mealKey: ev.mealKey },
       });
     }
