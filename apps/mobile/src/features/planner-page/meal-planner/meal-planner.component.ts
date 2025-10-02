@@ -31,8 +31,6 @@ type MealKey = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class MealPlannerComponent {
-  private readonly auth = inject(AuthService);
-  private readonly cookbookApi = inject(CookbookApiService);
   private readonly store = inject(PlannerStore);
   openRecipe = output<{
     recipe: Recipe;

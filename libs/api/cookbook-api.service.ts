@@ -24,6 +24,20 @@ export class CookbookApiService {
     return this.api.post<Recipe>('/cookbook', recipeToSend);
   }
 
+  updateRecipeInCookbook(
+    recipeId: string,
+    recipe: Recipe,
+  ): Promise<Recipe | undefined> {
+    const updateDto = {
+      name: recipe.name,
+      servings: recipe.servings,
+      ingredients: recipe.ingredients,
+      nutrition: recipe.nutrition,
+      instructions: recipe.instructions,
+    };
+    return this.api.put<Recipe>(`/cookbook/${recipeId}`, updateDto);
+  }
+
   removeRecipeFromCookbook(recipeId: string): Promise<void | undefined> {
     return this.api.delete<void>(`/cookbook/${recipeId}`);
   }

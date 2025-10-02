@@ -1,0 +1,58 @@
+<Label class="font-bold text-sm text-neutral mb-2" text="Sammlungen"></Label>
+<ScrollView orientation="horizontal" class="w-full">
+  <FlexboxLayout
+    class="flex items-center space-x-2 overflow-x-auto pb-2 no-scrollbar"
+  >
+    <Button
+      (tap)="selectCollection('all')"
+      text="Alle"
+      class="px-3 py-1 text-sm rounded-full whitespace-nowrap"
+      [class]="
+        selectedCollectionId() === 'all'
+          ? 'bg-primary text-white'
+          : 'text-neutral'
+      "
+    ></Button>
+    @if (loading()) {
+      <FlexboxLayout class="flex items-center px-3 py-1">
+        <ActivityIndicator
+          busy="true"
+          width="20"
+          height="20"
+          color="#4A6C6F"
+        ></ActivityIndicator>
+        <Label
+          class="ml-2 text-xs text-gray-500"
+          text="Lade Sammlungen..."
+        ></Label>
+      </FlexboxLayout>
+    } @else {
+      @for (col of cookbookCollection(); track col.id) {
+        <Button
+          (tap)="selectCollection(col.id)"
+          (longPress)="onCollectionLongPress(col)"
+          [text]="col.name"
+          class="px-3 py-1 text-sm rounded-full whitespace-nowrap"
+          [class]="
+            selectedCollectionId() === col.id
+              ? 'bg-primary text-white'
+              : 'text-neutral'
+          "
+        ></Button>
+      }
+      <FlexboxLayout
+        class="flex items-center gap-1 px-3 py-1 text-sm rounded-full whitespace-nowrap bg-base-200/50"
+      >
+        <svg:SVGImage
+          [src]="icons.Plus | svgToDataUri"
+          class="w-4 h-4"
+        ></svg:SVGImage>
+        <Button
+          (tap)="openNewCollectionModal()"
+          text="Neu"
+          class="text-neutral"
+        ></Button>
+      </FlexboxLayout>
+    }
+  </FlexboxLayout>
+</ScrollView>

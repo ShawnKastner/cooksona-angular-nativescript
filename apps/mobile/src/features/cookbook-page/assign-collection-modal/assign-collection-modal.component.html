@@ -1,0 +1,200 @@
+<GridLayout class="bg-black/40">
+  <!-- Backdrop -->
+  <StackLayout class="absolute inset-0" (tap)="close()"></StackLayout>
+
+  <!-- Modal Content -->
+  <StackLayout
+    verticalAlignment="center"
+    horizontalAlignment="center"
+    class="p-8"
+  >
+    <GridLayout
+      rows="auto,auto,auto"
+      class="bg-white rounded-2xl shadow-lg w-80 max-h-[90vh]"
+    >
+      <!-- Header -->
+      <GridLayout row="0" columns="*,auto" class="p-4 border-b border-base-200">
+        <StackLayout col="0">
+          <FlexboxLayout justifyContent="space-between">
+            <Label
+              class="text-lg font-bold text-neutral"
+              text="Zu Sammlungen hinzufügen"
+            ></Label>
+            <svg:SVGImage
+              (tap)="close()"
+              [src]="icons.X | svgToDataUri: '#9CA3AF'"
+              class="w-6 h-6 absolute right-4 top-4 cursor-pointer"
+            ></svg:SVGImage>
+          </FlexboxLayout>
+          <Label textWrap="true" class="text-xs text-gray-500 mt-1">
+            <FormattedString>
+              <Span text='Organisiere "'></Span>
+              <Span [text]="recipe.name"></Span>
+              <Span text='"'></Span>
+            </FormattedString>
+          </Label>
+        </StackLayout>
+      </GridLayout>
+
+      <!-- Content -->
+      <ScrollView row="1" class="max-h-96">
+        <StackLayout class="p-4 space-y-4">
+          <!-- Existing Collections -->
+          <StackLayout>
+            <Label
+              class="font-semibold text-neutral mb-2"
+              text="Meine Sammlungen"
+            ></Label>
+            @if (cookbookCollections().length > 0) {
+              <GridLayout rows="auto" class="border border-base-200 rounded-lg">
+                <ScrollView
+                  row="0"
+                  orientation="vertical"
+                  [height]="getCollectionsHeight()"
+                  class=""
+                >
+                  <StackLayout class="space-y-2 p-2">
+                    @for (
+                      collection of cookbookCollections();
+                      track collection.id
+                    ) {
+                      <GridLayout
+                        columns="auto,*"
+                        (tap)="toggle(collection.id)"
+                        class="p-3 bg-base-100 rounded-xl"
+                        [class.bg-primary-10]="isSelected(collection.id)"
+                      >
+                        <StackLayout
+                          col="0"
+                          class="w-5 h-5 rounded-md border-2 mr-3"
+                          [class.bg-primary]="isSelected(collection.id)"
+                          [class.border-primary]="isSelected(collection.id)"
+                          [class.border-gray-400]="!isSelected(collection.id)"
+                        >
+                          @if (isSelected(collection.id)) {
+                            <svg:SVGImage
+                              [src]="icons.Check | svgToDataUri: '#FFFFFF'"
+                              class="w-3 h-3 m-1"
+                            ></svg:SVGImage>
+                          }
+                        </StackLayout>
+                        <Label
+                          col="1"
+                          [text]="collection.name"
+                          class="text-sm font-medium text-neutral"
+                        ></Label>
+                      </GridLayout>
+                    }
+                  </StackLayout>
+                </ScrollView>
+              </GridLayout>
+            } @else {
+              <Label
+                class="text-sm text-gray-400"
+                text="Noch keine Sammlungen erstellt."
+              ></Label>
+            }
+          </StackLayout>
+
+          <!-- New Collection Input -->
+          <StackLayout>
+            <Label
+              class="font-semibold text-neutral mb-2"
+              text="Neue Sammlung erstellen"
+            ></Label>
+            <GridLayout columns="*,auto" class="mb-2">
+              <TextField
+                col="0"
+                [(ngModel)]="newCollectionName"
+                hint="Name der Sammlung"
+                class="px-3 py-2 bg-white border-2 border-base-200 rounded-lg text-neutral placeholder-gray-400"
+                returnKeyType="done"
+              ></TextField>
+              <FlexboxLayout
+                col="1"
+                (tap)="createAndSelect()"
+                class="ml-2 px-2 py-1 bg-primary text-white rounded-lg flex justify-center align-center items-center"
+              >
+                <svg:SVGImage
+                  [src]="icons.Plus | svgToDataUri: '#FFFFFF'"
+                  class="w-7 h-7"
+                ></svg:SVGImage>
+              </FlexboxLayout>
+            </GridLayout>
+            @if (error()) {
+              <Label
+                textWrap="true"
+                class="text-xs text-red-500 mt-1"
+                [text]="error()"
+              ></Label>
+            }
+          </StackLayout>
+
+          <!-- AI Suggestions -->
+          <StackLayout>
+            <FlexboxLayout class="mb-2 items-center">
+              <svg:SVGImage
+                [src]="icons.Sparkles | svgToDataUri: '#4A6C6F'"
+                class="w-5 h-5 mr-2"
+              ></svg:SVGImage>
+              <Label
+                class="font-semibold text-neutral"
+                text="KI-Vorschläge"
+              ></Label>
+            </FlexboxLayout>
+            @if (isAiLoading()) {
+              <FlexboxLayout class="items-center">
+                <ActivityIndicator
+                  busy="true"
+                  width="16"
+                  height="16"
+                  color="#9CA3AF"
+                  class="mr-2"
+                ></ActivityIndicator>
+                <Label
+                  class="text-sm text-gray-400"
+                  text="Suche nach Ideen..."
+                ></Label>
+              </FlexboxLayout>
+            } @else if (aiSuggestions().length > 0) {
+              <FlexboxLayout flexWrap="wrap" class="gap-2">
+                @for (name of aiSuggestions(); track name) {
+                  <Button
+                    (tap)="addSuggestion(name)"
+                    [text]="name"
+                    class="px-3 py-1.5 bg-secondary/10 text-secondary text-sm font-semibold rounded-full mr-2 mb-2"
+                  ></Button>
+                }
+              </FlexboxLayout>
+            } @else {
+              <Label
+                class="text-sm text-gray-400"
+                text="Keine Vorschläge verfügbar."
+              ></Label>
+            }
+          </StackLayout>
+        </StackLayout>
+      </ScrollView>
+
+      <!-- Footer Actions -->
+      <GridLayout
+        row="2"
+        columns="*,*"
+        class="gap-3 p-4 border-t border-base-200"
+      >
+        <Button
+          col="0"
+          text="Abbrechen"
+          class="px-4 py-3 font-semibold rounded-xl text-neutral bg-gray-100"
+          (tap)="close()"
+        ></Button>
+        <Button
+          col="1"
+          text="Speichern"
+          class="px-4 py-3 font-semibold text-white rounded-xl bg-primary"
+          (tap)="saveSelections()"
+        ></Button>
+      </GridLayout>
+    </GridLayout>
+  </StackLayout>
+</GridLayout>

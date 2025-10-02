@@ -14,6 +14,7 @@ import {
 } from '@nativescript/angular';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { PlannerStore } from '../planner.store';
+import { CookbookStore } from '../../cookbook-page/cookbook.store';
 
 @Component({
   selector: 'ns-transform-recipe',
@@ -24,12 +25,14 @@ import { PlannerStore } from '../planner.store';
 })
 export class TransformRecipeComponent {
   private readonly plannerStore = inject(PlannerStore);
+  private readonly cookbookStore = inject(CookbookStore);
 
   isSaving = signal(false);
 
   recipeToTransform = signal(<Recipe | null>null);
   transformatedRecipe = signal<Recipe | null>(null);
-  isTransforming = this.plannerStore.loading;
+  source = signal<'mealPlan' | 'cookbook'>('mealPlan');
+  isTransforming = signal(false);
   form!: FormGroup;
 
   constructor(
@@ -39,9 +42,14 @@ export class TransformRecipeComponent {
     const nav = this.router.router.currentNavigation();
     const state = (nav?.extras?.state as any) ?? {};
     const recipeFromState = state.recipe as Recipe | undefined;
+    const sourceFromState = state.source as 'cookbook' | 'mealPlan' | undefined;
 
     if (recipeFromState) {
       this.recipeToTransform.set(recipeFromState);
+    }
+
+    if (sourceFromState) {
+      this.source.set(sourceFromState);
     }
 
     this.form = this.fb.group({
@@ -73,14 +81,27 @@ export class TransformRecipeComponent {
     if (!recipe) {
       return;
     }
+    this.isTransforming.set(true);
     try {
-      const transformedRecipe = await this.plannerStore.transformRecipe(
-        recipe,
-        this.form.value.transformationWish,
-      );
+      let transformedRecipe: Recipe | null | undefined;
+
+      if (this.source() === 'cookbook') {
+        transformedRecipe = await this.cookbookStore.transformRecipe(
+          recipe,
+          this.form.value.transformationWish,
+        );
+      } else {
+        transformedRecipe = await this.plannerStore.transformRecipe(
+          recipe,
+          this.form.value.transformationWish,
+        );
+      }
+
       this.transformatedRecipe.set(transformedRecipe ?? null);
     } catch (error) {
       console.error('Error transforming recipe:', error);
+    } finally {
+      this.isTransforming.set(false);
     }
   }
 
@@ -92,16 +113,25 @@ export class TransformRecipeComponent {
       return;
     }
     try {
-      const activePlanId = this.plannerStore.activePlanId();
+      if (this.source() === 'cookbook') {
+        const recipeToSave = { ...transformedRecipe, id: originalId };
+        await this.cookbookStore.updateRecipe(recipeToSave);
 
-      if (activePlanId) {
-        await this.plannerStore.saveTransformedRecipe(
-          originalId,
-          transformedRecipe,
-          action,
-          activePlanId,
-        );
-        await this.router.navigate(['/home', 'plan']);
+        // Navigate back to cookbook
+        await this.router.navigate(['/home', 'cookbook']);
+      } else {
+        // For meal plan: use the original logic
+        const activePlanId = this.plannerStore.activePlanId();
+
+        if (activePlanId) {
+          await this.plannerStore.saveTransformedRecipe(
+            originalId,
+            transformedRecipe,
+            action,
+            activePlanId,
+          );
+          await this.router.navigate(['/home', 'plan']);
+        }
       }
     } catch (error) {
       console.error('Error saving transformed recipe:', error);
