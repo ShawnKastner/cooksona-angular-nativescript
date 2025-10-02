@@ -15,6 +15,7 @@ import {
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { PlannerStore } from '../planner.store';
 import { CookbookStore } from '../../cookbook-page/cookbook.store';
+import { Page } from '@nativescript/core';
 
 @Component({
   selector: 'ns-transform-recipe',
@@ -38,7 +39,10 @@ export class TransformRecipeComponent {
   constructor(
     private router: RouterExtensions,
     private fb: FormBuilder,
+    private page: Page,
   ) {
+    this.page.actionBarHidden = true;
+
     const nav = this.router.router.currentNavigation();
     const state = (nav?.extras?.state as any) ?? {};
     const recipeFromState = state.recipe as Recipe | undefined;
@@ -141,6 +145,16 @@ export class TransformRecipeComponent {
   }
 
   goBack() {
-    this.router.back();
+    const recipe = this.recipeToTransform();
+    if (recipe?.id) {
+      this.router.navigate(['/recipe', recipe.id], {
+        state: { recipe, source: this.source() },
+        clearHistory: true,
+      });
+    } else {
+      // Fallback: zur Tab-Seite wenn keine Recipe ID vorhanden
+      const targetRoute = this.source() === 'cookbook' ? 'cookbook' : 'plan';
+      this.router.navigate(['/home', targetRoute], { clearHistory: true });
+    }
   }
 }

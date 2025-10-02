@@ -65,20 +65,22 @@ export const routes: Routes = [
             (m) => m.ProfileComponent,
           ),
       },
-      {
-        path: 'recipe/:id',
-        loadComponent: () =>
-          import(
-            './features/planner-page/recipe-detail-view/recipe-detail-view.component'
-          ).then((m) => m.RecipeDetailViewComponent),
-      },
-      {
-        path: 'transform-recipe/:id',
-        loadComponent: () =>
-          import(
-            './features/planner-page/transform-recipe/transform-recipe.component'
-          ).then((m) => m.TransformRecipeComponent),
-      },
     ],
+  },
+  {
+    path: 'recipe/:id',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/planner-page/recipe-detail-view/recipe-detail-view.component'
+      ).then((m) => m.RecipeDetailViewComponent),
+  },
+  {
+    path: 'transform-recipe/:id',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/planner-page/transform-recipe/transform-recipe.component'
+      ).then((m) => m.TransformRecipeComponent),
   },
 ];
