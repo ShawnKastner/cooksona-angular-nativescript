@@ -1,9 +1,4 @@
-import {
-  Component,
-  NO_ERRORS_SCHEMA,
-  OnInit,
-  inject,
-} from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA, OnInit, inject } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { HealthStore } from './health.store';
 import { DayHeaderComponent } from './day-header/day-header.component';

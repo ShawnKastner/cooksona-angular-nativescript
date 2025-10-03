@@ -1,5 +1,6 @@
 import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
+import { RouterExtensions } from '@nativescript/angular';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { Apple, Dumbbell } from '@cooksona/constants/icons';
 
@@ -16,8 +17,10 @@ export class TrackingActionsComponent {
     Apple,
   };
 
+  constructor(private routerExtensions: RouterExtensions) {}
+
   protected logQuickActivity(): void {
-    console.warn('TODO: Implement activity logging modal');
+    this.routerExtensions.navigate(['/track-activity']);
   }
 
   protected logQuickMeal(): void {

@@ -29,3 +29,37 @@ export interface UserProfile {
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   goal: 'lose' | 'maintain' | 'gain';
 }
+
+export interface Activity {
+  id: string;
+  userId: string;
+  date: string; // YYYY-MM-DD
+  timestamp: number; // Unix timestamp
+  activityType: ActivityType;
+  durationMinutes: number;
+  caloriesBurned: number;
+}
+
+export type ActivityType =
+  | 'running'
+  | 'cycling'
+  | 'swimming'
+  | 'walking'
+  | 'weightlifting'
+  | 'yoga'
+  | 'pilates'
+  | 'hiit'
+  | 'dancing'
+  | 'soccer'
+  | 'basketball'
+  | 'tennis'
+  | 'hiking'
+  | 'rowing'
+  | 'boxing'
+  | 'other';
+
+export interface ActivityOption {
+  type: ActivityType;
+  label: string;
+  icon?: string;
+}

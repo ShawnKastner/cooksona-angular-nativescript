@@ -83,4 +83,12 @@ export const routes: Routes = [
         './features/planner-page/transform-recipe/transform-recipe.component'
       ).then((m) => m.TransformRecipeComponent),
   },
+  {
+    path: 'track-activity',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/health-page/track-activity/track-activity.component'
+      ).then((m) => m.TrackActivityComponent),
+  },
 ];
