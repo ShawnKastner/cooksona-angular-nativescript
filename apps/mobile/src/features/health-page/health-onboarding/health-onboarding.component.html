@@ -1,0 +1,117 @@
+<GridLayout rows="auto, *, auto" class="bg-base-100">
+    <!-- Progress Bar -->
+    <StackLayout row="0" class="p-6 pb-4">
+        <Label text="Profil einrichten" class="text-2xl font-bold text-neutral text-center mb-4"></Label>
+        <Label [text]="'Schritt ' + currentStep() + ' von ' + totalSteps"
+            class="text-sm text-gray-500 text-center mb-3"></Label>
+        <StackLayout class="h-2 bg-gray-700 rounded-full">
+            <StackLayout class="h-full bg-primary rounded-full" [width]="progressPercentage() + '%'"></StackLayout>
+        </StackLayout>
+    </StackLayout>
+
+    <!-- Steps -->
+    <ScrollView row="1">
+        <StackLayout class="p-6">
+            <!-- Step 1: Basic Info -->
+            @if (currentStep() === 1) {
+            <StackLayout>
+                <Label text="Grundlegende Informationen" class="text-xl font-bold text-neutral mb-6"></Label>
+
+                <!-- Gender Selection -->
+                <Label text="Geschlecht" class="text-sm font-medium text-neutral mb-2"></Label>
+                <GridLayout columns="*, *" class="mb-6 space-x-3">
+                    <Button col="0" [text]="basicInfoForm.get('gender')?.value === 'female' ? '✓ Weiblich' : 'Weiblich'"
+                        (tap)="basicInfoForm.patchValue({ gender: 'female' })" [class]="basicInfoForm.get('gender')?.value === 'female' 
+                  ? 'bg-primary text-white font-semibold py-3 rounded-xl' 
+                  : 'bg-base-200 text-neutral font-semibold py-3 rounded-xl'"></Button>
+                    <Button col="1" [text]="basicInfoForm.get('gender')?.value === 'male' ? '✓ Männlich' : 'Männlich'"
+                        (tap)="basicInfoForm.patchValue({ gender: 'male' })" [class]="basicInfoForm.get('gender')?.value === 'male' 
+                  ? 'bg-primary text-white font-semibold py-3 rounded-xl' 
+                  : 'bg-base-200 text-neutral font-semibold py-3 rounded-xl'"></Button>
+                   <!--  <Button col="2" [text]="basicInfoForm.get('gender')?.value === 'other' ? '✓ Divers' : 'Divers'"
+                        (tap)="basicInfoForm.patchValue({ gender: 'other' })" [class]="basicInfoForm.get('gender')?.value === 'other' 
+                  ? 'bg-primary text-white font-semibold py-3 rounded-xl' 
+                  : 'bg-base-200 text-neutral font-semibold py-3 rounded-xl'"></Button> -->
+                </GridLayout>
+
+                <!-- Age -->
+                <Label text="Alter (Jahre)" class="text-sm font-medium text-neutral mb-2"></Label>
+                <TextField [formControl]="ageControl" keyboardType="number" returnKeyType="next"
+                    class="text-input bg-base-200 text-neutral rounded-xl p-4 mb-6 placeholder:text-gray-400" hint="30" />
+
+                <!-- Height -->
+                <Label text="Größe (cm)" class="text-sm font-medium text-neutral mb-2"></Label>
+                <TextField [formControl]="heightControl" keyboardType="number" returnKeyType="next"
+                    class="text-input bg-base-200 text-neutral rounded-xl p-4 mb-6 placeholder:text-gray-400" hint="170" />
+
+                <!-- Weight -->
+                <Label text="Gewicht (kg)" class="text-sm font-medium text-neutral mb-2"></Label>
+                <TextField [formControl]="weightControl" keyboardType="number" returnKeyType="done"
+                    class="text-input bg-base-200 text-neutral rounded-xl p-4 mb-6 placeholder:text-gray-400" hint="65" />
+            </StackLayout>
+            }
+
+            <!-- Step 2: Activity Level -->
+            @if (currentStep() === 2) {
+            <StackLayout>
+                <Label text="Aktivitätslevel" class="text-xl font-bold text-neutral mb-2"></Label>
+                <Label text="Wie aktiv bist du im Alltag?" class="text-base text-gray-400 mb-6"></Label>
+
+                @for (level of activityLevels; track level.value) {
+                <StackLayout (tap)="selectActivityLevel(level.value)" [class]="selectedActivityLevel() === level.value 
+                  ? 'bg-primary/20 border-2 border-primary rounded-xl p-4 mb-3' 
+                  : 'bg-base-200 border-2 border-transparent rounded-xl p-4 mb-3'">
+                    <GridLayout columns="*, auto" class="items-center">
+                        <StackLayout col="0">
+                            <Label [text]="level.label" class="text-base font-semibold text-neutral mb-1"></Label>
+                            <Label [text]="level.description" class="text-sm text-gray-400" textWrap="true"></Label>
+                        </StackLayout>
+                        @if (selectedActivityLevel() === level.value) {
+                        <Label col="1" text="✓" class="text-2xl text-primary font-bold"></Label>
+                        }
+                    </GridLayout>
+                </StackLayout>
+                }
+            </StackLayout>
+            }
+
+            <!-- Step 3: Goal -->
+            @if (currentStep() === 3) {
+            <StackLayout>
+                <Label text="Dein Ziel" class="text-xl font-bold text-neutral mb-2"></Label>
+                <Label text="Was möchtest du erreichen?" class="text-base text-gray-400 mb-6"></Label>
+
+                @for (goal of goals; track goal.value) {
+                <StackLayout (tap)="selectGoal(goal.value)" [class]="selectedGoal() === goal.value 
+                  ? 'bg-primary/20 border-2 border-primary rounded-xl p-4 mb-3' 
+                  : 'bg-base-200 border-2 border-transparent rounded-xl p-4 mb-3'">
+                    <GridLayout columns="*, auto" class="items-center">
+                        <Label col="0" [text]="goal.label" class="text-base font-semibold text-neutral"></Label>
+                        @if (selectedGoal() === goal.value) {
+                        <Label col="1" text="✓" class="text-2xl text-primary font-bold"></Label>
+                        }
+                    </GridLayout>
+                </StackLayout>
+                }
+            </StackLayout>
+            }
+        </StackLayout>
+    </ScrollView>
+
+    <!-- Bottom Buttons -->
+    <GridLayout row="2" rows="auto, auto" class="bg-base-100">
+        <GridLayout row="0" columns="*, *" class="space-x-3 p-6">
+            @if (currentStep() > 1) {
+            <Button col="0" text="Zurück" (tap)="previousStep()"
+                class="bg-base-200 text-neutral font-semibold py-4 rounded-xl mr-3"></Button>
+            }
+            <Button [col]="currentStep() > 1 ? 1 : 0" [colSpan]="currentStep() > 1 ? 1 : 2"
+                [text]="isSaving() ? 'Speichern...' : (currentStep() === totalSteps ? 'Abschließen' : 'Weiter')"
+                (tap)="nextStep()" class="bg-primary text-white font-semibold py-4 rounded-xl disabled:bg-base-300"
+                [isEnabled]="canGoNext() && !isSaving()"></Button>
+        </GridLayout>
+
+        <!-- Safe area spacer for iOS -->
+        <StackLayout row="1" class="h-[34px] bg-base-100"></StackLayout>
+    </GridLayout>
+</GridLayout>
