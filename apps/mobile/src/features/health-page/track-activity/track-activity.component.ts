@@ -4,6 +4,7 @@ import {
   OnInit,
   inject,
   signal,
+  OnDestroy,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -23,6 +24,7 @@ import { ArrowLeft } from '@cooksona/constants/icons';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { HealthStore } from '../health.store';
 import { alert } from '@nativescript/core';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'ns-track-activity',
@@ -36,13 +38,21 @@ import { alert } from '@nativescript/core';
   ],
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class TrackActivityComponent implements OnInit {
+export class TrackActivityComponent implements OnInit, OnDestroy {
   private readonly healthStore = inject(HealthStore);
 
   activityOptions = ACTIVITY_OPTIONS;
   selectedActivityType: ActivityType | null = null;
   activityForm!: FormGroup;
   isSaving = signal(false);
+
+  // Signals for form values to avoid change detection errors
+  durationMinutes = signal(0);
+  caloriesBurned = signal(0);
+  formValid = signal(false); // Track form validity
+
+  private formSubscription?: Subscription;
+  private statusSubscription?: Subscription;
 
   icons = {
     ArrowLeft,
@@ -59,6 +69,29 @@ export class TrackActivityComponent implements OnInit {
       durationMinutes: [null, [Validators.required, Validators.min(1)]],
       caloriesBurned: [null, [Validators.required, Validators.min(1)]],
     });
+
+    // Subscribe to form changes and update signals
+    this.formSubscription = this.activityForm.valueChanges.subscribe(
+      (value) => {
+        this.durationMinutes.set(value.durationMinutes || 0);
+        this.caloriesBurned.set(value.caloriesBurned || 0);
+      },
+    );
+
+    // Subscribe to form status changes
+    this.statusSubscription = this.activityForm.statusChanges.subscribe(() => {
+      this.formValid.set(this.activityForm.valid);
+    });
+
+    // Also update on value changes for immediate feedback
+    this.activityForm.valueChanges.subscribe(() => {
+      this.formValid.set(this.activityForm.valid);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.formSubscription?.unsubscribe();
+    this.statusSubscription?.unsubscribe();
   }
 
   selectActivity(activityType: ActivityType): void {
@@ -105,13 +138,5 @@ export class TrackActivityComponent implements OnInit {
 
   getActivityLabel(type: ActivityType): string {
     return this.activityOptions.find((opt) => opt.type === type)?.label || type;
-  }
-
-  get durationMinutes(): number {
-    return this.activityForm.get('durationMinutes')?.value || 0;
-  }
-
-  get caloriesBurned(): number {
-    return this.activityForm.get('caloriesBurned')?.value || 0;
   }
 }

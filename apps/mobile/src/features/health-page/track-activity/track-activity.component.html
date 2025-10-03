@@ -49,7 +49,7 @@
         <TextField
           formControlName="durationMinutes"
           keyboardType="number"
-          class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral"
+          class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral placeholder-gray-400"
           hint="z.B. 30"
         >
         </TextField>
@@ -64,7 +64,7 @@
         <TextField
           formControlName="caloriesBurned"
           keyboardType="number"
-          class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral"
+          class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral placeholder-gray-400"
           hint="z.B. 200"
         >
         </TextField>
@@ -84,11 +84,11 @@
             class="text-sm text-gray-700 mb-1"
           ></Label>
           <Label
-            [text]="'Dauer: ' + durationMinutes + ' Minuten'"
+            [text]="'Dauer: ' + durationMinutes() + ' Minuten'"
             class="text-sm text-gray-700 mb-1"
           ></Label>
           <Label
-            [text]="'Kalorien: ' + caloriesBurned + ' kcal'"
+            [text]="'Kalorien: ' + caloriesBurned() + ' kcal'"
             class="text-sm text-gray-700"
           ></Label>
         </StackLayout>
@@ -109,12 +109,8 @@
     >
       <Button
         [text]="isSaving() ? 'Speichern...' : 'Speichern'"
-        [class]="
-          selectedActivityType && activityForm.valid && !isSaving
-            ? 'bg-primary text-white px-6 py-4 rounded-lg font-bold text-base'
-            : 'bg-gray-400 text-gray-200 px-6 py-4 rounded-lg font-bold text-base'
-        "
-        [isEnabled]="selectedActivityType && activityForm.valid && !isSaving"
+        class="bg-primary text-white px-6 py-4 rounded-lg font-bold text-base disabled:bg-base-300"
+        [isEnabled]="selectedActivityType && formValid() && !isSaving()"
         (tap)="saveActivity()"
       >
       </Button>
