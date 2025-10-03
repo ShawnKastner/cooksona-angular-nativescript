@@ -22,26 +22,6 @@ export class HealthStore {
   readonly healthData = signal<HealthData | null>(null);
   readonly selectedDate = signal<Date>(new Date());
 
-  private readonly activityMultipliers: Record<
-    NonNullable<UserProfile>['activityLevel'],
-    number
-  > = {
-    sedentary: 1.2,
-    light: 1.375,
-    moderate: 1.55,
-    active: 1.725,
-    very_active: 1.9,
-  };
-
-  private readonly goalAdjustments: Record<
-    NonNullable<UserProfile>['goal'],
-    number
-  > = {
-    lose: -300,
-    maintain: 0,
-    gain: 300,
-  };
-
   readonly isToday = computed(() => {
     const current = this.selectedDate();
     const now = new Date();
@@ -113,19 +93,21 @@ export class HealthStore {
     () => !!this.healthData() && !this.profile(),
   );
 
-  readonly tdee = computed(() => {
-    const data = this.healthData();
-    const profile = this.profile();
-    if (!data || !profile) return 0;
-    return Math.round(
-      data.bmr * (this.activityMultipliers[profile.activityLevel] ?? 1),
-    );
+  // All values come directly from backend - no calculations needed
+  readonly calorieGoal = computed(() => {
+    return this.healthData()?.calorieTarget ?? 0;
   });
 
-  readonly calorieGoal = computed(() => {
-    const profile = this.profile();
-    if (!profile) return 0;
-    return Math.round(this.tdee() + (this.goalAdjustments[profile.goal] ?? 0));
+  readonly proteinGoal = computed(() => {
+    return this.healthData()?.macroTargets?.protein ?? 0;
+  });
+
+  readonly carbsGoal = computed(() => {
+    return this.healthData()?.macroTargets?.carbs ?? 0;
+  });
+
+  readonly fatGoal = computed(() => {
+    return this.healthData()?.macroTargets?.fat ?? 0;
   });
 
   readonly totalCaloriesWithActivity = computed(() => {
@@ -139,14 +121,6 @@ export class HealthStore {
     const eaten = this.metricsForSelectedDate().caloriesEaten;
     return Math.max(0, Math.round(total - eaten));
   });
-
-  readonly proteinGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.3) / 4),
-  );
-  readonly carbsGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.4) / 4),
-  );
-  readonly fatGoal = computed(() => Math.round((this.calorieGoal() * 0.3) / 9));
 
   readonly calorieProgress = computed(() => {
     const total = this.totalCaloriesWithActivity();
@@ -177,8 +151,28 @@ export class HealthStore {
     this.error.set(null);
     try {
       const data = await this.api.getHealthState();
-      this.healthData.set(data ?? null);
-      if (data && !data.userProfile) {
+
+      // If no data exists, create empty health data structure
+      // This ensures requiresOnboarding works correctly
+      if (!data) {
+        this.healthData.set({
+          userId: '',
+          basalMetabolicRate: 0,
+          maintenanceCalories: 0,
+          calorieTarget: 0,
+          macroTargets: {
+            protein: 0,
+            carbs: 0,
+            fat: 0,
+          },
+          userProfile: undefined,
+          dailyMetrics: [],
+        });
+      } else {
+        this.healthData.set(data);
+      }
+
+      if (!this.profile()) {
         this.selectedDate.set(new Date());
       }
     } catch (e: any) {

@@ -16,7 +16,14 @@ export interface DailyMetrics {
 
 export interface HealthData {
   userId: string;
-  bmr: number; // Basal Metabolic Rate
+  basalMetabolicRate: number; // BMR from backend
+  maintenanceCalories: number; // TDEE from backend
+  calorieTarget: number; // Daily calorie goal from backend
+  macroTargets: {
+    protein: number; // Daily protein goal in grams from backend
+    carbs: number; // Daily carbs goal in grams from backend
+    fat: number; // Daily fat goal in grams from backend
+  };
   userProfile?: UserProfile;
   dailyMetrics: DailyMetrics[];
 }
@@ -62,4 +69,41 @@ export interface ActivityOption {
   type: ActivityType;
   label: string;
   icon?: string;
+}
+
+export interface NutritionalValues {
+  calories: number; // kcal per 100g
+  protein: number; // g per 100g
+  carbs: number; // g per 100g
+  fat: number; // g per 100g
+}
+
+export interface Food {
+  id: string;
+  name: string;
+  category: FoodCategory;
+  nutritionalValues: NutritionalValues;
+  servingSize?: number; // default serving size in grams
+  brand?: string;
+}
+
+export type FoodCategory =
+  | 'fruit'
+  | 'vegetable'
+  | 'meat'
+  | 'fish'
+  | 'dairy'
+  | 'grain'
+  | 'snack'
+  | 'beverage'
+  | 'other';
+
+export interface TrackedMeal {
+  id: string;
+  userId: string;
+  date: string; // YYYY-MM-DD
+  timestamp: number;
+  food: Food;
+  portionGrams: number;
+  calculatedNutrition: NutritionalValues; // actual values based on portion
 }

@@ -1,5 +1,6 @@
 import { Component, NO_ERRORS_SCHEMA, OnInit, inject } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
+import { RouterExtensions } from '@nativescript/angular';
 import { HealthStore } from './health.store';
 import { DayHeaderComponent } from './day-header/day-header.component';
 import { CalorieProgressComponent } from './calorie-progress/calorie-progress.component';
@@ -23,6 +24,7 @@ import { TrackingActionsComponent } from './tracking-actions/tracking-actions.co
 })
 export class HealthPageComponent implements OnInit {
   private readonly store = inject(HealthStore);
+  private readonly routerExtensions = inject(RouterExtensions);
 
   protected readonly loading = this.store.loading;
   protected readonly error = this.store.error;
@@ -32,5 +34,17 @@ export class HealthPageComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.store.load();
+
+    // Automatically navigate to onboarding if profile is not complete
+    if (this.store.requiresOnboarding()) {
+      this.startOnboarding();
+    }
+  }
+
+  startOnboarding(): void {
+    this.routerExtensions.navigate(['/home/health-onboarding'], {
+      clearHistory: false,
+      animated: true,
+    });
   }
 }

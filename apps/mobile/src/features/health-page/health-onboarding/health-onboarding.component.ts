@@ -1,7 +1,23 @@
-import { Component, NO_ERRORS_SCHEMA, signal, computed, inject, effect } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  Component,
+  NO_ERRORS_SCHEMA,
+  signal,
+  computed,
+  inject,
+  effect,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  FormControl,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { RouterExtensions } from '@nativescript/angular';
-import { NativeScriptCommonModule, NativeScriptFormsModule } from '@nativescript/angular';
+import {
+  NativeScriptCommonModule,
+  NativeScriptFormsModule,
+} from '@nativescript/angular';
 import { alert } from '@nativescript/core';
 import { UserProfile } from '@cooksona/models';
 import { HealthStore } from '../health.store';
@@ -21,10 +37,14 @@ interface GoalOption {
   selector: 'ns-health-onboarding',
   templateUrl: './health-onboarding.component.html',
   standalone: true,
-  imports: [NativeScriptCommonModule, NativeScriptFormsModule, ReactiveFormsModule],
+  imports: [
+    NativeScriptCommonModule,
+    NativeScriptFormsModule,
+    ReactiveFormsModule,
+  ],
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class HealthOnboardingComponent  {
+export class HealthOnboardingComponent {
   private readonly fb = inject(FormBuilder);
   private readonly routerExtensions = inject(RouterExtensions);
   private readonly healthStore = inject(HealthStore);
@@ -33,7 +53,7 @@ export class HealthOnboardingComponent  {
   totalSteps = 3;
   isSaving = signal(false);
   formValid = signal(false); // Track form validity in a signal
-  
+
   basicInfoForm: FormGroup;
   selectedActivityLevel = signal<UserProfile['activityLevel']>('light');
   selectedGoal = signal<UserProfile['goal']>('maintain');
@@ -43,8 +63,14 @@ export class HealthOnboardingComponent  {
     this.basicInfoForm = this.fb.group({
       gender: ['', Validators.required],
       age: ['', [Validators.required, Validators.min(10), Validators.max(120)]],
-      height: ['', [Validators.required, Validators.min(100), Validators.max(250)]],
-      weight: ['', [Validators.required, Validators.min(30), Validators.max(300)]],
+      height: [
+        '',
+        [Validators.required, Validators.min(100), Validators.max(250)],
+      ],
+      weight: [
+        '',
+        [Validators.required, Validators.min(30), Validators.max(300)],
+      ],
     });
 
     // Update formValid signal whenever form status changes
@@ -57,7 +83,7 @@ export class HealthOnboardingComponent  {
       this.formValid.set(this.basicInfoForm.valid);
     });
   }
-  
+
   activityLevels: ActivityLevelOption[] = [
     {
       value: 'sedentary',
@@ -144,7 +170,7 @@ export class HealthOnboardingComponent  {
     }
 
     const formValue = this.basicInfoForm.value;
-    
+
     const profile: UserProfile = {
       gender: formValue.gender,
       age: parseInt(formValue.age, 10),
@@ -155,11 +181,11 @@ export class HealthOnboardingComponent  {
     };
 
     this.isSaving.set(true);
-    
+
     try {
       await this.healthStore.saveProfile(profile);
       // Navigate to home after successful onboarding
-      this.routerExtensions.navigate(['/home'], {
+      this.routerExtensions.navigate(['/home/health'], {
         clearHistory: true,
         animated: true,
       });
@@ -167,7 +193,8 @@ export class HealthOnboardingComponent  {
       console.error('Error saving profile:', error);
       alert({
         title: 'Fehler',
-        message: 'Profil konnte nicht gespeichert werden. Bitte versuche es erneut.',
+        message:
+          'Profil konnte nicht gespeichert werden. Bitte versuche es erneut.',
         okButtonText: 'OK',
       });
     } finally {
