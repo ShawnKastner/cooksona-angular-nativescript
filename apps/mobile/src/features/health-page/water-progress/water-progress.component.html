@@ -1,0 +1,50 @@
+<StackLayout
+  class="bg-white p-5 rounded-2xl border border-base-200 box-shadow-1 mt-4"
+>
+  <FlexboxLayout class="items-center justify-center mb-4">
+    <!-- <svg:SVGImage [src]="icons.Droplet | svgToDataUri: '#60A5FA'" class="w-5 h-5 mr-2"></svg:SVGImage> -->
+    <Label class="font-semibold text-neutral" text="Wasser"></Label>
+  </FlexboxLayout>
+
+  <FlexboxLayout class="flex justify-center align-center items-center">
+    <StackLayout class="mb-4">
+      <Button
+        class="bg-base-200 text-neutral font-bold w-12 h-12 rounded-full"
+        text="-"
+        [isEnabled]="metrics().waterIntake > 0"
+        (tap)="adjustWater(-waterStep)"
+      ></Button>
+    </StackLayout>
+
+    <StackLayout>
+      <svg:SVGImage
+        [src]="bottleSvg | svgToDataUri"
+        width="70"
+        height="100"
+      ></svg:SVGImage>
+      <Label
+        class="text-xl font-bold text-primary"
+        [text]="metrics().waterIntake + ' ml'"
+      ></Label>
+      <Label
+        class="text-xs text-gray-400"
+        [text]="'von ' + waterGoal + ' ml'"
+      ></Label>
+    </StackLayout>
+
+    <StackLayout class="mb-4">
+      <Button
+        class="bg-base-200 text-neutral font-bold w-12 h-12 rounded-full"
+        text="+"
+        (tap)="adjustWater(waterStep)"
+      ></Button>
+    </StackLayout>
+  </FlexboxLayout>
+  <Progress
+    class="w-full h-2 rounded-full"
+    backgroundColor="#E2E8F0"
+    color="#38BDF8"
+    [value]="Math.min(Math.max(waterProgress(), 0), 100)"
+    maxValue="100"
+  ></Progress>
+</StackLayout>

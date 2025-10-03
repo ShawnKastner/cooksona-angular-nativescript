@@ -54,8 +54,8 @@ export const routes: Routes = [
       {
         path: 'health',
         loadComponent: () =>
-          import('./features/placeholder/health.component').then(
-            (m) => m.HealthComponent,
+          import('./features/health-page/health-page.component').then(
+            (m) => m.HealthPageComponent,
           ),
       },
       {

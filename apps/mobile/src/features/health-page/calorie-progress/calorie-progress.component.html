@@ -1,0 +1,57 @@
+<StackLayout
+  class="bg-white p-5 mt-4 rounded-2xl border border-base-200 box-shadow-1 space-y-4"
+>
+  <GridLayout width="160" height="160" horizontalAlignment="center">
+    <AnimatedCircle
+      backgroundColor="transparent"
+      width="160"
+      height="160"
+      animated="true"
+      animateFrom="0"
+      rimColor="#f1f0ee"
+      barColor="#4a6c6f"
+      rimWidth="14"
+      [progress]="displayProgress"
+      textSize="22"
+      textColor="#336699"
+    ></AnimatedCircle>
+    <StackLayout verticalAlignment="center" horizontalAlignment="center">
+      <Label
+        class="text-2xl font-bold text-center"
+        style="color: #4a6c6f"
+        [text]="displayCalories"
+      ></Label>
+      <Label
+        class="text-sm text-gray-500 text-center"
+        [text]="displayLabel"
+      ></Label>
+    </StackLayout>
+  </GridLayout>
+
+  <GridLayout
+    columns="*,*,*"
+    class="flex text-center justify-center pt-2 w-full"
+  >
+    <StackLayout col="0" class="items-center">
+      <Label
+        class="font-bold text-lg text-neutral"
+        [text]="Math.round(calorieGoal())"
+      ></Label>
+      <Label class="text-xs text-gray-400" text="Ziel"></Label>
+    </StackLayout>
+    <StackLayout col="1" class="items-center">
+      <Label
+        class="font-bold text-lg text-neutral"
+        [text]="Math.round(metrics().caloriesEaten)"
+      ></Label>
+      <Label class="text-xs text-gray-400" text="Essen"></Label>
+    </StackLayout>
+    <StackLayout col="2" class="items-center">
+      <Label
+        class="font-bold text-lg text-neutral"
+        [text]="Math.round(metrics().caloriesBurned)"
+      ></Label>
+      <Label class="text-xs text-gray-400" text="Aktivität"></Label>
+    </StackLayout>
+  </GridLayout>
+</StackLayout>

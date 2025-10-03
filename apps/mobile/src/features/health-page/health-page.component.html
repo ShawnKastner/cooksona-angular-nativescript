@@ -1,0 +1,63 @@
+<StackLayout class="h-full bg-base-100" iosOverflowSafeArea="false">
+  @if (loading()) {
+    <FlexboxLayout class="h-full items-center justify-center">
+      <ActivityIndicator
+        busy="true"
+        iosIndicatorViewStyle="large"
+        class="w-10 h-10"
+        color="#4A6C6F"
+      ></ActivityIndicator>
+    </FlexboxLayout>
+  } @else {
+    <ScrollView>
+      <StackLayout class="p-5 pb-10 space-y-5">
+        <StackLayout class="items-center">
+          <Label
+            class="text-3xl font-bold text-neutral"
+            text="Health Hub"
+          ></Label>
+          <Label
+            class="text-xs text-gray-500"
+            text="Deine tägliche Übersicht"
+          ></Label>
+        </StackLayout>
+
+        @if (error()) {
+          <StackLayout class="bg-red-50 border border-red-200 rounded-xl p-3">
+            <Label class="text-sm text-red-700" [text]="error()"></Label>
+          </StackLayout>
+        }
+
+        @if (requiresOnboarding()) {
+          <StackLayout
+            class="bg-primary/10 border border-primary/30 rounded-xl p-4 space-y-2"
+          >
+            <Label
+              class="text-base font-semibold text-neutral"
+              text="Profil benötigt"
+            ></Label>
+            <Label class="text-sm text-gray-500" textWrap="true">
+              <FormattedString>
+                <Span
+                  text="Bitte vervollständige dein Gesundheitsprofil, damit wir Ziele und Empfehlungen berechnen können."
+                ></Span>
+              </FormattedString>
+            </Label>
+          </StackLayout>
+        }
+
+        <ns-day-header></ns-day-header>
+
+        <ns-calorie-progress></ns-calorie-progress>
+
+        <ns-macronutrients></ns-macronutrients>
+
+        <ns-water-progress></ns-water-progress>
+
+        <ns-tracking-actions></ns-tracking-actions>
+
+        
+      </StackLayout>
+    </ScrollView>
+  }
+</StackLayout>
