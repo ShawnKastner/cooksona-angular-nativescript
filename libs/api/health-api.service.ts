@@ -12,6 +12,13 @@ export type MetricUpdates = {
   activityCalories?: number;
 };
 
+export type TrackActivityDto = {
+  date?: string; // YYYY-MM-DD, optional
+  activityType: string;
+  durationMinutes: number;
+  caloriesBurned: number;
+};
+
 @Injectable({ providedIn: 'root' })
 export class HealthApiService {
   constructor(private readonly api: ApiService) {}
@@ -40,5 +47,10 @@ export class HealthApiService {
       date: getDateString(date),
       ...updates,
     });
+  }
+
+  // POST /health/activities
+  trackActivity(activity: TrackActivityDto): Promise<HealthData | undefined> {
+    return this.api.post<HealthData>('/health/activities', activity);
   }
 }

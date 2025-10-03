@@ -257,4 +257,24 @@ export class HealthStore {
       fat: data.fat,
     });
   }
+
+  async trackActivity(activity: {
+    activityType: string;
+    durationMinutes: number;
+    caloriesBurned: number;
+    date?: string; // YYYY-MM-DD, optional
+  }): Promise<void> {
+    this.mutating.set(true);
+    this.error.set(null);
+    try {
+      const data = await this.api.trackActivity(activity);
+      if (data) this.healthData.set(data);
+    } catch (e: any) {
+      console.error('Failed to track activity', e);
+      this.error.set(e?.message ?? 'Aktivität konnte nicht gespeichert werden');
+      throw e;
+    } finally {
+      this.mutating.set(false);
+    }
+  }
 }

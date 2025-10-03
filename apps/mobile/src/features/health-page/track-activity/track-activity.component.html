@@ -108,8 +108,13 @@
       class="p-4 pt-4 bg-base-100 border-t-2 border-gray-200"
     >
       <Button
-        text="Speichern"
-        class="bg-primary text-white px-6 py-4 rounded-lg font-bold text-base"
+        [text]="isSaving() ? 'Speichern...' : 'Speichern'"
+        [class]="
+          selectedActivityType && activityForm.valid && !isSaving
+            ? 'bg-primary text-white px-6 py-4 rounded-lg font-bold text-base'
+            : 'bg-gray-400 text-gray-200 px-6 py-4 rounded-lg font-bold text-base'
+        "
+        [isEnabled]="selectedActivityType && activityForm.valid && !isSaving"
         (tap)="saveActivity()"
       >
       </Button>
