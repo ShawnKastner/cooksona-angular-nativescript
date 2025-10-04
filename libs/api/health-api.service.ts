@@ -20,7 +20,7 @@ export type TrackActivityDto = {
 };
 
 export type MealSourceType = 'manual' | 'recipe' | 'barcode';
-export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
 
 export type CreateMealEntryDto = {
   date?: string; // YYYY-MM-DD, optional
@@ -56,6 +56,27 @@ export type UpdateMealEntryDto = {
 
 export type ListMealsDto = {
   date?: string; // YYYY-MM-DD, optional
+  mealType?: MealType; // optional filter by meal type
+};
+
+export type MealEntry = {
+  id: string;
+  userId: string;
+  date: string;
+  name: string;
+  sourceType: MealSourceType;
+  mealType: MealType;
+  recipeId?: string | null;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  salt?: number | null;
+  sugar?: number | null;
+  fiber?: number | null;
+  saturatedFat?: number | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 @Injectable({ providedIn: 'root' })
@@ -94,11 +115,15 @@ export class HealthApiService {
   }
 
   // GET /health/meals
-  listMeals(query?: ListMealsDto): Promise<any> {
-    const url = query?.date
-      ? `/health/meals?date=${query.date}`
+  async listMeals(query?: ListMealsDto): Promise<MealEntry[]> {
+    const params = new URLSearchParams();
+    if (query?.date) params.append('date', query.date);
+    if (query?.mealType) params.append('mealType', query.mealType);
+    const url = params.toString()
+      ? `/health/meals?${params.toString()}`
       : '/health/meals';
-    return this.api.get<any>(url);
+    const result = await this.api.get<MealEntry[]>(url);
+    return result || [];
   }
 
   // POST /health/meals

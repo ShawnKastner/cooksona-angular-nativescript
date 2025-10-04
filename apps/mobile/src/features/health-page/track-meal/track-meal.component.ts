@@ -9,7 +9,7 @@ import { Food } from '@cooksona/models';
 import { MealTrackingService } from '../../../core/services/meal-tracking.service';
 import { ArrowLeft } from '@cooksona/constants/icons';
 
-export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
 
 interface MealTypeOption {
   type: MealType;
@@ -37,7 +37,7 @@ export class TrackMealComponent implements OnInit {
     { type: 'breakfast', label: 'Frühstück', emoji: '🌅' },
     { type: 'lunch', label: 'Mittagessen', emoji: '🌞' },
     { type: 'dinner', label: 'Abendessen', emoji: '🌙' },
-    { type: 'snack', label: 'Snacks', emoji: '🍿' },
+    { type: 'snacks', label: 'Snacks', emoji: '🍿' },
   ];
 
   icons = {
@@ -77,7 +77,7 @@ export class TrackMealComponent implements OnInit {
     }
     // 21:01 - 04:59 (late night / early morning)
     else {
-      return 'snack';
+      return 'snacks';
     }
   }
 
@@ -105,13 +105,13 @@ export class TrackMealComponent implements OnInit {
 
   selectFood(food: Food): void {
     this.routerExtensions.navigate(['/food-detail', food.id], {
-      queryParams: { mealType: this.selectedMealType() }
+      queryParams: { mealType: this.selectedMealType() },
     });
   }
 
   goToManualEntry(): void {
     this.routerExtensions.navigate(['/manual-food-entry'], {
-      queryParams: { mealType: this.selectedMealType() }
+      queryParams: { mealType: this.selectedMealType() },
     });
   }
 

@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { HealthApiService, MetricUpdates } from '@cooksona/api';
+import { HealthApiService, MetricUpdates, type MealEntry } from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
 import {
   DailyMetrics,
@@ -21,6 +21,7 @@ export class HealthStore {
   readonly error = signal<string | null>(null);
   readonly healthData = signal<HealthData | null>(null);
   readonly selectedDate = signal<Date>(new Date());
+  readonly meals = signal<MealEntry[]>([]);
 
   readonly isToday = computed(() => {
     const current = this.selectedDate();
@@ -175,6 +176,9 @@ export class HealthStore {
       if (!this.profile()) {
         this.selectedDate.set(new Date());
       }
+
+      // Load meals for the selected date
+      await this.loadMealsForSelectedDate();
     } catch (e: any) {
       console.error('Failed to load health data', e);
       this.error.set(
@@ -187,17 +191,20 @@ export class HealthStore {
 
   setSelectedDate(date: Date) {
     this.selectedDate.set(date);
+    this.loadMealsForSelectedDate();
   }
 
   goToPreviousDay() {
     const current = this.selectedDate();
     this.selectedDate.set(new Date(current.getTime() - 86400000));
+    this.loadMealsForSelectedDate();
   }
 
   goToNextDay() {
     if (this.isToday()) return;
     const current = this.selectedDate();
     this.selectedDate.set(new Date(current.getTime() + 86400000));
+    this.loadMealsForSelectedDate();
   }
 
   async saveProfile(profile: UserProfile): Promise<void> {
@@ -282,7 +289,7 @@ export class HealthStore {
     date?: string;
     name: string;
     sourceType: 'manual' | 'recipe' | 'barcode';
-    mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+    mealType: 'breakfast' | 'lunch' | 'dinner' | 'snacks';
     recipeId?: string | null;
     calories: number;
     protein: number;
@@ -305,5 +312,26 @@ export class HealthStore {
     } finally {
       this.mutating.set(false);
     }
+  }
+
+  async loadMeals(
+    date?: string,
+    mealType?: 'breakfast' | 'lunch' | 'dinner' | 'snacks',
+  ): Promise<MealEntry[]> {
+    this.error.set(null);
+    try {
+      const meals = await this.api.listMeals({ date, mealType });
+      return meals || [];
+    } catch (e: any) {
+      console.error('Failed to load meals', e);
+      this.error.set(e?.message ?? 'Mahlzeiten konnten nicht geladen werden');
+      return [];
+    }
+  }
+
+  private async loadMealsForSelectedDate(): Promise<void> {
+    const dateString = getDateString(this.selectedDate());
+    const meals = await this.loadMeals(dateString);
+    this.meals.set(meals);
   }
 }

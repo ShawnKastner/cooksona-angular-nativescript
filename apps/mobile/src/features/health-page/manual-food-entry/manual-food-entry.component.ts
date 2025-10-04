@@ -24,7 +24,7 @@ import { HealthStore } from '../health.store';
 import { getDateString } from '@cooksona/models';
 import { Subscription } from 'rxjs';
 
-type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
 
 @Component({
   selector: 'ns-manual-food-entry',
