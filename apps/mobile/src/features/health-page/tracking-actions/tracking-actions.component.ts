@@ -24,6 +24,6 @@ export class TrackingActionsComponent {
   }
 
   protected logQuickMeal(): void {
-    console.warn('TODO: Implement meal logging flow');
+    this.routerExtensions.navigate(['/track-meal']);
   }
 }

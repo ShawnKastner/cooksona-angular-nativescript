@@ -1,0 +1,105 @@
+<GridLayout rows="auto, auto, auto, *" class="h-full bg-base-100">
+  <!-- ActionBar -->
+  <ActionBar row="0" class="bg-base-100 text-neutral" title="Mahlzeit tracken">
+    <NavigationButton
+      ios.position="left"
+      android.position="actionBar"
+      (tap)="goBack()"
+    />
+  </ActionBar>
+
+  <!-- Meal Type Selection -->
+  <ScrollView
+    row="1"
+    orientation="horizontal"
+    scrollBarIndicatorVisible="false"
+    class="bg-base-100"
+  >
+    <StackLayout orientation="horizontal" class="px-4 py-4">
+      @for (option of mealTypeOptions; track option.type) {
+        <StackLayout
+          (tap)="selectMealType(option.type)"
+          [class]="
+            selectedMealType() === option.type
+              ? 'bg-primary rounded-2xl px-5 py-3 mr-3'
+              : 'bg-base-200 rounded-2xl px-5 py-3 mr-3'
+          "
+        >
+          <Label
+            [text]="option.emoji"
+            class="text-2xl text-center mb-1"
+          ></Label>
+          <Label
+            [text]="option.label"
+            [class]="
+              selectedMealType() === option.type
+                ? 'text-white text-sm font-semibold text-center'
+                : 'text-neutral text-sm font-medium text-center'
+            "
+          ></Label>
+        </StackLayout>
+      }
+    </StackLayout>
+  </ScrollView>
+
+  <!-- Search Bar -->
+  <StackLayout row="2" class="px-4 pb-4" [formGroup]="searchForm">
+    <TextField
+      formControlName="searchQuery"
+      class="bg-white border-2 border-gray-300 rounded-full p-3 text-base text-neutral placeholder-gray-400"
+      hint="Lebensmittel suchen..."
+    >
+    </TextField>
+  </StackLayout>
+
+  <!-- Content -->
+  <ScrollView row="3">
+    <StackLayout class="px-5 pb-10">
+      <!-- Manual Entry Button -->
+      <Button
+        text="Oder schnell manuell eintragen"
+        class="bg-white text-primary border-2 border-primary px-4 py-3 rounded-lg font-semibold text-base mb-6"
+        (tap)="goToManualEntry()"
+      >
+      </Button>
+
+      <!-- Food List -->
+      @for (food of foods; track food.id) {
+        <StackLayout
+          class="bg-white rounded-lg p-4 mb-3 border border-gray-200"
+          (tap)="selectFood(food)"
+        >
+          <FlexboxLayout class="justify-between items-center">
+            <StackLayout class="flex-1">
+              <Label
+                [text]="food.name"
+                class="text-base font-bold text-neutral"
+              ></Label>
+              <Label
+                [text]="
+                  getCategoryLabel(food.category) +
+                  ' - ' +
+                  food.nutritionalValues.calories +
+                  ' kcal / 100g'
+                "
+                class="text-sm text-gray-500 mt-1"
+              >
+              </Label>
+            </StackLayout>
+            <Label text="›" class="text-2xl text-gray-400 ml-2"></Label>
+          </FlexboxLayout>
+        </StackLayout>
+      }
+
+      @if (foods.length === 0) {
+        <StackLayout class="items-center justify-center p-10">
+          <Label
+            text="Keine Lebensmittel gefunden"
+            class="text-base text-gray-500 text-center"
+          >
+          </Label>
+        </StackLayout>
+      }
+    </StackLayout>
+  </ScrollView>
+</GridLayout>

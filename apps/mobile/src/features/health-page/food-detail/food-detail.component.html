@@ -1,0 +1,196 @@
+<GridLayout rows="auto, *, auto" class="h-full bg-base-100">
+  <!-- ActionBar -->
+  <ActionBar
+    row="0"
+    class="bg-base-100 text-neutral"
+    [title]="food?.name || 'Details'"
+  >
+    <NavigationButton visibility="collapsed" />
+    <ActionItem
+      ios.position="left"
+      android.position="actionBar"
+      (tap)="goBack()"
+    >
+      <FlexboxLayout class="items-center justify-center p-2">
+        <svg:SVGImage
+          [src]="icons.ArrowLeft | svgToDataUri: '#6b7280'"
+          class="w-6 h-6"
+        ></svg:SVGImage>
+      </FlexboxLayout>
+    </ActionItem>
+  </ActionBar>
+
+  <!-- Content -->
+  @if (food) {
+    <ScrollView row="1" iosOverflowSafeArea="false">
+      <StackLayout class="p-5 pb-10" [formGroup]="portionForm">
+        <!-- Food Info -->
+        <StackLayout
+          class="bg-white rounded-lg p-4 mb-6 border border-gray-200"
+        >
+          <Label
+            [text]="food.name"
+            class="text-xl font-bold text-neutral mb-2"
+          ></Label>
+          <Label
+            [text]="getCategoryLabel(food.category)"
+            class="text-sm text-gray-500"
+          ></Label>
+        </StackLayout>
+
+        <!-- Portion Input -->
+        <StackLayout class="mb-6">
+          <Label
+            text="Menge (Gramm)"
+            class="text-base font-semibold text-neutral mb-2"
+          ></Label>
+          <TextField
+            formControlName="portionGrams"
+            keyboardType="number"
+            class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral"
+            [hint]="'z.B. ' + (food.servingSize || 100)"
+          >
+          </TextField>
+        </StackLayout>
+
+        <!-- Nutritional Values per 100g -->
+        <StackLayout class="mb-6">
+          <Label
+            text="Nährwerte pro 100g"
+            class="text-lg font-bold text-neutral mb-3"
+          ></Label>
+          <StackLayout class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+            <GridLayout columns="*, auto" class="mb-2">
+              <Label
+                col="0"
+                text="Kalorien"
+                class="text-base text-neutral"
+              ></Label>
+              <Label
+                col="1"
+                [text]="food.nutritionalValues.calories + ' kcal'"
+                class="text-base font-semibold text-neutral"
+              ></Label>
+            </GridLayout>
+            <GridLayout columns="*, auto" class="mb-2">
+              <Label
+                col="0"
+                text="Protein"
+                class="text-base text-neutral"
+              ></Label>
+              <Label
+                col="1"
+                [text]="food.nutritionalValues.protein + ' g'"
+                class="text-base font-semibold text-neutral"
+              ></Label>
+            </GridLayout>
+            <GridLayout columns="*, auto" class="mb-2">
+              <Label
+                col="0"
+                text="Kohlenhydrate"
+                class="text-base text-neutral"
+              ></Label>
+              <Label
+                col="1"
+                [text]="food.nutritionalValues.carbs + ' g'"
+                class="text-base font-semibold text-neutral"
+              ></Label>
+            </GridLayout>
+            <GridLayout columns="*, auto">
+              <Label col="0" text="Fett" class="text-base text-neutral"></Label>
+              <Label
+                col="1"
+                [text]="food.nutritionalValues.fat + ' g'"
+                class="text-base font-semibold text-neutral"
+              ></Label>
+            </GridLayout>
+          </StackLayout>
+        </StackLayout>
+
+        <!-- Calculated Nutrition -->
+        @if (calculatedNutrition) {
+          <StackLayout class="mb-6">
+            <Label
+              text="Deine Portion"
+              class="text-lg font-bold text-neutral mb-3"
+            ></Label>
+            <StackLayout
+              class="bg-primary-light rounded-lg p-4 border-2 border-primary"
+            >
+              <GridLayout columns="*, auto" class="mb-2">
+                <Label
+                  col="0"
+                  text="Kalorien"
+                  class="text-base text-neutral font-semibold"
+                ></Label>
+                <Label
+                  col="1"
+                  [text]="calculatedNutrition.calories + ' kcal'"
+                  class="text-base font-bold text-primary"
+                ></Label>
+              </GridLayout>
+              <GridLayout columns="*, auto" class="mb-2">
+                <Label
+                  col="0"
+                  text="Protein"
+                  class="text-base text-neutral font-semibold"
+                ></Label>
+                <Label
+                  col="1"
+                  [text]="calculatedNutrition.protein + ' g'"
+                  class="text-base font-bold text-primary"
+                ></Label>
+              </GridLayout>
+              <GridLayout columns="*, auto" class="mb-2">
+                <Label
+                  col="0"
+                  text="Kohlenhydrate"
+                  class="text-base text-neutral font-semibold"
+                ></Label>
+                <Label
+                  col="1"
+                  [text]="calculatedNutrition.carbs + ' g'"
+                  class="text-base font-bold text-primary"
+                ></Label>
+              </GridLayout>
+              <GridLayout columns="*, auto">
+                <Label
+                  col="0"
+                  text="Fett"
+                  class="text-base text-neutral font-semibold"
+                ></Label>
+                <Label
+                  col="1"
+                  [text]="calculatedNutrition.fat + ' g'"
+                  class="text-base font-bold text-primary"
+                ></Label>
+              </GridLayout>
+            </StackLayout>
+          </StackLayout>
+        }
+      </StackLayout>
+    </ScrollView>
+  }
+
+  <!-- Fixed Track Button at Bottom -->
+  <GridLayout
+    row="2"
+    rows="auto, auto"
+    class="bg-base-100"
+    iosOverflowSafeArea="false"
+  >
+    <StackLayout
+      row="0"
+      class="p-4 pt-4 bg-base-100 border-t-2 border-gray-200"
+    >
+      <Button
+        text="Tracken"
+        class="bg-primary text-white px-6 py-4 rounded-lg font-bold text-base"
+        (tap)="trackFood()"
+      >
+      </Button>
+    </StackLayout>
+    <!-- Safe Area Spacer -->
+    <StackLayout row="1" class="bg-base-100" height="34"></StackLayout>
+  </GridLayout>
+</GridLayout>

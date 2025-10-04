@@ -277,4 +277,33 @@ export class HealthStore {
       this.mutating.set(false);
     }
   }
+
+  async createMeal(meal: {
+    date?: string;
+    name: string;
+    sourceType: 'manual' | 'recipe' | 'barcode';
+    mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+    recipeId?: string | null;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    salt?: number | null;
+    sugar?: number | null;
+    fiber?: number | null;
+    saturatedFat?: number | null;
+  }): Promise<void> {
+    this.mutating.set(true);
+    this.error.set(null);
+    try {
+      const data = await this.api.createMeal(meal);
+      if (data) this.healthData.set(data);
+    } catch (e: any) {
+      console.error('Failed to create meal', e);
+      this.error.set(e?.message ?? 'Mahlzeit konnte nicht gespeichert werden');
+      throw e;
+    } finally {
+      this.mutating.set(false);
+    }
+  }
 }
