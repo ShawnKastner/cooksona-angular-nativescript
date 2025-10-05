@@ -54,8 +54,8 @@ export const routes: Routes = [
       {
         path: 'health',
         loadComponent: () =>
-          import('./features/placeholder/health.component').then(
-            (m) => m.HealthComponent,
+          import('./features/health-page/health-page.component').then(
+            (m) => m.HealthPageComponent,
           ),
       },
       {
@@ -64,6 +64,13 @@ export const routes: Routes = [
           import('./features/placeholder/profile.component').then(
             (m) => m.ProfileComponent,
           ),
+      },
+      {
+        path: 'health-onboarding',
+        loadComponent: () =>
+          import(
+            './features/health-page/health-onboarding/health-onboarding.component'
+          ).then((m) => m.HealthOnboardingComponent),
       },
     ],
   },
@@ -82,5 +89,53 @@ export const routes: Routes = [
       import(
         './features/planner-page/transform-recipe/transform-recipe.component'
       ).then((m) => m.TransformRecipeComponent),
+  },
+  {
+    path: 'health-onboarding',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/health-page/health-onboarding/health-onboarding.component'
+      ).then((m) => m.HealthOnboardingComponent),
+  },
+  {
+    path: 'track-activity',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/health-page/track-activity/track-activity.component'
+      ).then((m) => m.TrackActivityComponent),
+  },
+  {
+    path: 'edit-activity',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/health-page/activity-section/edit-activity/edit-activity.component'
+      ).then((m) => m.EditActivityComponent),
+  },
+  {
+    path: 'track-meal',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import('./features/health-page/track-meal/track-meal.component').then(
+        (m) => m.TrackMealComponent,
+      ),
+  },
+  {
+    path: 'food-detail/:id',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import('./features/health-page/track-meal/food-detail/food-detail.component').then(
+        (m) => m.FoodDetailComponent,
+      ),
+  },
+  {
+    path: 'manual-food-entry',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/health-page/track-meal/manual-food-entry/manual-food-entry.component'
+      ).then((m) => m.ManualFoodEntryComponent),
   },
 ];

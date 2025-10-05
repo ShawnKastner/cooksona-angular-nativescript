@@ -1,0 +1,63 @@
+<StackLayout
+  class="bg-white p-5 rounded-2xl border border-base-200 box-shadow-1 space-y-4 mt-4"
+>
+  <Label class="font-bold text-neutral" text="Mahlzeitenprotokoll"></Label>
+  @if (loading()) {
+    <ActivityIndicator busy="true" class="text-primary"></ActivityIndicator>
+  } @else {
+    @for (meal of mealSections(); track meal.key) {
+      <StackLayout class="border border-base-200 rounded-xl">
+        <GridLayout
+          columns="*, auto, auto"
+          class="items-center justify-between p-3"
+          (tap)="toggleMeal(meal.key)"
+        >
+          <FlexboxLayout column="0" class="items-center space-x-3">
+            <FlexboxLayout
+              class="w-10 h-10 rounded-full bg-base-200 items-center justify-center"
+            >
+              <svg:SVGImage
+                [src]="meal.icon | svgToDataUri: '#4A6C6F'"
+                class="w-5 h-5"
+              ></svg:SVGImage>
+            </FlexboxLayout>
+            <Label
+              class="font-semibold text-sm text-neutral"
+              [text]="meal.label"
+            ></Label>
+          </FlexboxLayout>
+          <Label
+            column="1"
+            class="font-semibold text-sm text-neutral mr-3"
+            [text]="meal.calories + ' kcal'"
+          ></Label>
+          <svg:SVGImage
+            column="2"
+            [src]="icons.ChevronDown | svgToDataUri: '#94A3B8'"
+            class="w-5 h-5 transition-transform"
+            [class.rotate-180]="expandedMeal() === meal.key"
+          ></svg:SVGImage>
+        </GridLayout>
+        @if (expandedMeal() === meal.key) {
+          <StackLayout class="border-t border-base-200 px-4 py-2 space-y-1">
+            @if (meal.items.length === 0) {
+              <Label
+                class="text-xs text-gray-400 text-center py-2"
+                text="Keine Mahlzeiten eingetragen"
+              ></Label>
+            }
+            @for (item of meal.items; track item.id) {
+              <FlexboxLayout class="justify-between">
+                <Label class="text-xs text-gray-500" [text]="item.name"></Label>
+                <Label
+                  class="text-xs text-gray-400"
+                  [text]="item.calories + ' kcal'"
+                ></Label>
+              </FlexboxLayout>
+            }
+          </StackLayout>
+        }
+      </StackLayout>
+    }
+  }
+</StackLayout>

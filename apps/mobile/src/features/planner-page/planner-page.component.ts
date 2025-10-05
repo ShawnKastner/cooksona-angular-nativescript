@@ -9,6 +9,7 @@ import {
 import {
   ModalDialogService,
   NativeScriptCommonModule,
+  RouterExtensions,
 } from '@nativescript/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
@@ -46,7 +47,7 @@ import { Recipe } from '@cooksona/models';
 })
 export class PlannerPageComponent implements OnInit {
   private readonly store = inject(PlannerStore);
-  private readonly router = inject(Router);
+  private readonly router = inject(RouterExtensions);
   private readonly route = inject(ActivatedRoute);
   selected = signal<'plan' | 'list' | 'history'>('plan');
   isGenerating = signal(false);

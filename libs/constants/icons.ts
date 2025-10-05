@@ -438,6 +438,58 @@ export const ErrorCircle = `
 <circle cx="12" cy="12" r="10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
+export const ArrowRight = `
+ <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M5 12h14" />
+    <path d="m12 5 7 7-7 7" />
+  </svg>`;
+
+export const Dumbbell = `
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M14.4 14.4 9.6 9.6" />
+    <path d="M18.657 5.343a2 2 0 1 0-2.829-2.828l-1.767 1.768a2 2 0 1 0 2.829 2.829z" />
+    <path d="m21.5 8.3-1.6-1.6" />
+    <path d="M4.243 19.757a2 2 0 1 0 2.829 2.829l1.767-1.768a2 2 0 1 0-2.829-2.829z" />
+    <path d="m8.3 21.5-1.6-1.6" />
+    <path d="M6.71 11.95 5.05 13.6a3 3 0 1 0 4.24 4.24l1.66-1.66" />
+    <path d="m11.95 6.71 1.66 1.66a3 3 0 1 0 4.24-4.24l-1.66-1.66" />
+  </svg>`;
+
+export const Droplet = `
+   <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5S5 13 5 15a7 7 0 0 0 7 7z" />
+  </svg>`;
+
 export const icons = {
   ChefHat,
   ShoppingBasket,
@@ -496,6 +548,9 @@ export const icons = {
   Apple,
   ArrowLeft,
   ErrorCircle,
+  ArrowRight,
+  Dumbbell,
+  Droplet,
 };
 
 export type IconName = keyof typeof icons;

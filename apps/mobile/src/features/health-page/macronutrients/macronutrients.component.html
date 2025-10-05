@@ -1,0 +1,78 @@
+<StackLayout
+  class="bg-white p-5 rounded-2xl border border-base-200 box-shadow-1 space-y-4 mt-4"
+>
+  <Label
+    class="font-bold text-neutral text-center"
+    text="Makronährstoffe"
+  ></Label>
+  <StackLayout class="space-y-4">
+    <StackLayout>
+      <FlexboxLayout class="justify-between mb-1">
+        <Label
+          class="text-sm font-semibold text-neutral"
+          text="Protein"
+        ></Label>
+        <Label
+          class="text-xs text-gray-500"
+          [text]="
+            Math.round(metrics().protein) +
+            ' / ' +
+            Math.max(proteinGoal(), 0) +
+            ' g'
+          "
+        ></Label>
+      </FlexboxLayout>
+      <Progress
+        class="w-full h-2 rounded-full"
+        backgroundColor="#E2E8F0"
+        color="#FACC15"
+        [value]="Math.min(Math.max(proteinProgress(), 0), 100)"
+        maxValue="100"
+      ></Progress>
+    </StackLayout>
+
+    <StackLayout>
+      <FlexboxLayout class="justify-between mb-1">
+        <Label
+          class="text-sm font-semibold text-neutral"
+          text="Kohlenhydrate"
+        ></Label>
+        <Label
+          class="text-xs text-gray-500"
+          [text]="
+            Math.round(metrics().carbs) +
+            ' / ' +
+            Math.max(carbsGoal(), 0) +
+            ' g'
+          "
+        ></Label>
+      </FlexboxLayout>
+      <Progress
+        class="w-full h-2 rounded-full"
+        backgroundColor="#E2E8F0"
+        color="#FB923C"
+        [value]="Math.min(Math.max(carbsProgress(), 0), 100)"
+        maxValue="100"
+      ></Progress>
+    </StackLayout>
+
+    <StackLayout>
+      <FlexboxLayout class="justify-between mb-1">
+        <Label class="text-sm font-semibold text-neutral" text="Fett"></Label>
+        <Label
+          class="text-xs text-gray-500"
+          [text]="
+            Math.round(metrics().fat) + ' / ' + Math.max(fatGoal(), 0) + ' g'
+          "
+        ></Label>
+      </FlexboxLayout>
+      <Progress
+        class="w-full h-2 rounded-full"
+        backgroundColor="#E2E8F0"
+        color="#F87171"
+        [value]="Math.min(Math.max(fatProgress(), 0), 100)"
+        maxValue="100"
+      ></Progress>
+    </StackLayout>
+  </StackLayout>
+</StackLayout>

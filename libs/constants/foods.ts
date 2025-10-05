@@ -1,0 +1,148 @@
+import { Food } from '@cooksona/models/health.models';
+
+export const MOCK_FOODS: Food[] = [
+  {
+    id: 'food_1',
+    name: 'Apfel',
+    category: 'fruit',
+    nutritionalValues: {
+      calories: 52,
+      protein: 0.3,
+      carbs: 14,
+      fat: 0.2,
+    },
+    servingSize: 100,
+  },
+  {
+    id: 'food_2',
+    name: 'Banane',
+    category: 'fruit',
+    nutritionalValues: {
+      calories: 89,
+      protein: 1.1,
+      carbs: 23,
+      fat: 0.3,
+    },
+    servingSize: 120,
+  },
+  {
+    id: 'food_3',
+    name: 'Hähnchenbrust (gekocht)',
+    category: 'meat',
+    nutritionalValues: {
+      calories: 165,
+      protein: 31,
+      carbs: 0,
+      fat: 3.6,
+    },
+    servingSize: 100,
+  },
+  {
+    id: 'food_4',
+    name: 'Lachs (gebraten)',
+    category: 'fish',
+    nutritionalValues: {
+      calories: 206,
+      protein: 22,
+      carbs: 0,
+      fat: 13,
+    },
+    servingSize: 150,
+  },
+  {
+    id: 'food_5',
+    name: 'Vollkornbrot',
+    category: 'grain',
+    nutritionalValues: {
+      calories: 247,
+      protein: 8.5,
+      carbs: 41,
+      fat: 3.5,
+    },
+    servingSize: 50,
+  },
+  {
+    id: 'food_6',
+    name: 'Reis (gekocht)',
+    category: 'grain',
+    nutritionalValues: {
+      calories: 130,
+      protein: 2.7,
+      carbs: 28,
+      fat: 0.3,
+    },
+    servingSize: 150,
+  },
+  {
+    id: 'food_7',
+    name: 'Brokkoli',
+    category: 'vegetable',
+    nutritionalValues: {
+      calories: 34,
+      protein: 2.8,
+      carbs: 7,
+      fat: 0.4,
+    },
+    servingSize: 100,
+  },
+  {
+    id: 'food_8',
+    name: 'Ei (gekocht)',
+    category: 'dairy',
+    nutritionalValues: {
+      calories: 155,
+      protein: 13,
+      carbs: 1.1,
+      fat: 11,
+    },
+    servingSize: 50,
+  },
+  {
+    id: 'food_9',
+    name: 'Magerquark',
+    category: 'dairy',
+    nutritionalValues: {
+      calories: 67,
+      protein: 12,
+      carbs: 4,
+      fat: 0.3,
+    },
+    servingSize: 150,
+  },
+  {
+    id: 'food_10',
+    name: 'Haferflocken',
+    category: 'grain',
+    nutritionalValues: {
+      calories: 379,
+      protein: 13.5,
+      carbs: 58,
+      fat: 7,
+    },
+    servingSize: 50,
+  },
+  {
+    id: 'food_11',
+    name: 'Mandeln',
+    category: 'snack',
+    nutritionalValues: {
+      calories: 579,
+      protein: 21,
+      carbs: 22,
+      fat: 50,
+    },
+    servingSize: 30,
+  },
+  {
+    id: 'food_12',
+    name: 'Kartoffel (gekocht)',
+    category: 'vegetable',
+    nutritionalValues: {
+      calories: 77,
+      protein: 2,
+      carbs: 17,
+      fat: 0.1,
+    },
+    servingSize: 150,
+  },
+];
