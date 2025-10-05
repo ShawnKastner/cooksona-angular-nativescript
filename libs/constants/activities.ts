@@ -1,4 +1,4 @@
-import { ActivityOption } from '../models/health.models';
+import { ActivityOption } from '@cooksona/models/health.models';
 
 export const ACTIVITY_OPTIONS: ActivityOption[] = [
   { type: 'running', label: 'Laufen' },
