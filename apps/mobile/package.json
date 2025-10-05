@@ -9,7 +9,8 @@
     "@nativescript/core": "*",
     "@nativescript/google-signin": "^2.1.1",
     "@nstudio/nativescript-checkbox": "^2.0.5",
-    "@sergeymell/nativescript-svg": "^1.1.2"
+    "@sergeymell/nativescript-svg": "^1.1.2",
+    "nativescript-health-data": "^1.0.11"
   },
   "devDependencies": {
     "@nativescript/android": "~8.9.0",
