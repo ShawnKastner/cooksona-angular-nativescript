@@ -12,10 +12,10 @@ import {
   NativeScriptFormsModule,
 } from '@nativescript/angular';
 import { Food, NutritionalValues } from '@cooksona/models';
-import { MealTrackingService } from '../../../core/services/meal-tracking.service';
+import { MealTrackingService } from '../../../../core/services/meal-tracking.service';
 import { alert } from '@nativescript/core/ui/dialogs';
 import { ArrowLeft } from '@cooksona/constants/icons';
-import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
+import { SvgToDataUriPipe } from '../../../../utils/svg-to-data-uri.pipe';
 
 @Component({
   selector: 'ns-food-detail',

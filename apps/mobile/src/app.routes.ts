@@ -126,7 +126,7 @@ export const routes: Routes = [
     path: 'food-detail/:id',
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>
-      import('./features/health-page/food-detail/food-detail.component').then(
+      import('./features/health-page/track-meal/food-detail/food-detail.component').then(
         (m) => m.FoodDetailComponent,
       ),
   },
@@ -135,7 +135,7 @@ export const routes: Routes = [
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>
       import(
-        './features/health-page/manual-food-entry/manual-food-entry.component'
+        './features/health-page/track-meal/manual-food-entry/manual-food-entry.component'
       ).then((m) => m.ManualFoodEntryComponent),
   },
 ];
