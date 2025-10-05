@@ -1,4 +1,4 @@
-import { Food } from '../models/health.models';
+import { Food } from '@cooksona/models/health.models';
 
 export const MOCK_FOODS: Food[] = [
   {
