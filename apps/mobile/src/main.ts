@@ -5,12 +5,17 @@ import {
   registerElement,
   runNativeScriptAngularApp,
 } from '@nativescript/angular';
-import { APP_INITIALIZER, provideZonelessChangeDetection } from '@angular/core';
+import {
+  APP_INITIALIZER,
+  importProvidersFrom,
+  provideZonelessChangeDetection,
+} from '@angular/core';
 import { withInterceptorsFromDi } from '@angular/common/http';
 import { routes } from './app.routes';
 import { AppComponent } from './app.component';
 import { provideApiBaseUrl } from '@cooksona/api';
 import { environment } from './environments/environment';
+import { HealthModule } from './healthkit/health.module';
 import { AuthService } from '@cooksona/auth';
 import { MobileTokenService } from './core/mobile-token.service';
 
@@ -30,6 +35,7 @@ runNativeScriptAngularApp({
         provideNativeScriptHttpClient(withInterceptorsFromDi()),
         provideNativeScriptRouter(routes),
         provideZonelessChangeDetection(),
+        importProvidersFrom(HealthModule),
         // Provide the API base URL for shared ApiService
         provideApiBaseUrl(environment.apiBaseUrl),
         // Refresh current user before routes/guards run

@@ -45,10 +45,10 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
+        <key>NSAppTransportSecurity</key>
+        <dict>
+                <key>NSAllowsArbitraryLoads</key>
+                <true/>
 		<key>NSAllowsArbitraryLoadsForMedia</key>
 		<true/>
 		<key>NSAllowsArbitraryLoadsInWebContent</key>
@@ -71,9 +71,13 @@
 			</dict>
 		</dict>
 	</dict>
-  	<key>com.apple.developer.applesignin</key>
-  	<array>
-  	  <string>Default</string>
-  	</array>	
+        <key>com.apple.developer.applesignin</key>
+        <array>
+          <string>Default</string>
+        </array>
+        <key>NSHealthShareUsageDescription</key>
+        <string>Cooksona nutzt deine Schritte, Distanzen und Workouts aus Apple Health, um deine Aktivitäten automatisch zu synchronisieren.</string>
+        <key>NSHealthUpdateUsageDescription</key>
+        <string>Cooksona aktualisiert deine Gesundheitsdaten nur, um Aktivitätsfortschritte live anzuzeigen.</string>
 </dict>
 </plist>

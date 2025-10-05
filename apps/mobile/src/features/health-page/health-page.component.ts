@@ -2,6 +2,20 @@ import { Component, NO_ERRORS_SCHEMA, OnInit, inject } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { RouterExtensions } from '@nativescript/angular';
 import { HealthStore } from './health.store';
+
+/**
+ * Example HealthFacade integration:
+ *
+ * const healthFacade = inject(HealthFacade);
+ * await healthFacade.init();
+ * healthFacade.startLiveStepMonitoring();
+ * this.summarySub = healthFacade.observeSummary().subscribe((summary) => {
+ *   this.activitySummary = summary;
+ * });
+ * this.workoutsSub = healthFacade.observeWorkouts().subscribe((items) => {
+ *   this.appleHealthWorkouts = items;
+ * });
+ */
 import { DayHeaderComponent } from './day-header/day-header.component';
 import { CalorieProgressComponent } from './calorie-progress/calorie-progress.component';
 import { MacronutrientsComponent } from './macronutrients/macronutrients.component';
