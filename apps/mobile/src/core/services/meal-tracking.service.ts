@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Food, TrackedMeal, NutritionalValues } from '@cooksona/models';
 import { getString, setString } from '@nativescript/core/application-settings';
-import { MOCK_FOODS } from '../../../../../libs/constants/foods';
+import { MOCK_FOODS } from '@cooksona/constants/foods';
 
 const TRACKED_MEALS_KEY = 'user_tracked_meals';
 // can be removed later
