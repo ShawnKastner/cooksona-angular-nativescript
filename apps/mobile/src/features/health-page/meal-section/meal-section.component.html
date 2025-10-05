@@ -7,11 +7,12 @@
   } @else {
     @for (meal of mealSections(); track meal.key) {
       <StackLayout class="border border-base-200 rounded-xl">
-        <FlexboxLayout
+        <GridLayout
+          columns="*, auto, auto"
           class="items-center justify-between p-3"
           (tap)="toggleMeal(meal.key)"
         >
-          <FlexboxLayout class="items-center gap-3">
+          <FlexboxLayout column="0" class="items-center space-x-3">
             <FlexboxLayout
               class="w-10 h-10 rounded-full bg-base-200 items-center justify-center"
             >
@@ -26,15 +27,17 @@
             ></Label>
           </FlexboxLayout>
           <Label
-            class="font-semibold text-sm text-neutral"
+            column="1"
+            class="font-semibold text-sm text-neutral mr-3"
             [text]="meal.calories + ' kcal'"
           ></Label>
           <svg:SVGImage
+            column="2"
             [src]="icons.ChevronDown | svgToDataUri: '#94A3B8'"
             class="w-5 h-5 transition-transform"
             [class.rotate-180]="expandedMeal() === meal.key"
           ></svg:SVGImage>
-        </FlexboxLayout>
+        </GridLayout>
         @if (expandedMeal() === meal.key) {
           <StackLayout class="border-t border-base-200 px-4 py-2 space-y-1">
             @if (meal.items.length === 0) {
