@@ -107,6 +107,14 @@ export const routes: Routes = [
       ).then((m) => m.TrackActivityComponent),
   },
   {
+    path: 'edit-activity',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/health-page/activity-section/edit-activity/edit-activity.component'
+      ).then((m) => m.EditActivityComponent),
+  },
+  {
     path: 'track-meal',
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>

@@ -1,5 +1,10 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { HealthApiService, MetricUpdates, type MealEntry } from '@cooksona/api';
+import {
+  HealthApiService,
+  MetricUpdates,
+  type MealEntry,
+  type ActivityEntry,
+} from '@cooksona/api';
 import { AuthService } from '@cooksona/auth';
 import {
   DailyMetrics,
@@ -22,6 +27,7 @@ export class HealthStore {
   readonly healthData = signal<HealthData | null>(null);
   readonly selectedDate = signal<Date>(new Date());
   readonly meals = signal<MealEntry[]>([]);
+  readonly activities = signal<ActivityEntry[]>([]);
 
   readonly isToday = computed(() => {
     const current = this.selectedDate();
@@ -179,6 +185,9 @@ export class HealthStore {
 
       // Load meals for the selected date
       await this.loadMealsForSelectedDate();
+
+      // Load activities for the selected date
+      await this.loadActivitiesForSelectedDate();
     } catch (e: any) {
       console.error('Failed to load health data', e);
       this.error.set(
@@ -192,12 +201,14 @@ export class HealthStore {
   setSelectedDate(date: Date) {
     this.selectedDate.set(date);
     this.loadMealsForSelectedDate();
+    this.loadActivitiesForSelectedDate();
   }
 
   goToPreviousDay() {
     const current = this.selectedDate();
     this.selectedDate.set(new Date(current.getTime() - 86400000));
     this.loadMealsForSelectedDate();
+    this.loadActivitiesForSelectedDate();
   }
 
   goToNextDay() {
@@ -205,6 +216,7 @@ export class HealthStore {
     const current = this.selectedDate();
     this.selectedDate.set(new Date(current.getTime() + 86400000));
     this.loadMealsForSelectedDate();
+    this.loadActivitiesForSelectedDate();
   }
 
   async saveProfile(profile: UserProfile): Promise<void> {
@@ -247,7 +259,7 @@ export class HealthStore {
     await this.updateMetrics({ water: amountDelta });
   }
 
-  async updateActivity(calories: number): Promise<void> {
+  async updateActivityCalories(calories: number): Promise<void> {
     await this.updateMetrics({ activityCalories: calories });
   }
 
@@ -333,5 +345,67 @@ export class HealthStore {
     const dateString = getDateString(this.selectedDate());
     const meals = await this.loadMeals(dateString);
     this.meals.set(meals);
+  }
+
+  async loadActivities(date?: string): Promise<ActivityEntry[]> {
+    this.error.set(null);
+    try {
+      const activities = await this.api.listActivities({ date });
+      return activities || [];
+    } catch (e: any) {
+      console.error('Failed to load activities', e);
+      this.error.set(e?.message ?? 'Aktivitäten konnten nicht geladen werden');
+      return [];
+    }
+  }
+
+  private async loadActivitiesForSelectedDate(): Promise<void> {
+    const dateString = getDateString(this.selectedDate());
+    const activities = await this.loadActivities(dateString);
+    this.activities.set(activities);
+  }
+
+  async updateActivity(
+    id: string,
+    activity: {
+      date?: string;
+      activityType?: string;
+      durationMinutes?: number;
+      caloriesBurned?: number;
+    },
+  ): Promise<void> {
+    this.mutating.set(true);
+    this.error.set(null);
+    try {
+      const data = await this.api.updateActivity(id, activity);
+      if (data) this.healthData.set(data);
+      // Reload activities to reflect the update
+      await this.loadActivitiesForSelectedDate();
+    } catch (e: any) {
+      console.error('Failed to update activity', e);
+      this.error.set(
+        e?.message ?? 'Aktivität konnte nicht aktualisiert werden',
+      );
+      throw e;
+    } finally {
+      this.mutating.set(false);
+    }
+  }
+
+  async deleteActivity(id: string): Promise<void> {
+    this.mutating.set(true);
+    this.error.set(null);
+    try {
+      const data = await this.api.deleteActivity(id);
+      if (data) this.healthData.set(data);
+      // Reload activities to reflect the deletion
+      await this.loadActivitiesForSelectedDate();
+    } catch (e: any) {
+      console.error('Failed to delete activity', e);
+      this.error.set(e?.message ?? 'Aktivität konnte nicht gelöscht werden');
+      throw e;
+    } finally {
+      this.mutating.set(false);
+    }
   }
 }

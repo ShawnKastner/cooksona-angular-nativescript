@@ -8,6 +8,7 @@ import { MacronutrientsComponent } from './macronutrients/macronutrients.compone
 import { WaterProgressComponent } from './water-progress/water-progress.component';
 import { TrackingActionsComponent } from './tracking-actions/tracking-actions.component';
 import { MealSectionComponent } from './meal-section/meal-section.component';
+import { ActivitySectionComponent } from './activity-section/activity-section.component';
 
 @Component({
   selector: 'ns-health-page',
@@ -21,6 +22,7 @@ import { MealSectionComponent } from './meal-section/meal-section.component';
     WaterProgressComponent,
     TrackingActionsComponent,
     MealSectionComponent,
+    ActivitySectionComponent,
   ],
   schemas: [NO_ERRORS_SCHEMA],
 })

@@ -1,0 +1,89 @@
+<StackLayout
+  class="bg-white p-5 rounded-2xl border border-base-200 box-shadow-1 space-y-4 mt-4"
+>
+  <FlexboxLayout class="items-center justify-between">
+    <Label class="font-bold text-neutral" text="Aktivitäten"></Label>
+    <Label
+      class="text-sm text-gray-500"
+      [text]="totalCalories() + ' kcal verbrannt'"
+    ></Label>
+  </FlexboxLayout>
+
+  @if (loading()) {
+    <ActivityIndicator busy="true" class="text-primary"></ActivityIndicator>
+  } @else {
+    @if (activities().length === 0) {
+      <Label
+        class="text-sm text-gray-400 text-center py-4"
+        text="Keine Aktivitäten eingetragen"
+      ></Label>
+    } @else {
+      @for (activity of activities(); track activity.id) {
+        <StackLayout class="border border-base-200 rounded-xl">
+          <GridLayout
+            columns="*, auto, auto"
+            class="items-center justify-between p-3"
+            (tap)="toggleActivity(activity.id)"
+            (longPress)="onLongPress(activity)"
+          >
+            <FlexboxLayout column="0" class="items-center space-x-3">
+              <FlexboxLayout
+                class="w-10 h-10 rounded-full bg-base-200 items-center justify-center"
+              >
+                <svg:SVGImage
+                  [src]="
+                    getActivityIcon(activity.activityType)
+                      | svgToDataUri: '#4A6C6F'
+                  "
+                  class="w-5 h-5"
+                ></svg:SVGImage>
+              </FlexboxLayout>
+              <StackLayout>
+                <Label
+                  class="font-semibold text-sm text-neutral"
+                  [text]="getActivityLabel(activity.activityType)"
+                ></Label>
+                <Label
+                  class="text-xs text-gray-500"
+                  [text]="formatDuration(activity.durationMinutes)"
+                ></Label>
+              </StackLayout>
+            </FlexboxLayout>
+            <Label
+              column="1"
+              class="font-semibold text-sm text-neutral mr-3"
+              [text]="activity.caloriesBurned + ' kcal'"
+            ></Label>
+            <svg:SVGImage
+              column="2"
+              [src]="icons.ChevronDown | svgToDataUri: '#94A3B8'"
+              class="w-5 h-5 transition-transform"
+              [class.rotate-180]="expandedActivity() === activity.id"
+            ></svg:SVGImage>
+          </GridLayout>
+          @if (expandedActivity() === activity.id) {
+            <StackLayout class="border-t border-base-200 px-4 py-3 space-y-2">
+              <FlexboxLayout class="justify-between">
+                <Label class="text-xs text-gray-500" text="Dauer"></Label>
+                <Label
+                  class="text-xs font-medium text-gray-700"
+                  [text]="formatDuration(activity.durationMinutes)"
+                ></Label>
+              </FlexboxLayout>
+              <FlexboxLayout class="justify-between">
+                <Label
+                  class="text-xs text-gray-500"
+                  text="Kalorien verbrannt"
+                ></Label>
+                <Label
+                  class="text-xs font-medium text-gray-700"
+                  [text]="activity.caloriesBurned + ' kcal'"
+                ></Label>
+              </FlexboxLayout>
+            </StackLayout>
+          }
+        </StackLayout>
+      }
+    }
+  }
+</StackLayout>

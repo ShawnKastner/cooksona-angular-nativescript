@@ -19,6 +19,28 @@ export type TrackActivityDto = {
   caloriesBurned: number;
 };
 
+export type UpdateActivityDto = {
+  date?: string; // YYYY-MM-DD, optional
+  activityType?: string;
+  durationMinutes?: number;
+  caloriesBurned?: number;
+};
+
+export type ListActivitiesDto = {
+  date?: string; // YYYY-MM-DD, optional
+};
+
+export type ActivityEntry = {
+  id: string;
+  userId: string;
+  date: string;
+  activityType: string;
+  durationMinutes: number;
+  caloriesBurned: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type MealSourceType = 'manual' | 'recipe' | 'barcode';
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
 
@@ -112,6 +134,30 @@ export class HealthApiService {
   // POST /health/activities
   trackActivity(activity: TrackActivityDto): Promise<HealthData | undefined> {
     return this.api.post<HealthData>('/health/activities', activity);
+  }
+
+  // GET /health/activities
+  async listActivities(query?: ListActivitiesDto): Promise<ActivityEntry[]> {
+    const params = new URLSearchParams();
+    if (query?.date) params.append('date', query.date);
+    const url = params.toString()
+      ? `/health/activities?${params.toString()}`
+      : '/health/activities';
+    const result = await this.api.get<ActivityEntry[]>(url);
+    return result || [];
+  }
+
+  // PUT /health/activities/:id
+  updateActivity(
+    id: string,
+    activity: UpdateActivityDto,
+  ): Promise<HealthData | undefined> {
+    return this.api.put<HealthData>(`/health/activities/${id}`, activity);
+  }
+
+  // DELETE /health/activities/:id
+  deleteActivity(id: string): Promise<HealthData | undefined> {
+    return this.api.delete<HealthData>(`/health/activities/${id}`);
   }
 
   // GET /health/meals
