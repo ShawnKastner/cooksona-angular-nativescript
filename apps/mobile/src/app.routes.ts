@@ -61,8 +61,8 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadComponent: () =>
-          import('./features/placeholder/profile.component').then(
-            (m) => m.ProfileComponent,
+          import('./features/profile-page/profile-page.component').then(
+            (m) => m.ProfilePageComponent,
           ),
       },
       {
@@ -126,9 +126,9 @@ export const routes: Routes = [
     path: 'food-detail/:id',
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>
-      import('./features/health-page/track-meal/food-detail/food-detail.component').then(
-        (m) => m.FoodDetailComponent,
-      ),
+      import(
+        './features/health-page/track-meal/food-detail/food-detail.component'
+      ).then((m) => m.FoodDetailComponent),
   },
   {
     path: 'manual-food-entry',
