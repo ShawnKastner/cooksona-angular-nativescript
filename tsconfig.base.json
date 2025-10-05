@@ -20,8 +20,7 @@
       "@cooksona/api/*": ["libs/api/*"],
       "@cooksona/models": ["libs/models/index.ts"],
       "@cooksona/models/*": ["libs/models/*"],
-      "@cooksona/constants/icons": ["libs/constants/icons.ts"],
-      "@cooksona/constants/activities": ["libs/constants/activities.ts"]
+      "@cooksona/constants/*": ["libs/constants/index.ts"],
     },
     "baseUrl": ".",
     "rootDir": "."
