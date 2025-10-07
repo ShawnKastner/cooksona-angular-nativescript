@@ -17,7 +17,6 @@ import { Recipe } from '@cooksona/models';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlannerStore } from '../planner.store';
 import { DailyPlan } from '@cooksona/models';
-import { Page } from '@nativescript/core';
 
 @Component({
   selector: 'ns-recipe-detail-view',
@@ -51,8 +50,8 @@ export class RecipeDetailViewComponent {
     Users,
   } as const;
 
-  constructor(private page: Page) {
-    this.page.actionBarHidden = true;
+  constructor() {
+    console.log('ActivePlanId:', this.store?.activePlanId());
 
     const nav = this.router.currentNavigation();
     try {

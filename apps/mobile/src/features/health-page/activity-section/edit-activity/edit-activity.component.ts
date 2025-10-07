@@ -21,7 +21,6 @@ import {
 import { ActivityType } from '@cooksona/models';
 import { ACTIVITY_OPTIONS } from '@cooksona/constants/activities';
 import { ArrowLeft } from '@cooksona/constants/icons';
-import { SvgToDataUriPipe } from '../../../../utils/svg-to-data-uri.pipe';
 import { HealthStore } from '../../health.store';
 import { alert } from '@nativescript/core';
 import { Subscription } from 'rxjs';
@@ -34,7 +33,6 @@ import { Subscription } from 'rxjs';
     NativeScriptCommonModule,
     NativeScriptFormsModule,
     ReactiveFormsModule,
-    SvgToDataUriPipe,
   ],
   schemas: [NO_ERRORS_SCHEMA],
 })

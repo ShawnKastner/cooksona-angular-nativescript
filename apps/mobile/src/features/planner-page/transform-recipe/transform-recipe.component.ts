@@ -11,17 +11,22 @@ import { Recipe } from '@cooksona/models';
 import {
   NativeScriptFormsModule,
   RouterExtensions,
+  NativeScriptCommonModule,
 } from '@nativescript/angular';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { PlannerStore } from '../planner.store';
 import { CookbookStore } from '../../cookbook-page/cookbook.store';
-import { Page } from '@nativescript/core';
 
 @Component({
   selector: 'ns-transform-recipe',
   templateUrl: './transform-recipe.component.html',
   standalone: true,
-  imports: [SvgToDataUriPipe, ReactiveFormsModule, NativeScriptFormsModule],
+  imports: [
+    SvgToDataUriPipe,
+    ReactiveFormsModule,
+    NativeScriptFormsModule,
+    NativeScriptCommonModule,
+  ],
   schemas: [NO_ERRORS_SCHEMA],
 })
 export class TransformRecipeComponent {
@@ -39,10 +44,7 @@ export class TransformRecipeComponent {
   constructor(
     private router: RouterExtensions,
     private fb: FormBuilder,
-    private page: Page,
   ) {
-    this.page.actionBarHidden = true;
-
     const nav = this.router.router.currentNavigation();
     const state = (nav?.extras?.state as any) ?? {};
     const recipeFromState = state.recipe as Recipe | undefined;

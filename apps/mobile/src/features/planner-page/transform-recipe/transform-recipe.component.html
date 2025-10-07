@@ -1,24 +1,11 @@
 <GridLayout rows="auto,*,auto" class="bg-base-100 flex flex-col h-full">
-  <GridLayout
-    row="0"
-    columns="auto,*"
-    class="p-4 flex items-center space-x-3 border-b border-base-200 flex-shrink-00"
-  >
-    <svg:SVGImage
+  <ActionBar row="0" class="bg-base-100 text-neutral" title="Rezept anpassen">
+    <NavigationButton
+      ios.position="left"
+      android.position="actionBar"
       (tap)="goBack()"
-      verticalAlignment="top"
-      [src]="icons.ArrowLeft | svgToDataUri: '#6B7280'"
-      class="w-6 h-6"
-    ></svg:SVGImage>
-    <Label textWrap="true" col="1">
-      <FormattedString>
-        <Span
-          text="Rezept anpassen"
-          class="text-lg font-bold text-neutral truncate"
-        ></Span>
-      </FormattedString>
-    </Label>
-  </GridLayout>
+    />
+  </ActionBar>
   <ScrollView row="1">
     <FlexboxLayout flexDirection="row" class="p-4" justifyContent="flex-start">
       @if (recipeToTransform()) {
@@ -155,7 +142,7 @@
         editable="true"
         horizontalAlignment="stretch"
         placeholderColor="#9CA3AF"
-        class="w-full text-sm p-2 bg-white border-2 border-base-200 rounded-lg text-neutral"
+        class="w-full text-sm p-2 bg-white border-2 border-base-200 placeholder-gray-400 rounded-lg text-neutral"
         hint="Dein Wunsch..."
       >
       </TextField>

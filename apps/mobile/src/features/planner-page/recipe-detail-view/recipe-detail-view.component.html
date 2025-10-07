@@ -2,44 +2,40 @@
   rows="auto,*,auto"
   class="absolute inset-0 bg-base-100 z-30 flex flex-col animate-fade-in0"
 >
-  <GridLayout
-    row="0"
-    columns="auto,*"
-    rows="auto,auto"
-    class="p-4 flex items-center space-x-3 border-b border-base-200 flex-shrink-00"
-  >
-    <svg:SVGImage
-      verticalAlignment="top"
+  <ActionBar row="0" class="bg-base-100 text-neutral" title="">
+    <NavigationButton
+      ios.position="left"
+      android.position="actionBar"
       (tap)="closeDetailView()"
-      [src]="icons.ArrowLeft | svgToDataUri: '#6B7280'"
-      class="w-6 h-6"
-    ></svg:SVGImage>
-    <Label textWrap="true" col="1">
-      <FormattedString>
-        <Span
-          [text]="displayRecipe()?.name"
-          class="text-lg font-bold text-neutral truncate"
-        ></Span>
-      </FormattedString>
-    </Label>
-    <FlexboxLayout row="1" col="1" class="mt-1">
-      <svg:SVGImage
-        verticalAlignment="top"
-        (tap)="closeDetailView()"
-        [src]="icons.Users | svgToDataUri: '#6B7280'"
-        class="w-4 h-4 mr-2"
-      ></svg:SVGImage>
-      <Label
-        class="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5"
-        [text]="
-          (displayRecipe()?.servings ?? 0) +
-          ((displayRecipe()?.servings ?? 0) > 1 ? ' Personen' : ' Person')
-        "
-      ></Label>
-    </FlexboxLayout>
-  </GridLayout>
+    />
+  </ActionBar>
   <ScrollView row="1">
     <StackLayout class="flex-grow overflow-y-auto p-4 space-y-6">
+      <!-- Recipe Name and Servings -->
+      <StackLayout class="mb-4">
+        <Label textWrap="true">
+          <FormattedString>
+            <Span
+              class="text-lg font-bold text-neutral truncate"
+              [text]="displayRecipe()?.name"
+            ></Span>
+          </FormattedString>
+        </Label>
+        <FlexboxLayout flexDirection="row" alignItems="center">
+          <svg:SVGImage
+            [src]="icons.Users | svgToDataUri: '#6B7280'"
+            class="w-4 h-4 mr-2"
+          ></svg:SVGImage>
+          <Label
+            class="text-sm text-gray-500"
+            [text]="
+              (displayRecipe()?.servings ?? 0) +
+              ((displayRecipe()?.servings ?? 0) > 1 ? ' Personen' : ' Person')
+            "
+          ></Label>
+        </FlexboxLayout>
+      </StackLayout>
+
       <StackLayout
         class="list-disc list-inside space-y-1 text-sm text-neutral bg-white p-4 rounded-lg border border-base-200"
       >

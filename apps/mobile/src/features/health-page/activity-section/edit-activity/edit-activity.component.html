@@ -5,19 +5,11 @@
     class="bg-base-100 text-neutral"
     title="Aktivität bearbeiten"
   >
-    <NavigationButton visibility="collapsed" />
-    <ActionItem
+    <NavigationButton
       ios.position="left"
       android.position="actionBar"
       (tap)="goBack()"
-    >
-      <FlexboxLayout class="items-center justify-center p-2">
-        <svg:SVGImage
-          [src]="icons.ArrowLeft | svgToDataUri: '#6b7280'"
-          class="w-6 h-6"
-        ></svg:SVGImage>
-      </FlexboxLayout>
-    </ActionItem>
+    />
   </ActionBar>
 
   <!-- Scrollable Content -->
