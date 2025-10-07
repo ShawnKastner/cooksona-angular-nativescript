@@ -26,6 +26,8 @@ import { isIOS, isAndroid, ApplicationSettings } from '@nativescript/core';
 import { confirm } from '@nativescript/core/ui/dialogs';
 import { HealthKitService } from '../../plugins/healthkit/healthkit.service';
 import { HealthConnectionModalComponent } from './health-connection-modal/health-connection-modal.component';
+import { SubscriptionModalComponent } from './subscription-modal/subscription-modal.component';
+import type { SubscriptionPlan } from './subscription-modal/subscription-modal.component';
 
 interface SettingsSection {
   title: string;
@@ -253,11 +255,25 @@ export class ProfilePageComponent implements OnInit {
     return u?.email || '';
   }
 
-  protected manageSubscription() {
-    // TODO: Navigate to subscription management or open subscription modal
-    console.log('Manage subscription');
-    // For now, we could show a dialog or navigate to a subscription page
-    // this.router.navigate(['/subscription-management']);
+  protected async manageSubscription() {
+    try {
+      const selectedPlan = await this.modalService.showModal(
+        SubscriptionModalComponent,
+        {
+          fullscreen: true,
+          animated: true,
+          stretched: true,
+        },
+      );
+
+      if (selectedPlan) {
+        console.log('User selected plan:', selectedPlan);
+        // TODO: Process the subscription purchase
+        // For now, just log it
+      }
+    } catch (error) {
+      console.error('Error showing subscription modal:', error);
+    }
   }
 
   protected onLogout() {

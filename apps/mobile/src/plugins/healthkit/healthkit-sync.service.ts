@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { isIOS, ApplicationSettings } from '@nativescript/core';
-import { HealthKitService, HealthKitWorkout } from './healthkit.service';
+import { HealthKitService } from './healthkit.service';
 import { mapWorkoutTypeToActivityType } from './workout-type-mapper';
 import { HealthApiService } from '@cooksona/api';
 import { getDateString } from '@cooksona/models';
