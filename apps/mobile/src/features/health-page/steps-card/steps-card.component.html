@@ -1,0 +1,106 @@
+<StackLayout
+  class="bg-white p-5 rounded-2xl border border-base-200 box-shadow-1 mt-4"
+>
+  <!-- Header -->
+  <FlexboxLayout class="items-center justify-between">
+    <FlexboxLayout class="items-center space-x-3">
+      <FlexboxLayout
+        class="w-10 h-10 rounded-full bg-primary/10 items-center justify-center"
+      >
+        <svg:SVGImage
+          [src]="icons.Dumbbell | svgToDataUri: '#4A6C6F'"
+          class="w-5 h-5"
+        ></svg:SVGImage>
+      </FlexboxLayout>
+      <Label class="font-bold text-lg text-neutral" text="Schritte"></Label>
+    </FlexboxLayout>
+
+    @if (loading()) {
+      <ActivityIndicator busy="true" class="w-5 h-5"></ActivityIndicator>
+    }
+  </FlexboxLayout>
+
+  @if (!isConnected()) {
+    <!-- Not Connected State -->
+    <StackLayout class="py-4">
+      <Label
+        class="text-sm text-gray-400 text-center"
+        text="Verbinde dich mit Apple Health"
+      ></Label>
+      <Label
+        class="text-xs text-gray-400 text-center mt-2"
+        text="in der Profil-Seite"
+      ></Label>
+    </StackLayout>
+  } @else {
+    <!-- Connected - Show Steps -->
+    <StackLayout class="space-y-3">
+      <!-- Current Steps / Goal -->
+      <FlexboxLayout
+        justifyContent="center"
+        alignItems="center"
+        class="items-baseline align-center text-center flex justify-center space-x-2"
+      >
+        <Label
+          class="text-4xl font-bold text-primary"
+          [text]="formatNumber(steps())"
+        ></Label>
+        <Label
+          class="text-lg text-gray-500"
+          [text]="'/ ' + formatNumber(stepGoal())"
+        ></Label>
+      </FlexboxLayout>
+
+      <Label
+        class="text-sm text-gray-500 text-center"
+        text="Schritte heute"
+      ></Label>
+
+      <!-- Additional Stats: km and kcal -->
+      <FlexboxLayout class="justify-around pt-2 border-t border-gray-100">
+        <StackLayout class="text-center">
+          <Label
+            class="text-xl font-semibold text-neutral"
+            [text]="kilometers().toFixed(2)"
+          ></Label>
+          <Label class="text-xs text-gray-500 mt-1" text="km"></Label>
+        </StackLayout>
+        <StackLayout class="text-center">
+          <Label
+            class="text-xl font-semibold text-neutral"
+            [text]="formatNumber(calories())"
+          ></Label>
+          <Label class="text-xs text-gray-500 mt-1" text="kcal"></Label>
+        </StackLayout>
+      </FlexboxLayout>
+
+      <!-- Progress Bar -->
+      <StackLayout class="space-y-2">
+        <StackLayout class="h-2 bg-gray-200 rounded-full">
+          <StackLayout
+            class="h-2 bg-primary rounded-full"
+            [width]="progressPercentage + '%'"
+          ></StackLayout>
+        </StackLayout>
+
+        <FlexboxLayout class="justify-between">
+          <Label
+            class="text-xs text-gray-500"
+            [text]="Math.round(progressPercentage) + '% erreicht'"
+          ></Label>
+          @if (steps() >= stepGoal()) {
+            <Label
+              class="text-xs text-primary font-semibold"
+              text="🎉 Ziel erreicht!"
+            ></Label>
+          } @else {
+            <Label
+              class="text-xs text-gray-500"
+              [text]="formatNumber(stepGoal() - steps()) + ' übrig'"
+            ></Label>
+          }
+        </FlexboxLayout>
+      </StackLayout>
+    </StackLayout>
+  }
+</StackLayout>

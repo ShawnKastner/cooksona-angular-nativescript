@@ -19,7 +19,8 @@ import {
   ChevronDown,
   Settings,
 } from '@cooksona/constants/icons';
-import { isIOS, isAndroid } from '@nativescript/core';
+import { isIOS, isAndroid, ApplicationSettings } from '@nativescript/core';
+import { HealthKitService } from '../../plugins/healthkit/healthkit.service';
 
 interface SettingsSection {
   title: string;
@@ -45,6 +46,7 @@ interface SettingsItem {
 export class ProfilePageComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly health = inject(HealthKitService);
 
   protected readonly icons = {
     User: UserIcon,
@@ -68,15 +70,87 @@ export class ProfilePageComponent implements OnInit {
     this.checkHealthConnection();
   }
 
+  private checkHealthConnection() {
+    if (this.isIOS && this.health.isAvailable()) {
+      // Check if we have a stored connection status
+      const storedStatus = ApplicationSettings.getBoolean(
+        'healthkit_connected',
+        false,
+      );
+
+      // Use the stored status as the source of truth
+      this.healthConnected.set(storedStatus);
+
+      // Optionally verify with HealthKit API in the background
+      // If authorization was revoked externally, we could detect it here
+      // and update the stored status, but for now we trust the stored value
+    } else if (this.isAndroid) {
+      // Android path will come later (Google Fit)
+      const storedStatus = ApplicationSettings.getBoolean(
+        'googlefit_connected',
+        false,
+      );
+      this.healthConnected.set(storedStatus);
+    } else {
+      this.healthConnected.set(false);
+    }
+  }
+
+  protected toggleHealthConnection() {
+    this.loading.set(true);
+
+    if (this.healthConnected()) {
+      this.disconnectHealthService();
+    } else {
+      this.connectHealthService();
+    }
+  }
+
+  private async connectHealthService() {
+    try {
+      if (this.isIOS) {
+        if (!this.health.isAvailable()) {
+          throw new Error('Apple Health ist auf diesem Gerät nicht verfügbar.');
+        }
+        await this.health.requestAuthorization();
+
+        // Save the connection status persistently
+        ApplicationSettings.setBoolean('healthkit_connected', true);
+        this.healthConnected.set(true);
+      } else if (this.isAndroid) {
+        // TODO: Implement Google Fit later
+        throw new Error('Google Fit wird bald unterstützt.');
+      }
+    } catch (error) {
+      console.error('Failed to connect health service:', error);
+      // TODO: show a nice dialog/toast
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  private async disconnectHealthService() {
+    try {
+      if (this.isIOS) {
+        await this.health.disconnect();
+        // Clear the persistent connection status
+        ApplicationSettings.setBoolean('healthkit_connected', false);
+        // Inform the user they can revoke in iOS Settings > Health > Apps > Cooksona
+      } else if (this.isAndroid) {
+        // TODO: later for Google Fit
+        ApplicationSettings.setBoolean('googlefit_connected', false);
+      }
+      this.healthConnected.set(false);
+    } catch (error) {
+      console.error('Failed to disconnect health service:', error);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
   private loadUserData() {
     const currentUser = this.auth.currentUser as User;
     this.user.set(currentUser);
-  }
-
-  private checkHealthConnection() {
-    // TODO: Implement actual health connection check
-    // This would check if Apple Health or Google Fit is connected
-    this.healthConnected.set(false);
   }
 
   get settingsSections(): SettingsSection[] {
@@ -145,62 +219,6 @@ export class ProfilePageComponent implements OnInit {
     console.log('Manage subscription');
     // For now, we could show a dialog or navigate to a subscription page
     // this.router.navigate(['/subscription-management']);
-  }
-
-  protected toggleHealthConnection() {
-    this.loading.set(true);
-
-    if (this.healthConnected()) {
-      // Disconnect from health service
-      this.disconnectHealthService();
-    } else {
-      // Connect to health service
-      this.connectHealthService();
-    }
-  }
-
-  private async connectHealthService() {
-    try {
-      if (this.isIOS) {
-        // TODO: Implement Apple Health connection
-        console.log('Connecting to Apple Health...');
-        // Example: await this.healthService.connectAppleHealth();
-      } else if (this.isAndroid) {
-        // TODO: Implement Google Fit connection
-        console.log('Connecting to Google Fit...');
-        // Example: await this.healthService.connectGoogleFit();
-      }
-
-      // Simulate connection delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      this.healthConnected.set(true);
-    } catch (error) {
-      console.error('Failed to connect health service:', error);
-      // TODO: Show error dialog
-    } finally {
-      this.loading.set(false);
-    }
-  }
-
-  private async disconnectHealthService() {
-    try {
-      if (this.isIOS) {
-        // TODO: Implement Apple Health disconnection
-        console.log('Disconnecting from Apple Health...');
-      } else if (this.isAndroid) {
-        // TODO: Implement Google Fit disconnection
-        console.log('Disconnecting from Google Fit...');
-      }
-
-      // Simulate disconnection delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      this.healthConnected.set(false);
-    } catch (error) {
-      console.error('Failed to disconnect health service:', error);
-      // TODO: Show error dialog
-    } finally {
-      this.loading.set(false);
-    }
   }
 
   protected onLogout() {

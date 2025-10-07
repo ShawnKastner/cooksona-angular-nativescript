@@ -2,8 +2,9 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "types": []
+    "types": ["@nativescript/types"],
+    "skipLibCheck": true
   },
-  "include": ["./src/environments/environment.*.ts"],
+  "include": ["./src/environments/environment.*.ts", "./src/**/*.d.ts"],
   "files": ["./references.d.ts", "./src/main.ts", "./src/polyfills.ts"]
 }

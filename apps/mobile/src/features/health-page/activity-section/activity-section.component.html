@@ -30,23 +30,33 @@
               <FlexboxLayout
                 class="w-10 h-10 rounded-full bg-base-200 items-center justify-center"
               >
-                <svg:SVGImage
-                  [src]="
-                    getActivityIcon(activity.activityType)
-                      | svgToDataUri: '#4A6C6F'
-                  "
-                  class="w-5 h-5"
-                ></svg:SVGImage>
+                @if (getActivityImagePath(activity)) {
+                  <Image
+                    [src]="getActivityImagePath(activity)"
+                    class="w-6 h-6"
+                    stretch="aspectFit"
+                  ></Image>
+                } @else {
+                  <svg:SVGImage
+                    [src]="
+                      getActivityIcon(activity.activityType)
+                        | svgToDataUri: '#4A6C6F'
+                    "
+                    class="w-5 h-5"
+                  ></svg:SVGImage>
+                }
               </FlexboxLayout>
               <StackLayout>
                 <Label
                   class="font-semibold text-sm text-neutral"
                   [text]="getActivityLabel(activity.activityType)"
                 ></Label>
-                <Label
-                  class="text-xs text-gray-500"
-                  [text]="formatDuration(activity.durationMinutes)"
-                ></Label>
+                @if (activity.durationMinutes > 0) {
+                  <Label
+                    class="text-xs text-gray-500"
+                    [text]="formatDuration(activity.durationMinutes)"
+                  ></Label>
+                }
               </StackLayout>
             </FlexboxLayout>
             <Label
@@ -63,13 +73,15 @@
           </GridLayout>
           @if (expandedActivity() === activity.id) {
             <StackLayout class="border-t border-base-200 px-4 py-3 space-y-2">
-              <FlexboxLayout class="justify-between">
-                <Label class="text-xs text-gray-500" text="Dauer"></Label>
-                <Label
-                  class="text-xs font-medium text-gray-700"
-                  [text]="formatDuration(activity.durationMinutes)"
-                ></Label>
-              </FlexboxLayout>
+              @if (activity.durationMinutes > 0) {
+                <FlexboxLayout class="justify-between">
+                  <Label class="text-xs text-gray-500" text="Dauer"></Label>
+                  <Label
+                    class="text-xs font-medium text-gray-700"
+                    [text]="formatDuration(activity.durationMinutes)"
+                  ></Label>
+                </FlexboxLayout>
+              }
               <FlexboxLayout class="justify-between">
                 <Label
                   class="text-xs text-gray-500"

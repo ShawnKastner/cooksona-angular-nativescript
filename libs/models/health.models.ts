@@ -11,6 +11,9 @@ export interface DailyMetrics {
   protein: number; // in g
   carbs: number; // in g
   fat: number; // in g
+  steps?: number; // Daily steps from Apple Health or manual tracking
+  stepsKilometers?: number; // Distance in kilometers from steps
+  stepsCalories?: number; // Calories burned from steps
   eatenMeals: { [recipeId: string]: number }; // Maps recipeId to portions eaten
 }
 
@@ -35,6 +38,7 @@ export interface UserProfile {
   weight: number; // in kg
   activityLevel: 'sedentary' | 'light' | 'moderate' | 'active' | 'very_active';
   goal: 'lose' | 'maintain' | 'gain';
+  stepGoal?: number; // Daily step goal (optional, defaults to 10000)
 }
 
 export interface Activity {

@@ -75,5 +75,10 @@
   	<array>
   	  <string>Default</string>
   	</array>	
+	<key>NSHealthShareUsageDescription</key>
+	<string>Cooksona liest Gesundheitsdaten (z. B. Schritte, Workouts), um dir Statistiken und Auswertungen anzuzeigen.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Cooksona kann optionale Gesundheitsdaten aktualisieren, um dein Tracking zu vervollständigen.</string>
+
 </dict>
 </plist>

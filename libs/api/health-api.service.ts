@@ -10,6 +10,9 @@ export type MetricUpdates = {
   fat?: number;
   water?: number;
   activityCalories?: number;
+  steps?: number;
+  stepsKilometers?: number;
+  stepsCalories?: number;
 };
 
 export type TrackActivityDto = {
@@ -17,6 +20,7 @@ export type TrackActivityDto = {
   activityType: string;
   durationMinutes: number;
   caloriesBurned: number;
+  isFromAppleHealth?: boolean; // True if synced from Apple Health
 };
 
 export type UpdateActivityDto = {
@@ -37,6 +41,7 @@ export type ActivityEntry = {
   activityType: string;
   durationMinutes: number;
   caloriesBurned: number;
+  isFromAppleHealth?: boolean; // True if synced from Apple Health
   createdAt: string;
   updatedAt: string;
 };

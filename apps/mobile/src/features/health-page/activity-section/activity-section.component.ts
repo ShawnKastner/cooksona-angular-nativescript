@@ -57,11 +57,31 @@ export class ActivitySectionComponent {
   }
 
   protected getActivityLabel(activityType: string): string {
+    // Special label for Apple Health active energy
+    if (activityType === 'active_energy') {
+      return 'Aktivitätsenergie';
+    }
+
     const option = ACTIVITY_OPTIONS.find((opt) => opt.type === activityType);
     return option?.label || activityType;
   }
 
+  protected isAppleHealthActivity(activity: ActivityEntry): boolean {
+    return activity.isFromAppleHealth === true;
+  }
+
   protected async onLongPress(activity: ActivityEntry): Promise<void> {
+    // Don't allow editing/deleting Apple Health activities
+    if (this.isAppleHealthActivity(activity)) {
+      await alert({
+        title: 'Apple Health Aktivität',
+        message:
+          'Diese Aktivität stammt aus Apple Health und kann nicht bearbeitet oder gelöscht werden.',
+        okButtonText: 'OK',
+      });
+      return;
+    }
+
     try {
       const result = await action({
         title: this.getActivityLabel(activity.activityType),
@@ -134,6 +154,14 @@ export class ActivitySectionComponent {
   protected getActivityIcon(activityType: string): string {
     // You can add more specific icons based on activity type
     return this.icons.Dumbbell;
+  }
+
+  protected getActivityImagePath(activity: ActivityEntry): string | null {
+    // Return Apple Health icon path for Apple Health activities
+    if (this.isAppleHealthActivity(activity)) {
+      return '~/assets/images/apple_health_icon.png';
+    }
+    return null;
   }
 
   protected formatDuration(minutes: number): string {
