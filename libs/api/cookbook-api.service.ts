@@ -6,9 +6,20 @@ import { CookbookCollection, Recipe } from '@cooksona/models/recipe.models';
 export class CookbookApiService {
   constructor(private readonly api: ApiService) {}
 
-  async getCookbookForUser(collectionId?: string): Promise<Recipe[]> {
-    const url = collectionId
-      ? `/cookbook?collectionId=${collectionId}`
+  async getCookbookForUser(
+    collectionId?: string,
+    searchTerm?: string,
+  ): Promise<Recipe[]> {
+    const params = new URLSearchParams();
+    if (collectionId) {
+      params.set('collectionId', collectionId);
+    }
+    if (searchTerm && searchTerm.trim().length > 0) {
+      params.set('search', searchTerm.trim());
+    }
+
+    const url = params.toString()
+      ? `/cookbook?${params.toString()}`
       : '/cookbook';
     const recipes = await this.api.get<Recipe[]>(url);
     return recipes ?? [];

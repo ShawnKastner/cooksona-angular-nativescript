@@ -46,7 +46,9 @@ export class CollectionsComponent {
     // track selected collection locally for UI state
     this.selectedCollectionId.set(id ?? 'all');
     // ask the store to load recipes for the collection
-    await this.cookbookStore.load(id === 'all' ? undefined : id);
+    await this.cookbookStore.load({
+      collectionId: id === 'all' ? undefined : id,
+    });
   }
 
   async openNewCollectionModal() {

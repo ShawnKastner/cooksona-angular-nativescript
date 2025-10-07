@@ -16,6 +16,8 @@ export class CookbookStore {
   readonly collections = signal<CookbookCollection[]>([]);
   readonly favoriteRecipeIds = signal<Set<string>>(new Set());
   readonly activeRecipeId = signal<string | null>(null);
+  readonly activeCollectionId = signal<string | undefined>(undefined);
+  readonly searchTerm = signal('');
 
   readonly activeRecipe = computed(() => {
     const id = this.activeRecipeId();
@@ -27,11 +29,33 @@ export class CookbookStore {
     this.activeRecipeId.set(id);
   }
 
-  async load(collectionId?: string): Promise<void> {
+  async load(options?: {
+    collectionId?: string | null;
+    search?: string;
+  }): Promise<void> {
     this.loading.set(true);
     this.error.set(null);
     try {
-      const data = await this.cookbookApi.getCookbookForUser(collectionId);
+      if (
+        options &&
+        Object.prototype.hasOwnProperty.call(options, 'collectionId')
+      ) {
+        const normalized =
+          options.collectionId && options.collectionId.length > 0
+            ? options.collectionId
+            : undefined;
+        this.activeCollectionId.set(normalized);
+      }
+
+      if (options && Object.prototype.hasOwnProperty.call(options, 'search')) {
+        const normalized = options.search?.trim() ?? '';
+        this.searchTerm.set(normalized);
+      }
+
+      const data = await this.cookbookApi.getCookbookForUser(
+        this.activeCollectionId(),
+        this.searchTerm(),
+      );
       this.recipes.set(data ?? []);
       // ensure favorites set is populated
       const ids = new Set(
