@@ -13,7 +13,7 @@
     <StackLayout
       class="bg-white rounded-2xl border border-base-200 p-5 space-y-3"
     >
-      <FlexboxLayout class="items-center gap-4">
+      <FlexboxLayout class="items-center space-x-4">
         <!-- User Avatar -->
         <FlexboxLayout
           class="w-16 h-16 rounded-full bg-primary items-center justify-center"
@@ -60,14 +60,22 @@
                     'bg-gray-50': !item.isConnected,
                   }"
                 >
-                  <svg:SVGImage
-                    [src]="
-                      item.icon
-                        | svgToDataUri
-                          : (item.isConnected ? '#10B981' : '#4A6C6F')
-                    "
-                    class="w-5 h-5"
-                  ></svg:SVGImage>
+                  @if (item.imageIcon) {
+                    <Image
+                      [src]="item.imageIcon"
+                      class="w-6 h-6"
+                      stretch="aspectFit"
+                    ></Image>
+                  } @else if (item.icon) {
+                    <svg:SVGImage
+                      [src]="
+                        item.icon
+                          | svgToDataUri
+                            : (item.isConnected ? '#10B981' : '#4A6C6F')
+                      "
+                      class="w-5 h-5"
+                    ></svg:SVGImage>
+                  }
                 </FlexboxLayout>
 
                 <!-- Label & Subtitle -->

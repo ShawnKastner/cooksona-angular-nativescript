@@ -33,7 +33,8 @@ interface SettingsSection {
 }
 
 interface SettingsItem {
-  icon: string;
+  icon?: string;
+  imageIcon?: string;
   label: string;
   subtitle?: string;
   action: () => void;
@@ -210,11 +211,13 @@ export class ProfilePageComponent implements OnInit {
         title: 'Health Integration',
         items: [
           {
-            icon: this.isIOS ? this.icons.Apple : this.icons.Heart,
+            imageIcon: this.isIOS
+              ? '~/assets/images/apple_health_icon.png'
+              : '~/assets/images/google_fit_icon.png',
             label: this.isIOS ? 'Apple Health' : 'Google Fit',
             subtitle: this.healthConnected() ? 'Verbunden' : 'Nicht verbunden',
             action: () => this.toggleHealthConnection(),
-            showChevron: true,
+            showChevron: false,
             isConnected: this.healthConnected(),
           },
         ],
