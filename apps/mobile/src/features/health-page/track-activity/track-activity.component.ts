@@ -12,16 +12,18 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
 import { RouterExtensions } from '@nativescript/angular';
 import {
   NativeScriptCommonModule,
   NativeScriptFormsModule,
 } from '@nativescript/angular';
 import { ActivityType, getDateString } from '@cooksona/models';
-import { ACTIVITY_OPTIONS } from '@cooksona/constants/activities';
+import {
+  ACTIVITY_OPTIONS,
+  ACTIVITY_CATEGORIES,
+  ActivityCategory,
+} from '@cooksona/constants/activities';
 import { ArrowLeft } from '@cooksona/constants/icons';
-import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { HealthStore } from '../health.store';
 import { alert } from '@nativescript/core';
 import { Subscription } from 'rxjs';
@@ -34,7 +36,6 @@ import { Subscription } from 'rxjs';
     NativeScriptCommonModule,
     NativeScriptFormsModule,
     ReactiveFormsModule,
-    SvgToDataUriPipe,
   ],
   schemas: [NO_ERRORS_SCHEMA],
 })
@@ -42,9 +43,19 @@ export class TrackActivityComponent implements OnInit, OnDestroy {
   private readonly healthStore = inject(HealthStore);
 
   activityOptions = ACTIVITY_OPTIONS;
+  activityCategories = ACTIVITY_CATEGORIES;
+  filteredCategories = signal<ActivityCategory[]>(ACTIVITY_CATEGORIES);
+
   selectedActivityType: ActivityType | null = null;
   activityForm!: FormGroup;
   isSaving = signal(false);
+
+  // UI State - Step-based flow
+  showActivitySelection = signal(true); // true = Schritt 1, false = Schritt 2
+
+  // Search and UI state
+  searchQuery = signal('');
+  expandedCategories = signal<Set<string>>(new Set(['Beliebt'])); // 'Beliebt' ist standardmäßig ausgeklappt
 
   // Signals for form values to avoid change detection errors
   durationMinutes = signal(0);
@@ -61,7 +72,6 @@ export class TrackActivityComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private routerExtensions: RouterExtensions,
-    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -96,6 +106,55 @@ export class TrackActivityComponent implements OnInit, OnDestroy {
 
   selectActivity(activityType: ActivityType): void {
     this.selectedActivityType = activityType;
+    // Nach Auswahl zum nächsten Schritt wechseln
+    this.showActivitySelection.set(false);
+  }
+
+  backToActivitySelection(): void {
+    this.showActivitySelection.set(true);
+  }
+
+  onSearchChange(value: string): void {
+    const query = value.toLowerCase().trim();
+    this.searchQuery.set(query);
+
+    if (!query) {
+      // Wenn keine Suche, zeige alle Kategorien
+      this.filteredCategories.set(this.activityCategories);
+      return;
+    }
+
+    // Filtere Kategorien und Aktivitäten basierend auf der Suche
+    const filtered = this.activityCategories
+      .map((category) => ({
+        ...category,
+        activities: category.activities.filter((activity) =>
+          activity.label.toLowerCase().includes(query),
+        ),
+      }))
+      .filter((category) => category.activities.length > 0);
+
+    this.filteredCategories.set(filtered);
+
+    // Erweitere automatisch alle Kategorien bei Suche
+    if (query) {
+      const allCategoryNames = filtered.map((c) => c.category);
+      this.expandedCategories.set(new Set(allCategoryNames));
+    }
+  }
+
+  toggleCategory(categoryName: string): void {
+    const expanded = new Set(this.expandedCategories());
+    if (expanded.has(categoryName)) {
+      expanded.delete(categoryName);
+    } else {
+      expanded.add(categoryName);
+    }
+    this.expandedCategories.set(expanded);
+  }
+
+  isCategoryExpanded(categoryName: string): boolean {
+    return this.expandedCategories().has(categoryName);
   }
 
   async saveActivity(): Promise<void> {

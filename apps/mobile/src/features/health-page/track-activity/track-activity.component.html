@@ -1,119 +1,195 @@
 <GridLayout rows="auto, *, auto" class="h-full bg-base-100">
   <!-- ActionBar -->
-  <ActionBar row="0" class="bg-base-100 text-neutral" title="Aktivität tracken">
-    <NavigationButton visibility="collapsed" />
-    <ActionItem
+  <ActionBar
+    row="0"
+    class="bg-base-100 text-neutral"
+    [title]="
+      showActivitySelection() ? 'Aktivität hinzufügen' : 'Details eingeben'
+    "
+  >
+    <NavigationButton
       ios.position="left"
       android.position="actionBar"
-      (tap)="goBack()"
-    >
-      <FlexboxLayout class="items-center justify-center p-2">
-        <svg:SVGImage
-          [src]="icons.ArrowLeft | svgToDataUri: '#6b7280'"
-          class="w-6 h-6"
-        ></svg:SVGImage>
-      </FlexboxLayout>
-    </ActionItem>
+      (tap)="showActivitySelection() ? goBack() : backToActivitySelection()"
+    />
   </ActionBar>
 
-  <!-- Scrollable Content -->
-  <ScrollView row="1" iosOverflowSafeArea="false">
-    <StackLayout class="p-5 pb-10" [formGroup]="activityForm">
-      <!-- Activity Selection Section -->
-      <Label
-        text="Sportart auswählen"
-        class="text-lg font-bold text-neutral mb-4"
-      ></Label>
-
-      <WrapLayout class="mb-6">
-        @for (activity of activityOptions; track activity) {
-          <Button
-            [text]="activity.label"
-            [class]="
-              selectedActivityType === activity.type
-                ? 'bg-primary text-white border-2 border-primary m-1 px-4 py-2 rounded-lg text-sm font-medium'
-                : 'bg-white text-neutral border-2 border-gray-300 m-1 px-4 py-2 rounded-lg text-sm font-medium'
-            "
-            (tap)="selectActivity(activity.type)"
+  <!-- Step 1: Activity Selection -->
+  @if (showActivitySelection()) {
+    <ScrollView row="1" iosOverflowSafeArea="false">
+      <StackLayout class="p-0">
+        <!-- Search Field -->
+        <StackLayout class="p-4 pb-2">
+          <TextField
+            [text]="searchQuery()"
+            (textChange)="onSearchChange($event.value)"
+            hint="Aktivität suchen"
+            class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral placeholder-gray-400"
           >
-          </Button>
+          </TextField>
+        </StackLayout>
+
+        <!-- Popular Activities (Always visible when no search) -->
+        @if (!searchQuery()) {
+          <StackLayout class="px-4 pt-2 pb-3">
+            <Label
+              text="Häufig verwendet"
+              class="text-sm font-semibold text-gray-500 mb-2 uppercase"
+            ></Label>
+          </StackLayout>
         }
-      </WrapLayout>
 
-      <!-- Duration Input Section -->
-      <StackLayout class="mb-6">
-        <Label
-          text="Dauer (Minuten)"
-          class="text-base font-semibold text-neutral mb-2"
-        ></Label>
-        <TextField
-          formControlName="durationMinutes"
-          keyboardType="number"
-          class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral placeholder-gray-400"
-          hint="z.B. 30"
-        >
-        </TextField>
+        <!-- Categories List -->
+        <StackLayout class="pb-4">
+          @for (category of filteredCategories(); track category.category) {
+            <StackLayout>
+              <!-- Category Header -->
+              @if (searchQuery() || category.category !== "Beliebt") {
+                <GridLayout
+                  columns="*, auto"
+                  class="px-4 py-3 bg-gray-50"
+                  (tap)="toggleCategory(category.category)"
+                >
+                  <Label
+                    col="0"
+                    [text]="category.category"
+                    class="text-sm font-semibold text-gray-500 uppercase"
+                  ></Label>
+                  <Label
+                    col="1"
+                    [text]="isCategoryExpanded(category.category) ? '−' : '+'"
+                    class="text-gray-500 text-lg font-bold"
+                  ></Label>
+                </GridLayout>
+              }
+
+              <!-- Category Activities -->
+              @if (isCategoryExpanded(category.category)) {
+                <StackLayout class="bg-white">
+                  @for (
+                    activity of category.activities;
+                    track activity.type;
+                    let isLast = $last
+                  ) {
+                    <GridLayout
+                      columns="*, auto"
+                      class="px-4 py-4 active:bg-gray-100"
+                      [class.border-b]="!isLast"
+                      [class.border-gray-200]="!isLast"
+                      (tap)="selectActivity(activity.type)"
+                    >
+                      <Label
+                        col="0"
+                        [text]="activity.label"
+                        class="text-base text-neutral"
+                      ></Label>
+                      <Label
+                        col="1"
+                        text="›"
+                        class="text-gray-400 text-xl"
+                      ></Label>
+                    </GridLayout>
+                  }
+                </StackLayout>
+              }
+            </StackLayout>
+          }
+        </StackLayout>
       </StackLayout>
+    </ScrollView>
+  }
 
-      <!-- Calories Input Section -->
-      <StackLayout class="mb-6">
-        <Label
-          text="Verbrannte Kalorien (kcal)"
-          class="text-base font-semibold text-neutral mb-2"
-        ></Label>
-        <TextField
-          formControlName="caloriesBurned"
-          keyboardType="number"
-          class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral placeholder-gray-400"
-          hint="z.B. 200"
-        >
-        </TextField>
-      </StackLayout>
-
-      <!-- Preview/Summary if activity selected -->
-      @if (selectedActivityType) {
-        <StackLayout
-          class="mt-6 p-4 bg-gray-100 border border-gray-200 rounded-lg"
-        >
+  <!-- Step 2: Activity Details -->
+  @if (!showActivitySelection() && selectedActivityType) {
+    <ScrollView row="1" iosOverflowSafeArea="false">
+      <StackLayout class="p-5 pb-10" [formGroup]="activityForm">
+        <!-- Selected Activity Display -->
+        <StackLayout class="mb-6 p-4 bg-primary/10 rounded-lg">
           <Label
-            text="Zusammenfassung"
-            class="text-base font-bold text-neutral mb-2"
+            text="Ausgewählte Aktivität"
+            class="text-sm font-semibold text-gray-600 mb-1"
           ></Label>
           <Label
-            [text]="'Sportart: ' + getActivityLabel(selectedActivityType)"
-            class="text-sm text-gray-700 mb-1"
-          ></Label>
-          <Label
-            [text]="'Dauer: ' + durationMinutes() + ' Minuten'"
-            class="text-sm text-gray-700 mb-1"
-          ></Label>
-          <Label
-            [text]="'Kalorien: ' + caloriesBurned() + ' kcal'"
-            class="text-sm text-gray-700"
+            [text]="getActivityLabel(selectedActivityType)"
+            class="text-xl font-bold text-primary"
           ></Label>
         </StackLayout>
-      }
-    </StackLayout>
-  </ScrollView>
 
-  <!-- Fixed Save Button at Bottom -->
-  <GridLayout
-    row="2"
-    rows="auto, auto"
-    class="bg-base-100"
-    iosOverflowSafeArea="false"
-  >
-    <StackLayout
-      row="0"
-      class="p-4 pt-4 bg-base-100 border-t-2 border-gray-200"
+        <!-- Duration Input Section -->
+        <StackLayout class="mb-6">
+          <Label
+            text="Dauer (Minuten)"
+            class="text-base font-semibold text-neutral mb-2"
+          ></Label>
+          <TextField
+            formControlName="durationMinutes"
+            keyboardType="number"
+            class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral placeholder-gray-400"
+            hint="z.B. 30"
+          >
+          </TextField>
+        </StackLayout>
+
+        <!-- Calories Input Section -->
+        <StackLayout class="mb-6">
+          <Label
+            text="Verbrannte Kalorien (kcal)"
+            class="text-base font-semibold text-neutral mb-2"
+          ></Label>
+          <TextField
+            formControlName="caloriesBurned"
+            keyboardType="number"
+            class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral placeholder-gray-400"
+            hint="z.B. 200"
+          >
+          </TextField>
+        </StackLayout>
+
+        <!-- Preview/Summary -->
+        @if (durationMinutes() > 0 || caloriesBurned() > 0) {
+          <StackLayout
+            class="mt-6 p-4 bg-gray-100 border border-gray-200 rounded-lg"
+          >
+            <Label
+              text="Zusammenfassung"
+              class="text-base font-bold text-neutral mb-2"
+            ></Label>
+            <Label
+              [text]="'Sportart: ' + getActivityLabel(selectedActivityType)"
+              class="text-sm text-gray-700 mb-1"
+            ></Label>
+            <Label
+              [text]="'Dauer: ' + durationMinutes() + ' Minuten'"
+              class="text-sm text-gray-700 mb-1"
+            ></Label>
+            <Label
+              [text]="'Kalorien: ' + caloriesBurned() + ' kcal'"
+              class="text-sm text-gray-700"
+            ></Label>
+          </StackLayout>
+        }
+      </StackLayout>
+    </ScrollView>
+
+    <!-- Fixed Save Button at Bottom (only in Step 2) -->
+    <GridLayout
+      row="2"
+      rows="auto"
+      class="bg-base-100"
+      iosOverflowSafeArea="false"
     >
-      <Button
-        [text]="isSaving() ? 'Speichern...' : 'Speichern'"
-        class="bg-primary text-white px-6 py-4 rounded-lg font-bold text-base disabled:bg-base-300"
-        [isEnabled]="selectedActivityType && formValid() && !isSaving()"
-        (tap)="saveActivity()"
+      <StackLayout
+        row="0"
+        class="p-4 pt-4 bg-base-100 border-t-2 border-gray-200"
       >
-      </Button>
-    </StackLayout>
-  </GridLayout>
+        <Button
+          [text]="isSaving() ? 'Speichern...' : 'Speichern'"
+          class="bg-primary text-white px-6 py-4 rounded-lg font-bold text-base disabled:bg-base-300"
+          [isEnabled]="selectedActivityType && formValid() && !isSaving()"
+          (tap)="saveActivity()"
+        >
+        </Button>
+      </StackLayout>
+    </GridLayout>
+  }
 </GridLayout>
