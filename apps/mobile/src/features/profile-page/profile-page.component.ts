@@ -5,7 +5,10 @@ import {
   signal,
   inject,
 } from '@angular/core';
-import { NativeScriptCommonModule } from '@nativescript/angular';
+import {
+  NativeScriptCommonModule,
+  ModalDialogService,
+} from '@nativescript/angular';
 import { Router } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
 import { User } from '@cooksona/models';
@@ -20,7 +23,9 @@ import {
   Settings,
 } from '@cooksona/constants/icons';
 import { isIOS, isAndroid, ApplicationSettings } from '@nativescript/core';
+import { confirm } from '@nativescript/core/ui/dialogs';
 import { HealthKitService } from '../../plugins/healthkit/healthkit.service';
+import { HealthConnectionModalComponent } from './health-connection-modal/health-connection-modal.component';
 
 interface SettingsSection {
   title: string;
@@ -47,6 +52,7 @@ export class ProfilePageComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly health = inject(HealthKitService);
+  private readonly modalService = inject(ModalDialogService);
 
   protected readonly icons = {
     User: UserIcon,
@@ -96,13 +102,43 @@ export class ProfilePageComponent implements OnInit {
     }
   }
 
-  protected toggleHealthConnection() {
-    this.loading.set(true);
-
+  protected async toggleHealthConnection() {
     if (this.healthConnected()) {
-      this.disconnectHealthService();
+      // Show confirmation dialog before disconnecting
+      const result = await confirm({
+        title: 'Verbindung trennen?',
+        message: 'Möchtest du die Verbindung zu Apple Health wirklich trennen?',
+        okButtonText: 'Trennen',
+        cancelButtonText: 'Abbrechen',
+      });
+
+      if (result) {
+        this.loading.set(true);
+        this.disconnectHealthService();
+      }
     } else {
-      this.connectHealthService();
+      // Show beautiful connection modal
+      this.showHealthConnectionModal();
+    }
+  }
+
+  private async showHealthConnectionModal() {
+    try {
+      const shouldConnect = await this.modalService.showModal(
+        HealthConnectionModalComponent,
+        {
+          fullscreen: false,
+          animated: true,
+          stretched: false,
+        },
+      );
+
+      if (shouldConnect) {
+        this.loading.set(true);
+        this.connectHealthService();
+      }
+    } catch (error) {
+      console.error('Error showing health connection modal:', error);
     }
   }
 

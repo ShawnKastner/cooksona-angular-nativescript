@@ -1,0 +1,126 @@
+<GridLayout rows="*" class="bg-white">
+  <FlexboxLayout row="0" class="absolute top-12 left-6 z-10">
+    <FlexboxLayout
+      (tap)="close()"
+      class="w-10 h-10 items-center justify-center"
+    >
+      <svg:SVGImage
+        [src]="icons.X | svgToDataUri: '#FFFFFF'"
+        class="w-7 h-7"
+      ></svg:SVGImage>
+    </FlexboxLayout>
+  </FlexboxLayout>
+
+  <ScrollView row="0">
+    <StackLayout class="h-full">
+      <StackLayout
+        class="pt-20 pb-10 px-6"
+        style="background: linear-gradient(135deg, #5b8184 0%, #4a6c6f 100%)"
+      >
+        <FlexboxLayout class="items-center justify-center mb-6">
+          <FlexboxLayout
+            class="w-32 h-32 bg-white rounded-3xl items-center justify-center shadow-xl"
+          >
+            <Image
+              [src]="
+                isIOS
+                  ? '~/assets/images/apple_health_icon.png'
+                  : '~/assets/images/google_fit_icon.png'
+              "
+              class="w-20 h-20"
+              stretch="aspectFit"
+            ></Image>
+          </FlexboxLayout>
+        </FlexboxLayout>
+
+        <Label
+          class="text-3xl font-bold text-white text-center mb-2"
+          [text]="platformName"
+        ></Label>
+
+        <Label
+          class="text-lg text-white/80 text-center"
+          text="Automatisches Tracking"
+        ></Label>
+      </StackLayout>
+
+      <StackLayout class="bg-white px-8 pt-8 pb-10">
+        <Label
+          textWrap="true"
+          class="text-base text-gray-600 text-center leading-relaxed mb-8"
+        >
+          <FormattedString>
+            @if (isIOS) {
+              <Span
+                text="Verbinde Cooksona mit der Health App, um auf die Fitnessdaten deines iPhones sowie verschiedener Apps (z.B. Runtastic) oder deiner Apple Watch zugreifen und mit Cooksona synchronisieren zu können."
+              ></Span>
+            } @else {
+              <Span
+                text="Verbinde Cooksona mit Google Fit, um auf die Fitnessdaten deines Smartphones sowie verschiedener Fitness-Apps zugreifen und mit Cooksona synchronisieren zu können."
+              ></Span>
+            }
+          </FormattedString>
+        </Label>
+
+        <FlexboxLayout
+          justifyContent="center"
+          alignItems="center"
+          class="mb-10"
+        >
+          <StackLayout class="items-center mx-6">
+            <FlexboxLayout
+              class="w-24 h-24 bg-gray-50 rounded-3xl items-center justify-center shadow-sm"
+            >
+              <Label class="text-5xl" text="🍳"></Label>
+            </FlexboxLayout>
+            <Label
+              class="text-base text-gray-700 mt-4 font-semibold"
+              text="Cooksona"
+            ></Label>
+          </StackLayout>
+
+          <StackLayout class="items-center mx-6">
+            <FlexboxLayout
+              class="w-24 h-24 bg-gray-50 rounded-3xl items-center justify-center shadow-sm"
+            >
+              <Image
+                [src]="
+                  isIOS
+                    ? '~/assets/images/apple_health_icon.png'
+                    : '~/assets/images/google_fit_icon.png'
+                "
+                class="w-14 h-14"
+                stretch="aspectFit"
+              ></Image>
+            </FlexboxLayout>
+            <Label
+              class="text-base text-gray-700 mt-4 font-semibold"
+              text="Health"
+            ></Label>
+          </StackLayout>
+        </FlexboxLayout>
+
+        <FlexboxLayout
+          (tap)="connect()"
+          class="w-full py-5 px-6 rounded-3xl items-center justify-center shadow-lg mx-auto"
+          style="background: linear-gradient(135deg, #5b8184 0%, #4a6c6f 100%)"
+          [class.opacity-70]="loading()"
+        >
+          @if (loading()) {
+            <ActivityIndicator
+              busy="true"
+              iosIndicatorViewStyle="medium"
+              class="w-6 h-6"
+              color="#FFFFFF"
+            ></ActivityIndicator>
+          } @else {
+            <Label
+              class="text-white font-bold text-xl"
+              text="Verbinden"
+            ></Label>
+          }
+        </FlexboxLayout>
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+</GridLayout>
