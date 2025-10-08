@@ -164,7 +164,6 @@ export class HealthKitService {
   }
 
   async getTodayWorkouts(): Promise<HealthKitWorkout[]> {
-
     if (!isIOS || !this.iosStore) {
       return [];
     }

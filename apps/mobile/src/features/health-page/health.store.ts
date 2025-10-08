@@ -21,6 +21,14 @@ export class HealthStore {
   private readonly api = inject(HealthApiService);
   private readonly auth = inject(AuthService);
 
+  private readonly MIN_RELOAD_INTERVAL_MS = 60_000;
+  private readonly HEALTHKIT_SYNC_INTERVAL_MS = 5 * 60_000;
+
+  private pendingLoad: Promise<void> | null = null;
+
+  private readonly lastLoadedAt = signal<number | null>(null);
+  private readonly lastHealthKitSyncAt = signal<number | null>(null);
+
   readonly loading = signal(false);
   readonly mutating = signal(false);
   readonly error = signal<string | null>(null);
@@ -100,6 +108,8 @@ export class HealthStore {
     () => !!this.healthData() && !this.profile(),
   );
 
+  readonly hasLoadedOnce = computed(() => this.lastLoadedAt() !== null);
+
   // All values come directly from backend - no calculations needed
   readonly calorieGoal = computed(() => {
     return this.healthData()?.calorieTarget ?? 0;
@@ -153,7 +163,38 @@ export class HealthStore {
     return (this.metricsForSelectedDate().fat / goal) * 100;
   });
 
-  async load(): Promise<void> {
+  async load(options: { force?: boolean } = {}): Promise<boolean> {
+    const force = options.force === true;
+
+    if (this.pendingLoad) {
+      if (force) {
+        await this.pendingLoad;
+      } else {
+        await this.pendingLoad;
+        return false;
+      }
+    }
+
+    const lastLoadedAt = this.lastLoadedAt();
+    if (
+      !force &&
+      lastLoadedAt &&
+      Date.now() - lastLoadedAt < this.MIN_RELOAD_INTERVAL_MS
+    ) {
+      return false;
+    }
+
+    this.pendingLoad = this.performLoad();
+
+    try {
+      await this.pendingLoad;
+      return true;
+    } finally {
+      this.pendingLoad = null;
+    }
+  }
+
+  private async performLoad(): Promise<void> {
     this.loading.set(true);
     this.error.set(null);
     try {
@@ -183,11 +224,17 @@ export class HealthStore {
         this.selectedDate.set(new Date());
       }
 
-      // Load meals for the selected date
-      await this.loadMealsForSelectedDate();
+      // Load meals and activities for the selected date in parallel
+      const dateString = getDateString(this.selectedDate());
+      const [meals, activities] = await Promise.all([
+        this.loadMeals(dateString),
+        this.loadActivities(dateString),
+      ]);
 
-      // Load activities for the selected date
-      await this.loadActivitiesForSelectedDate();
+      this.meals.set(meals);
+      this.activities.set(activities);
+
+      this.markDataFresh();
     } catch (e: any) {
       console.error('Failed to load health data', e);
       this.error.set(
@@ -196,6 +243,22 @@ export class HealthStore {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  private markDataFresh(): void {
+    this.lastLoadedAt.set(Date.now());
+  }
+
+  shouldSyncHealthKit(): boolean {
+    const lastSync = this.lastHealthKitSyncAt();
+    if (!lastSync) {
+      return true;
+    }
+    return Date.now() - lastSync > this.HEALTHKIT_SYNC_INTERVAL_MS;
+  }
+
+  markHealthKitSynced(): void {
+    this.lastHealthKitSyncAt.set(Date.now());
   }
 
   setSelectedDate(date: Date) {
@@ -224,7 +287,10 @@ export class HealthStore {
     this.error.set(null);
     try {
       const data = await this.api.saveProfile(profile);
-      if (data) this.healthData.set(data);
+      if (data) {
+        this.healthData.set(data);
+        this.markDataFresh();
+      }
     } catch (e: any) {
       console.error('Failed to save profile', e);
       this.error.set(e?.message ?? 'Profil konnte nicht gespeichert werden');
@@ -242,7 +308,10 @@ export class HealthStore {
         this.selectedDate(),
         updates,
       );
-      if (data) this.healthData.set(data);
+      if (data) {
+        this.healthData.set(data);
+        this.markDataFresh();
+      }
     } catch (e: any) {
       console.error('Failed to update metrics', e);
       this.error.set(
@@ -287,7 +356,11 @@ export class HealthStore {
     this.error.set(null);
     try {
       const data = await this.api.trackActivity(activity);
-      if (data) this.healthData.set(data);
+      if (data) {
+        this.healthData.set(data);
+      }
+      await this.loadActivitiesForSelectedDate();
+      this.markDataFresh();
     } catch (e: any) {
       console.error('Failed to track activity', e);
       this.error.set(e?.message ?? 'Aktivität konnte nicht gespeichert werden');
@@ -316,7 +389,11 @@ export class HealthStore {
     this.error.set(null);
     try {
       const data = await this.api.createMeal(meal);
-      if (data) this.healthData.set(data);
+      if (data) {
+        this.healthData.set(data);
+      }
+      await this.loadMealsForSelectedDate();
+      this.markDataFresh();
     } catch (e: any) {
       console.error('Failed to create meal', e);
       this.error.set(e?.message ?? 'Mahlzeit konnte nicht gespeichert werden');
@@ -378,9 +455,12 @@ export class HealthStore {
     this.error.set(null);
     try {
       const data = await this.api.updateActivity(id, activity);
-      if (data) this.healthData.set(data);
+      if (data) {
+        this.healthData.set(data);
+      }
       // Reload activities to reflect the update
       await this.loadActivitiesForSelectedDate();
+      this.markDataFresh();
     } catch (e: any) {
       console.error('Failed to update activity', e);
       this.error.set(
@@ -397,9 +477,12 @@ export class HealthStore {
     this.error.set(null);
     try {
       const data = await this.api.deleteActivity(id);
-      if (data) this.healthData.set(data);
+      if (data) {
+        this.healthData.set(data);
+      }
       // Reload activities to reflect the deletion
       await this.loadActivitiesForSelectedDate();
+      this.markDataFresh();
     } catch (e: any) {
       console.error('Failed to delete activity', e);
       this.error.set(e?.message ?? 'Aktivität konnte nicht gelöscht werden');

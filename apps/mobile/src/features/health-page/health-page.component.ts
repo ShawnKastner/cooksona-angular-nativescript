@@ -44,6 +44,7 @@ export class HealthPageComponent implements OnInit {
   protected readonly loading = this.store.loading;
   protected readonly error = this.store.error;
   protected readonly metrics = this.store.metricsForSelectedDate;
+  protected readonly hasLoadedOnce = this.store.hasLoadedOnce;
   protected readonly isBusy = signal(false); // For pull-to-refresh loading indicator
 
   protected readonly requiresOnboarding = this.store.requiresOnboarding;
@@ -64,26 +65,35 @@ export class HealthPageComponent implements OnInit {
     }
 
     // Sync all Apple Health data in the background
-    this.syncHealthKitData();
+    if (this.store.shouldSyncHealthKit()) {
+      void this.syncHealthKitData();
+    }
   }
 
   private async syncHealthKitData(): Promise<void> {
     try {
       // Sync workouts
       const workoutResult = await this.healthKitSync.syncTodayWorkouts();
-     
+
       // Sync steps to daily metrics (always updates with latest values)
       const stepsResult = await this.healthKitSync.syncTodaySteps();
 
       // Sync active energy as activity (always updates with latest values)
       const energyResult = await this.healthKitSync.syncTodayActiveEnergy();
 
-      // Always reload data after sync to show latest values
-      // Steps and active energy change throughout the day
-      await this.store.load();
+      const shouldReload =
+        workoutResult.synced > 0 ||
+        stepsResult.synced === true ||
+        energyResult.synced === true;
+
+      if (shouldReload) {
+        await this.store.load({ force: true });
+      }
     } catch (error) {
       console.error('Failed to sync HealthKit data:', error);
       // Don't show error to user, just log it
+    } finally {
+      this.store.markHealthKitSynced();
     }
   }
 
@@ -92,16 +102,15 @@ export class HealthPageComponent implements OnInit {
 
     try {
       // Force resync of all HealthKit data
-      const results = await Promise.all([
+      await Promise.all([
         this.healthKitSync.syncTodayWorkouts(),
         this.healthKitSync.forceResyncSteps(),
         this.healthKitSync.forceResyncActiveEnergy(),
       ]);
 
-
       // Reload health data to get updated values
-      await this.store.load();
-
+      await this.store.load({ force: true });
+      this.store.markHealthKitSynced();
     } catch (error) {
       console.error('[Health Page] Refresh failed:', error);
     } finally {

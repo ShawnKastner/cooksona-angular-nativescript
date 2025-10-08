@@ -18,7 +18,6 @@ export class HealthKitSyncService {
    * Only syncs workouts that haven't been synced before
    */
   async syncTodayWorkouts(): Promise<{ synced: number; skipped: number }> {
-
     // Check if already syncing
     if (this.isSyncing) {
       return { synced: 0, skipped: 0 };
@@ -29,7 +28,7 @@ export class HealthKitSyncService {
       'healthkit_connected',
       false,
     );
-   
+
     if (!isConnected || !isIOS || !this.healthKit.isAvailable()) {
       return { synced: 0, skipped: 0 };
     }
@@ -85,7 +84,6 @@ export class HealthKitSyncService {
           // Mark as synced
           this.addSyncedWorkoutUuid(workout.uuid);
           syncedCount++;
-
         } catch (error) {
           console.error('[HealthKit Sync] ❌ Failed to sync workout:', error);
           skippedCount++;
@@ -143,7 +141,6 @@ export class HealthKitSyncService {
    * Updates every time since steps change throughout the day
    */
   async syncTodaySteps(): Promise<{ synced: boolean; steps: number }> {
-
     // Check if connected
     const isConnected = ApplicationSettings.getBoolean(
       'healthkit_connected',
@@ -197,7 +194,6 @@ export class HealthKitSyncService {
     synced: boolean;
     calories: number;
   }> {
-
     // Check if connected
     const isConnected = ApplicationSettings.getBoolean(
       'healthkit_connected',
