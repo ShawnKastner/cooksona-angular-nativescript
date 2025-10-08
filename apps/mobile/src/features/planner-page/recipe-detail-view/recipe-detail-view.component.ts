@@ -51,8 +51,6 @@ export class RecipeDetailViewComponent {
   } as const;
 
   constructor() {
-    console.log('ActivePlanId:', this.store?.activePlanId());
-
     const nav = this.router.currentNavigation();
     try {
       const stateRecipe = (nav?.extras?.state as any)?.recipe as
