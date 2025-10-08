@@ -13,7 +13,6 @@ import {
   UtensilsCrossed,
 } from '@cooksona/constants/icons';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
-import { PlannerStore } from '../../../features/planner-page/planner.store';
 
 @Component({
   selector: 'ns-tabs',
@@ -21,7 +20,6 @@ import { PlannerStore } from '../../../features/planner-page/planner.store';
   imports: [NativeScriptCommonModule, SvgToDataUriPipe, RouterModule],
   schemas: [NO_ERRORS_SCHEMA],
   templateUrl: './tabs.component.html',
-  providers: [PlannerStore],
 })
 export class TabsComponent {
   selectedIndex = signal(0);
