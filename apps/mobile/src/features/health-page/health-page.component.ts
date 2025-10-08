@@ -71,27 +71,12 @@ export class HealthPageComponent implements OnInit {
     try {
       // Sync workouts
       const workoutResult = await this.healthKitSync.syncTodayWorkouts();
-      if (workoutResult.synced > 0) {
-        console.log(
-          `Successfully synced ${workoutResult.synced} workout(s) from Apple Health`,
-        );
-      }
-
+     
       // Sync steps to daily metrics (always updates with latest values)
       const stepsResult = await this.healthKitSync.syncTodaySteps();
-      if (stepsResult.synced) {
-        console.log(
-          `Successfully synced ${stepsResult.steps} steps to daily metrics`,
-        );
-      }
 
       // Sync active energy as activity (always updates with latest values)
       const energyResult = await this.healthKitSync.syncTodayActiveEnergy();
-      if (energyResult.synced) {
-        console.log(
-          `Successfully synced ${energyResult.calories} kcal active energy as activity`,
-        );
-      }
 
       // Always reload data after sync to show latest values
       // Steps and active energy change throughout the day
@@ -103,25 +88,20 @@ export class HealthPageComponent implements OnInit {
   }
 
   async onRefresh(args: any): Promise<void> {
-    console.log('[Health Page] Pull-to-refresh triggered');
     this.isBusy.set(true);
 
     try {
       // Force resync of all HealthKit data
-      console.log('[Health Page] Starting force resync...');
       const results = await Promise.all([
         this.healthKitSync.syncTodayWorkouts(),
         this.healthKitSync.forceResyncSteps(),
         this.healthKitSync.forceResyncActiveEnergy(),
       ]);
 
-      console.log('[Health Page] Sync results:', results);
 
       // Reload health data to get updated values
-      console.log('[Health Page] Reloading health data...');
       await this.store.load();
 
-      console.log('[Health Page] Refresh complete');
     } catch (error) {
       console.error('[Health Page] Refresh failed:', error);
     } finally {

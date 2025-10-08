@@ -164,10 +164,8 @@ export class HealthKitService {
   }
 
   async getTodayWorkouts(): Promise<HealthKitWorkout[]> {
-    console.log('[HealthKit] getTodayWorkouts called');
 
     if (!isIOS || !this.iosStore) {
-      console.log('[HealthKit] Not iOS or no store');
       return [];
     }
 
@@ -175,21 +173,12 @@ export class HealthKitService {
       // @ts-ignore
       const workoutType = HKObjectType.workoutType();
       if (!workoutType) {
-        console.log('[HealthKit] No workout type');
         return [];
       }
 
       // Query last 7 days to see if there are ANY workouts
       const now = new Date();
       const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-      console.log(
-        '[HealthKit] Querying workouts from',
-        sevenDaysAgo,
-        'to',
-        now,
-      );
-      console.log('[HealthKit] Current time:', now.toISOString());
 
       // @ts-ignore
       const predicate = HKQuery.predicateForSamplesWithStartDateEndDateOptions(
@@ -201,7 +190,6 @@ export class HealthKitService {
       // Check authorization for workout type
       // @ts-ignore
       const authStatus = this.iosStore!.authorizationStatusForType(workoutType);
-      console.log('[HealthKit] Workout authorization status:', authStatus);
 
       return new Promise<HealthKitWorkout[]>((resolve) => {
         // @ts-ignore
@@ -230,15 +218,8 @@ export class HealthKitService {
               }
 
               const count = samples ? samples.count : 0;
-              console.log(
-                '[HealthKit] Total samples found in last 7 days:',
-                count,
-              );
 
               if (!samples || count === 0) {
-                console.log(
-                  '[HealthKit] No samples found - check if workouts exist in Health app',
-                );
                 return resolve([]);
               }
 
@@ -257,20 +238,8 @@ export class HealthKitService {
                 const workout = samples.objectAtIndex(i);
                 const workoutStart = workout.startDate;
 
-                console.log(
-                  '[HealthKit] Workout',
-                  i,
-                  'start date:',
-                  workoutStart,
-                );
-
                 // Filter to only today's workouts
                 if (workoutStart < startOfToday) {
-                  console.log(
-                    '[HealthKit] Skipping workout from',
-                    workoutStart,
-                    '- before today',
-                  );
                   continue;
                 }
 
@@ -292,18 +261,9 @@ export class HealthKitService {
                   uuid: workout.UUID.UUIDString,
                 };
 
-                console.log(
-                  '[HealthKit] Adding workout from today:',
-                  workoutData,
-                );
                 workouts.push(workoutData);
               }
 
-              console.log(
-                '[HealthKit] Returning',
-                workouts.length,
-                'workouts from today',
-              );
               resolve(workouts);
             },
           );

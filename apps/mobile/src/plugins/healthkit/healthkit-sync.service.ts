@@ -18,11 +18,9 @@ export class HealthKitSyncService {
    * Only syncs workouts that haven't been synced before
    */
   async syncTodayWorkouts(): Promise<{ synced: number; skipped: number }> {
-    console.log('[HealthKit Sync] Starting workout sync...');
 
     // Check if already syncing
     if (this.isSyncing) {
-      console.log('[HealthKit Sync] Sync already in progress, skipping...');
       return { synced: 0, skipped: 0 };
     }
 
@@ -31,17 +29,8 @@ export class HealthKitSyncService {
       'healthkit_connected',
       false,
     );
-    console.log(
-      '[HealthKit Sync] Connected:',
-      isConnected,
-      'isIOS:',
-      isIOS,
-      'Available:',
-      this.healthKit.isAvailable(),
-    );
-
+   
     if (!isConnected || !isIOS || !this.healthKit.isAvailable()) {
-      console.log('[HealthKit Sync] HealthKit not connected or not available');
       return { synced: 0, skipped: 0 };
     }
 
@@ -49,46 +38,28 @@ export class HealthKitSyncService {
       this.isSyncing = true;
 
       // Get today's workouts from HealthKit
-      console.log('[HealthKit Sync] Fetching workouts from HealthKit...');
       const workouts = await this.healthKit.getTodayWorkouts();
-      console.log(`[HealthKit Sync] Found ${workouts.length} workout(s)`);
 
       if (workouts.length === 0) {
-        console.log('[HealthKit Sync] No workouts found for today');
         return { synced: 0, skipped: 0 };
       }
 
       // Get already synced workout UUIDs
       const syncedUuids = this.getSyncedWorkoutUuids();
-      console.log(`[HealthKit Sync] Already synced UUIDs:`, syncedUuids);
 
       let syncedCount = 0;
       let skippedCount = 0;
 
       // Process each workout
       for (const workout of workouts) {
-        console.log(`[HealthKit Sync] Processing workout:`, {
-          uuid: workout.uuid,
-          type: workout.workoutActivityType,
-          duration: workout.duration,
-          calories: workout.totalEnergyBurned,
-          alreadySynced: syncedUuids.includes(workout.uuid),
-        });
-
         // Skip if already synced
         if (syncedUuids.includes(workout.uuid)) {
-          console.log(
-            `[HealthKit Sync] Skipping already synced workout: ${workout.uuid}`,
-          );
           skippedCount++;
           continue;
         }
 
         // Skip if no energy burned (invalid workout)
         if (workout.totalEnergyBurned === 0) {
-          console.log(
-            `[HealthKit Sync] Skipping workout with 0 calories: ${workout.uuid}`,
-          );
           skippedCount++;
           continue;
         }
@@ -101,13 +72,6 @@ export class HealthKitSyncService {
 
           // Calculate duration in minutes
           const durationMinutes = Math.round(workout.duration / 60);
-
-          console.log(`[HealthKit Sync] Syncing to backend:`, {
-            activityType,
-            durationMinutes,
-            caloriesBurned: workout.totalEnergyBurned,
-            date: getDateString(workout.startDate),
-          });
 
           // Sync to backend
           await this.healthApi.trackActivity({
@@ -122,18 +86,12 @@ export class HealthKitSyncService {
           this.addSyncedWorkoutUuid(workout.uuid);
           syncedCount++;
 
-          console.log(
-            `[HealthKit Sync] ✅ Synced workout: ${activityType}, ${durationMinutes}min, ${workout.totalEnergyBurned}kcal`,
-          );
         } catch (error) {
           console.error('[HealthKit Sync] ❌ Failed to sync workout:', error);
           skippedCount++;
         }
       }
 
-      console.log(
-        `[HealthKit Sync] Sync complete: ${syncedCount} synced, ${skippedCount} skipped`,
-      );
       return { synced: syncedCount, skipped: skippedCount };
     } catch (error) {
       console.error('[HealthKit Sync] Failed to sync workouts:', error);
@@ -185,7 +143,6 @@ export class HealthKitSyncService {
    * Updates every time since steps change throughout the day
    */
   async syncTodaySteps(): Promise<{ synced: boolean; steps: number }> {
-    console.log('[HealthKit Sync] Starting steps sync...');
 
     // Check if connected
     const isConnected = ApplicationSettings.getBoolean(
@@ -193,7 +150,6 @@ export class HealthKitSyncService {
       false,
     );
     if (!isConnected || !isIOS || !this.healthKit.isAvailable()) {
-      console.log('[HealthKit Sync] HealthKit not connected or not available');
       return { synced: false, steps: 0 };
     }
 
@@ -201,39 +157,24 @@ export class HealthKitSyncService {
       // Get weight from health data for calorie calculation (default 70kg)
       const healthData = await this.healthApi.getHealthState();
       const weight = healthData?.userProfile?.weight || 70;
-      console.log(
-        `[HealthKit Sync] Using weight: ${weight}kg for calculations`,
-      );
-
       // Get steps details from HealthKit
       const stepsDetails =
         await this.healthKit.getTodayStepsWithDetails(weight);
-      console.log(`[HealthKit Sync] Steps details:`, stepsDetails);
-      console.log(
-        `[HealthKit Sync] Found ${stepsDetails.steps} steps, ${stepsDetails.kilometers} km, ${stepsDetails.caloriesBurned} kcal for today`,
-      );
+      if (stepsDetails.steps === 0) {
+        return { synced: false, steps: 0 };
+      }
 
       if (stepsDetails.steps === 0) {
-        console.log('[HealthKit Sync] No steps to sync');
         return { synced: false, steps: 0 };
       }
 
       // Sync to backend using daily metrics API with all details
-      console.log('[HealthKit Sync] Syncing to backend:', {
-        steps: stepsDetails.steps,
-        stepsKilometers: stepsDetails.kilometers,
-        stepsCalories: stepsDetails.caloriesBurned,
-      });
-
       await this.healthApi.updateTodayMetrics({
         steps: stepsDetails.steps,
         stepsKilometers: stepsDetails.kilometers,
         stepsCalories: stepsDetails.caloriesBurned,
       });
 
-      console.log(
-        `[HealthKit Sync] ✅ Synced ${stepsDetails.steps} steps (${stepsDetails.kilometers} km, ${stepsDetails.caloriesBurned} kcal) to daily metrics`,
-      );
       return { synced: true, steps: stepsDetails.steps };
     } catch (error) {
       console.error('[HealthKit Sync] Failed to sync steps:', error);
@@ -245,7 +186,6 @@ export class HealthKitSyncService {
    * Force resync of steps (now just calls syncTodaySteps since it always updates)
    */
   async forceResyncSteps(): Promise<{ synced: boolean; steps: number }> {
-    console.log('[HealthKit Sync] Force resync steps...');
     return this.syncTodaySteps();
   }
 
@@ -257,12 +197,6 @@ export class HealthKitSyncService {
     synced: boolean;
     calories: number;
   }> {
-    console.log('[HealthKit Sync] Starting active energy sync...');
-    console.log('[HealthKit Sync] HealthKit service:', this.healthKit);
-    console.log(
-      '[HealthKit Sync] getTodayActiveEnergy method type:',
-      typeof this.healthKit.getTodayActiveEnergy,
-    );
 
     // Check if connected
     const isConnected = ApplicationSettings.getBoolean(
@@ -270,7 +204,6 @@ export class HealthKitSyncService {
       false,
     );
     if (!isConnected || !isIOS || !this.healthKit.isAvailable()) {
-      console.log('[HealthKit Sync] HealthKit not connected or not available');
       return { synced: false, calories: 0 };
     }
 
@@ -278,14 +211,9 @@ export class HealthKitSyncService {
       const today = getDateString(new Date());
 
       // Get active energy from HealthKit
-      console.log('[HealthKit Sync] Calling getTodayActiveEnergy...');
       const activeEnergy = await this.healthKit.getTodayActiveEnergy();
-      console.log(
-        `[HealthKit Sync] Found ${activeEnergy} kcal active energy for today`,
-      );
 
       if (activeEnergy === 0) {
-        console.log('[HealthKit Sync] No active energy to sync');
         return { synced: false, calories: 0 };
       }
 
@@ -297,16 +225,11 @@ export class HealthKitSyncService {
 
       if (existingActivity) {
         // Update existing activity
-        console.log(
-          '[HealthKit Sync] Updating existing active energy activity:',
-          existingActivity.id,
-        );
         await this.healthApi.updateActivity(existingActivity.id, {
           caloriesBurned: activeEnergy,
         });
       } else {
         // Create new activity
-        console.log('[HealthKit Sync] Creating new active energy activity');
         await this.healthApi.trackActivity({
           date: today,
           activityType: 'active_energy', // Special type for active energy
@@ -316,9 +239,6 @@ export class HealthKitSyncService {
         });
       }
 
-      console.log(
-        `[HealthKit Sync] ✅ Synced ${activeEnergy} kcal active energy as activity`,
-      );
       return { synced: true, calories: activeEnergy };
     } catch (error) {
       console.error('[HealthKit Sync] Failed to sync active energy:', error);
@@ -333,7 +253,6 @@ export class HealthKitSyncService {
     synced: boolean;
     calories: number;
   }> {
-    console.log('[HealthKit Sync] Force resync active energy...');
     return this.syncTodayActiveEnergy();
   }
 }
