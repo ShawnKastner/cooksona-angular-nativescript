@@ -11,6 +11,18 @@
     <ActionItem
       ios.position="right"
       android.position="actionBar"
+      (tap)="printRecipe()"
+    >
+      <FlexboxLayout class="items-center justify-center p-2 bg-transparent">
+        <svg:SVGImage
+          [src]="icons.Printer | svgToDataUri: '#6B7280'"
+          class="w-6 h-6"
+        ></svg:SVGImage>
+      </FlexboxLayout>
+    </ActionItem>
+    <ActionItem
+      ios.position="right"
+      android.position="actionBar"
       (tap)="toggleCookbook()"
     >
       <FlexboxLayout class="items-center justify-center p-2 bg-transparent">

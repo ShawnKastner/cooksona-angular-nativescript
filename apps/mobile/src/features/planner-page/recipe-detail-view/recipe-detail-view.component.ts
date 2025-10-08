@@ -14,6 +14,7 @@ import {
 import {
   ArrowLeft,
   Heart,
+  Printer,
   Shuffle,
   Users,
   Wand2,
@@ -24,6 +25,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PlannerStore } from '../planner.store';
 import { DailyPlan } from '@cooksona/models';
 import { CookbookStore } from '../../cookbook-page/cookbook.store';
+import { Dialogs } from '@nativescript/core';
 
 @Component({
   selector: 'ns-recipe-detail-view',
@@ -77,6 +79,7 @@ export class RecipeDetailViewComponent {
   icons = {
     ArrowLeft,
     Heart,
+    Printer,
     Shuffle,
     Wand2,
     Users,
@@ -263,6 +266,86 @@ export class RecipeDetailViewComponent {
       }
     } catch (e) {
       console.warn('[RecipeDetail] toggleCookbook failed', e);
+    }
+  }
+
+  async printRecipe() {
+    const recipe = this.displayRecipe();
+    if (!recipe) return;
+
+    try {
+      // Format recipe as text for sharing/printing
+      let recipeText = `${recipe.name}\n\n`;
+
+      if (recipe.servings) {
+        recipeText += `Für ${recipe.servings} ${recipe.servings > 1 ? 'Personen' : 'Person'}\n\n`;
+      }
+
+      recipeText += `ZUTATEN:\n`;
+      recipe.ingredients?.forEach((ingredient) => {
+        const amount = (ingredient.amount + ' ' + ingredient.unit).trim();
+        recipeText += `• ${amount} ${ingredient.name}\n`;
+      });
+
+      if (recipe.instructions?.length) {
+        recipeText += `\nZUBEREITUNG:\n`;
+        recipe.instructions.forEach((step, index) => {
+          recipeText += `${index + 1}. ${step}\n`;
+        });
+      }
+
+      // Use NativeScript's Utils for sharing
+      const { Utils, Device } = require('@nativescript/core');
+
+      if (Device.os === 'iOS') {
+        // iOS: Use UIActivityViewController
+        const app = Utils.ios.getter(
+          UIApplication,
+          UIApplication.sharedApplication,
+        );
+        const rootViewController =
+          app.keyWindow?.rootViewController ||
+          app.windows[0]?.rootViewController;
+
+        if (rootViewController) {
+          const activityController =
+            UIActivityViewController.alloc().initWithActivityItemsApplicationActivities(
+              NSArray.arrayWithObject(recipeText),
+              null as any,
+            );
+
+          rootViewController.presentViewControllerAnimatedCompletion(
+            activityController,
+            true,
+            null,
+          );
+        }
+      } else {
+        // Android: Use Share Intent
+        const context = Utils.android.getApplicationContext();
+        const intent = new android.content.Intent(
+          android.content.Intent.ACTION_SEND,
+        );
+        intent.setType('text/plain');
+        intent.putExtra(android.content.Intent.EXTRA_SUBJECT, recipe.name);
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, recipeText);
+
+        const chooserIntent = android.content.Intent.createChooser(
+          intent,
+          'Rezept teilen/drucken',
+        );
+        chooserIntent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(chooserIntent);
+      }
+    } catch (e) {
+      console.error('[RecipeDetail] printRecipe failed', e);
+      Dialogs.alert({
+        title: 'Fehler',
+        message:
+          'Das Rezept konnte nicht geteilt werden. Fehler: ' +
+          (e as Error).message,
+        okButtonText: 'OK',
+      });
     }
   }
 }
