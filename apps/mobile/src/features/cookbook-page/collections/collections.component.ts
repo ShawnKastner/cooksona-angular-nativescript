@@ -36,7 +36,7 @@ export class CollectionsComponent {
 
   cookbookCollection = this.cookbookStore.collections;
 
-  loading = this.cookbookStore.loading;
+  loading = this.cookbookStore.loadingCollections;
 
   icons = {
     Plus,
@@ -67,7 +67,7 @@ export class CollectionsComponent {
 
       if (collectionName && typeof collectionName === 'string') {
         // Reload collections to show the new one
-        await this.cookbookStore.load();
+        await this.cookbookStore.load({ reloadCollections: true });
       }
     } catch (e) {
       console.error('Failed to open collection modal', e);
@@ -125,7 +125,7 @@ export class CollectionsComponent {
 
       if (newName && typeof newName === 'string') {
         // Reload collections to show the updated one
-        await this.cookbookStore.load();
+        await this.cookbookStore.load({ reloadCollections: true });
       }
     } catch (e) {
       console.error('Failed to edit collection', e);
@@ -158,7 +158,7 @@ export class CollectionsComponent {
         }
 
         // Always reload collections to verify the actual state
-        await this.cookbookStore.load();
+        await this.cookbookStore.load({ reloadCollections: true });
       }
     } catch (e) {
       console.error('Failed to delete collection', e);
