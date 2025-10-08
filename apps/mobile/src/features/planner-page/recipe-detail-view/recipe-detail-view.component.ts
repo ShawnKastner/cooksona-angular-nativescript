@@ -11,12 +11,19 @@ import {
   NativeScriptCommonModule,
   RouterExtensions,
 } from '@nativescript/angular';
-import { ArrowLeft, Shuffle, Users, Wand2 } from '@cooksona/constants/icons';
+import {
+  ArrowLeft,
+  Heart,
+  Shuffle,
+  Users,
+  Wand2,
+} from '@cooksona/constants/icons';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { Recipe } from '@cooksona/models';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PlannerStore } from '../planner.store';
 import { DailyPlan } from '@cooksona/models';
+import { CookbookStore } from '../../cookbook-page/cookbook.store';
 
 @Component({
   selector: 'ns-recipe-detail-view',
@@ -33,6 +40,7 @@ export class RecipeDetailViewComponent {
   private readonly router = inject(Router);
   private readonly routerExt = inject(RouterExtensions);
   private readonly store = inject(PlannerStore, { optional: true });
+  private readonly cookbookStore = inject(CookbookStore);
 
   private readonly routeRecipe = signal<Recipe | null>(null);
   readonly displayRecipe = computed(() => this.recipe() ?? this.routeRecipe());
@@ -43,8 +51,32 @@ export class RecipeDetailViewComponent {
   // Computed property to determine if swap button should be shown
   readonly showSwapButton = computed(() => this.source() === 'mealPlan');
 
+  // Computed property to check if recipe is in cookbook
+  readonly isInCookbook = computed(() => {
+    const recipe = this.displayRecipe();
+    if (!recipe?.id) return false;
+    return this.cookbookStore.favoriteRecipeIds().has(String(recipe.id));
+  });
+
+  // Computed property for heart icon SVG with proper fill
+  readonly heartIconSvg = computed(() => {
+    const isFavorite = this.isInCookbook();
+    if (isFavorite) {
+      // Filled red heart
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#EF4444" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+</svg>`;
+    } else {
+      // Outline gray heart
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+</svg>`;
+    }
+  });
+
   icons = {
     ArrowLeft,
+    Heart,
     Shuffle,
     Wand2,
     Users,
@@ -213,6 +245,24 @@ export class RecipeDetailViewComponent {
       );
     } catch (e) {
       console.warn('[RecipeDetail] navigate to plan failed', e);
+    }
+  }
+
+  async toggleCookbook() {
+    const recipe = this.displayRecipe();
+    if (!recipe) return;
+
+    try {
+      const isCurrentlyInCookbook = this.isInCookbook();
+      if (isCurrentlyInCookbook) {
+        // Remove from cookbook
+        await this.cookbookStore.removeRecipe(String(recipe.id));
+      } else {
+        // Add to cookbook
+        await this.cookbookStore.addRecipe(recipe);
+      }
+    } catch (e) {
+      console.warn('[RecipeDetail] toggleCookbook failed', e);
     }
   }
 }

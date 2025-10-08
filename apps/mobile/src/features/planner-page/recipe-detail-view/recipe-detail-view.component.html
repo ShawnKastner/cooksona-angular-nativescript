@@ -8,6 +8,18 @@
       android.position="actionBar"
       (tap)="closeDetailView()"
     />
+    <ActionItem
+      ios.position="right"
+      android.position="actionBar"
+      (tap)="toggleCookbook()"
+    >
+      <FlexboxLayout class="items-center justify-center p-2 bg-transparent">
+        <svg:SVGImage
+          [src]="heartIconSvg() | svgToDataUri"
+          class="w-6 h-6"
+        ></svg:SVGImage>
+      </FlexboxLayout>
+    </ActionItem>
   </ActionBar>
   <ScrollView row="1">
     <StackLayout class="flex-grow overflow-y-auto p-4 space-y-6">
