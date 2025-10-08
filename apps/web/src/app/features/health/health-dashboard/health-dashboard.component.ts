@@ -1,10 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { ProgressRingComponent } from '../../../shared/ui/progress-ring/progress-ring.component';
-import type {
-  DailyMetrics,
-  HealthData,
-  UserProfile,
-} from '@cooksona/models/health.models';
+import type { DailyMetrics, HealthData } from '@cooksona/models/health.models';
 
 @Component({
   selector: 'app-health-dashboard',
@@ -21,32 +17,11 @@ export class HealthDashboardComponent {
   updateProfile = output<void>();
   openManualEntry = output<void>();
 
-  private activityMultipliers: Record<UserProfile['activityLevel'], number> = {
-    sedentary: 1.2,
-    light: 1.375,
-    moderate: 1.55,
-    active: 1.725,
-    very_active: 1.9,
-  };
-
-  private goalAdjustments: Record<UserProfile['goal'], number> = {
-    lose: -300,
-    maintain: 0,
-    gain: 300,
-  };
-
-  // Calculations
-  protected tdee = computed(() => {
-    const data = this.healthData();
-    const profile = data.userProfile;
-    if (!profile) return 0;
-    return data.bmr * (this.activityMultipliers[profile.activityLevel] ?? 1);
-  });
-
   protected calorieGoal = computed(() => {
-    const profile = this.healthData().userProfile;
-    if (!profile) return 0;
-    return this.tdee() + (this.goalAdjustments[profile.goal] ?? 0);
+    const data = this.healthData();
+    if (data.calorieTarget) return data.calorieTarget;
+    if (data.maintenanceCalories) return data.maintenanceCalories;
+    return data.basalMetabolicRate ?? 0;
   });
 
   protected totalCaloriesWithActivity = computed(() => {
@@ -62,16 +37,25 @@ export class HealthDashboardComponent {
     );
   });
 
-  // Macro goals (C 40%, P 30%, F 30%)
-  protected proteinGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.3) / 4),
-  );
-  protected carbsGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.4) / 4),
-  );
-  protected fatGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.3) / 9),
-  );
+  // Macro goals prefer backend targets, fallback to standard distribution
+  protected proteinGoal = computed(() => {
+    const macros = this.healthData().macroTargets;
+    if (macros?.protein) return macros.protein;
+    const goal = this.calorieGoal();
+    return goal ? Math.round((goal * 0.3) / 4) : 0;
+  });
+  protected carbsGoal = computed(() => {
+    const macros = this.healthData().macroTargets;
+    if (macros?.carbs) return macros.carbs;
+    const goal = this.calorieGoal();
+    return goal ? Math.round((goal * 0.4) / 4) : 0;
+  });
+  protected fatGoal = computed(() => {
+    const macros = this.healthData().macroTargets;
+    if (macros?.fat) return macros.fat;
+    const goal = this.calorieGoal();
+    return goal ? Math.round((goal * 0.3) / 9) : 0;
+  });
 
   // Progress percentages
   protected calorieProgress = computed(() => {

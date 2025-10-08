@@ -1,21 +1,52 @@
-<div class="max-w-4xl mx-auto">
-  <h1
-    class="text-4xl font-serif font-bold text-neutral mb-2 flex items-center gap-4"
+<div class="max-w-6xl mx-auto px-4 lg:px-0 space-y-6 pb-16">
+  <div
+    class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
   >
-    <span class="w-10 h-10 text-primary" [svgInject]="icons.HeartPulse"></span>
-    Health Hub
-  </h1>
-  <p class="text-gray-500 mb-8">
-    Dein tägliches Dashboard für Ernährung und Fitness.
-  </p>
+    <div>
+      <h1
+        class="text-4xl font-serif font-bold text-neutral mb-1 flex items-center gap-3"
+      >
+        <span
+          class="w-10 h-10 text-primary"
+          [svgInject]="icons.HeartPulse"
+        ></span>
+        Health Hub
+      </h1>
+      <p class="text-gray-500">
+        Dein tägliches Dashboard für Ernährung, Aktivität und Hydration.
+      </p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        class="btn btn-outline btn-sm"
+        (click)="handleRefresh()"
+        [disabled]="isRefreshing() || loading()"
+      >
+        @if (isRefreshing()) {
+          <span class="loading loading-spinner loading-xs"></span>
+          <span>Aktualisiere...</span>
+        } @else {
+          <span>Aktualisieren</span>
+        }
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        (click)="isManualEntryOpen.set(true)"
+      >
+        Manueller Eintrag
+      </button>
+    </div>
+  </div>
 
   <div
-    class="flex items-center justify-between p-4 bg-base-100 rounded-lg mb-6 shadow-soft border border-base-200"
+    class="flex items-center justify-between p-4 bg-base-100 rounded-xl shadow-soft border border-base-200"
   >
     <button
-      (click)="prevDay()"
-      class="p-2 rounded-full hover:bg-base-200 transition-colors"
       type="button"
+      class="p-2 rounded-full hover:bg-base-200 transition-colors"
+      (click)="prevDay()"
     >
       ‹
     </button>
@@ -26,64 +57,119 @@
       <p class="text-sm text-gray-500">{{ dateLabel() }}</p>
     </div>
     <button
+      type="button"
+      class="p-2 rounded-full hover:bg-base-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
       (click)="nextDay()"
       [disabled]="isToday()"
-      class="p-2 rounded-full hover:bg-base-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-      type="button"
     >
       ›
     </button>
   </div>
 
-  @if (healthData() && selectedMetrics(); as sel) {
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="md:col-span-2">
+  @if (error()) {
+    <div
+      class="p-4 bg-error/10 border border-error/30 text-error rounded-xl text-sm"
+    >
+      {{ error() }}
+    </div>
+  }
+
+  @if (loading() && !healthData()) {
+    <div class="w-full h-64 flex items-center justify-center">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+  } @else if (healthData(); as data) {
+    @let dayMetrics = metrics();
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="md:col-span-2 space-y-6">
         <app-health-dashboard
-          [healthData]="healthData()!"
-          [metrics]="selectedMetrics()!"
+          [healthData]="data"
+          [metrics]="dayMetrics"
           (updateProfile)="isOnboardingOpen.set(true)"
           (openManualEntry)="isManualEntryOpen.set(true)"
         ></app-health-dashboard>
+
+        <app-meal-section [meals]="meals()"></app-meal-section>
+
+        <app-activity-section
+          [activities]="activities()"
+          (deleteActivity)="handleDeleteActivity($event)"
+        ></app-activity-section>
       </div>
-      <div class="md:col-span-1">
+
+      <div class="md:col-span-1 space-y-6">
         <app-hydration-tracker
-          [currentIntake]="selectedMetrics()!.waterIntake"
+          [currentIntake]="dayMetrics.waterIntake"
           (updateIntake)="handleWaterUpdate($event)"
         ></app-hydration-tracker>
+
+        <app-steps-card
+          [metrics]="dayMetrics"
+          [stepGoal]="stepGoal()"
+        ></app-steps-card>
+
+        <div
+          class="bg-white p-6 rounded-2xl shadow-soft border border-base-200 space-y-4"
+        >
+          <div class="flex items-center gap-3">
+            <span
+              [svgInject]="icons.BarChart2"
+              class="w-6 h-6 text-primary"
+            ></span>
+            <h3 class="font-serif font-bold text-lg text-neutral">
+              Zusammenfassung
+            </h3>
+          </div>
+          <div class="space-y-3 text-sm text-gray-600">
+            <div class="flex justify-between">
+              <span>Kalorien (gegessen)</span>
+              <span class="font-semibold text-primary">
+                {{ dayMetrics.caloriesEaten | number: "1.0-0" }} kcal
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span>Aktivität</span>
+              <span class="font-semibold text-success">
+                {{ dayMetrics.caloriesBurned | number: "1.0-0" }} kcal
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span>Wasser</span>
+              <span class="font-semibold text-secondary">
+                {{ dayMetrics.waterIntake | number: "1.0-0" }} ml
+              </span>
+            </div>
+          </div>
+          <p class="text-xs text-gray-400">Datenstand: {{ dateLabel() }}</p>
+        </div>
       </div>
     </div>
   } @else {
-    @if (isLoading()) {
-      <div class="w-full h-64 flex items-center justify-center bg-transparent">
-        <div
-          class="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-primary"
-        ></div>
-      </div>
-    } @else if (!isOnboardingOpen()) {
-      <div class="text-center p-8 bg-white rounded-lg shadow-soft">
-        <p class="text-gray-500">
-          Gesundheitsdaten konnten nicht geladen werden. Bitte richte zuerst
-          dein Profil ein.
-        </p>
-        <button
-          (click)="isOnboardingOpen.set(true)"
-          class="mt-4 btn btn-primary"
-        >
-          Profil einrichten
-        </button>
-      </div>
-    }
+    <div
+      class="text-center p-8 bg-white rounded-2xl shadow-soft border border-base-200 space-y-4"
+    >
+      <p class="text-gray-500">
+        Gesundheitsdaten konnten nicht geladen werden. Bitte richte zuerst dein
+        Profil ein.
+      </p>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="isOnboardingOpen.set(true)"
+      >
+        Profil einrichten
+      </button>
+    </div>
   }
 </div>
 
-<!-- Onboarding modal -->
 <app-health-onboarding-modal
   [isOpen]="isOnboardingOpen()"
+  [existingProfile]="profile() ?? undefined"
   (close)="isOnboardingOpen.set(false)"
   (complete)="handleOnboardingComplete($event)"
 ></app-health-onboarding-modal>
 
-<!-- Manual entry modal -->
 <app-manual-entry-modal
   [isOpen]="isManualEntryOpen()"
   (close)="isManualEntryOpen.set(false)"

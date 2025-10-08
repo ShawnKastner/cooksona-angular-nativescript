@@ -1,22 +1,22 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
 import { icons } from '@cooksona/constants/icons';
 import { HealthDashboardComponent } from './health-dashboard/health-dashboard.component';
 import { HydrationTrackerComponent } from './hydration-tracker/hydration-tracker';
 import { ManualEntryModalComponent } from './manual-entry-modal.ts/manual-entry-modal';
 import { HealthOnboardingModalComponent } from './health-onboarding-modal/health-onboarding-modal';
-import { AuthService } from '@cooksona/auth';
-import { HealthApiService } from '@cooksona/api';
-import {
-  getDefaultMetrics,
-  getMetricsForDate,
-  getTodaysMetrics,
-} from '@cooksona/models';
-import type {
-  DailyMetrics,
-  HealthData,
-  UserProfile,
-} from '@cooksona/models/health.models';
+import { StepsCardComponent } from './steps-card/steps-card.component';
+import { MealSectionComponent } from './meal-section/meal-section.component';
+import { ActivitySectionComponent } from './activity-section/activity-section.component';
+import { HealthStore } from './health.store';
+import type { UserProfile } from '@cooksona/models';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 
 @Component({
@@ -29,130 +29,124 @@ import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
     HydrationTrackerComponent,
     ManualEntryModalComponent,
     HealthOnboardingModalComponent,
+    StepsCardComponent,
+    MealSectionComponent,
+    ActivitySectionComponent,
   ],
 })
-export class HealthComponent {
+export class HealthComponent implements OnInit {
   protected readonly icons = icons;
-  private readonly auth = inject(AuthService);
-  private readonly healthApi = inject(HealthApiService);
+  private readonly store = inject(HealthStore);
   private readonly snackbar = inject(SnackbarService);
 
-  protected isLoading = signal(false);
-  protected healthData = signal<HealthData | null>(null);
+  protected readonly loading = this.store.loading;
+  protected readonly error = this.store.error;
+  protected readonly healthData = this.store.healthData;
+  protected readonly metrics = this.store.metricsForSelectedDate;
+  protected readonly meals = this.store.meals;
+  protected readonly activities = this.store.activities;
 
-  constructor() {
-    // Load on init
-    this.loadHealthData();
-  }
+  protected readonly dayLabel = this.store.dayLabel;
+  protected readonly dateLabel = this.store.dateLabel;
+  protected readonly isToday = this.store.isToday;
 
-  // Date navigation
-  protected selectedDate = signal<Date>(new Date());
-  protected isToday = computed(() => {
-    const d = this.selectedDate();
-    const n = new Date();
-    return (
-      d.getFullYear() === n.getFullYear() &&
-      d.getMonth() === n.getMonth() &&
-      d.getDate() === n.getDate()
-    );
-  });
-  protected dayLabel = computed(() =>
-    this.isToday()
-      ? 'Heute'
-      : this.selectedDate().toLocaleDateString('de-DE', { weekday: 'long' }),
-  );
-  protected dateLabel = computed(() =>
-    this.selectedDate().toLocaleDateString('de-DE', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-    }),
+  protected readonly requiresOnboarding = this.store.requiresOnboarding;
+  protected readonly profile = this.store.profile;
+
+  protected readonly stepGoal = computed(
+    () => this.profile()?.stepGoal ?? 10000,
   );
 
-  protected todaysMetrics = computed<DailyMetrics>(() => {
-    const data = this.healthData();
-    return data ? getTodaysMetrics(data) : getDefaultMetrics();
-  });
-  protected selectedMetrics = computed<DailyMetrics | null>(() => {
-    const data = this.healthData();
-    return data ? getMetricsForDate(data, this.selectedDate()) : null;
-  });
-
-  // Template helpers to avoid using `new` or complex expressions in HTML
-  prevDay() {
-    const d = this.selectedDate();
-    this.selectedDate.set(new Date(d.getTime() - 86400000));
-  }
-  nextDay() {
-    if (this.isToday()) return;
-    const d = this.selectedDate();
-    this.selectedDate.set(new Date(d.getTime() + 86400000));
-  }
-
-  // Modals
   protected isManualEntryOpen = signal(false);
   protected isOnboardingOpen = signal(false);
+  protected isRefreshing = signal(false);
 
-  // Load data
-  async loadHealthData(): Promise<void> {
-    this.isLoading.set(true);
-    try {
-      const data = await this.healthApi.getHealthState();
-      if (data) this.healthData.set(data);
-      if (data && !data.userProfile) {
+  constructor() {
+    effect(() => {
+      if (this.requiresOnboarding()) {
         this.isOnboardingOpen.set(true);
       }
-    } catch (e) {
+    });
+  }
+
+  async ngOnInit(): Promise<void> {
+    await this.store.load();
+  }
+
+  prevDay(): void {
+    this.store.goToPreviousDay();
+  }
+
+  nextDay(): void {
+    this.store.goToNextDay();
+  }
+
+  async handleRefresh(): Promise<void> {
+    this.isRefreshing.set(true);
+    try {
+      await this.store.load({ force: true });
+      const currentError = this.error();
+      if (currentError) {
+        this.snackbar.error(currentError);
+      } else {
+        this.snackbar.success('Gesundheitsdaten aktualisiert.');
+      }
+    } catch (error: unknown) {
+      console.error('Refresh failed', error);
       this.snackbar.error(
-        'Fehler beim Laden der Gesundheitsdaten. Bitte versuche es später erneut.',
+        this.getErrorMessage(
+          error,
+          'Aktualisierung fehlgeschlagen. Bitte versuche es später erneut.',
+        ),
       );
     } finally {
-      this.isLoading.set(false);
+      this.isRefreshing.set(false);
     }
   }
 
-  // Handlers
   async handleOnboardingComplete(profile: UserProfile): Promise<void> {
     try {
-      const updated = await this.healthApi.saveProfile(profile);
-      if (updated) this.healthData.set(updated);
+      await this.store.saveProfile(profile);
       this.isOnboardingOpen.set(false);
-    } catch (e) {
+      await this.store.load({ force: true });
+      this.snackbar.success('Profil gespeichert.');
+    } catch (error: unknown) {
+      console.error('Failed to save profile', error);
       this.snackbar.error(
-        'Fehler beim Speichern des Profils. Bitte versuche es später erneut.',
+        this.getErrorMessage(
+          error,
+          'Fehler beim Speichern des Profils. Bitte versuche es später erneut.',
+        ),
       );
     }
   }
 
   async handleWaterUpdate(amountDelta: number): Promise<void> {
     try {
-      const updated = await this.healthApi.updateMetricsForDate(
-        this.selectedDate(),
-        {
-          water: amountDelta,
-        },
-      );
-      if (updated) this.healthData.set(updated);
-    } catch (e) {
+      await this.store.updateWater(amountDelta);
+    } catch (error: unknown) {
+      console.error('Failed to update water', error);
       this.snackbar.error(
-        'Fehler beim Aktualisieren der Wasseraufnahme. Bitte versuche es später erneut.',
+        this.getErrorMessage(
+          error,
+          'Fehler beim Aktualisieren der Wasseraufnahme. Bitte versuche es später erneut.',
+        ),
       );
     }
   }
 
   async handleSaveActivity(calories: number): Promise<void> {
     try {
-      const updated = await this.healthApi.updateMetricsForDate(
-        this.selectedDate(),
-        {
-          activityCalories: calories,
-        },
-      );
-      if (updated) this.healthData.set(updated);
+      await this.store.updateActivityCalories(calories);
       this.isManualEntryOpen.set(false);
-    } catch (e) {
+      this.snackbar.success('Aktivität gespeichert.');
+    } catch (error: unknown) {
+      console.error('Failed to save activity calories', error);
       this.snackbar.error(
-        'Fehler beim Speichern der Aktivität. Bitte versuche es später erneut.',
+        this.getErrorMessage(
+          error,
+          'Fehler beim Speichern der Aktivität. Bitte versuche es später erneut.',
+        ),
       );
     }
   }
@@ -164,16 +158,44 @@ export class HealthComponent {
     fat: number;
   }): Promise<void> {
     try {
-      const updated = await this.healthApi.updateMetricsForDate(
-        this.selectedDate(),
-        data,
-      );
-      if (updated) this.healthData.set(updated);
+      await this.store.updateNutrition(data);
       this.isManualEntryOpen.set(false);
-    } catch (e) {
+      this.snackbar.success('Nährwerte gespeichert.');
+    } catch (error: unknown) {
+      console.error('Failed to save nutrition', error);
       this.snackbar.error(
-        'Fehler beim Speichern der Ernährung. Bitte versuche es später erneut.',
+        this.getErrorMessage(
+          error,
+          'Fehler beim Speichern der Ernährung. Bitte versuche es später erneut.',
+        ),
       );
     }
+  }
+
+  async handleDeleteActivity(id: string): Promise<void> {
+    try {
+      await this.store.deleteActivity(id);
+      this.snackbar.success('Aktivität gelöscht.');
+    } catch (error: unknown) {
+      console.error('Failed to delete activity', error);
+      this.snackbar.error(
+        this.getErrorMessage(
+          error,
+          'Aktivität konnte nicht gelöscht werden. Bitte versuche es später erneut.',
+        ),
+      );
+    }
+  }
+
+  private getErrorMessage(error: unknown, fallback: string): string {
+    if (typeof error === 'string') return error;
+    if (error instanceof Error) return error.message;
+    if (error && typeof error === 'object' && 'message' in error) {
+      const { message } = error as { message?: unknown };
+      if (typeof message === 'string') {
+        return message;
+      }
+    }
+    return fallback;
   }
 }

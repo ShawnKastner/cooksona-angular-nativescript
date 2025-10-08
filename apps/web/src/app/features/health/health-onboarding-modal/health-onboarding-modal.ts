@@ -1,4 +1,4 @@
-import { Component, input, output, signal } from '@angular/core';
+import { Component, effect, input, output, signal } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { SvgInjectDirective } from '../../../shared/directives/svg-inject.directive';
 import { icons } from '@cooksona/constants/icons';
@@ -19,14 +19,35 @@ export class HealthOnboardingModalComponent {
   complete = output<UserProfile>();
 
   step = signal(1);
-  profile = signal<UserProfile>({
+  private readonly defaultProfile: UserProfile = {
     gender: 'female',
     age: 30,
     height: 170,
     weight: 65,
     activityLevel: 'light',
     goal: 'maintain',
-  });
+    stepGoal: 10000,
+  };
+  profile = signal<UserProfile>({ ...this.defaultProfile });
+
+  constructor() {
+    let prepared = false;
+    effect(() => {
+      const open = this.isOpen();
+      if (open && !prepared) {
+        const existing = this.existingProfile();
+        this.profile.set(
+          existing
+            ? { ...this.defaultProfile, ...existing }
+            : { ...this.defaultProfile },
+        );
+        this.step.set(1);
+        prepared = true;
+      } else if (!open && prepared) {
+        prepared = false;
+      }
+    });
+  }
 
   // Expose Math for potential future template use
   protected Math = Math;
