@@ -8,6 +8,7 @@
     "@nativescript/apple-sign-in": "^1.0.0",
     "@nativescript/core": "*",
     "@nativescript/google-signin": "^2.1.1",
+    "@nativescript-community/ui-pulltorefresh": "^5.0.0",
     "@nstudio/nativescript-checkbox": "^2.0.5",
     "@sergeymell/nativescript-svg": "^1.1.2"
   },
