@@ -9,7 +9,15 @@ export class CookbookStore {
   private readonly api = inject(ApiService);
   private readonly auth = inject(AuthService);
 
-  readonly loading = signal(false);
+  readonly loadingRecipes = signal(false);
+  readonly loadingCollections = signal(false);
+  private readonly loadingMutations = signal(false);
+  readonly loading = computed(
+    () =>
+      this.loadingRecipes() ||
+      this.loadingCollections() ||
+      this.loadingMutations(),
+  );
   readonly error = signal<string | null>(null);
 
   readonly recipes = signal<Recipe[]>([]);
@@ -33,47 +41,79 @@ export class CookbookStore {
     collectionId?: string | null;
     search?: string;
   }): Promise<void> {
-    this.loading.set(true);
     this.error.set(null);
-    try {
-      if (
-        options &&
-        Object.prototype.hasOwnProperty.call(options, 'collectionId')
-      ) {
-        const normalized =
-          options.collectionId && options.collectionId.length > 0
-            ? options.collectionId
-            : undefined;
-        this.activeCollectionId.set(normalized);
-      }
 
-      if (options && Object.prototype.hasOwnProperty.call(options, 'search')) {
-        const normalized = options.search?.trim() ?? '';
-        this.searchTerm.set(normalized);
-      }
+    const hasCollectionIdOption =
+      options && Object.prototype.hasOwnProperty.call(options, 'collectionId');
+    const hasSearchOption =
+      options && Object.prototype.hasOwnProperty.call(options, 'search');
 
-      const data = await this.cookbookApi.getCookbookForUser(
-        this.activeCollectionId(),
-        this.searchTerm(),
+    if (hasCollectionIdOption) {
+      const normalized =
+        options?.collectionId && options.collectionId.length > 0
+          ? options.collectionId
+          : undefined;
+      this.activeCollectionId.set(normalized);
+    }
+
+    if (hasSearchOption) {
+      const normalized = options?.search?.trim() ?? '';
+      this.searchTerm.set(normalized);
+    }
+
+    const shouldLoadRecipes = options?.reloadRecipes ?? true;
+    const shouldLoadCollections =
+      options?.reloadCollections ??
+      (!hasCollectionIdOption && !hasSearchOption);
+
+    const loaders: Promise<void>[] = [];
+
+    if (shouldLoadRecipes) {
+      this.loadingRecipes.set(true);
+      loaders.push(
+        (async () => {
+          try {
+            const data = await this.cookbookApi.getCookbookForUser(
+              this.activeCollectionId(),
+              this.searchTerm(),
+            );
+            this.recipes.set(data ?? []);
+            const ids = new Set(
+              (await this.cookbookApi.getCookbookRecipeIds()) ?? [],
+            );
+            this.favoriteRecipeIds.set(ids);
+          } catch (e: any) {
+            this.error.set(e?.message ?? 'Fehler beim Laden des Kochbuchs');
+          } finally {
+            this.loadingRecipes.set(false);
+          }
+        })(),
       );
-      this.recipes.set(data ?? []);
-      // ensure favorites set is populated
-      const ids = new Set(
-        (await this.cookbookApi.getCookbookRecipeIds()) ?? [],
+    }
+
+    if (shouldLoadCollections) {
+      this.loadingCollections.set(true);
+      loaders.push(
+        (async () => {
+          try {
+            const cols = await this.cookbookApi.getRecipeCollections();
+            this.collections.set(cols ?? []);
+          } catch (e: any) {
+            this.error.set(e?.message ?? 'Fehler beim Laden der Sammlungen');
+          } finally {
+            this.loadingCollections.set(false);
+          }
+        })(),
       );
-      this.favoriteRecipeIds.set(ids);
-      // load collections too
-      const cols = await this.cookbookApi.getRecipeCollections();
-      this.collections.set(cols ?? []);
-    } catch (e: any) {
-      this.error.set(e?.message ?? 'Fehler beim Laden des Kochbuchs');
-    } finally {
-      this.loading.set(false);
+    }
+
+    if (loaders.length > 0) {
+      await Promise.all(loaders);
     }
   }
 
   async addRecipe(recipe: Recipe): Promise<Recipe | undefined> {
-    this.loading.set(true);
+    this.loadingMutations.set(true);
     this.error.set(null);
     try {
       const saved = await this.cookbookApi.addRecipeToCookbook(recipe);
@@ -88,12 +128,12 @@ export class CookbookStore {
       this.error.set(e?.message ?? 'Fehler beim Hinzufügen des Rezepts');
       throw e;
     } finally {
-      this.loading.set(false);
+      this.loadingMutations.set(false);
     }
   }
 
   async updateRecipe(recipe: Recipe): Promise<Recipe | undefined> {
-    this.loading.set(true);
+    this.loadingMutations.set(true);
     this.error.set(null);
     try {
       const recipeId = String(recipe.id);
@@ -115,12 +155,12 @@ export class CookbookStore {
       this.error.set(e?.message ?? 'Fehler beim Aktualisieren des Rezepts');
       throw e;
     } finally {
-      this.loading.set(false);
+      this.loadingMutations.set(false);
     }
   }
 
   async removeRecipe(recipeId: string): Promise<void> {
-    this.loading.set(true);
+    this.loadingMutations.set(true);
     this.error.set(null);
     try {
       await this.cookbookApi.removeRecipeFromCookbook(recipeId);
@@ -135,7 +175,7 @@ export class CookbookStore {
       this.error.set(e?.message ?? 'Fehler beim Entfernen des Rezepts');
       throw e;
     } finally {
-      this.loading.set(false);
+      this.loadingMutations.set(false);
     }
   }
 
@@ -169,7 +209,7 @@ export class CookbookStore {
   }
 
   async setCollectionsForRecipe(recipeId: string, collectionIds: string[]) {
-    this.loading.set(true);
+    this.loadingMutations.set(true);
     this.error.set(null);
     try {
       const updated = await this.cookbookApi.setRecipeToCollections(
@@ -186,12 +226,12 @@ export class CookbookStore {
       this.error.set(e?.message ?? 'Sammlungen konnten nicht gesetzt werden');
       throw e;
     } finally {
-      this.loading.set(false);
+      this.loadingMutations.set(false);
     }
   }
 
   async suggestCollections(recipe: Recipe): Promise<string[] | undefined> {
-    this.loading.set(true);
+    this.loadingMutations.set(true);
     this.error.set(null);
     try {
       const suggestions =
@@ -201,12 +241,12 @@ export class CookbookStore {
       this.error.set(e?.message ?? 'Vorschläge konnten nicht geladen werden');
       return undefined;
     } finally {
-      this.loading.set(false);
+      this.loadingMutations.set(false);
     }
   }
 
   async transformRecipe(recipe: Recipe, modification: string) {
-    this.loading.set(true);
+    this.loadingMutations.set(true);
     this.error.set(null);
     try {
       // Gate behind pro/quota like planner if needed
@@ -228,7 +268,7 @@ export class CookbookStore {
       this.error.set(e?.message ?? 'Rezept-Transformation fehlgeschlagen');
       throw e;
     } finally {
-      this.loading.set(false);
+      this.loadingMutations.set(false);
     }
   }
 }

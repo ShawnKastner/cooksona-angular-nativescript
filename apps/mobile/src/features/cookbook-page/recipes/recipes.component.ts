@@ -28,7 +28,7 @@ export class RecipesComponent {
   private readonly vcRef = inject(ViewContainerRef);
 
   recipesInCookbook = this.cookbookStore.recipes;
-  loading = this.cookbookStore.loading;
+  loading = this.cookbookStore.loadingRecipes;
 
   icons = {
     FolderPlus,
@@ -68,7 +68,7 @@ export class RecipesComponent {
 
       if (success) {
         // Reload cookbook to reflect changes
-        await this.cookbookStore.load();
+        await this.cookbookStore.load({ reloadCollections: true });
       }
     } catch (error) {
       console.error('Failed to open assign collection modal', error);
