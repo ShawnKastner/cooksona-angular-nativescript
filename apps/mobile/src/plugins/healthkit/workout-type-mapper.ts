@@ -64,7 +64,7 @@ export function mapWorkoutTypeToActivityType(
       return 'waterSports';
 
     // Winter Sports
-    case 19: // HKWorkoutActivityTypeDownhillSkiing
+    case 60: // HKWorkoutActivityTypeDownhillSkiing (corrected from 19 which is Dance)
       return 'downhillSkiing';
     case 18: // HKWorkoutActivityTypeCrossCountrySkiing
       return 'crossCountrySkiing';
@@ -140,7 +140,7 @@ export function mapWorkoutTypeToActivityType(
       return 'dancing';
     case 7: // HKWorkoutActivityTypeBarre
       return 'barre';
-    case 60: // HKWorkoutActivityTypeDiscSports
+    case 3003: // Custom: DiscSports (avoiding conflict with CoreTraining=59)
       return 'discSports';
 
     // Outdoor Activities
@@ -174,7 +174,7 @@ export function mapWorkoutTypeToActivityType(
       return 'stepTraining';
     case 76: // HKWorkoutActivityTypeFitnessGaming
       return 'fitnessGaming';
-    case 27: // HKWorkoutActivityTypeJumpRope
+    case 3002: // Custom: JumpRope (avoiding conflict with Golf=27)
       return 'jumpRope';
     case 75: // HKWorkoutActivityTypeStairs
       return 'stairs';

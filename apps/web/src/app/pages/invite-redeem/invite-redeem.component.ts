@@ -10,7 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService, InviteRedeemApiService } from '@cooksona/api';
 import { toErrorMessage } from '../../shared/utils/error.utils';
 import { SvgInjectDirective } from '../../shared/directives/svg-inject.directive';
-import { Eye, EyeOff } from '../../../../../../libs/constants/icons';
+import { Eye, EyeOff } from '@cooksona/constants/icons';
 
 interface InviteRedeemInfo {
   presetRole: 'admin' | 'user';

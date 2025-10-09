@@ -5,7 +5,7 @@ import { NativeScriptCommonModule } from '@nativescript/angular';
 import { ShoppingListItem } from '@cooksona/models';
 import { PlannerStore } from '../planner.store';
 import { TNSCheckBoxModule } from '@nstudio/nativescript-checkbox/angular';
-import { AuthService } from '../../../../../../libs/auth';
+import { AuthService } from '@cooksona/auth';
 
 @Component({
   selector: 'ns-shopping-list',

@@ -218,7 +218,9 @@ export class MealPlanFormComponent implements AfterViewInit {
               view.focus();
             }
           }
-        } catch {}
+        } catch {
+          // Ignore focus errors
+        }
         return;
       }
     }

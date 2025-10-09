@@ -16,8 +16,6 @@ import {
 } from '@cooksona/constants/icons';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { CookbookApiService } from '@cooksona/api';
-import { AuthService } from '@cooksona/auth';
 import { PlannerStore } from '../planner.store';
 import { DailyPlan, Recipe } from '@cooksona/models';
 
@@ -48,8 +46,6 @@ export class MealPlannerComponent {
   plans = this.store.plans;
   activePlan = this.store.activePlan;
   swappingMealId = this.store.swappingMealId;
-
-  constructor() {}
 
   mealKeys: ReadonlyArray<MealKey> = [
     'breakfast',

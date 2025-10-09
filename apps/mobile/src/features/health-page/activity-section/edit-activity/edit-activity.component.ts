@@ -48,7 +48,7 @@ export class EditActivityComponent implements OnInit, OnDestroy {
   isSaving = signal(false);
 
   // Activity ID for editing
-  private activityId: string = '';
+  private activityId = signal<string>('');
 
   // Signals for form values
   durationMinutes = signal(0);
@@ -65,7 +65,7 @@ export class EditActivityComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Get activity data from query params
     this.route.queryParams.subscribe((params) => {
-      this.activityId = params['id'] || '';
+      this.activityId.set(params['id'] || '');
       this.selectedActivityType =
         (params['activityType'] as ActivityType) || null;
 
@@ -124,7 +124,7 @@ export class EditActivityComponent implements OnInit, OnDestroy {
       !this.selectedActivityType ||
       !this.activityForm.valid ||
       this.isSaving() ||
-      !this.activityId
+      !this.activityId()
     ) {
       return;
     }
@@ -132,7 +132,7 @@ export class EditActivityComponent implements OnInit, OnDestroy {
     this.isSaving.set(true);
 
     try {
-      await this.healthStore.updateActivity(this.activityId, {
+      await this.healthStore.updateActivity(this.activityId(), {
         activityType: this.selectedActivityType,
         durationMinutes: parseInt(this.activityForm.value.durationMinutes, 10),
         caloriesBurned: parseInt(this.activityForm.value.caloriesBurned, 10),

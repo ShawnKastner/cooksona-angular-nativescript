@@ -14,21 +14,21 @@ export class SvgToDataUriPipe implements PipeTransform {
     if (color) {
       // 1) Ensure root <svg> defines a color so `currentColor` inherits
       cleaned = cleaned.replace(/<svg\b([^>]*)>/i, (match, attrs) => {
-        if (/style=\"[^\"]*\"/i.test(attrs)) {
+        if (/style="[^"]*"/i.test(attrs)) {
           // Prepend color to existing style
           attrs = attrs.replace(
-            /style=\"([^\"]*)\"/i,
+            /style="([^"]*)"/i,
             (m: string, style: string) => `style="color: ${color}; ${style}"`,
           );
         } else {
-          attrs = `${attrs} style=\"color: ${color};\"`;
+          attrs = `${attrs} style="color: ${color};"`;
         }
         return `<svg${attrs}>`;
       });
       // 2) Replace explicit currentColor usages as a fallback
       cleaned = cleaned
-        .replace(/stroke=\"currentColor\"/gi, `stroke="${color}"`)
-        .replace(/fill=\"currentColor\"/gi, `fill="${color}"`);
+        .replace(/stroke="currentColor"/gi, `stroke="${color}"`)
+        .replace(/fill="currentColor"/gi, `fill="${color}"`);
     }
     const encoded = encodeURIComponent(cleaned)
       .replace(/'/g, '%27')

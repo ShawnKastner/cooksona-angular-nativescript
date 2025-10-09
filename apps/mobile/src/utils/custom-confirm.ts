@@ -58,7 +58,9 @@ export function showCustomConfirm(
         rootController.presentViewControllerAnimatedCompletion(
           alertController,
           true,
-          () => {},
+          () => {
+            // Empty completion handler
+          },
         );
       }
     } else {

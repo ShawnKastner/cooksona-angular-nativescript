@@ -49,7 +49,9 @@ export class MobileTokenService implements OnDestroy {
       );
       try {
         ApplicationSettings.remove(KEY);
-      } catch {}
+      } catch {
+        // Ignore errors when removing token
+      }
       return false;
     }
   }

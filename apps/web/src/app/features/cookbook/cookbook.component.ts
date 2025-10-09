@@ -153,7 +153,7 @@ export class CookbookComponent implements OnInit {
     action: 'updateInPlan' | 'saveAsCopy';
   }): Promise<void> {
     this.error.set(null);
-    let shouldCloseModal = signal(true);
+    const shouldCloseModal = signal(true);
     try {
       const newRecipe = await this.cookbookApi.addRecipeToCookbook(
         ev.transformedRecipe,
@@ -232,7 +232,7 @@ export class CookbookComponent implements OnInit {
     const { recipe, selectedIds, newCollections } = ev;
     (async () => {
       try {
-        let finalCollections = [...this.collections()];
+        const finalCollections = [...this.collections()];
 
         for (const c of newCollections) {
           const created = await this.cookbookApi.createRecipeCollection(c.name);

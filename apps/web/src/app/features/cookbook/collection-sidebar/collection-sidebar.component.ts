@@ -15,7 +15,7 @@ import { toErrorMessage } from '../../../shared/utils/error.utils';
 import { LoadingSpinnerComponent } from '../../../shared/ui/loading-spinner/loading-spinner.component';
 import { LoadingSpinnerSmallComponent } from '../../../shared/ui/loading-spinner/loading-spinner-small.component';
 import { DeleteConfirmModalComponent } from '../../../shared/ui/modals/delete-confirm-modal/delete-confirm-modal.component';
-import { CookbookCollection } from '../../../../../../../libs/models/recipe.models';
+import { CookbookCollection } from '@cooksona/models';
 
 @Component({
   selector: 'app-collection-sidebar',
