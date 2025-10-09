@@ -158,6 +158,7 @@ export interface ActivityOption {
   type: ActivityType;
   label: string;
   icon?: string;
+  met?: number; // Metabolic Equivalent of Task - used to calculate calories
 }
 
 export interface NutritionalValues {

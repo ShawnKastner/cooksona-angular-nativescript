@@ -5,6 +5,7 @@ import {
   inject,
   signal,
   OnDestroy,
+  computed,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -18,7 +19,7 @@ import {
   NativeScriptCommonModule,
   NativeScriptFormsModule,
 } from '@nativescript/angular';
-import { ActivityType } from '@cooksona/models';
+import { ActivityType, calculateCaloriesBurned } from '@cooksona/models';
 import { ACTIVITY_OPTIONS } from '@cooksona/constants/activities';
 import { ArrowLeft } from '@cooksona/constants/icons';
 import { HealthStore } from '../../health.store';
@@ -52,7 +53,23 @@ export class EditActivityComponent implements OnInit, OnDestroy {
 
   // Signals for form values
   durationMinutes = signal(0);
-  caloriesBurned = signal(0);
+
+  // Computed signal für automatische Kalorienberechnung
+  caloriesBurned = computed(() => {
+    const duration = this.durationMinutes();
+    const userWeight = this.healthStore.healthData()?.userProfile?.weight || 70; // Default 70kg falls kein Gewicht
+
+    if (!this.selectedActivityType || duration <= 0) {
+      return 0;
+    }
+
+    return calculateCaloriesBurned(
+      this.selectedActivityType,
+      duration,
+      userWeight,
+    );
+  });
+
   formValid = signal(false);
 
   private formSubscription?: Subscription;
@@ -70,30 +87,23 @@ export class EditActivityComponent implements OnInit, OnDestroy {
         (params['activityType'] as ActivityType) || null;
 
       const durationMinutes = parseInt(params['durationMinutes'], 10) || 0;
-      const caloriesBurned = parseInt(params['caloriesBurned'], 10) || 0;
 
-      // Initialize form with existing values
+      // Initialize form with existing values - nur noch Dauer
       this.activityForm = this.fb.group({
         durationMinutes: [
           durationMinutes,
-          [Validators.required, Validators.min(1)],
-        ],
-        caloriesBurned: [
-          caloriesBurned,
           [Validators.required, Validators.min(1)],
         ],
       });
 
       // Set initial signals
       this.durationMinutes.set(durationMinutes);
-      this.caloriesBurned.set(caloriesBurned);
       this.formValid.set(this.activityForm.valid);
 
       // Subscribe to form changes
       this.formSubscription = this.activityForm.valueChanges.subscribe(
         (value) => {
           this.durationMinutes.set(value.durationMinutes || 0);
-          this.caloriesBurned.set(value.caloriesBurned || 0);
         },
       );
 
@@ -135,7 +145,7 @@ export class EditActivityComponent implements OnInit, OnDestroy {
       await this.healthStore.updateActivity(this.activityId(), {
         activityType: this.selectedActivityType,
         durationMinutes: parseInt(this.activityForm.value.durationMinutes, 10),
-        caloriesBurned: parseInt(this.activityForm.value.caloriesBurned, 10),
+        caloriesBurned: this.caloriesBurned(), // Verwende die berechneten Kalorien
       });
 
       // Navigate back on success
