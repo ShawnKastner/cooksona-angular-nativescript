@@ -5,6 +5,7 @@ import {
   inject,
   signal,
   OnDestroy,
+  computed,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -17,7 +18,11 @@ import {
   NativeScriptCommonModule,
   NativeScriptFormsModule,
 } from '@nativescript/angular';
-import { ActivityType, getDateString } from '@cooksona/models';
+import {
+  ActivityType,
+  calculateCaloriesBurned,
+  getDateString,
+} from '@cooksona/models';
 import {
   ACTIVITY_OPTIONS,
   ACTIVITY_CATEGORIES,
@@ -59,7 +64,23 @@ export class TrackActivityComponent implements OnInit, OnDestroy {
 
   // Signals for form values to avoid change detection errors
   durationMinutes = signal(0);
-  caloriesBurned = signal(0);
+
+  // Computed signal für automatische Kalorienberechnung
+  caloriesBurned = computed(() => {
+    const duration = this.durationMinutes();
+    const userWeight = this.healthStore.healthData()?.userProfile?.weight || 70; // Default 70kg falls kein Gewicht
+
+    if (!this.selectedActivityType || duration <= 0) {
+      return 0;
+    }
+
+    return calculateCaloriesBurned(
+      this.selectedActivityType,
+      duration,
+      userWeight,
+    );
+  });
+
   formValid = signal(false); // Track form validity
 
   private formSubscription?: Subscription;
@@ -75,16 +96,15 @@ export class TrackActivityComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Nur noch Dauer im Formular - Kalorien werden automatisch berechnet
     this.activityForm = this.fb.group({
       durationMinutes: [null, [Validators.required, Validators.min(1)]],
-      caloriesBurned: [null, [Validators.required, Validators.min(1)]],
     });
 
     // Subscribe to form changes and update signals
     this.formSubscription = this.activityForm.valueChanges.subscribe(
       (value) => {
         this.durationMinutes.set(value.durationMinutes || 0);
-        this.caloriesBurned.set(value.caloriesBurned || 0);
       },
     );
 
@@ -172,7 +192,7 @@ export class TrackActivityComponent implements OnInit, OnDestroy {
       await this.healthStore.trackActivity({
         activityType: this.selectedActivityType,
         durationMinutes: parseInt(this.activityForm.value.durationMinutes, 10),
-        caloriesBurned: parseInt(this.activityForm.value.caloriesBurned, 10),
+        caloriesBurned: this.caloriesBurned(), // Verwende die berechneten Kalorien
         date: getDateString(this.healthStore.selectedDate()), // Use selected date from store
       });
 

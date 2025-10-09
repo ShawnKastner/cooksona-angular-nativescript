@@ -130,23 +130,24 @@
           </TextField>
         </StackLayout>
 
-        <!-- Calories Input Section -->
-        <StackLayout class="mb-6">
-          <Label
-            text="Verbrannte Kalorien (kcal)"
-            class="text-base font-semibold text-neutral mb-2"
-          ></Label>
-          <TextField
-            formControlName="caloriesBurned"
-            keyboardType="number"
-            class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral placeholder-gray-400"
-            hint="z.B. 200"
+        <!-- Berechnete Kalorien Anzeige -->
+        @if (durationMinutes() > 0) {
+          <StackLayout
+            class="mb-6 p-4 bg-success/10 border border-success/20 rounded-lg"
           >
-          </TextField>
-        </StackLayout>
+            <Label
+              text="Verbrannte Kalorien"
+              class="text-sm font-semibold text-gray-600 mb-1"
+            ></Label>
+            <Label
+              [text]="caloriesBurned() + ' kcal'"
+              class="text-2xl font-bold text-success"
+            ></Label>
+          </StackLayout>
+        }
 
         <!-- Preview/Summary -->
-        @if (durationMinutes() > 0 || caloriesBurned() > 0) {
+        @if (durationMinutes() > 0) {
           <StackLayout
             class="mt-6 p-4 bg-gray-100 border border-gray-200 rounded-lg"
           >
