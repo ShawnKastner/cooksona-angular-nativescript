@@ -63,7 +63,8 @@ export class CookbookStore {
 
     const shouldLoadRecipes = options?.reloadRecipes ?? true;
     const shouldLoadCollections =
-      options?.reloadCollections ?? (!hasCollectionIdOption && !hasSearchOption);
+      options?.reloadCollections ??
+      (!hasCollectionIdOption && !hasSearchOption);
 
     const loaders: Promise<void>[] = [];
 
@@ -82,9 +83,7 @@ export class CookbookStore {
             );
             this.favoriteRecipeIds.set(ids);
           } catch (e: any) {
-            this.error.set(
-              e?.message ?? 'Fehler beim Laden des Kochbuchs',
-            );
+            this.error.set(e?.message ?? 'Fehler beim Laden des Kochbuchs');
           } finally {
             this.loadingRecipes.set(false);
           }
@@ -100,9 +99,7 @@ export class CookbookStore {
             const cols = await this.cookbookApi.getRecipeCollections();
             this.collections.set(cols ?? []);
           } catch (e: any) {
-            this.error.set(
-              e?.message ?? 'Fehler beim Laden der Sammlungen',
-            );
+            this.error.set(e?.message ?? 'Fehler beim Laden der Sammlungen');
           } finally {
             this.loadingCollections.set(false);
           }
