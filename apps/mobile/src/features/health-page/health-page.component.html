@@ -9,23 +9,9 @@
       ></ActivityIndicator>
     </FlexboxLayout>
   } @else {
-    <ScrollView>
-      <PullToRefresh
-        (refresh)="onRefresh($event)"
-        [indicatorColor]="'#4A6C6F'"
-        [indicatorFillColor]="'transparent'"
-        [indicatorBackgroundColor]="'transparent'"
-      >
+    <PullToRefresh (refresh)="onRefresh($event)">
+      <ScrollView>
         <StackLayout class="p-5 pb-10 space-y-5">
-          @if (isBusy()) {
-            <FlexboxLayout class="items-center justify-center py-2">
-              <ActivityIndicator
-                busy="true"
-                class="w-6 h-6"
-                color="#4A6C6F"
-              ></ActivityIndicator>
-            </FlexboxLayout>
-          }
           @if (!isBusy() && loading() && hasLoadedOnce()) {
             <FlexboxLayout class="items-center justify-center py-2 space-x-2">
               <ActivityIndicator
@@ -72,7 +58,7 @@
 
           <ns-activity-section></ns-activity-section>
         </StackLayout>
-      </PullToRefresh>
-    </ScrollView>
+      </ScrollView>
+    </PullToRefresh>
   }
 </StackLayout>
