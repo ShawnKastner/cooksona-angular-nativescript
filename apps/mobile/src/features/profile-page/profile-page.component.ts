@@ -27,7 +27,6 @@ import { confirm } from '@nativescript/core/ui/dialogs';
 import { HealthKitService } from '../../plugins/healthkit/healthkit.service';
 import { HealthConnectionModalComponent } from './health-connection-modal/health-connection-modal.component';
 import { SubscriptionModalComponent } from './subscription-modal/subscription-modal.component';
-import type { SubscriptionPlan } from './subscription-modal/subscription-modal.component';
 
 interface SettingsSection {
   title: string;
@@ -278,6 +277,8 @@ export class ProfilePageComponent implements OnInit {
 
   protected onLogout() {
     this.auth.logout();
-    this.router.navigateByUrl('/login').catch(() => {});
+    this.router.navigateByUrl('/login').catch(() => {
+      // Ignore navigation errors
+    });
   }
 }

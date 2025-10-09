@@ -18,29 +18,30 @@ export interface StepsDetails {
 
 @Injectable({ providedIn: 'root' })
 export class HealthKitService {
+  // @ts-expect-error - HKHealthStore is not available in TypeScript types
   private iosStore: HKHealthStore | null = null;
 
   constructor() {
     if (isIOS) {
-      // @ts-ignore
+      // @ts-expect-error - HKHealthStore is not available in TypeScript types
       this.iosStore = HKHealthStore.new();
     }
   }
 
   isAvailable(): boolean {
     if (!isIOS) return false;
-    // @ts-ignore
+    // @ts-expect-error - HKHealthStore is not available in TypeScript types
     return HKHealthStore.isHealthDataAvailable();
   }
 
   checkAuthorized(): boolean {
     if (!isIOS || !this.iosStore) return false;
-    // @ts-ignore
+    // @ts-expect-error - HKObjectType is not available in TypeScript types
     const stepsType = HKObjectType.quantityTypeForIdentifier(
+      // @ts-expect-error - HKObjectType is not available in TypeScript types
       HKQuantityTypeIdentifierStepCount,
     );
     if (!stepsType) return false;
-    // @ts-ignore
     const status = this.iosStore.authorizationStatusForType(stepsType);
     return Number(status) === 2;
   }
@@ -49,26 +50,28 @@ export class HealthKitService {
     if (!isIOS || !this.iosStore) {
       throw new Error('Apple Health is only available on iOS devices.');
     }
-    // @ts-ignore
+
     const readItems = NSMutableArray.new();
-    // @ts-ignore
+    // @ts-expect-error - HKObjectType is not available in TypeScript types
     readItems.addObject(HKObjectType.workoutType());
-    // @ts-ignore
+    // @ts-expect-error - HKObjectType is not available in TypeScript types
     const stepsType = HKObjectType.quantityTypeForIdentifier(
+      // @ts-expect-error - HKQuantityTypeIdentifierStepCount is not available in TypeScript types
       HKQuantityTypeIdentifierStepCount,
     );
     if (stepsType) readItems.addObject(stepsType);
-    // @ts-ignore
+    // @ts-expect-error - HKObjectType is not available in TypeScript types
     const energyType = HKObjectType.quantityTypeForIdentifier(
+      // @ts-expect-error - HKQuantityTypeIdentifierActiveEnergyBurned is not available in TypeScript types
       HKQuantityTypeIdentifierActiveEnergyBurned,
     );
     if (energyType) readItems.addObject(energyType);
-    // @ts-ignore
+    // @ts-expect-error - HKObjectType is not available in TypeScript types
     const routeType = HKObjectType.seriesTypeForIdentifier(
+      // @ts-expect-error - HKWorkoutRouteTypeIdentifier is not available in TypeScript types
       HKWorkoutRouteTypeIdentifier,
     );
     if (routeType) readItems.addObject(routeType);
-    // @ts-ignore
     const readTypes = NSSet.setWithArray(readItems);
 
     await new Promise<void>((resolve, reject) => {
@@ -97,8 +100,9 @@ export class HealthKitService {
     if (!isIOS || !this.iosStore) return 0;
 
     try {
-      // @ts-ignore
+      // @ts-expect-error - HKObjectType is not available in TypeScript types
       const stepsType = HKObjectType.quantityTypeForIdentifier(
+        // @ts-expect-error - HKQuantityTypeIdentifierStepCount is not available in TypeScript types
         HKQuantityTypeIdentifierStepCount,
       );
       if (!stepsType) return 0;
@@ -121,21 +125,21 @@ export class HealthKitService {
         59,
       );
 
-      // @ts-ignore
+      // @ts-expect-error - HKQuery is not available in TypeScript types
       const predicate = HKQuery.predicateForSamplesWithStartDateEndDateOptions(
         startOfDay,
         endOfDay,
-        // @ts-ignore
+        // @ts-expect-error - HKQueryOptions is not available in TypeScript types
         HKQueryOptions.StrictStartDate,
       );
 
       return new Promise<number>((resolve) => {
-        // @ts-ignore
         const query =
+          // @ts-expect-error - HKStatisticsQuery is not available in TypeScript types
           HKStatisticsQuery.alloc().initWithQuantityTypeQuantitySamplePredicateOptionsCompletionHandler(
             stepsType,
             predicate,
-            // @ts-ignore
+            // @ts-expect-error - HKStatisticsOptions is not available in TypeScript types
             HKStatisticsOptions.CumulativeSum,
             (query: any, result: any, error: NSError) => {
               if (error) {
@@ -146,10 +150,10 @@ export class HealthKitService {
                 return resolve(0);
               }
               if (!result) return resolve(0);
-              // @ts-ignore
+
               const sum = result.sumQuantity();
               if (!sum) return resolve(0);
-              // @ts-ignore
+              // @ts-expect-error - HKUnit is not available in TypeScript types
               const unit = HKUnit.countUnit();
               const stepCount = sum.doubleValueForUnit(unit);
               resolve(Math.round(stepCount));
@@ -169,7 +173,7 @@ export class HealthKitService {
     }
 
     try {
-      // @ts-ignore
+      // @ts-expect-error - HKObjectType is not available in TypeScript types
       const workoutType = HKObjectType.workoutType();
       if (!workoutType) {
         return [];
@@ -179,28 +183,23 @@ export class HealthKitService {
       const now = new Date();
       const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-      // @ts-ignore
+      // @ts-expect-error - HKQuery is not available in TypeScript types
       const predicate = HKQuery.predicateForSamplesWithStartDateEndDateOptions(
         sevenDaysAgo,
         now,
         0,
       );
 
-      // Check authorization for workout type
-      // @ts-ignore
-      const authStatus = this.iosStore!.authorizationStatusForType(workoutType);
-
       return new Promise<HealthKitWorkout[]>((resolve) => {
-        // @ts-ignore
         const sortDescriptor = NSSortDescriptor.sortDescriptorWithKeyAscending(
           'startDate',
           false,
         );
-        // @ts-ignore
+
         const sortDescriptors = NSArray.arrayWithObject(sortDescriptor);
 
-        // @ts-ignore
         const query =
+          // @ts-expect-error - HKSampleQuery is not available in TypeScript types
           HKSampleQuery.alloc().initWithSampleTypePredicateLimitSortDescriptorsResultsHandler(
             workoutType,
             predicate,
@@ -243,10 +242,9 @@ export class HealthKitService {
                 }
 
                 let energyBurned = 0;
-                // @ts-ignore
                 const totalEnergy = workout.totalEnergyBurned;
                 if (totalEnergy) {
-                  // @ts-ignore
+                  // @ts-expect-error - HKUnit is not available in TypeScript types
                   const kcalUnit = HKUnit.kilocalorieUnit();
                   energyBurned = totalEnergy.doubleValueForUnit(kcalUnit);
                 }
@@ -274,7 +272,7 @@ export class HealthKitService {
     }
   }
 
-  async getTodayStepsWithDetails(weight: number = 70): Promise<StepsDetails> {
+  async getTodayStepsWithDetails(weight = 70): Promise<StepsDetails> {
     if (!isIOS || !this.iosStore) {
       return { steps: 0, kilometers: 0, caloriesBurned: 0 };
     }
@@ -306,8 +304,9 @@ export class HealthKitService {
     if (!isIOS || !this.iosStore) return 0;
 
     try {
-      // @ts-ignore
+      // @ts-expect-error - HKObjectType is not available in TypeScript types
       const energyType = HKObjectType.quantityTypeForIdentifier(
+        // @ts-expect-error - HKQuantityTypeIdentifierActiveEnergyBurned is not available in TypeScript types
         HKQuantityTypeIdentifierActiveEnergyBurned,
       );
       if (!energyType) return 0;
@@ -330,21 +329,21 @@ export class HealthKitService {
         59,
       );
 
-      // @ts-ignore
+      // @ts-expect-error - HKQuery is not available in TypeScript types
       const predicate = HKQuery.predicateForSamplesWithStartDateEndDateOptions(
         startOfDay,
         endOfDay,
-        // @ts-ignore
+        // @ts-expect-error - HKQueryOptions is not available in TypeScript types
         HKQueryOptions.StrictStartDate,
       );
 
       return new Promise<number>((resolve) => {
-        // @ts-ignore
         const query =
+          // @ts-expect-error - HKStatisticsQuery is not available in TypeScript types
           HKStatisticsQuery.alloc().initWithQuantityTypeQuantitySamplePredicateOptionsCompletionHandler(
             energyType,
             predicate,
-            // @ts-ignore
+            // @ts-expect-error - HKStatisticsOptions is not available in TypeScript types
             HKStatisticsOptions.CumulativeSum,
             (query: any, result: any, error: NSError) => {
               if (error) {
@@ -355,10 +354,10 @@ export class HealthKitService {
                 return resolve(0);
               }
               if (!result) return resolve(0);
-              // @ts-ignore
+
               const sum = result.sumQuantity();
               if (!sum) return resolve(0);
-              // @ts-ignore
+              // @ts-expect-error - HKUnit is not available in TypeScript types
               const unit = HKUnit.kilocalorieUnit();
               const energyBurned = sum.doubleValueForUnit(unit);
               resolve(Math.round(energyBurned));

@@ -11,7 +11,7 @@ import {
   NativeScriptCommonModule,
   RouterExtensions,
 } from '@nativescript/angular';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import {
   BookOpen,
   Check,
@@ -77,7 +77,7 @@ export class PlannerPageComponent implements OnInit {
     await this.store.load();
   }
 
-  onPlanSelected(_: boolean) {
+  onPlanSelected() {
     this.selected.set('plan');
     this.showPlanSelectedBanner(this.store.currentPlanDate());
   }
@@ -121,7 +121,7 @@ export class PlannerPageComponent implements OnInit {
         try {
           await this.store.generatePlan(options);
           this.selected.set('plan');
-        } catch (e) {
+        } catch {
           this.showBanner('error', 'Der Plan konnte nicht erstellt werden.');
         } finally {
           this.isGenerating.set(false);

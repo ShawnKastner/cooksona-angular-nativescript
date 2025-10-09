@@ -9,12 +9,6 @@ import { NativeScriptCommonModule } from '@nativescript/angular';
 import { HealthStore } from '../health.store';
 import type { MealEntry } from '@cooksona/api';
 import {
-  ArrowLeft,
-  ArrowRight,
-  Dumbbell,
-  Apple,
-  Droplet,
-  Flame,
   Soup,
   Sandwich,
   Utensils,

@@ -50,7 +50,7 @@ export class RecipesComponent {
     }
   }
 
-  async openAssignCollectionModal(recipe: Recipe, event?: any) {
+  async openAssignCollectionModal(recipe: Recipe) {
     try {
       const success = await this.modalService.showModal(
         AssignCollectionModalComponent,

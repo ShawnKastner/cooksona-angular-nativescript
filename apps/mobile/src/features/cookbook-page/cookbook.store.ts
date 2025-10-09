@@ -40,6 +40,8 @@ export class CookbookStore {
   async load(options?: {
     collectionId?: string | null;
     search?: string;
+    reloadRecipes?: boolean;
+    reloadCollections?: boolean;
   }): Promise<void> {
     this.error.set(null);
 

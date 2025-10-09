@@ -40,7 +40,9 @@ export class RealTimeService {
     if (!this.socket || needReconnectForUser) {
       try {
         this.socket?.close();
-      } catch {}
+      } catch {
+        // Ignore close errors
+      }
       this.socket = io(urlWithQuery, {
         path: opts?.path ?? defaultPath,
         withCredentials: true,

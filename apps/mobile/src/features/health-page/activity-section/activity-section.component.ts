@@ -19,7 +19,6 @@ import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { action, alert } from '@nativescript/core/ui/dialogs';
 import { RouterExtensions } from '@nativescript/angular';
 import { showCustomConfirm } from '../../../utils/custom-confirm';
-import { Frame } from '@nativescript/core';
 
 @Component({
   selector: 'ns-activity-section',
@@ -151,7 +150,7 @@ export class ActivitySectionComponent {
     }
   }
 
-  protected getActivityIcon(activityType: string): string {
+  protected getActivityIcon(): string {
     // You can add more specific icons based on activity type
     return this.icons.Dumbbell;
   }

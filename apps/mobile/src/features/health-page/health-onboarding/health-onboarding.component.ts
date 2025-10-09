@@ -4,7 +4,6 @@ import {
   signal,
   computed,
   inject,
-  effect,
 } from '@angular/core';
 import {
   FormBuilder,

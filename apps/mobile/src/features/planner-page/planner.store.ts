@@ -279,7 +279,9 @@ export class PlannerStore {
         // Best-effort request consumption to keep counters in sync
         try {
           await this.auth.consumeRequest();
-        } catch {}
+        } catch {
+          // Ignore errors when consuming request
+        }
       }
       return newPlan;
     } catch (e: any) {
@@ -526,7 +528,7 @@ export class PlannerStore {
           'Der Plan konnte nach dem Tausch nicht aktualisiert werden.',
         );
       }
-    } catch (error) {
+    } catch {
       this.error.set(
         'Der Austausch des Rezepts ist fehlgeschlagen. Bitte versuche es später erneut.',
       );
