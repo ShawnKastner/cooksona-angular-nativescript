@@ -16,12 +16,22 @@
   <ScrollView row="1" iosOverflowSafeArea="false">
     <StackLayout class="p-5 pb-10" [formGroup]="activityForm">
       <!-- Activity Selection Section -->
-      <Label
-        text="Sportart auswählen"
-        class="text-lg font-bold text-neutral mb-4"
-      ></Label>
+      <StackLayout class="mb-6 p-4 bg-primary/10 rounded-lg">
+        <Label
+          text="Ausgewählte Aktivität"
+          class="text-sm font-semibold text-gray-600 mb-1"
+        ></Label>
+        <Label
+          [text]="
+            selectedActivityType
+              ? getActivityLabel(selectedActivityType)
+              : 'Keine ausgewählt'
+          "
+          class="text-xl font-bold text-primary"
+        ></Label>
+      </StackLayout>
 
-      <WrapLayout class="mb-6">
+      <!-- <WrapLayout class="mb-6">
         @for (activity of activityOptions; track activity) {
           <Button
             [text]="activity.label"
@@ -34,7 +44,7 @@
           >
           </Button>
         }
-      </WrapLayout>
+      </WrapLayout> -->
 
       <!-- Duration Input Section -->
       <StackLayout class="mb-6">

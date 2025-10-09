@@ -6,6 +6,7 @@ import {
   computed,
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
+import { RouterExtensions } from '@nativescript/angular';
 import { HealthStore } from '../health.store';
 import type { ActivityEntry } from '@cooksona/api';
 import {
@@ -17,7 +18,6 @@ import {
 import { ACTIVITY_OPTIONS } from '@cooksona/constants/activities';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { action, alert } from '@nativescript/core/ui/dialogs';
-import { RouterExtensions } from '@nativescript/angular';
 import { showCustomConfirm } from '../../../utils/custom-confirm';
 
 @Component({
@@ -34,6 +34,7 @@ export class ActivitySectionComponent {
   protected readonly loading = this.store.loading;
   protected readonly activities = this.store.activities;
   protected expandedActivity = signal<string | null>(null);
+  protected isActionSheetOpen = signal(false); // Add flag to prevent multiple action sheets
 
   protected readonly icons = {
     Dumbbell,
@@ -81,6 +82,13 @@ export class ActivitySectionComponent {
       return;
     }
 
+    // Prevent multiple action sheets from opening
+    if (this.isActionSheetOpen()) {
+      return;
+    }
+
+    this.isActionSheetOpen.set(true);
+
     try {
       const result = await action({
         title: this.getActivityLabel(activity.activityType),
@@ -89,41 +97,58 @@ export class ActivitySectionComponent {
         actions: ['Bearbeiten', 'Löschen'],
       });
 
-      // Action sheet is now closed, proceed with the selected action
       if (result === 'Bearbeiten') {
-        // Navigate immediately without animation to prevent action sheet from staying open
-        this.routerExtensions
-          .navigate(['/edit-activity'], {
-            queryParams: {
-              id: activity.id,
-              activityType: activity.activityType,
-              activityLabel: this.getActivityLabel(activity.activityType),
-              durationMinutes: activity.durationMinutes.toString(),
-              caloriesBurned: activity.caloriesBurned.toString(),
-              date: activity.date,
-            },
-            animated: false, // Disable animation to close action sheet properly
-            transition: {
-              name: 'fade',
-              duration: 200,
-            },
-          })
-          .catch((err) => {
-            console.error('Navigation error:', err);
-            alert({
-              title: 'Fehler',
-              message: 'Navigation fehlgeschlagen.',
-              okButtonText: 'OK',
+        // Use setTimeout to ensure action sheet is fully closed before navigation
+        setTimeout(() => {
+          this.routerExtensions
+            .navigate(['/edit-activity'], {
+              queryParams: {
+                id: activity.id,
+                activityType: activity.activityType,
+                activityLabel: this.getActivityLabel(activity.activityType),
+                durationMinutes: activity.durationMinutes.toString(),
+                caloriesBurned: activity.caloriesBurned.toString(),
+                date: activity.date,
+              },
+              clearHistory: false,
+              animated: true,
+            })
+            .catch((err: any) => {
+              console.error('Navigation error:', err);
+              alert({
+                title: 'Fehler',
+                message: 'Navigation fehlgeschlagen.',
+                okButtonText: 'OK',
+              });
+            })
+            .finally(() => {
+              // Reset flag after navigation completes
+              setTimeout(() => {
+                this.isActionSheetOpen.set(false);
+              }, 50);
             });
-          });
+        }, 100); // Increased timeout for action sheet to fully close
       } else if (result === 'Löschen') {
         // Use setTimeout to ensure action sheet is fully closed before showing confirm
         setTimeout(async () => {
           await this.deleteActivity(activity);
+          // Reset flag after delete action completes
+          setTimeout(() => {
+            this.isActionSheetOpen.set(false);
+          }, 50);
+        }, 100);
+      } else {
+        // User cancelled - reset flag immediately
+        setTimeout(() => {
+          this.isActionSheetOpen.set(false);
         }, 300);
       }
     } catch (error) {
       console.error('Error showing action sheet:', error);
+      // Reset flag on error
+      setTimeout(() => {
+        this.isActionSheetOpen.set(false);
+      }, 300);
     }
   }
 
