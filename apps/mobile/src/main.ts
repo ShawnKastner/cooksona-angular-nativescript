@@ -22,6 +22,10 @@ registerElement(
   'GoogleSignInButton',
   () => require('@nativescript/google-signin').GoogleSignInButton,
 );
+registerElement(
+  'PullToRefresh',
+  () => require('@nativescript-community/ui-pulltorefresh').PullToRefresh,
+);
 
 runNativeScriptAngularApp({
   appModuleBootstrap: () =>

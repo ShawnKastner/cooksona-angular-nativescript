@@ -213,16 +213,37 @@ export class HealthKitSyncService {
         return { synced: false, calories: 0 };
       }
 
+      // Subtract today's workout calories so we don't double count them in active energy
+      const workouts = await this.healthKit.getTodayWorkouts();
+      const workoutEnergy = workouts.reduce(
+        (sum, workout) => sum + Math.max(0, workout.totalEnergyBurned || 0),
+        0,
+      );
+      const netActiveEnergy = Math.max(
+        0,
+        Math.round(activeEnergy - workoutEnergy),
+      );
+
       // Check if activity already exists for today
       const activities = await this.healthApi.listActivities({ date: today });
       const existingActivity = activities.find(
         (a) => a.activityType === 'active_energy' && a.isFromAppleHealth,
       );
 
+      if (netActiveEnergy === 0) {
+        if (existingActivity) {
+          await this.healthApi.updateActivity(existingActivity.id, {
+            caloriesBurned: 0,
+          });
+          return { synced: true, calories: 0 };
+        }
+        return { synced: false, calories: 0 };
+      }
+
       if (existingActivity) {
         // Update existing activity
         await this.healthApi.updateActivity(existingActivity.id, {
-          caloriesBurned: activeEnergy,
+          caloriesBurned: netActiveEnergy,
         });
       } else {
         // Create new activity
@@ -230,12 +251,12 @@ export class HealthKitSyncService {
           date: today,
           activityType: 'active_energy', // Special type for active energy
           durationMinutes: 1440, // Full day (24 hours * 60 minutes)
-          caloriesBurned: activeEnergy,
+          caloriesBurned: netActiveEnergy,
           isFromAppleHealth: true,
         });
       }
 
-      return { synced: true, calories: activeEnergy };
+      return { synced: true, calories: netActiveEnergy };
     } catch (error) {
       console.error('[HealthKit Sync] Failed to sync active energy:', error);
       return { synced: false, calories: 0 };

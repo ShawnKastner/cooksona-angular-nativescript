@@ -18,6 +18,7 @@ import { MealSectionComponent } from './meal-section/meal-section.component';
 import { ActivitySectionComponent } from './activity-section/activity-section.component';
 import { StepsCardComponent } from './steps-card/steps-card.component';
 import { HealthKitSyncService } from '../../plugins/healthkit/healthkit-sync.service';
+import type { PullToRefreshEventData } from '@nativescript-community/ui-pulltorefresh';
 
 @Component({
   selector: 'ns-health-page',
@@ -97,7 +98,7 @@ export class HealthPageComponent implements OnInit {
     }
   }
 
-  async onRefresh(args: any): Promise<void> {
+  async onRefresh({ object }: PullToRefreshEventData): Promise<void> {
     this.isBusy.set(true);
 
     try {
@@ -116,7 +117,7 @@ export class HealthPageComponent implements OnInit {
     } finally {
       // Tell pull-to-refresh we're done
       this.isBusy.set(false);
-      args.object.refreshing = false;
+      object.refreshing = false;
     }
   }
 
