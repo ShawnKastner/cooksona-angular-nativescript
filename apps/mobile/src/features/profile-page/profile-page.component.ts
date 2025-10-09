@@ -275,6 +275,12 @@ export class ProfilePageComponent implements OnInit {
     }
   }
 
+  protected navigateToSettings() {
+    this.router.navigate(['/settings']).catch((err) => {
+      console.error('Navigation to settings failed:', err);
+    });
+  }
+
   protected onLogout() {
     this.auth.logout();
     this.router.navigateByUrl('/login').catch(() => {

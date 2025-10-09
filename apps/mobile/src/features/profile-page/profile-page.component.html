@@ -1,6 +1,11 @@
-<ScrollView class="h-full bg-base-100">
-  <StackLayout class="p-5 pb-10 space-y-5">
-    <!-- Header -->
+<GridLayout rows="auto, *">
+  <!-- Header -->
+  <FlexboxLayout
+    row="0"
+    justifyContent="space-between"
+    verticalAlignment="top"
+    class="p-5 border-b border-base-200"
+  >
     <StackLayout class="items-center mb-4">
       <Label class="text-3xl font-bold text-neutral" text="Profil"></Label>
       <Label
@@ -8,140 +13,156 @@
         text="Verwalte deine Einstellungen"
       ></Label>
     </StackLayout>
-
-    <!-- User Info Card -->
-    <StackLayout
-      class="bg-white rounded-2xl border border-base-200 p-5 space-y-3"
+    <FlexboxLayout
+      justifyContent="center"
+      alignItems="center"
+      (tap)="navigateToSettings()"
+      class="flex align-start"
     >
-      <FlexboxLayout class="items-center space-x-4">
-        <!-- User Avatar -->
-        <FlexboxLayout
-          class="w-16 h-16 rounded-full bg-primary items-center justify-center"
-        >
-          <svg:SVGImage
-            [src]="icons.User | svgToDataUri: '#FFFFFF'"
-            class="w-8 h-8"
-          ></svg:SVGImage>
+      <svg:SVGImage
+        [src]="icons.Settings | svgToDataUri: '#374151'"
+        class="w-6 h-6"
+      ></svg:SVGImage>
+    </FlexboxLayout>
+  </FlexboxLayout>
+
+  <ScrollView row="1" class="h-full bg-base-100">
+    <StackLayout class="p-5 pb-10 space-y-5">
+      <!-- User Info Card -->
+      <StackLayout
+        class="bg-white rounded-2xl border border-base-200 p-5 space-y-3"
+      >
+        <FlexboxLayout class="items-center space-x-4">
+          <!-- User Avatar -->
+          <FlexboxLayout
+            class="w-16 h-16 rounded-full bg-primary items-center justify-center"
+          >
+            <svg:SVGImage
+              [src]="icons.User | svgToDataUri: '#FFFFFF'"
+              class="w-8 h-8"
+            ></svg:SVGImage>
+          </FlexboxLayout>
+
+          <!-- User Details -->
+          <StackLayout class="flex-1">
+            <Label
+              class="text-xl font-bold text-neutral"
+              [text]="userLabel"
+            ></Label>
+            <Label class="text-sm text-gray-500" [text]="userEmail"></Label>
+          </StackLayout>
         </FlexboxLayout>
+      </StackLayout>
 
-        <!-- User Details -->
-        <StackLayout class="flex-1">
+      <!-- Settings Sections -->
+      @for (section of settingsSections; track section.title) {
+        <StackLayout class="space-y-3">
           <Label
-            class="text-xl font-bold text-neutral"
-            [text]="userLabel"
+            class="text-sm font-semibold text-gray-500 ml-1"
+            [text]="section.title"
           ></Label>
-          <Label class="text-sm text-gray-500" [text]="userEmail"></Label>
-        </StackLayout>
-      </FlexboxLayout>
-    </StackLayout>
 
-    <!-- Settings Sections -->
-    @for (section of settingsSections; track section.title) {
-      <StackLayout class="space-y-3">
-        <Label
-          class="text-sm font-semibold text-gray-500 ml-1"
-          [text]="section.title"
-        ></Label>
-
-        <StackLayout
-          class="bg-white rounded-2xl border border-base-200 overflow-hidden"
-        >
-          @for (item of section.items; track item.label; let isLast = $last) {
-            <StackLayout>
-              <FlexboxLayout
-                class="p-4 items-center active:bg-gray-50"
-                (tap)="item.action()"
-              >
-                <!-- Icon -->
+          <StackLayout
+            class="bg-white rounded-2xl border border-base-200 overflow-hidden"
+          >
+            @for (item of section.items; track item.label; let isLast = $last) {
+              <StackLayout>
                 <FlexboxLayout
-                  class="w-10 h-10 rounded-full items-center justify-center mr-3"
-                  [ngClass]="{
-                    'bg-green-50': item.isConnected,
-                    'bg-gray-50': !item.isConnected,
-                  }"
+                  class="p-4 items-center active:bg-gray-50"
+                  (tap)="item.action()"
                 >
-                  @if (item.imageIcon) {
-                    <Image
-                      [src]="item.imageIcon"
-                      class="w-6 h-6"
-                      stretch="aspectFit"
-                    ></Image>
-                  } @else if (item.icon) {
+                  <!-- Icon -->
+                  <FlexboxLayout
+                    class="w-10 h-10 rounded-full items-center justify-center mr-3"
+                    [ngClass]="{
+                      'bg-green-50': item.isConnected,
+                      'bg-gray-50': !item.isConnected,
+                    }"
+                  >
+                    @if (item.imageIcon) {
+                      <Image
+                        [src]="item.imageIcon"
+                        class="w-6 h-6"
+                        stretch="aspectFit"
+                      ></Image>
+                    } @else if (item.icon) {
+                      <svg:SVGImage
+                        [src]="
+                          item.icon
+                            | svgToDataUri
+                              : (item.isConnected ? '#10B981' : '#4A6C6F')
+                        "
+                        class="w-5 h-5"
+                      ></svg:SVGImage>
+                    }
+                  </FlexboxLayout>
+
+                  <!-- Label & Subtitle -->
+                  <StackLayout class="flex-1">
+                    <Label
+                      class="text-base font-semibold text-neutral"
+                      [text]="item.label"
+                    ></Label>
+                    @if (item.subtitle) {
+                      <Label
+                        class="text-sm"
+                        [ngClass]="{
+                          'text-green-600': item.isConnected,
+                          'text-gray-500': !item.isConnected,
+                        }"
+                        [text]="item.subtitle"
+                      ></Label>
+                    }
+                  </StackLayout>
+
+                  <!-- Chevron -->
+                  @if (item.showChevron) {
                     <svg:SVGImage
-                      [src]="
-                        item.icon
-                          | svgToDataUri
-                            : (item.isConnected ? '#10B981' : '#4A6C6F')
-                      "
+                      [src]="icons.ChevronDown | svgToDataUri: '#9CA3AF'"
                       class="w-5 h-5"
+                      style="transform: rotate(-90deg)"
                     ></svg:SVGImage>
                   }
                 </FlexboxLayout>
 
-                <!-- Label & Subtitle -->
-                <StackLayout class="flex-1">
-                  <Label
-                    class="text-base font-semibold text-neutral"
-                    [text]="item.label"
-                  ></Label>
-                  @if (item.subtitle) {
-                    <Label
-                      class="text-sm"
-                      [ngClass]="{
-                        'text-green-600': item.isConnected,
-                        'text-gray-500': !item.isConnected,
-                      }"
-                      [text]="item.subtitle"
-                    ></Label>
-                  }
-                </StackLayout>
-
-                <!-- Chevron -->
-                @if (item.showChevron) {
-                  <svg:SVGImage
-                    [src]="icons.ChevronDown | svgToDataUri: '#9CA3AF'"
-                    class="w-5 h-5"
-                    style="transform: rotate(-90deg)"
-                  ></svg:SVGImage>
+                <!-- Divider -->
+                @if (!isLast) {
+                  <StackLayout class="h-[1px] bg-base-200 ml-16"></StackLayout>
                 }
-              </FlexboxLayout>
-
-              <!-- Divider -->
-              @if (!isLast) {
-                <StackLayout class="h-[1px] bg-base-200 ml-16"></StackLayout>
-              }
-            </StackLayout>
-          }
+              </StackLayout>
+            }
+          </StackLayout>
         </StackLayout>
+      }
+
+      <!-- Logout Button -->
+      <StackLayout class="mt-4">
+        <FlexboxLayout
+          class="bg-red-50 border border-red-200 text-red-600 font-bold py-4 px-4 rounded-2xl items-center justify-center active:opacity-90"
+          (tap)="onLogout()"
+        >
+          <svg:SVGImage
+            [src]="icons.LogOut | svgToDataUri: '#DC2626'"
+            class="w-5 h-5 mr-2"
+          ></svg:SVGImage>
+          <Label class="text-red-600 font-bold" text="Abmelden"></Label>
+        </FlexboxLayout>
       </StackLayout>
-    }
 
-    <!-- Logout Button -->
-    <StackLayout class="mt-4">
-      <FlexboxLayout
-        class="bg-red-50 border border-red-200 text-red-600 font-bold py-4 px-4 rounded-2xl items-center justify-center active:opacity-90"
-        (tap)="onLogout()"
-      >
-        <svg:SVGImage
-          [src]="icons.LogOut | svgToDataUri: '#DC2626'"
-          class="w-5 h-5 mr-2"
-        ></svg:SVGImage>
-        <Label class="text-red-600 font-bold" text="Abmelden"></Label>
-      </FlexboxLayout>
+      <!-- Loading Indicator -->
+      @if (loading()) {
+        <FlexboxLayout
+          class="absolute top-0 left-0 right-0 bottom-0 items-center justify-center bg-black/20"
+        >
+          <ActivityIndicator
+            busy="true"
+            iosIndicatorViewStyle="large"
+            class="w-10 h-10"
+            color="#4A6C6F"
+          >
+          </ActivityIndicator>
+        </FlexboxLayout>
+      }
     </StackLayout>
-
-    <!-- Loading Indicator -->
-    @if (loading()) {
-      <FlexboxLayout
-        class="absolute top-0 left-0 right-0 bottom-0 items-center justify-center bg-black/20"
-      >
-        <ActivityIndicator
-          busy="true"
-          iosIndicatorViewStyle="large"
-          class="w-10 h-10"
-          color="#4A6C6F"
-        ></ActivityIndicator>
-      </FlexboxLayout>
-    }
-  </StackLayout>
-</ScrollView>
+  </ScrollView>
+</GridLayout>

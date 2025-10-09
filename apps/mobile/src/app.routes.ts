@@ -99,6 +99,14 @@ export const routes: Routes = [
       ).then((m) => m.HealthOnboardingComponent),
   },
   {
+    path: 'settings',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import('./features/settings-page/settings-page.component').then(
+        (m) => m.SettingsPageComponent,
+      ),
+  },
+  {
     path: 'track-activity',
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>
