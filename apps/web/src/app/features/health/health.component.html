@@ -1,73 +1,289 @@
-<div class="max-w-4xl mx-auto">
-  <h1
-    class="text-4xl font-serif font-bold text-neutral mb-2 flex items-center gap-4"
-  >
-    <span class="w-10 h-10 text-primary" [svgInject]="icons.HeartPulse"></span>
-    Health Hub
-  </h1>
-  <p class="text-gray-500 mb-8">
-    Dein tägliches Dashboard für Ernährung und Fitness.
-  </p>
+<div class="max-w-5xl mx-auto space-y-6 pb-12">
+  <header class="space-y-2">
+    <h1
+      class="text-4xl font-serif font-bold text-neutral flex items-center gap-3"
+    >
+      <span
+        class="w-10 h-10 text-primary"
+        [svgInject]="icons.HeartPulse"
+      ></span>
+      Health Hub
+    </h1>
+    <p class="text-gray-500">
+      Behalte Ernährung, Aktivitäten und deine Ziele jeden Tag im Blick.
+    </p>
+  </header>
 
   <div
-    class="flex items-center justify-between p-4 bg-base-100 rounded-lg mb-6 shadow-soft border border-base-200"
+    class="flex items-center justify-between p-4 bg-base-100 rounded-2xl shadow-soft border border-base-200"
   >
     <button
-      (click)="prevDay()"
-      class="p-2 rounded-full hover:bg-base-200 transition-colors"
       type="button"
+      class="p-2 rounded-full hover:bg-base-200 transition-colors"
+      (click)="prevDay()"
     >
       ‹
     </button>
     <div class="text-center">
-      <h2 class="text-xl font-bold font-serif text-neutral">
+      <p class="text-xs uppercase tracking-wide text-gray-500">
+        Ausgewählter Tag
+      </p>
+      <h2 class="text-xl font-serif font-bold text-neutral">
         {{ dayLabel() }}
       </h2>
       <p class="text-sm text-gray-500">{{ dateLabel() }}</p>
     </div>
-    <button
-      (click)="nextDay()"
-      [disabled]="isToday()"
-      class="p-2 rounded-full hover:bg-base-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-      type="button"
-    >
-      ›
-    </button>
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        (click)="nextDay()"
+        [disabled]="isToday()"
+        class="p-2 rounded-full hover:bg-base-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+      >
+        ›
+      </button>
+    </div>
   </div>
 
-  @if (healthData() && selectedMetrics(); as sel) {
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="md:col-span-2">
-        <app-health-dashboard
-          [healthData]="healthData()!"
-          [metrics]="selectedMetrics()!"
-          (updateProfile)="isOnboardingOpen.set(true)"
-          (openManualEntry)="isManualEntryOpen.set(true)"
-        ></app-health-dashboard>
-      </div>
-      <div class="md:col-span-1">
-        <app-hydration-tracker
-          [currentIntake]="selectedMetrics()!.waterIntake"
-          (updateIntake)="handleWaterUpdate($event)"
-        ></app-hydration-tracker>
-      </div>
+  @if (loading() && !hasLoadedOnce()) {
+    <div class="w-full h-64 flex items-center justify-center">
+      <div
+        class="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-primary"
+      ></div>
     </div>
   } @else {
-    @if (isLoading()) {
-      <div class="w-full h-64 flex items-center justify-center bg-transparent">
+    @if (healthData()) {
+      <div class="space-y-10">
         <div
-          class="w-16 h-16 border-4 border-dashed rounded-full animate-spin border-primary"
-        ></div>
+          class="grid grid-cols-1 items-stretch lg:grid-cols-[minmax(0,2fr),minmax(0,1fr)] gap-8"
+        >
+          <app-health-dashboard
+            [healthData]="healthData()!"
+            [metrics]="selectedMetrics()"
+            (updateProfile)="isOnboardingOpen.set(true)"
+            (openManualEntry)="isManualEntryOpen.set(true)"
+          ></app-health-dashboard>
+
+          <div class="flex h-full flex-col gap-6 justify-between">
+            <app-hydration-tracker
+              [currentIntake]="selectedMetrics().waterIntake"
+              (updateIntake)="handleWaterUpdate($event)"
+            ></app-hydration-tracker>
+
+            <div
+              class="bg-white rounded-2xl border border-base-200 shadow-soft p-5 space-y-3"
+            >
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-semibold text-neutral">Heutige Bilanz</p>
+                <span
+                  class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold"
+                >
+                  <span [svgInject]="icons.Calendar" class="w-3.5 h-3.5"></span>
+                  {{ selectedDateString() }}
+                </span>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-sm text-gray-600">
+                <div class="bg-base-100/80 rounded-xl p-3">
+                  <p class="text-xs uppercase text-gray-400">
+                    Kalorien gegessen
+                  </p>
+                  <p class="text-lg font-bold text-neutral">
+                    {{ Math.round(selectedMetrics().caloriesEaten) }} kcal
+                  </p>
+                </div>
+                <div class="bg-base-100/80 rounded-xl p-3">
+                  <p class="text-xs uppercase text-gray-400">Aktivität</p>
+                  <p class="text-lg font-bold text-success">
+                    {{ Math.round(selectedMetrics().caloriesBurned) }} kcal
+                  </p>
+                </div>
+                <div class="bg-base-100/80 rounded-xl p-3">
+                  <p class="text-xs uppercase text-gray-400">Schritte</p>
+                  <p class="text-lg font-bold text-neutral">
+                    {{ selectedMetrics().steps ?? 0 }}
+                  </p>
+                </div>
+                <div class="bg-base-100/80 rounded-xl p-3">
+                  <p class="text-xs uppercase text-gray-400">Wasser</p>
+                  <p class="text-lg font-bold text-neutral">
+                    {{ selectedMetrics().waterIntake }} ml
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <section
+            class="bg-white rounded-2xl border border-base-200 shadow-soft p-6 space-y-5"
+          >
+            <header class="flex items-center justify-between gap-3">
+              <div>
+                <h2 class="text-lg font-serif font-semibold text-neutral">
+                  Mahlzeiten
+                </h2>
+                <p class="text-sm text-gray-500">
+                  Gesamt: {{ totalMealCalories() }} kcal
+                </p>
+              </div>
+              <button
+                type="button"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-base-300 text-sm font-semibold text-primary hover:border-primary hover:bg-primary/10 transition-colors"
+                (click)="isTrackMealOpen.set(true)"
+              >
+                <span [svgInject]="icons.Plus" class="w-4 h-4"></span>
+                Hinzufügen
+              </button>
+            </header>
+
+            <div class="space-y-4">
+              @for (section of mealSections(); track section.key) {
+                <div class="border border-base-200 rounded-xl overflow-hidden">
+                  <div
+                    class="flex items-center justify-between gap-3 bg-base-100/70 px-4 py-3"
+                  >
+                    <div class="flex items-center gap-3">
+                      <span
+                        [svgInject]="icons[section.icon]"
+                        class="w-6 h-6 text-primary"
+                      ></span>
+                      <div>
+                        <p class="font-semibold text-neutral text-sm">
+                          {{ section.label }}
+                        </p>
+                      </div>
+                    </div>
+                    <span class="font-semibold text-sm text-neutral">
+                      {{ Math.round(section.totalCalories) }} kcal
+                    </span>
+                  </div>
+
+                  @if (section.items.length) {
+                    <ul class="divide-y divide-base-200">
+                      @for (meal of section.items; track meal.id) {
+                        <li
+                          class="px-4 py-3 flex items-start gap-3 justify-between text-sm"
+                        >
+                          <div>
+                            <p class="font-semibold text-neutral">
+                              {{ meal.name }}
+                            </p>
+                            <p class="text-xs text-gray-500">
+                              {{ meal.calories }} kcal • {{ meal.protein }}g P •
+                              {{ meal.carbs }}g KH • {{ meal.fat }}g F
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            class="text-gray-400 hover:text-error transition-colors rounded-full p-1.5"
+                            (click)="handleDeleteMeal(meal)"
+                          >
+                            <span
+                              [svgInject]="icons.Trash"
+                              class="w-4 h-4"
+                            ></span>
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  } @else {
+                    <p class="px-4 py-5 text-sm text-gray-500">
+                      Noch keine Einträge für {{ section.label }}.
+                    </p>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+
+          <section
+            class="bg-white rounded-2xl border border-base-200 shadow-soft p-6 space-y-5"
+          >
+            <header class="flex items-center justify-between gap-3">
+              <div>
+                <h2 class="text-lg font-serif font-semibold text-neutral">
+                  Aktivitäten
+                </h2>
+                <p class="text-sm text-gray-500">
+                  Gesamt: {{ Math.round(totalActivityCalories()) }} kcal
+                </p>
+              </div>
+              <button
+                type="button"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-base-300 text-sm font-semibold text-primary hover:border-primary hover:bg-primary/10 transition-colors"
+                (click)="isTrackActivityOpen.set(true)"
+              >
+                <span [svgInject]="icons.Plus" class="w-4 h-4"></span>
+                Erfassen
+              </button>
+            </header>
+
+            @if (activities().length) {
+              <ul class="space-y-4">
+                @for (activity of activities(); track activity.id) {
+                  <li
+                    class="border border-base-200 rounded-xl px-4 py-3 flex items-start justify-between gap-3"
+                  >
+                    <div class="space-y-1">
+                      <div class="flex items-center gap-2">
+                        <span
+                          [svgInject]="icons.Dumbbell"
+                          class="w-5 h-5 text-primary"
+                        ></span>
+                        <p class="font-semibold text-neutral text-sm">
+                          {{ getActivityLabel($any(activity.activityType)) }}
+                        </p>
+                        @if (isAppleHealthActivity(activity)) {
+                          <span
+                            class="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-success/10 text-success"
+                          >
+                            <span
+                              [svgInject]="icons.Apple"
+                              class="w-3 h-3"
+                            ></span>
+                            Apple Health
+                          </span>
+                        }
+                      </div>
+                      <p class="text-xs text-gray-500">
+                        {{ activity.durationMinutes }} Minuten •
+                        {{ activity.caloriesBurned }} kcal
+                      </p>
+                      <p class="text-[11px] text-gray-400">
+                        Erfasst am {{ activity.date }}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      class="text-gray-400 hover:text-error transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      (click)="handleDeleteActivity(activity)"
+                      [disabled]="isAppleHealthActivity(activity)"
+                    >
+                      <span [svgInject]="icons.Trash" class="w-4 h-4"></span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <div
+                class="border border-dashed border-base-300 rounded-2xl p-6 text-center text-sm text-gray-500"
+              >
+                Noch keine Aktivitäten für diesen Tag. Starte mit einem Eintrag!
+              </div>
+            }
+          </section>
+        </div>
       </div>
     } @else if (!isOnboardingOpen()) {
-      <div class="text-center p-8 bg-white rounded-lg shadow-soft">
+      <div class="text-center p-8 bg-white rounded-2xl shadow-soft border">
         <p class="text-gray-500">
-          Gesundheitsdaten konnten nicht geladen werden. Bitte richte zuerst
-          dein Profil ein.
+          Es liegen noch keine Gesundheitsdaten vor. Lege zuerst dein Profil an.
         </p>
         <button
+          type="button"
+          class="btn btn-primary mt-4"
           (click)="isOnboardingOpen.set(true)"
-          class="mt-4 btn btn-primary"
         >
           Profil einrichten
         </button>
@@ -76,17 +292,28 @@
   }
 </div>
 
-<!-- Onboarding modal -->
 <app-health-onboarding-modal
   [isOpen]="isOnboardingOpen()"
   (close)="isOnboardingOpen.set(false)"
   (complete)="handleOnboardingComplete($event)"
 ></app-health-onboarding-modal>
 
-<!-- Manual entry modal -->
 <app-manual-entry-modal
   [isOpen]="isManualEntryOpen()"
   (close)="isManualEntryOpen.set(false)"
   (saveActivity)="handleSaveActivity($event)"
   (saveNutrition)="handleSaveNutrition($event)"
 ></app-manual-entry-modal>
+
+<app-track-activity-modal
+  [isOpen]="isTrackActivityOpen()"
+  [weight]="healthData()?.userProfile?.weight ?? 70"
+  (close)="isTrackActivityOpen.set(false)"
+  (save)="handleTrackActivity($event)"
+></app-track-activity-modal>
+
+<app-track-meal-modal
+  [isOpen]="isTrackMealOpen()"
+  (close)="isTrackMealOpen.set(false)"
+  (save)="handleTrackMeal($event)"
+></app-track-meal-modal>

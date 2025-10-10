@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { RouterExtensions } from '@nativescript/angular';
-import { HealthStore } from './health.store';
+import { HealthStore } from '@cooksona/health';
 import { DayHeaderComponent } from './day-header/day-header.component';
 import { CalorieProgressComponent } from './calorie-progress/calorie-progress.component';
 import { MacronutrientsComponent } from './macronutrients/macronutrients.component';
@@ -18,7 +18,7 @@ import { MealSectionComponent } from './meal-section/meal-section.component';
 import { ActivitySectionComponent } from './activity-section/activity-section.component';
 import { StepsCardComponent } from './steps-card/steps-card.component';
 import { HealthKitSyncService } from '../../plugins/healthkit/healthkit-sync.service';
-import type { PullToRefreshEventData } from '@nativescript-community/ui-pulltorefresh';
+import { PullToRefresh } from '@nativescript-community/ui-pulltorefresh';
 
 @Component({
   selector: 'ns-health-page',
@@ -98,7 +98,7 @@ export class HealthPageComponent implements OnInit {
     }
   }
 
-  async onRefresh({ object }: PullToRefreshEventData): Promise<void> {
+  async onRefresh(args: { object: PullToRefresh }): Promise<void> {
     this.isBusy.set(true);
 
     try {
@@ -117,7 +117,7 @@ export class HealthPageComponent implements OnInit {
     } finally {
       // Tell pull-to-refresh we're done
       this.isBusy.set(false);
-      object.refreshing = false;
+      args.object.refreshing = false;
     }
   }
 

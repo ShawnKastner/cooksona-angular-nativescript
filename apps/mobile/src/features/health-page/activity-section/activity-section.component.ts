@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { RouterExtensions } from '@nativescript/angular';
-import { HealthStore } from '../health.store';
+import { HealthStore } from '@cooksona/health';
 import type { ActivityEntry } from '@cooksona/api';
 import {
   Dumbbell,
@@ -175,7 +175,7 @@ export class ActivitySectionComponent {
     }
   }
 
-  protected getActivityIcon(): string {
+  protected getActivityIcon(activityIcon: string): string {
     // You can add more specific icons based on activity type
     return this.icons.Dumbbell;
   }

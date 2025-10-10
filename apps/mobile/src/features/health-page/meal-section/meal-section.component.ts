@@ -6,7 +6,7 @@ import {
   computed,
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { HealthStore } from '../health.store';
+import { HealthStore } from '@cooksona/health';
 import type { MealEntry } from '@cooksona/api';
 import {
   Soup,

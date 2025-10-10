@@ -1,5 +1,5 @@
 import { Component, inject, NO_ERRORS_SCHEMA } from '@angular/core';
-import { HealthStore } from '../health.store';
+import { HealthStore } from '@cooksona/health';
 
 @Component({
   selector: 'ns-macronutrients',
