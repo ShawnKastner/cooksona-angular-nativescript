@@ -1,10 +1,6 @@
 import { Component, computed, input, output } from '@angular/core';
 import { ProgressRingComponent } from '../../../shared/ui/progress-ring/progress-ring.component';
-import type {
-  DailyMetrics,
-  HealthData,
-  UserProfile,
-} from '@cooksona/models/health.models';
+import type { DailyMetrics, HealthData } from '@cooksona/models/health.models';
 
 @Component({
   selector: 'app-health-dashboard',
@@ -21,32 +17,9 @@ export class HealthDashboardComponent {
   updateProfile = output<void>();
   openManualEntry = output<void>();
 
-  private activityMultipliers: Record<UserProfile['activityLevel'], number> = {
-    sedentary: 1.2,
-    light: 1.375,
-    moderate: 1.55,
-    active: 1.725,
-    very_active: 1.9,
-  };
-
-  private goalAdjustments: Record<UserProfile['goal'], number> = {
-    lose: -300,
-    maintain: 0,
-    gain: 300,
-  };
-
-  // Calculations
-  protected tdee = computed(() => {
-    const data = this.healthData();
-    const profile = data.userProfile;
-    if (!profile) return 0;
-    return data.bmr * (this.activityMultipliers[profile.activityLevel] ?? 1);
-  });
-
   protected calorieGoal = computed(() => {
-    const profile = this.healthData().userProfile;
-    if (!profile) return 0;
-    return this.tdee() + (this.goalAdjustments[profile.goal] ?? 0);
+    const data = this.healthData();
+    return Math.max(0, data.calorieTarget ?? 0);
   });
 
   protected totalCaloriesWithActivity = computed(() => {
@@ -64,13 +37,13 @@ export class HealthDashboardComponent {
 
   // Macro goals (C 40%, P 30%, F 30%)
   protected proteinGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.3) / 4),
+    Math.round(this.healthData().macroTargets?.protein ?? 0),
   );
   protected carbsGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.4) / 4),
+    Math.round(this.healthData().macroTargets?.carbs ?? 0),
   );
   protected fatGoal = computed(() =>
-    Math.round((this.calorieGoal() * 0.3) / 9),
+    Math.round(this.healthData().macroTargets?.fat ?? 0),
   );
 
   // Progress percentages

@@ -11,7 +11,7 @@ import { NativeScriptCommonModule } from '@nativescript/angular';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { Dumbbell } from '@cooksona/constants/icons';
 import { isIOS, ApplicationSettings } from '@nativescript/core';
-import { HealthStore } from '../health.store';
+import { HealthStore } from '@cooksona/health';
 
 @Component({
   selector: 'ns-steps-card',

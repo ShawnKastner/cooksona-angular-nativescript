@@ -19,7 +19,7 @@ import {
 } from '@nativescript/angular';
 import { alert } from '@nativescript/core';
 import { UserProfile } from '@cooksona/models';
-import { HealthStore } from '../health.store';
+import { HealthStore } from '@cooksona/health';
 
 interface ActivityLevelOption {
   value: UserProfile['activityLevel'];

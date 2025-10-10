@@ -22,7 +22,7 @@
         <StackLayout class="p-4 pb-2">
           <TextField
             [text]="searchQuery()"
-            (textChange)="onSearchChange($event.value)"
+            (textChange)="onSearchChange($any($event).object.text)"
             hint="Aktivität suchen"
             class="bg-white border-2 border-gray-300 rounded-lg p-3 text-base text-neutral placeholder-gray-400"
           >

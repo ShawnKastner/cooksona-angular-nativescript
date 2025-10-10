@@ -20,7 +20,7 @@ import {
 } from '@nativescript/angular';
 import { alert } from '@nativescript/core/ui/dialogs';
 import { ArrowLeft } from '@cooksona/constants/icons';
-import { HealthStore } from '../../health.store';
+import { HealthStore } from '@cooksona/health';
 import { getDateString } from '@cooksona/models';
 import { Subscription } from 'rxjs';
 

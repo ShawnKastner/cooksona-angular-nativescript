@@ -1,6 +1,6 @@
 import { Component, inject, NO_ERRORS_SCHEMA } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { HealthStore } from '../health.store';
+import { HealthStore } from '@cooksona/health';
 import { ArrowLeft, ArrowRight } from '@cooksona/constants/icons';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 

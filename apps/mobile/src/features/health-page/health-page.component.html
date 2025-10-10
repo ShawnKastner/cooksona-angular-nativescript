@@ -9,7 +9,7 @@
       ></ActivityIndicator>
     </FlexboxLayout>
   } @else {
-    <PullToRefresh (refresh)="onRefresh($event)">
+    <PullToRefresh (refresh)="onRefresh($any($event))">
       <ScrollView>
         <StackLayout class="p-5 pb-10 space-y-5">
           @if (!isBusy() && loading() && hasLoadedOnce()) {

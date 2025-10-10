@@ -19,8 +19,8 @@
           textFieldBackgroundColor="#F9FAFB"
           hint="Rezepte suchen..."
           [text]="searchTerm()"
-          (textChange)="onSearchChange($event)"
-          (submit)="onSearchSubmit($event)"
+          (textChange)="onSearchChange($any($event))"
+          (submit)="onSearchSubmit($any($event))"
           (clear)="onSearchClear()"
           (loaded)="onSearchBarLoaded($event)"
         ></SearchBar>
