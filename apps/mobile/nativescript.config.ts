@@ -11,6 +11,7 @@ export default {
   },
   ios: {
     discardUncaughtJsExceptions: false,
+    deploymentTarget: '15.0',
   },
   appPath: 'src',
 } as NativeScriptConfig;

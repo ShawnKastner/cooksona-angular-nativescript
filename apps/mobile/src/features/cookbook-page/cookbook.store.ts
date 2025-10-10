@@ -8,6 +8,9 @@ export class CookbookStore {
   private readonly cookbookApi = inject(CookbookApiService);
   private readonly api = inject(ApiService);
   private readonly auth = inject(AuthService);
+  private readonly pageSize = 20;
+  private currentPage = 1;
+  private activeRequestId = 0;
 
   readonly loadingRecipes = signal(false);
   readonly loadingCollections = signal(false);
@@ -26,6 +29,8 @@ export class CookbookStore {
   readonly activeRecipeId = signal<string | null>(null);
   readonly activeCollectionId = signal<string | undefined>(undefined);
   readonly searchTerm = signal('');
+  readonly hasMore = signal(true);
+  readonly loadingMore = signal(false);
 
   readonly activeRecipe = computed(() => {
     const id = this.activeRecipeId();
@@ -71,26 +76,7 @@ export class CookbookStore {
     const loaders: Promise<void>[] = [];
 
     if (shouldLoadRecipes) {
-      this.loadingRecipes.set(true);
-      loaders.push(
-        (async () => {
-          try {
-            const data = await this.cookbookApi.getCookbookForUser(
-              this.activeCollectionId(),
-              this.searchTerm(),
-            );
-            this.recipes.set(data ?? []);
-            const ids = new Set(
-              (await this.cookbookApi.getCookbookRecipeIds()) ?? [],
-            );
-            this.favoriteRecipeIds.set(ids);
-          } catch (e: any) {
-            this.error.set(e?.message ?? 'Fehler beim Laden des Kochbuchs');
-          } finally {
-            this.loadingRecipes.set(false);
-          }
-        })(),
-      );
+      loaders.push(this.fetchRecipes(true));
     }
 
     if (shouldLoadCollections) {
@@ -271,6 +257,75 @@ export class CookbookStore {
       throw e;
     } finally {
       this.loadingMutations.set(false);
+    }
+  }
+
+  async loadNextPage(): Promise<void> {
+    if (!this.hasMore()) return;
+    if (this.loadingRecipes() || this.loadingMore()) return;
+    await this.fetchRecipes(false);
+  }
+
+  private async fetchRecipes(reset: boolean): Promise<void> {
+    const requestId = ++this.activeRequestId;
+
+    if (reset) {
+      this.loadingRecipes.set(true);
+      this.currentPage = 1;
+      this.hasMore.set(true);
+      this.loadingMore.set(false);
+    } else {
+      if (!this.hasMore()) return;
+      this.loadingMore.set(true);
+    }
+
+    const page = this.currentPage;
+    try {
+      const recipes =
+        (await this.cookbookApi.getCookbookForUser(
+          this.activeCollectionId(),
+          this.searchTerm(),
+          { page, limit: this.pageSize },
+        )) ?? [];
+
+      if (requestId !== this.activeRequestId) {
+        return;
+      }
+
+      if (reset) {
+        this.recipes.set(recipes);
+      } else {
+        this.recipes.set([...this.recipes(), ...recipes]);
+      }
+
+      if (recipes.length < this.pageSize) {
+        this.hasMore.set(false);
+      } else {
+        this.currentPage = page + 1;
+      }
+
+      if (reset) {
+        const ids = new Set(
+          (await this.cookbookApi.getCookbookRecipeIds()) ?? [],
+        );
+        this.favoriteRecipeIds.set(ids);
+      } else if (recipes.length) {
+        const next = new Set(this.favoriteRecipeIds());
+        for (const recipe of recipes) {
+          if (recipe?.id != null) {
+            next.add(String(recipe.id));
+          }
+        }
+        this.favoriteRecipeIds.set(next);
+      }
+    } catch (e: any) {
+      this.error.set(e?.message ?? 'Fehler beim Laden des Kochbuchs');
+    } finally {
+      if (reset) {
+        this.loadingRecipes.set(false);
+      } else {
+        this.loadingMore.set(false);
+      }
     }
   }
 }

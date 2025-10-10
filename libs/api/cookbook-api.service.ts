@@ -9,6 +9,7 @@ export class CookbookApiService {
   async getCookbookForUser(
     collectionId?: string,
     searchTerm?: string,
+    pagination?: { page?: number; limit?: number },
   ): Promise<Recipe[]> {
     const params = new URLSearchParams();
     if (collectionId) {
@@ -16,6 +17,12 @@ export class CookbookApiService {
     }
     if (searchTerm && searchTerm.trim().length > 0) {
       params.set('search', searchTerm.trim());
+    }
+    if (pagination?.page && pagination.page > 0) {
+      params.set('page', String(pagination.page));
+    }
+    if (pagination?.limit && pagination.limit > 0) {
+      params.set('limit', String(pagination.limit));
     }
 
     const url = params.toString()

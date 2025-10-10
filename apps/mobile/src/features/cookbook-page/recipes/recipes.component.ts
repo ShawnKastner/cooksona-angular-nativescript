@@ -8,6 +8,7 @@ import {
   NativeScriptCommonModule,
   ModalDialogService,
 } from '@nativescript/angular';
+import { ScrollEventData, ScrollView } from '@nativescript/core';
 import { CookbookStore } from '../cookbook.store';
 import { Recipe } from '@cooksona/models';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -29,6 +30,9 @@ export class RecipesComponent {
 
   recipesInCookbook = this.cookbookStore.recipes;
   loading = this.cookbookStore.loadingRecipes;
+  loadingMore = this.cookbookStore.loadingMore;
+  hasMore = this.cookbookStore.hasMore;
+  private readonly loadMoreThreshold = 120;
 
   icons = {
     FolderPlus,
@@ -72,6 +76,22 @@ export class RecipesComponent {
       }
     } catch (error) {
       console.error('Failed to open assign collection modal', error);
+    }
+  }
+
+  handleScroll(event: ScrollEventData) {
+    if (!this.hasMore()) return;
+    if (this.loading() || this.loadingMore()) return;
+
+    const scrollView = event.object as ScrollView | undefined;
+    if (!scrollView) return;
+
+    const offset = event.scrollY ?? 0;
+    const maxOffset = scrollView.scrollableHeight ?? 0;
+    if (maxOffset <= 0) return;
+
+    if (offset >= maxOffset - this.loadMoreThreshold) {
+      void this.cookbookStore.loadNextPage();
     }
   }
 }

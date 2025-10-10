@@ -1,4 +1,4 @@
-<ScrollView>
+<ScrollView (scroll)="handleScroll($any($event))">
   @if (loading()) {
     <StackLayout
       class="flex flex-col items-center justify-center text-center p-8"
@@ -17,69 +17,87 @@
       ></Label>
     </StackLayout>
   } @else {
-    <FlexboxLayout flexWrap="wrap" justifyContent="space-between">
-      @for (recipe of recipesInCookbook(); track recipe.id) {
-        <FlexboxLayout
-          style="width: 48%"
-          class="bg-white rounded-xl box-shadow-1 border border-base-200 overflow-hidden mb-2"
-          flexDirection="column"
-        >
-          <StackLayout
-            (tap)="openRecipe(recipe)"
-            class="text-left flex-grow p-3 pb-0"
+    <StackLayout>
+      <FlexboxLayout flexWrap="wrap" justifyContent="space-between">
+        @for (recipe of recipesInCookbook(); track recipe.id) {
+          <FlexboxLayout
+            style="width: 48%"
+            class="bg-white rounded-xl box-shadow-1 border border-base-200 overflow-hidden mb-2"
+            flexDirection="column"
           >
-            <Label textWrap="true" class="leading-tight h-10 mb-2">
-              <FormattedString>
-                <Span
-                  class="font-bold text-sm text-neutral"
-                  [text]="recipe.name"
-                ></Span>
-              </FormattedString>
-            </Label>
-            <StackLayout class="h-20 mb-2">
-              <Label
-                class="text-xs font-semibold text-gray-400 mb-1"
-                text="Zutaten:"
-              ></Label>
-              @for (
-                ingredient of (recipe.ingredients || []).slice(0, 3);
-                track ingredient.name
-              ) {
-                <GridLayout columns="auto,*" rows="auto">
-                  <Label
-                    class="text-xs text-gray-600"
-                    col="0"
-                    [text]="'- '"
-                  ></Label>
-                  <Label col="1">
-                    <FormattedString>
-                      <Span
-                        class="text-xs text-gray-600"
-                        [text]="ingredient.name"
-                      ></Span>
-                    </FormattedString>
-                  </Label>
-                </GridLayout>
-              }
-              @if (recipe.ingredients && recipe.ingredients.length > 3) {
-                <Label class="text-xs text-gray-400">... und mehr</Label>
-              }
-            </StackLayout>
-          </StackLayout>
-          <StackLayout class="p-3 pt-0">
-            <FlexboxLayout
-              (tap)="openAssignCollectionModal(recipe)"
-              class="w-full text-xs font-semibold flex items-center justify-center gap-2 py-1.5 rounded-md bg-base-200 text-neutral hover:bg-base-300 transition-colors"
+            <StackLayout
+              (tap)="openRecipe(recipe)"
+              class="text-left flex-grow p-3 pb-0"
             >
-              <svg:SVGImage
-                [src]="icons.FolderPlus | svgToDataUri"
-                class="w-4 h-4 mr-2"
-              ></svg:SVGImage>
-              <Label text="Zuordnen"></Label>
-            </FlexboxLayout>
-          </StackLayout>
-        </FlexboxLayout>
+              <Label textWrap="true" class="leading-tight h-10 mb-2">
+                <FormattedString>
+                  <Span
+                    class="font-bold text-sm text-neutral"
+                    [text]="recipe.name"
+                  ></Span>
+                </FormattedString>
+              </Label>
+              <StackLayout class="h-20 mb-2">
+                <Label
+                  class="text-xs font-semibold text-gray-400 mb-1"
+                  text="Zutaten:"
+                ></Label>
+                @for (
+                  ingredient of (recipe.ingredients || []).slice(0, 3);
+                  track ingredient.name
+                ) {
+                  <GridLayout columns="auto,*" rows="auto">
+                    <Label
+                      class="text-xs text-gray-600"
+                      col="0"
+                      [text]="'- '"
+                    ></Label>
+                    <Label col="1">
+                      <FormattedString>
+                        <Span
+                          class="text-xs text-gray-600"
+                          [text]="ingredient.name"
+                        ></Span>
+                      </FormattedString>
+                    </Label>
+                  </GridLayout>
+                }
+                @if (recipe.ingredients && recipe.ingredients.length > 3) {
+                  <Label class="text-xs text-gray-400">... und mehr</Label>
+                }
+              </StackLayout>
+            </StackLayout>
+            <StackLayout class="p-3 pt-0">
+              <FlexboxLayout
+                (tap)="openAssignCollectionModal(recipe)"
+                class="w-full text-xs font-semibold flex items-center justify-center gap-2 py-1.5 rounded-md bg-base-200 text-neutral hover:bg-base-300 transition-colors"
+              >
+                <svg:SVGImage
+                  [src]="icons.FolderPlus | svgToDataUri"
+                  class="w-4 h-4 mr-2"
+                ></svg:SVGImage>
+                <Label text="Zuordnen"></Label>
+              </FlexboxLayout>
+            </StackLayout>
+          </FlexboxLayout>
+        }
+      </FlexboxLayout>
+      @if (loadingMore()) {
+        <StackLayout class="w-full py-4 items-center">
+          <ActivityIndicator
+            busy="true"
+            width="36"
+            height="36"
+            color="#4A6C6F"
+            iosIndicatorViewStyle="medium"
+          >
+          </ActivityIndicator>
+          <Label
+            class="mt-2 text-xs text-gray-500"
+            text="Mehr Rezepte werden geladen..."
+          ></Label>
+        </StackLayout>
       }
-    </FlexboxLayout>
+    </StackLayout>
   }
 </ScrollView>
