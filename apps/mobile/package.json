@@ -4,6 +4,7 @@
   "license": "SEE LICENSE IN <your-license-filename>",
   "version": "0.0.0",
   "dependencies": {
+    "@nativescript-community/ui-pulltorefresh": "^2.5.3",
     "@nativescript/animated-circle": "^1.3.0",
     "@nativescript/apple-sign-in": "^1.0.0",
     "@nativescript/core": "*",

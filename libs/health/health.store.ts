@@ -491,4 +491,23 @@ export class HealthStore {
       this.mutating.set(false);
     }
   }
+
+  async deleteMeal(id: string): Promise<void> {
+    this.mutating.set(true);
+    this.error.set(null);
+    try {
+      const data = await this.api.deleteMeal(id);
+      if (data) {
+        this.healthData.set(data);
+      }
+      await this.loadMealsForSelectedDate();
+      this.markDataFresh();
+    } catch (e: any) {
+      console.error('Failed to delete meal', e);
+      this.error.set(e?.message ?? 'Mahlzeit konnte nicht gelöscht werden');
+      throw e;
+    } finally {
+      this.mutating.set(false);
+    }
+  }
 }

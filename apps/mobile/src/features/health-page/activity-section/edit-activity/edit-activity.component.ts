@@ -22,7 +22,7 @@ import {
 import { ActivityType, calculateCaloriesBurned } from '@cooksona/models';
 import { ACTIVITY_OPTIONS } from '@cooksona/constants/activities';
 import { ArrowLeft } from '@cooksona/constants/icons';
-import { HealthStore } from '../../health.store';
+import { HealthStore } from '@cooksona/health';
 import { alert } from '@nativescript/core';
 import { Subscription } from 'rxjs';
 
