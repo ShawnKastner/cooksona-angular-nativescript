@@ -1,0 +1,59 @@
+<GridLayout rows="auto, *, auto">
+  <!-- Header -->
+  <ActionBar row="0" title="Bevorzugte Mahlzeiten">
+    <NavigationButton ios.position="left" (tap)="cancel()" />
+  </ActionBar>
+
+  <!-- Content -->
+  <ScrollView row="1" class="h-full bg-base-100">
+    <StackLayout class="p-5">
+      <Label
+        class="text-sm text-gray-500 mb-6 text-center"
+        text="Welche Mahlzeiten möchtest du normalerweise planen?"
+        textWrap="true"
+      ></Label>
+
+      <!-- Meal Options -->
+      <StackLayout
+        class="bg-white rounded-2xl border border-base-200 overflow-hidden"
+      >
+        @for (meal of meals(); track meal.id; let isLast = $last) {
+          <FlexboxLayout
+            class="p-4 active:bg-gray-50"
+            [class.border-b]="!isLast"
+            [class.border-base-200]="!isLast"
+            (tap)="toggleMeal(meal.id)"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Label
+              class="text-base text-neutral font-medium flex-1"
+              [text]="meal.label"
+            ></Label>
+
+            <Switch
+              [checked]="meal.selected"
+              (checkedChange)="toggleMeal(meal.id)"
+              class="ml-3"
+            ></Switch>
+          </FlexboxLayout>
+        }
+      </StackLayout>
+
+      <Label
+        class="text-xs text-gray-400 mt-4 text-center"
+        text="Du kannst dies beim Erstellen eines Plans ändern"
+        textWrap="true"
+      ></Label>
+    </StackLayout>
+  </ScrollView>
+
+  <!-- Save Button -->
+  <StackLayout row="2" class="p-5 bg-base-100">
+    <Button
+      (tap)="save()"
+      class="bg-primary text-white font-semibold text-lg py-4 rounded-2xl"
+      text="Speichern"
+    ></Button>
+  </StackLayout>
+</GridLayout>

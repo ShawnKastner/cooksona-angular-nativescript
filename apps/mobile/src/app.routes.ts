@@ -107,6 +107,38 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'nutrition-settings',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/settings-page/nutrition-settings/nutrition-settings.component'
+      ).then((m) => m.NutritionSettingsComponent),
+  },
+  {
+    path: 'edit-number-of-people',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/settings-page/nutrition-settings/edit-number-of-people/edit-number-of-people.component'
+      ).then((m) => m.EditNumberOfPeopleComponent),
+  },
+  {
+    path: 'edit-preferred-meals',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/settings-page/nutrition-settings/edit-preferred-meals/edit-preferred-meals.component'
+      ).then((m) => m.EditPreferredMealsComponent),
+  },
+  {
+    path: 'plan-personalization',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/settings-page/plan-personalization/plan-personalization.component'
+      ).then((m) => m.PlanPersonalizationComponent),
+  },
+  {
     path: 'track-activity',
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>

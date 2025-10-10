@@ -1,0 +1,104 @@
+<GridLayout rows="auto, *">
+  <!-- Header -->
+  <ActionBar row="0" title="Plan-Personalisierung">
+    <NavigationButton ios.position="left" (tap)="goBack()" />
+  </ActionBar>
+
+  <ScrollView row="1" class="h-full bg-base-100">
+    <StackLayout class="p-5 pb-10">
+      <!-- Description -->
+      <Label
+        class="text-center mb-6"
+        text="Passe die KI-Vorschläge noch genauer an dich an."
+        textWrap="true"
+      >
+        <FormattedString>
+          <Span
+            class="text-sm text-gray-500"
+            text="Passe die KI-Vorschläge noch genauer an dich an."
+          ></Span>
+        </FormattedString>
+      </Label>
+
+      <!-- Card Container -->
+      <StackLayout
+        class="bg-white rounded-2xl border border-base-200 overflow-hidden"
+      >
+        <!-- Settings Items (Clickable) -->
+        <StackLayout>
+          <!-- Lieblingszutaten -->
+          <FlexboxLayout
+            class="p-4 border-b border-base-200 active:bg-gray-50"
+            (tap)="editFavoriteIngredients()"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <StackLayout class="flex-1">
+              <Label
+                class="text-xs text-gray-500 mb-2"
+                text="Lieblingszutaten"
+              ></Label>
+              <Label
+                class="text-base text-neutral font-semibold"
+                [text]="favoriteIngredients()"
+                textWrap="true"
+              ></Label>
+            </StackLayout>
+            <svg:SVGImage
+              [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
+              class="w-5 h-5 ml-3"
+            ></svg:SVGImage>
+          </FlexboxLayout>
+
+          <!-- "No-Go" Zutaten -->
+          <FlexboxLayout
+            class="p-4 border-b border-base-200 active:bg-gray-50"
+            (tap)="editNoGoIngredients()"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <StackLayout class="flex-1">
+              <Label
+                class="text-xs text-gray-500 mb-2"
+                text='"No-Go" Zutaten'
+              ></Label>
+              <Label
+                class="text-base text-neutral font-semibold"
+                [text]="noGoIngredients()"
+                textWrap="true"
+              ></Label>
+            </StackLayout>
+            <svg:SVGImage
+              [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
+              class="w-5 h-5 ml-3"
+            ></svg:SVGImage>
+          </FlexboxLayout>
+
+          <!-- Küchenausstattung -->
+          <FlexboxLayout
+            class="p-4 active:bg-gray-50"
+            (tap)="editKitchenEquipment()"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <StackLayout class="flex-1">
+              <Label
+                class="text-xs text-gray-500 mb-2"
+                text="Küchenausstattung"
+              ></Label>
+              <Label
+                class="text-base text-neutral font-semibold"
+                [text]="kitchenEquipment()"
+                textWrap="true"
+              ></Label>
+            </StackLayout>
+            <svg:SVGImage
+              [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
+              class="w-5 h-5 ml-3"
+            ></svg:SVGImage>
+          </FlexboxLayout>
+        </StackLayout>
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+</GridLayout>

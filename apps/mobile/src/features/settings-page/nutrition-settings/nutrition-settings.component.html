@@ -1,0 +1,123 @@
+<GridLayout rows="auto, *">
+  <!-- Header -->
+  <ActionBar row="0" title="Ernährungseinstellungen">
+    <NavigationButton ios.position="left" (tap)="goBack()" />
+  </ActionBar>
+
+  <ScrollView row="1" class="h-full bg-base-100">
+    <StackLayout class="p-5 pb-10">
+      <!-- Description -->
+      <Label class="text-center mb-6" textWrap="true">
+        <FormattedString>
+          <Span
+            class="text-sm text-gray-500"
+            text="Diese Werte werden beim Erstellen eines neuen Plans vorausgefüllt."
+          ></Span>
+        </FormattedString>
+      </Label>
+
+      <!-- Card Container -->
+      <StackLayout
+        class="bg-white rounded-2xl border border-base-200 overflow-hidden"
+      >
+        <!-- Settings Items (Clickable) -->
+        <StackLayout>
+          <!-- Diät-Wünsche -->
+          <FlexboxLayout
+            class="p-4 border-b border-base-200 active:bg-gray-50"
+            (tap)="editDietPreferences()"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <StackLayout class="flex-1">
+              <Label
+                class="text-xs text-gray-500 mb-2"
+                text="Diät-Wünsche"
+              ></Label>
+              <Label
+                class="text-base text-neutral font-semibold"
+                [text]="dietPreferences()"
+                textWrap="true"
+              ></Label>
+            </StackLayout>
+            <svg:SVGImage
+              [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
+              class="w-5 h-5 ml-3"
+            ></svg:SVGImage>
+          </FlexboxLayout>
+
+          <!-- Allergien -->
+          <FlexboxLayout
+            class="p-4 border-b border-base-200 active:bg-gray-50"
+            (tap)="editAllergies()"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <StackLayout class="flex-1">
+              <Label
+                class="text-xs text-gray-500 mb-2"
+                text="Allergien"
+              ></Label>
+              <Label
+                class="text-base text-neutral font-semibold"
+                [text]="allergies()"
+                textWrap="true"
+              ></Label>
+            </StackLayout>
+            <svg:SVGImage
+              [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
+              class="w-5 h-5 ml-3"
+            ></svg:SVGImage>
+          </FlexboxLayout>
+
+          <!-- Personenanzahl -->
+          <FlexboxLayout
+            class="p-4 border-b border-base-200 active:bg-gray-50"
+            (tap)="editNumberOfPeople()"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <StackLayout class="flex-1">
+              <Label
+                class="text-xs text-gray-500 mb-2"
+                text="Personenanzahl"
+              ></Label>
+              <Label
+                class="text-2xl text-primary font-bold"
+                [text]="numberOfPeople()"
+              ></Label>
+            </StackLayout>
+            <svg:SVGImage
+              [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
+              class="w-5 h-5 ml-3"
+            ></svg:SVGImage>
+          </FlexboxLayout>
+
+          <!-- Bevorzugte Mahlzeiten -->
+          <FlexboxLayout
+            class="p-4 active:bg-gray-50"
+            (tap)="editPreferredMeals()"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <StackLayout class="flex-1">
+              <Label
+                class="text-xs text-gray-500 mb-2"
+                text="Bevorzugte Mahlzeiten"
+              ></Label>
+              <Label
+                class="text-base text-neutral font-semibold"
+                [text]="preferredMeals()"
+                textWrap="true"
+              ></Label>
+            </StackLayout>
+            <svg:SVGImage
+              [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
+              class="w-5 h-5 ml-3"
+            ></svg:SVGImage>
+          </FlexboxLayout>
+        </StackLayout>
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+</GridLayout>

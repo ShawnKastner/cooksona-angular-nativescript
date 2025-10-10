@@ -6,7 +6,6 @@ import {
   inject,
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { Router } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
 import { AuthUser } from '@cooksona/auth';
 import { SvgToDataUriPipe } from '../../utils/svg-to-data-uri.pipe';
@@ -18,6 +17,9 @@ import {
   Info,
   ChevronRight,
   User as UserIcon,
+  Settings as SettingsIcon,
+  Apple,
+  ChefHat,
 } from '@cooksona/constants/icons';
 import { ApplicationSettings, isIOS } from '@nativescript/core';
 import { confirm } from '@nativescript/core/ui/dialogs';
@@ -58,6 +60,9 @@ export class SettingsPageComponent implements OnInit {
     Info,
     ChevronRight,
     User: UserIcon,
+    Settings: SettingsIcon,
+    Apple,
+    ChefHat,
   } as const;
 
   protected readonly isIOS = isIOS;
@@ -99,6 +104,27 @@ export class SettingsPageComponent implements OnInit {
             label: 'Profil bearbeiten',
             subtitle: 'Name, E-Mail, Passwort',
             action: () => this.navigateToEditProfile(),
+            showChevron: true,
+            type: 'navigation',
+          },
+        ],
+      },
+      {
+        title: 'Planung',
+        items: [
+          {
+            icon: this.icons.Apple,
+            label: 'Ernährungseinstellungen',
+            subtitle: 'Diät, Allergien, Mahlzeiten',
+            action: () => this.navigateToNutritionSettings(),
+            showChevron: true,
+            type: 'navigation',
+          },
+          {
+            icon: this.icons.ChefHat,
+            label: 'Plan-Personalisierung',
+            subtitle: 'Lieblingszutaten, Küchenausstattung',
+            action: () => this.navigateToPlanPersonalization(),
             showChevron: true,
             type: 'navigation',
           },
@@ -208,6 +234,14 @@ export class SettingsPageComponent implements OnInit {
   protected navigateToEditProfile() {
     console.log('Navigate to edit profile');
     // TODO: Implement edit profile page
+  }
+
+  protected navigateToNutritionSettings() {
+    this.routerExtensions.navigate(['/nutrition-settings']);
+  }
+
+  protected navigateToPlanPersonalization() {
+    this.routerExtensions.navigate(['/plan-personalization']);
   }
 
   protected navigateToLanguage() {
