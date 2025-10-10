@@ -1,7 +1,13 @@
-import { Component, NO_ERRORS_SCHEMA, signal } from '@angular/core';
+import {
+  Component,
+  NO_ERRORS_SCHEMA,
+  signal,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { RouterExtensions } from '@nativescript/angular';
-import { ActivatedRoute } from '@angular/router';
+import { ProfileSettingsStore } from '@cooksona/models';
 
 @Component({
   selector: 'ns-edit-number-of-people',
@@ -10,14 +16,18 @@ import { ActivatedRoute } from '@angular/router';
   schemas: [NO_ERRORS_SCHEMA],
   templateUrl: './edit-number-of-people.component.html',
 })
-export class EditNumberOfPeopleComponent {
-  protected numberOfPeople = signal(2);
+export class EditNumberOfPeopleComponent implements OnInit {
+  private readonly routerExtensions = inject(RouterExtensions);
+  private readonly store = inject(ProfileSettingsStore);
 
-  constructor(
-    private routerExtensions: RouterExtensions,
-    private route: ActivatedRoute,
-  ) {
-    // TODO: Load actual value from service/store
+  protected numberOfPeople = signal<number>(2);
+
+  ngOnInit() {
+    // Load current value from store
+    const currentCount = this.store.personCount$();
+    if (currentCount && typeof currentCount === 'number') {
+      this.numberOfPeople.set(currentCount);
+    }
   }
 
   protected increment() {
@@ -33,8 +43,7 @@ export class EditNumberOfPeopleComponent {
   }
 
   protected save() {
-    // TODO: Save to service/store
-    console.log('Saving number of people:', this.numberOfPeople());
+    this.store.updatePersonCount(this.numberOfPeople());
     this.routerExtensions.back();
   }
 

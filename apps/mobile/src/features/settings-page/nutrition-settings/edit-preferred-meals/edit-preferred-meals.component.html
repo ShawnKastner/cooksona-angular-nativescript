@@ -22,18 +22,18 @@
             class="p-4 active:bg-gray-50"
             [class.border-b]="!isLast"
             [class.border-base-200]="!isLast"
-            (tap)="toggleMeal(meal.id)"
             justifyContent="space-between"
             alignItems="center"
           >
             <Label
               class="text-base text-neutral font-medium flex-1"
               [text]="meal.label"
+              (tap)="toggleMeal(meal.id)"
             ></Label>
 
             <Switch
               [checked]="meal.selected"
-              (checkedChange)="toggleMeal(meal.id)"
+              (checkedChange)="onSwitchChange($event, meal.id)"
               class="ml-3"
             ></Switch>
           </FlexboxLayout>

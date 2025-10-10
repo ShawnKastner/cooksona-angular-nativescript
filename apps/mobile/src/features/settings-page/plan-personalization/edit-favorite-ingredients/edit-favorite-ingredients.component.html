@@ -1,0 +1,61 @@
+<GridLayout rows="auto, *, auto">
+  <!-- Header -->
+  <ActionBar row="0" title="Lieblingszutaten">
+    <NavigationButton ios.position="left" (tap)="cancel()" />
+  </ActionBar>
+
+  <!-- Content -->
+  <ScrollView row="1" class="h-full bg-base-100">
+    <StackLayout class="p-5">
+      <Label
+        class="text-sm text-gray-500 mb-6 text-center"
+        text="Welche Zutaten verwendest du besonders gerne?"
+        textWrap="true"
+      ></Label>
+
+      <!-- Add Button -->
+      <Button
+        (tap)="addIngredient()"
+        class="bg-primary/10 text-primary font-semibold text-base py-4 rounded-2xl mb-6"
+        text="+ Zutat hinzufügen"
+      ></Button>
+
+      <!-- Ingredients List -->
+      @if (ingredients().length === 0) {
+        <Label
+          class="text-center text-gray-400 py-8"
+          text="Noch keine Zutaten hinzugefügt"
+        ></Label>
+      }
+
+      <StackLayout class="space-y-2">
+        @for (ingredient of ingredients(); track ingredient; let i = $index) {
+          <FlexboxLayout
+            class="bg-white rounded-2xl p-4 items-center border border-base-200"
+            justifyContent="space-between"
+          >
+            <Label
+              class="text-base text-neutral flex-1"
+              [text]="ingredient"
+              textWrap="true"
+            ></Label>
+            <Button
+              (tap)="removeIngredient(i)"
+              class="bg-red-500/10 text-red-500 font-semibold text-sm px-4 py-2 rounded-xl ml-3"
+              text="Entfernen"
+            ></Button>
+          </FlexboxLayout>
+        }
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+
+  <!-- Save Button -->
+  <StackLayout row="2" class="p-5 bg-base-100">
+    <Button
+      (tap)="save()"
+      class="bg-primary text-white font-semibold text-lg py-4 rounded-2xl"
+      text="Speichern"
+    ></Button>
+  </StackLayout>
+</GridLayout>

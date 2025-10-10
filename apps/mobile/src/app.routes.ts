@@ -131,12 +131,52 @@ export const routes: Routes = [
       ).then((m) => m.EditPreferredMealsComponent),
   },
   {
+    path: 'edit-diet-wishes',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/settings-page/nutrition-settings/edit-diet-wishes/edit-diet-wishes.component'
+      ).then((m) => m.EditDietWishesComponent),
+  },
+  {
+    path: 'edit-allergies',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/settings-page/nutrition-settings/edit-allergies/edit-allergies.component'
+      ).then((m) => m.EditAllergiesComponent),
+  },
+  {
     path: 'plan-personalization',
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>
       import(
         './features/settings-page/plan-personalization/plan-personalization.component'
       ).then((m) => m.PlanPersonalizationComponent),
+  },
+  {
+    path: 'edit-favorite-ingredients',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/settings-page/plan-personalization/edit-favorite-ingredients/edit-favorite-ingredients.component'
+      ).then((m) => m.EditFavoriteIngredientsComponent),
+  },
+  {
+    path: 'edit-excluded-ingredients',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/settings-page/plan-personalization/edit-excluded-ingredients/edit-excluded-ingredients.component'
+      ).then((m) => m.EditExcludedIngredientsComponent),
+  },
+  {
+    path: 'edit-kitchen-equipment',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/settings-page/plan-personalization/edit-kitchen-equipment/edit-kitchen-equipment.component'
+      ).then((m) => m.EditKitchenEquipmentComponent),
   },
   {
     path: 'track-activity',

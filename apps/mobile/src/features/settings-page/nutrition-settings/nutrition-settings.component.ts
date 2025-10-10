@@ -1,8 +1,9 @@
-import { Component, NO_ERRORS_SCHEMA, signal } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA, OnInit, inject } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { RouterExtensions } from '@nativescript/angular';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { ChevronLeft, ChevronRight } from '@cooksona/constants/icons';
+import { ProfileSettingsStore } from '@cooksona/models';
 
 @Component({
   selector: 'ns-nutrition-settings',
@@ -11,32 +12,36 @@ import { ChevronLeft, ChevronRight } from '@cooksona/constants/icons';
   schemas: [NO_ERRORS_SCHEMA],
   templateUrl: './nutrition-settings.component.html',
 })
-export class NutritionSettingsComponent {
+export class NutritionSettingsComponent implements OnInit {
+  private readonly routerExtensions = inject(RouterExtensions);
+  private readonly store = inject(ProfileSettingsStore);
+
   protected readonly icons = {
     ChevronLeft,
     ChevronRight,
   } as const;
 
-  // Hardcoded Ernährungseinstellungen
-  protected dietPreferences = signal('Keine Angabe');
-  protected allergies = signal('Keine Angabe');
-  protected numberOfPeople = signal('2');
-  protected preferredMeals = signal('Frühstück, Mittagessen, Abendessen');
+  // Get values from store
+  protected readonly dietPreferences = this.store.dietWishes$;
+  protected readonly allergies = this.store.allergies$;
+  protected readonly numberOfPeople = this.store.personCount$;
+  protected readonly preferredMeals = this.store.preferredMeals$;
+  protected readonly loading = this.store.loading$;
 
-  constructor(private routerExtensions: RouterExtensions) {}
+  ngOnInit() {
+    this.store.loadNutritionSettings();
+  }
 
   protected goBack() {
     this.routerExtensions.back();
   }
 
   protected editDietPreferences() {
-    console.log('Edit diet preferences');
-    // TODO: Navigate to diet preferences page
+    this.routerExtensions.navigate(['/edit-diet-wishes']);
   }
 
   protected editAllergies() {
-    console.log('Edit allergies');
-    // TODO: Navigate to allergies page
+    this.routerExtensions.navigate(['/edit-allergies']);
   }
 
   protected editNumberOfPeople() {

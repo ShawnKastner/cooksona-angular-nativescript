@@ -38,11 +38,18 @@
                 class="text-xs text-gray-500 mb-2"
                 text="Lieblingszutaten"
               ></Label>
-              <Label
-                class="text-base text-neutral font-semibold"
-                [text]="favoriteIngredients()"
-                textWrap="true"
-              ></Label>
+              @if (favoriteIngredients()) {
+                <Label
+                  class="text-base text-neutral font-semibold"
+                  [text]="favoriteIngredients()"
+                  textWrap="true"
+                ></Label>
+              } @else {
+                <Label
+                  class="text-base text-neutral font-semibold text-gray-400"
+                  text="Keine Angabe"
+                ></Label>
+              }
             </StackLayout>
             <svg:SVGImage
               [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
@@ -62,11 +69,18 @@
                 class="text-xs text-gray-500 mb-2"
                 text='"No-Go" Zutaten'
               ></Label>
-              <Label
-                class="text-base text-neutral font-semibold"
-                [text]="noGoIngredients()"
-                textWrap="true"
-              ></Label>
+              @if (noGoIngredients()) {
+                <Label
+                  class="text-base text-neutral font-semibold"
+                  [text]="noGoIngredients()"
+                  textWrap="true"
+                ></Label>
+              } @else {
+                <Label
+                  class="text-base text-neutral font-semibold text-gray-400"
+                  text="Keine Angabe"
+                ></Label>
+              }
             </StackLayout>
             <svg:SVGImage
               [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
@@ -86,11 +100,18 @@
                 class="text-xs text-gray-500 mb-2"
                 text="Küchenausstattung"
               ></Label>
-              <Label
-                class="text-base text-neutral font-semibold"
-                [text]="kitchenEquipment()"
-                textWrap="true"
-              ></Label>
+              @if (kitchenEquipment()) {
+                <Label
+                  class="text-base text-neutral font-semibold"
+                  [text]="kitchenEquipment()"
+                  textWrap="true"
+                ></Label>
+              } @else {
+                <Label
+                  class="text-base text-neutral font-semibold text-gray-400"
+                  text="Keine Angabe"
+                ></Label>
+              }
             </StackLayout>
             <svg:SVGImage
               [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
