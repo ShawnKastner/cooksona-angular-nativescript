@@ -18,7 +18,6 @@ import {
   LogOut,
   Apple,
   Heart,
-  CreditCard,
   ChevronDown,
   Settings,
 } from '@cooksona/constants/icons';
@@ -26,7 +25,6 @@ import { isIOS, isAndroid, ApplicationSettings } from '@nativescript/core';
 import { confirm } from '@nativescript/core/ui/dialogs';
 import { HealthKitService } from '../../plugins/healthkit/healthkit.service';
 import { HealthConnectionModalComponent } from './health-connection-modal/health-connection-modal.component';
-import { SubscriptionModalComponent } from './subscription-modal/subscription-modal.component';
 
 interface SettingsSection {
   title: string;
@@ -61,7 +59,6 @@ export class ProfilePageComponent implements OnInit {
     LogOut,
     Apple,
     Heart,
-    CreditCard,
     ChevronDown,
     Settings,
   } as const;
@@ -192,22 +189,7 @@ export class ProfilePageComponent implements OnInit {
   }
 
   get settingsSections(): SettingsSection[] {
-    const user = this.user();
-    const subscriptionLabel = this.getSubscriptionLabel(user);
-
     return [
-      {
-        title: 'Abonnement',
-        items: [
-          {
-            icon: this.icons.CreditCard,
-            label: 'Abo verwalten',
-            subtitle: subscriptionLabel,
-            action: () => this.manageSubscription(),
-            showChevron: true,
-          },
-        ],
-      },
       {
         title: 'Health Integration',
         items: [
@@ -226,24 +208,6 @@ export class ProfilePageComponent implements OnInit {
     ];
   }
 
-  private getSubscriptionLabel(user: User | null): string {
-    if (!user) return 'Nicht geladen';
-
-    if (user.lifetimeSubscription) {
-      return 'Lifetime Abo';
-    }
-
-    if (user.subscriptionStatus === 'active') {
-      if (user.subscriptionType === 'monthly') {
-        return 'Monatliches Abo';
-      } else if (user.subscriptionType === 'yearly') {
-        return 'Jährliches Abo';
-      }
-    }
-
-    return 'Kostenloser Plan';
-  }
-
   protected get userLabel(): string {
     const u = this.user();
     return u?.name || u?.email || 'Unbekannter Benutzer';
@@ -252,27 +216,6 @@ export class ProfilePageComponent implements OnInit {
   protected get userEmail(): string {
     const u = this.user();
     return u?.email || '';
-  }
-
-  protected async manageSubscription() {
-    try {
-      const selectedPlan = await this.modalService.showModal(
-        SubscriptionModalComponent,
-        {
-          fullscreen: true,
-          animated: true,
-          stretched: true,
-        },
-      );
-
-      if (selectedPlan) {
-        console.log('User selected plan:', selectedPlan);
-        // TODO: Process the subscription purchase
-        // For now, just log it
-      }
-    } catch (error) {
-      console.error('Error showing subscription modal:', error);
-    }
   }
 
   protected navigateToSettings() {
