@@ -6,24 +6,26 @@
     verticalAlignment="top"
     class="p-5 border-b border-base-200"
   >
-    <StackLayout class="items-center mb-4">
-      <Label class="text-3xl font-bold text-neutral" text="Profil"></Label>
+    <StackLayout class="items-center mb-4 w-full">
+      <FlexboxLayout justifyContent="space-between" alignItems="center">
+        <Label class="text-3xl font-bold text-neutral" text="Profil"></Label>
+        <FlexboxLayout
+          justifyContent="center"
+          alignItems="center"
+          (tap)="navigateToSettings()"
+          class="flex align-start absolute"
+        >
+          <svg:SVGImage
+            [src]="icons.Settings | svgToDataUri: '#374151'"
+            class="w-6 h-6"
+          ></svg:SVGImage>
+        </FlexboxLayout>
+      </FlexboxLayout>
       <Label
         class="text-xs text-gray-500"
         text="Verwalte deine Einstellungen"
       ></Label>
     </StackLayout>
-    <FlexboxLayout
-      justifyContent="center"
-      alignItems="center"
-      (tap)="navigateToSettings()"
-      class="flex align-start"
-    >
-      <svg:SVGImage
-        [src]="icons.Settings | svgToDataUri: '#374151'"
-        class="w-6 h-6"
-      ></svg:SVGImage>
-    </FlexboxLayout>
   </FlexboxLayout>
 
   <ScrollView row="1" class="h-full bg-base-100">
