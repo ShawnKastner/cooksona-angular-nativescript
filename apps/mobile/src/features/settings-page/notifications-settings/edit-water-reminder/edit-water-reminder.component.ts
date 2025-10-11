@@ -6,9 +6,15 @@ import {
   inject,
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { ApplicationSettings } from '@nativescript/core';
+import {
+  ApplicationSettings,
+  Utils,
+  isAndroid,
+  isIOS,
+} from '@nativescript/core';
 import { RouterExtensions } from '@nativescript/angular';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { confirm } from '@nativescript/core/ui/dialogs';
 
 @Component({
   selector: 'ns-edit-water-reminder',
@@ -38,14 +44,26 @@ export class EditWaterReminderComponent implements OnInit {
     );
 
     this.loadSettings();
-    this.requestNotificationPermissions();
+    void this.requestNotificationPermissions();
   }
 
-  private async requestNotificationPermissions() {
+  private async requestNotificationPermissions(
+    showPromptOnDenied = false,
+  ): Promise<boolean> {
     try {
-      await this.notificationService.requestPermissions();
+      const granted = await this.notificationService.requestPermissions();
+
+      if (!granted && showPromptOnDenied) {
+        await this.showNotificationPermissionDialog();
+      }
+
+      return granted;
     } catch (error) {
       console.error('Error requesting permissions:', error);
+      if (showPromptOnDenied) {
+        await this.showNotificationPermissionDialog();
+      }
+      return false;
     }
   }
 
@@ -136,7 +154,6 @@ export class EditWaterReminderComponent implements OnInit {
     try {
       // Save to ApplicationSettings (local storage)
       ApplicationSettings.setString('water_reminder_time', timeString);
-      ApplicationSettings.setBoolean('water_reminder_enabled', true);
 
       // Schedule the notification
       const success = await this.notificationService.scheduleWaterReminder(
@@ -145,13 +162,12 @@ export class EditWaterReminderComponent implements OnInit {
       );
 
       if (success) {
+        ApplicationSettings.setBoolean('water_reminder_enabled', true);
         this.routerExtensions.back();
       } else {
-        console.error(
-          'Failed to schedule notification but data is saved locally',
-        );
-        // Even if notification fails, data is saved locally
-        this.routerExtensions.back();
+        ApplicationSettings.setBoolean('water_reminder_enabled', false);
+        this.reminderEnabled.set(false);
+        await this.showNotificationPermissionDialog();
       }
     } catch (error) {
       console.error('Error saving water reminder:', error);
@@ -176,15 +192,68 @@ export class EditWaterReminderComponent implements OnInit {
     }
 
     // Request permissions when enabling the reminder so the user sees the prompt immediately
-    const permissionGranted =
-      await this.notificationService.requestPermissions();
+    const permissionGranted = await this.requestNotificationPermissions(true);
     if (!permissionGranted) {
       console.warn('Notification permission denied by user');
       this.reminderEnabled.set(false);
+      ApplicationSettings.setBoolean('water_reminder_enabled', false);
       if (args?.object) {
         args.object.checked = false;
       }
       return;
+    }
+  }
+
+  private async showNotificationPermissionDialog(): Promise<void> {
+    const shouldOpenSettings = await confirm({
+      title: 'Mitteilungen deaktiviert',
+      message:
+        'Aktiviere Mitteilungen in den Geräteeinstellungen, um Trink-Erinnerungen zu erhalten.',
+      okButtonText: 'Einstellungen',
+      cancelButtonText: 'Abbrechen',
+    });
+
+    if (shouldOpenSettings) {
+      this.openNotificationSettings();
+    }
+  }
+
+  private openNotificationSettings(): void {
+    if (isIOS) {
+      Utils.openUrl('app-settings:');
+      return;
+    }
+
+    if (isAndroid) {
+      const context = Utils.android.getApplicationContext();
+      if (!context) {
+        return;
+      }
+
+      const sdkInt = android.os.Build.VERSION.SDK_INT;
+      const intent =
+        sdkInt >= 26
+          ? new android.content.Intent(
+              android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS,
+            )
+          : new android.content.Intent(
+              android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            );
+
+      if (sdkInt >= 26) {
+        intent.putExtra(
+          android.provider.Settings.EXTRA_APP_PACKAGE,
+          context.getPackageName(),
+        );
+      } else {
+        intent.setData(
+          android.net.Uri.fromParts('package', context.getPackageName(), ''),
+        );
+      }
+
+      intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+
+      context.startActivity(intent);
     }
   }
 }
