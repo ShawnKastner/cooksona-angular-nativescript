@@ -54,7 +54,7 @@
                 @if (item.type === "toggle") {
                   <Switch
                     [checked]="item.toggleValue || false"
-                    (checkedChange)="onToggleChange(item)"
+                    (checkedChange)="onToggleChange(item, $any($event))"
                     class="ml-3"
                   >
                   </Switch>

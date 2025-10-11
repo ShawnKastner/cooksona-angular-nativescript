@@ -4,6 +4,7 @@ import {
   OnInit,
   signal,
   inject,
+  effect,
 } from '@angular/core';
 import {
   NativeScriptCommonModule,
@@ -29,6 +30,7 @@ import { ApplicationSettings, isIOS } from '@nativescript/core';
 import { confirm } from '@nativescript/core/ui/dialogs';
 import { RouterExtensions } from '@nativescript/angular';
 import { SubscriptionModalComponent } from '../profile-page/subscription-modal/subscription-modal.component';
+import { ThemeService } from '../../core/services/theme.service';
 
 interface SettingsSection {
   title: string;
@@ -57,6 +59,8 @@ export class SettingsPageComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly routerExtensions = inject(RouterExtensions);
   private readonly modalService = inject(ModalDialogService);
+  private readonly themeService = inject(ThemeService);
+  private skipToggleInitialization = true;
 
   protected readonly icons = {
     Bell,
@@ -77,11 +81,26 @@ export class SettingsPageComponent implements OnInit {
   protected darkMode = signal(false);
   protected notifications = signal(true);
   protected settingsSections: SettingsSection[] = [];
+  private readonly syncTheme = effect(
+    () => {
+      const isDark = this.themeService.isDark();
+      if (this.darkMode() !== isDark) {
+        this.darkMode.set(isDark);
+      }
+      if (this.settingsSections.length) {
+        this.updateToggleValue('Dunkler Modus', isDark);
+      }
+    },
+    { allowSignalWrites: true },
+  );
 
   ngOnInit() {
     this.loadUserData();
     this.loadSettings();
     this.initializeSettingsSections();
+    setTimeout(() => {
+      this.skipToggleInitialization = false;
+    });
   }
 
   private loadUserData() {
@@ -93,9 +112,7 @@ export class SettingsPageComponent implements OnInit {
 
   private loadSettings() {
     // Load saved settings
-    this.darkMode.set(
-      ApplicationSettings.getBoolean('dark_mode_enabled', false),
-    );
+    this.darkMode.set(this.themeService.isDarkMode);
     this.notifications.set(
       ApplicationSettings.getBoolean('notifications_enabled', true),
     );
@@ -214,14 +231,23 @@ export class SettingsPageComponent implements OnInit {
     this.routerExtensions.back();
   }
 
-  protected onToggleChange(item: SettingsItem) {
-    if (item.action) {
-      item.action();
+  protected onToggleChange(item: SettingsItem, event: { value: boolean }) {
+    const newValue = !!event?.value;
+
+    if (this.skipToggleInitialization) {
+      this.updateToggleValue(item.label, newValue);
+      return;
+    }
+
+    if (item.label === 'Push-Benachrichtigungen') {
+      this.toggleNotifications(newValue);
+    } else if (item.label === 'Dunkler Modus') {
+      this.toggleDarkMode(newValue);
     }
   }
 
-  protected toggleNotifications() {
-    const newValue = !this.notifications();
+  protected toggleNotifications(value?: boolean) {
+    const newValue = value ?? !this.notifications();
     this.notifications.set(newValue);
     ApplicationSettings.setBoolean('notifications_enabled', newValue);
 
@@ -232,16 +258,13 @@ export class SettingsPageComponent implements OnInit {
     console.log('Notifications:', newValue);
   }
 
-  protected toggleDarkMode() {
-    const newValue = !this.darkMode();
+  protected toggleDarkMode(value?: boolean) {
+    const newValue = value ?? !this.darkMode();
+    this.themeService.setTheme(newValue ? 'dark' : 'light');
     this.darkMode.set(newValue);
-    ApplicationSettings.setBoolean('dark_mode_enabled', newValue);
 
     // Update the toggle value in the settings sections
     this.updateToggleValue('Dunkler Modus', newValue);
-
-    // TODO: Implement actual dark mode theme switching
-    console.log('Dark mode:', newValue);
   }
 
   private updateToggleValue(label: string, value: boolean) {
