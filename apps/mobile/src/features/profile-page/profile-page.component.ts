@@ -121,7 +121,7 @@ export class ProfilePageComponent implements OnInit {
 
   private async showHealthConnectionModal() {
     try {
-      const shouldConnect = await this.modalService.showModal(
+      const wasConnected = await this.modalService.showModal(
         HealthConnectionModalComponent,
         {
           fullscreen: false,
@@ -130,35 +130,12 @@ export class ProfilePageComponent implements OnInit {
         },
       );
 
-      if (shouldConnect) {
-        this.loading.set(true);
-        this.connectHealthService();
+      // If connection was successful, update the local state
+      if (wasConnected) {
+        this.healthConnected.set(true);
       }
     } catch (error) {
       console.error('Error showing health connection modal:', error);
-    }
-  }
-
-  private async connectHealthService() {
-    try {
-      if (this.isIOS) {
-        if (!this.health.isAvailable()) {
-          throw new Error('Apple Health ist auf diesem Gerät nicht verfügbar.');
-        }
-        await this.health.requestAuthorization();
-
-        // Save the connection status persistently
-        ApplicationSettings.setBoolean('healthkit_connected', true);
-        this.healthConnected.set(true);
-      } else if (this.isAndroid) {
-        // TODO: Implement Google Fit later
-        throw new Error('Google Fit wird bald unterstützt.');
-      }
-    } catch (error) {
-      console.error('Failed to connect health service:', error);
-      // TODO: show a nice dialog/toast
-    } finally {
-      this.loading.set(false);
     }
   }
 

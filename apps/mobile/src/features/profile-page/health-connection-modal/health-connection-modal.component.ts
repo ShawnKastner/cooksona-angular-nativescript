@@ -4,6 +4,8 @@ import { ModalDialogParams } from '@nativescript/angular';
 import { X } from '@cooksona/constants/icons';
 import { isIOS } from '@nativescript/core';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
+import { HealthKitService } from '../../../plugins/healthkit/healthkit.service';
+import { ApplicationSettings } from '@nativescript/core';
 
 @Component({
   selector: 'ns-health-connection-modal',
@@ -14,6 +16,7 @@ import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 })
 export class HealthConnectionModalComponent {
   private params = inject(ModalDialogParams);
+  private health = inject(HealthKitService);
 
   protected readonly icons = {
     X,
@@ -32,7 +35,30 @@ export class HealthConnectionModalComponent {
 
   protected async connect() {
     this.loading.set(true);
-    // Return true to indicate user wants to connect
-    this.params.closeCallback(true);
+
+    try {
+      if (this.isIOS) {
+        if (!this.health.isAvailable()) {
+          throw new Error('Apple Health ist auf diesem Gerät nicht verfügbar.');
+        }
+
+        // Request authorization
+        await this.health.requestAuthorization();
+
+        // Save the connection status persistently
+        ApplicationSettings.setBoolean('healthkit_connected', true);
+
+        // Return success
+        this.params.closeCallback(true);
+      } else {
+        // TODO: Implement Google Fit later
+        throw new Error('Google Fit wird bald unterstützt.');
+      }
+    } catch (error) {
+      console.error('Failed to connect health service:', error);
+      this.loading.set(false);
+      // Return failure
+      this.params.closeCallback(false);
+    }
   }
 }

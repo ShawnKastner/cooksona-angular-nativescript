@@ -83,17 +83,15 @@ export class SettingsPageComponent implements OnInit {
   protected darkMode = signal(false);
   protected notifications = signal(true);
   protected settingsSections: SettingsSection[] = [];
-  private readonly syncTheme = effect(
-    () => {
-      const isDark = this.themeService.isDark();
-      if (this.darkMode() !== isDark) {
-        this.darkMode.set(isDark);
-      }
-      if (this.settingsSections.length) {
-        this.updateToggleValue('Dunkler Modus', isDark);
-      }
-    },
-  );
+  private readonly syncTheme = effect(() => {
+    const isDark = this.themeService.isDark();
+    if (this.darkMode() !== isDark) {
+      this.darkMode.set(isDark);
+    }
+    if (this.settingsSections.length) {
+      this.updateToggleValue('Dunkler Modus', isDark);
+    }
+  });
 
   ngOnInit() {
     this.loadUserData();
