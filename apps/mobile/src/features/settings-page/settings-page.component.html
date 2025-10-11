@@ -24,14 +24,26 @@
             <StackLayout>
               <FlexboxLayout
                 class="p-4 items-center"
+                [ngClass]="{
+                  'active:bg-red-50': item.label === 'Abmelden',
+                  'active:bg-gray-50': item.label !== 'Abmelden',
+                }"
                 (tap)="item.type !== 'toggle' ? item.action() : undefined"
               >
                 <!-- Icon -->
                 <FlexboxLayout
-                  class="w-10 h-10 rounded-full items-center justify-center mr-3 bg-primary/10"
+                  class="w-10 h-10 rounded-full items-center justify-center mr-3"
+                  [ngClass]="{
+                    'bg-red-50': item.label === 'Abmelden',
+                    'bg-primary/10': item.label !== 'Abmelden',
+                  }"
                 >
                   <svg:SVGImage
-                    [src]="item.icon | svgToDataUri: '#4A6C6F'"
+                    [src]="
+                      item.icon
+                        | svgToDataUri
+                          : (item.label === 'Abmelden' ? '#DC2626' : '#4A6C6F')
+                    "
                     class="w-5 h-5"
                   />
                 </FlexboxLayout>
@@ -39,7 +51,11 @@
                 <!-- Label and Subtitle -->
                 <StackLayout class="flex-1">
                   <Label
-                    class="text-base font-medium text-neutral"
+                    class="text-base font-medium"
+                    [ngClass]="{
+                      'text-red-600': item.label === 'Abmelden',
+                      'text-neutral': item.label !== 'Abmelden',
+                    }"
                     [text]="item.label"
                   ></Label>
                   @if (item.subtitle) {
@@ -77,35 +93,5 @@
         </StackLayout>
       </StackLayout>
     }
-
-    <!-- Danger Zone -->
-    <StackLayout class="space-y-3 mt-8">
-      <Label
-        class="text-sm font-semibold text-red-500 ml-1"
-        text="Gefahrenzone"
-      ></Label>
-
-      <StackLayout
-        class="bg-white rounded-2xl border border-red-200 overflow-hidden"
-      >
-        <FlexboxLayout class="p-4 items-center" (tap)="deleteAccount()">
-          <StackLayout class="flex-1">
-            <Label
-              class="text-base font-medium text-red-500"
-              text="Konto löschen"
-            ></Label>
-            <Label
-              class="text-sm text-gray-500"
-              text="Konto und alle Daten unwiderruflich löschen"
-            ></Label>
-          </StackLayout>
-
-          <svg:SVGImage
-            [src]="icons.ChevronRight | svgToDataUri: '#EF4444'"
-            class="w-5 h-5 ml-3"
-          />
-        </FlexboxLayout>
-      </StackLayout>
-    </StackLayout>
   </StackLayout>
 </ScrollView>

@@ -15,7 +15,6 @@ import { User } from '@cooksona/models';
 import { SvgToDataUriPipe } from '../../utils/svg-to-data-uri.pipe';
 import {
   User as UserIcon,
-  LogOut,
   Apple,
   Heart,
   ChevronDown,
@@ -56,7 +55,6 @@ export class ProfilePageComponent implements OnInit {
 
   protected readonly icons = {
     User: UserIcon,
-    LogOut,
     Apple,
     Heart,
     ChevronDown,
@@ -221,13 +219,6 @@ export class ProfilePageComponent implements OnInit {
   protected navigateToSettings() {
     this.router.navigate(['/settings']).catch((err) => {
       console.error('Navigation to settings failed:', err);
-    });
-  }
-
-  protected onLogout() {
-    this.auth.logout();
-    this.router.navigateByUrl('/login').catch(() => {
-      // Ignore navigation errors
     });
   }
 }

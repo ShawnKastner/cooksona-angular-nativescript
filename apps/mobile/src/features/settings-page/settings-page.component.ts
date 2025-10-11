@@ -25,6 +25,7 @@ import {
   Apple,
   ChefHat,
   CreditCard,
+  LogOut,
 } from '@cooksona/constants/icons';
 import { ApplicationSettings, isIOS } from '@nativescript/core';
 import { confirm } from '@nativescript/core/ui/dialogs';
@@ -74,6 +75,7 @@ export class SettingsPageComponent implements OnInit {
     Apple,
     ChefHat,
     CreditCard,
+    LogOut,
   } as const;
 
   protected readonly isIOS = isIOS;
@@ -224,6 +226,18 @@ export class SettingsPageComponent implements OnInit {
           },
         ],
       },
+      {
+        title: 'Konto',
+        items: [
+          {
+            icon: this.icons.LogOut,
+            label: 'Abmelden',
+            action: () => this.onLogout(),
+            showChevron: false,
+            type: 'navigation',
+          },
+        ],
+      },
     ];
   }
 
@@ -357,5 +371,16 @@ export class SettingsPageComponent implements OnInit {
       // TODO: Implement account deletion
       console.log('Delete account confirmed');
     }
+  }
+
+  protected onLogout() {
+    this.auth.logout();
+    this.routerExtensions
+      .navigate(['/login'], {
+        clearHistory: true,
+      })
+      .catch(() => {
+        // Ignore navigation errors
+      });
   }
 }
