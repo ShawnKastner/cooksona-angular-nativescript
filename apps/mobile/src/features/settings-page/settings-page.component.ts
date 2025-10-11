@@ -93,7 +93,6 @@ export class SettingsPageComponent implements OnInit {
         this.updateToggleValue('Dunkler Modus', isDark);
       }
     },
-    { allowSignalWrites: true },
   );
 
   ngOnInit() {
@@ -179,9 +178,9 @@ export class SettingsPageComponent implements OnInit {
             icon: this.icons.Bell,
             label: 'Push-Benachrichtigungen',
             subtitle: 'Erhalte Erinnerungen und Updates',
-            action: () => this.toggleNotifications(),
-            type: 'toggle',
-            toggleValue: this.notifications(),
+            action: () => this.navigateToNotifications(),
+            showChevron: true,
+            type: 'navigation',
           },
         ],
       },
@@ -267,9 +266,6 @@ export class SettingsPageComponent implements OnInit {
 
     // Update the toggle value in the settings sections
     this.updateToggleValue('Push-Benachrichtigungen', newValue);
-
-    // TODO: Implement actual notification settings
-    console.log('Notifications:', newValue);
   }
 
   protected toggleDarkMode(value?: boolean) {
@@ -302,6 +298,10 @@ export class SettingsPageComponent implements OnInit {
 
   protected navigateToPlanPersonalization() {
     this.routerExtensions.navigate(['/plan-personalization']);
+  }
+
+  protected navigateToNotifications() {
+    this.routerExtensions.navigate(['/notifications-settings']);
   }
 
   protected navigateToLanguage() {

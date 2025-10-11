@@ -79,6 +79,8 @@
 	<string>Cooksona liest Gesundheitsdaten (z. B. Schritte, Workouts), um dir Statistiken und Auswertungen anzuzeigen.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Cooksona kann optionale Gesundheitsdaten aktualisieren, um dein Tracking zu vervollständigen.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>Cooksona sendet dir Erinnerungen, wie z.B. Trink-Erinnerungen, um deine Gesundheitsziele zu unterstützen.</string>
 
 </dict>
 </plist>
