@@ -156,7 +156,17 @@ export class ProfileSettingsStore {
   // Update methods
   async updatePersonCount(count: number) {
     const current = this.nutritionSettings();
-    const dto = { ...current, personCount: count };
+
+    // Build clean DTO - only include the fields the backend expects
+    const dto: UpdateNutritionSettingsDto = {
+      personCount: count,
+    };
+
+    // Include other fields if they exist
+    if (current?.dietWishes) dto.dietWishes = current.dietWishes;
+    if (current?.allergies) dto.allergies = current.allergies;
+    if (current?.preferredMeals?.length)
+      dto.preferredMeals = current.preferredMeals;
 
     this.loading.set(true);
     this.error.set(null);
@@ -192,7 +202,16 @@ export class ProfileSettingsStore {
 
   async updatePreferredMeals(meals: PreferredMeal[]) {
     const current = this.nutritionSettings();
-    const dto = { ...current, preferredMeals: meals };
+
+    // Build clean DTO - only include the fields the backend expects
+    const dto: UpdateNutritionSettingsDto = {
+      preferredMeals: meals,
+    };
+
+    // Include other fields if they exist
+    if (current?.personCount) dto.personCount = current.personCount;
+    if (current?.dietWishes) dto.dietWishes = current.dietWishes;
+    if (current?.allergies) dto.allergies = current.allergies;
 
     this.loading.set(true);
     this.error.set(null);
@@ -244,12 +263,14 @@ export class ProfileSettingsStore {
         await this.api.deleteNutritionSettings();
         this.nutritionSettings.set(null);
       } else {
-        // Build DTO - omit empty fields instead of sending empty strings
-        const dto: UpdateNutritionSettingsDto = {};
+        // Build DTO - include dietWishes even if empty to allow deletion
+        const dto: UpdateNutritionSettingsDto = {
+          dietWishes: dietWishes || '', // Send empty string to clear the field
+        };
+
         if (current?.personCount) dto.personCount = current.personCount;
         if (current?.preferredMeals?.length)
           dto.preferredMeals = current.preferredMeals;
-        if (dietWishes) dto.dietWishes = dietWishes;
         if (current?.allergies) dto.allergies = current.allergies;
 
         let result;
@@ -299,12 +320,14 @@ export class ProfileSettingsStore {
         await this.api.deleteNutritionSettings();
         this.nutritionSettings.set(null);
       } else {
-        // Build DTO - omit empty fields instead of sending empty strings
-        const dto: UpdateNutritionSettingsDto = {};
+        // Build DTO - include allergies even if empty to allow deletion
+        const dto: UpdateNutritionSettingsDto = {
+          allergies: allergies || '', // Send empty string to clear the field
+        };
+
         if (current?.personCount) dto.personCount = current.personCount;
         if (current?.preferredMeals?.length)
           dto.preferredMeals = current.preferredMeals;
-        if (allergies) dto.allergies = allergies;
         if (current?.dietWishes) dto.dietWishes = current.dietWishes;
 
         let result;
