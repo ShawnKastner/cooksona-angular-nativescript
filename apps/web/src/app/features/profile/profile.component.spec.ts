@@ -3,7 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { ProfileComponent } from './profile.component';
 import { AuthService } from '@cooksona/auth';
 import { ContactApiService, ApiService } from '@cooksona/api';
-import { SnackbarService } from '../../shared/ui/snackbar.service';
+import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 import { User } from '@cooksona/models/user.models';
 
 class AuthStub {
@@ -11,6 +11,7 @@ class AuthStub {
     id: 'u1',
     name: 'Max',
     email: 'max@example.com',
+    role: 'user',
   });
   currentUser$ = this.subj.asObservable();
   get currentUser() {
@@ -53,11 +54,11 @@ describe('ProfileComponent', () => {
   it('submits profile, calls updateProfile and shows success snackbar', async () => {
     const auth = TestBed.inject(AuthService) as unknown as AuthStub;
     const snackbar = TestBed.inject(SnackbarService) as unknown as SnackbarStub;
-    comp.isEditing = true;
+    comp.isEditing.set(true);
     comp.form.patchValue({ name: 'Moritz', email: 'm@example.com' });
     await comp.handleSubmit();
     expect(auth.updateProfile).toHaveBeenCalled();
     expect(snackbar.success).toHaveBeenCalled();
-    expect(comp.isSaving).toBeFalse();
+    expect(comp.isSaving()).toBeFalse();
   });
 });

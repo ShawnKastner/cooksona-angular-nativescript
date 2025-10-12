@@ -1,0 +1,59 @@
+<GridLayout rows="auto, *, auto">
+  <!-- Header -->
+  <ActionBar row="0" title="Personenanzahl">
+    <NavigationButton ios.position="left" (tap)="cancel()" />
+  </ActionBar>
+
+  <!-- Content -->
+  <FlexboxLayout
+    row="1"
+    class="h-full bg-base-100"
+    justifyContent="center"
+    alignItems="center"
+    flexDirection="column"
+  >
+    <Label
+      class="text-sm text-gray-500 mb-8 text-center px-8"
+      text="Für wie viele Personen planst du normalerweise?"
+      textWrap="true"
+    ></Label>
+
+    <!-- Number Picker -->
+    <FlexboxLayout alignItems="center" justifyContent="center" class="mb-8">
+      <!-- Decrement Button -->
+      <Button
+        (tap)="decrement()"
+        class="w-16 h-16 bg-gray-100 text-neutral font-bold text-2xl rounded-full"
+        text="-"
+      ></Button>
+
+      <!-- Current Value -->
+      <Label
+        [text]="numberOfPeople()"
+        class="text-6xl font-bold text-primary mx-8"
+      ></Label>
+
+      <!-- Increment Button -->
+      <Button
+        (tap)="increment()"
+        class="w-16 h-16 bg-gray-100 text-neutral font-bold text-2xl rounded-full"
+        text="+"
+      ></Button>
+    </FlexboxLayout>
+
+    <Label
+      class="text-xs text-gray-400"
+      text="Du kannst dies beim Erstellen eines Plans ändern"
+      textWrap="true"
+    ></Label>
+  </FlexboxLayout>
+
+  <!-- Save Button -->
+  <StackLayout row="2" class="p-5 bg-base-100">
+    <Button
+      (tap)="save()"
+      class="bg-primary text-white font-semibold text-lg py-4 rounded-2xl"
+      text="Speichern"
+    ></Button>
+  </StackLayout>
+</GridLayout>

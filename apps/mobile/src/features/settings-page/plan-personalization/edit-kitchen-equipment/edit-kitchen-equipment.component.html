@@ -1,0 +1,56 @@
+<GridLayout rows="auto, *, auto">
+  <!-- Header -->
+  <ActionBar row="0" title="Küchenausstattung">
+    <NavigationButton ios.position="left" (tap)="cancel()" />
+  </ActionBar>
+
+  <!-- Content -->
+  <ScrollView row="1" class="h-full bg-base-100">
+    <StackLayout class="p-5">
+      <Label
+        class="text-sm text-gray-500 mb-6 text-center"
+        text="Welche Küchengeräte stehen dir zur Verfügung?"
+        textWrap="true"
+      ></Label>
+
+      <!-- Equipment Options -->
+      <StackLayout class="space-y-3">
+        @for (equipment of equipmentOptions(); track equipment.id) {
+          <GridLayout
+            columns="*, auto"
+            class="bg-white border border-base-200 rounded-2xl p-4"
+            (tap)="toggleEquipment(equipment.id)"
+          >
+            <Label
+              col="0"
+              [text]="equipment.label"
+              class="text-base text-neutral font-medium"
+              verticalAlignment="center"
+            ></Label>
+            <Switch
+              col="1"
+              [checked]="equipment.selected"
+              class="ml-3"
+            ></Switch>
+          </GridLayout>
+        }
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+
+  <!-- Action Buttons -->
+  <GridLayout row="2" columns="*, *" class="p-5 bg-base-100">
+    <Button
+      col="0"
+      (tap)="cancel()"
+      class="bg-gray-200 text-neutral font-semibold text-base py-4 rounded-2xl mr-2"
+      text="Abbrechen"
+    ></Button>
+    <Button
+      col="1"
+      (tap)="save()"
+      class="bg-primary text-white font-semibold text-base py-4 rounded-2xl ml-2"
+      text="Einstellungen speichern"
+    ></Button>
+  </GridLayout>
+</GridLayout>

@@ -15,10 +15,8 @@ import { User } from '@cooksona/models';
 import { SvgToDataUriPipe } from '../../utils/svg-to-data-uri.pipe';
 import {
   User as UserIcon,
-  LogOut,
   Apple,
   Heart,
-  CreditCard,
   ChevronDown,
   Settings,
 } from '@cooksona/constants/icons';
@@ -26,7 +24,6 @@ import { isIOS, isAndroid, ApplicationSettings } from '@nativescript/core';
 import { confirm } from '@nativescript/core/ui/dialogs';
 import { HealthKitService } from '../../plugins/healthkit/healthkit.service';
 import { HealthConnectionModalComponent } from './health-connection-modal/health-connection-modal.component';
-import { SubscriptionModalComponent } from './subscription-modal/subscription-modal.component';
 
 interface SettingsSection {
   title: string;
@@ -58,10 +55,8 @@ export class ProfilePageComponent implements OnInit {
 
   protected readonly icons = {
     User: UserIcon,
-    LogOut,
     Apple,
     Heart,
-    CreditCard,
     ChevronDown,
     Settings,
   } as const;
@@ -126,7 +121,7 @@ export class ProfilePageComponent implements OnInit {
 
   private async showHealthConnectionModal() {
     try {
-      const shouldConnect = await this.modalService.showModal(
+      const wasConnected = await this.modalService.showModal(
         HealthConnectionModalComponent,
         {
           fullscreen: false,
@@ -135,35 +130,12 @@ export class ProfilePageComponent implements OnInit {
         },
       );
 
-      if (shouldConnect) {
-        this.loading.set(true);
-        this.connectHealthService();
+      // If connection was successful, update the local state
+      if (wasConnected) {
+        this.healthConnected.set(true);
       }
     } catch (error) {
       console.error('Error showing health connection modal:', error);
-    }
-  }
-
-  private async connectHealthService() {
-    try {
-      if (this.isIOS) {
-        if (!this.health.isAvailable()) {
-          throw new Error('Apple Health ist auf diesem Gerät nicht verfügbar.');
-        }
-        await this.health.requestAuthorization();
-
-        // Save the connection status persistently
-        ApplicationSettings.setBoolean('healthkit_connected', true);
-        this.healthConnected.set(true);
-      } else if (this.isAndroid) {
-        // TODO: Implement Google Fit later
-        throw new Error('Google Fit wird bald unterstützt.');
-      }
-    } catch (error) {
-      console.error('Failed to connect health service:', error);
-      // TODO: show a nice dialog/toast
-    } finally {
-      this.loading.set(false);
     }
   }
 
@@ -192,22 +164,7 @@ export class ProfilePageComponent implements OnInit {
   }
 
   get settingsSections(): SettingsSection[] {
-    const user = this.user();
-    const subscriptionLabel = this.getSubscriptionLabel(user);
-
     return [
-      {
-        title: 'Abonnement',
-        items: [
-          {
-            icon: this.icons.CreditCard,
-            label: 'Abo verwalten',
-            subtitle: subscriptionLabel,
-            action: () => this.manageSubscription(),
-            showChevron: true,
-          },
-        ],
-      },
       {
         title: 'Health Integration',
         items: [
@@ -226,24 +183,6 @@ export class ProfilePageComponent implements OnInit {
     ];
   }
 
-  private getSubscriptionLabel(user: User | null): string {
-    if (!user) return 'Nicht geladen';
-
-    if (user.lifetimeSubscription) {
-      return 'Lifetime Abo';
-    }
-
-    if (user.subscriptionStatus === 'active') {
-      if (user.subscriptionType === 'monthly') {
-        return 'Monatliches Abo';
-      } else if (user.subscriptionType === 'yearly') {
-        return 'Jährliches Abo';
-      }
-    }
-
-    return 'Kostenloser Plan';
-  }
-
   protected get userLabel(): string {
     const u = this.user();
     return u?.name || u?.email || 'Unbekannter Benutzer';
@@ -254,31 +193,9 @@ export class ProfilePageComponent implements OnInit {
     return u?.email || '';
   }
 
-  protected async manageSubscription() {
-    try {
-      const selectedPlan = await this.modalService.showModal(
-        SubscriptionModalComponent,
-        {
-          fullscreen: true,
-          animated: true,
-          stretched: true,
-        },
-      );
-
-      if (selectedPlan) {
-        console.log('User selected plan:', selectedPlan);
-        // TODO: Process the subscription purchase
-        // For now, just log it
-      }
-    } catch (error) {
-      console.error('Error showing subscription modal:', error);
-    }
-  }
-
-  protected onLogout() {
-    this.auth.logout();
-    this.router.navigateByUrl('/login').catch(() => {
-      // Ignore navigation errors
+  protected navigateToSettings() {
+    this.router.navigate(['/settings']).catch((err) => {
+      console.error('Navigation to settings failed:', err);
     });
   }
 }

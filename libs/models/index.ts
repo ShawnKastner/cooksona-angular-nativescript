@@ -5,3 +5,5 @@ export * from './recipe.models';
 export * from './user.models';
 export * from './health.models';
 export * from './health.utils';
+export * from './profile-settings.models';
+export * from './profile-settings.store';

@@ -1,0 +1,97 @@
+<ActionBar class="bg-base-100 border-b border-base-200">
+  <NavigationButton
+    (tap)="navigateBack()"
+    text=""
+    android.systemIcon="ic_menu_back"
+  ></NavigationButton>
+  <Label class="text-xl font-bold text-neutral" text="Einstellungen"></Label>
+</ActionBar>
+
+<ScrollView class="h-full bg-base-100">
+  <StackLayout class="p-5 pb-10 space-y-5">
+    <!-- Settings Sections -->
+    @for (section of settingsSections; track section) {
+      <StackLayout class="space-y-3">
+        <Label
+          class="text-sm font-semibold text-gray-500 ml-1"
+          [text]="section.title"
+        ></Label>
+
+        <StackLayout
+          class="bg-white rounded-2xl border border-base-200 overflow-hidden"
+        >
+          @for (item of section.items; track item.label; let isLast = $last) {
+            <StackLayout>
+              <FlexboxLayout
+                class="p-4 items-center"
+                [ngClass]="{
+                  'active:bg-red-50': item.label === 'Abmelden',
+                  'active:bg-gray-50': item.label !== 'Abmelden',
+                }"
+                (tap)="item.type !== 'toggle' ? item.action() : undefined"
+              >
+                <!-- Icon -->
+                <FlexboxLayout
+                  class="w-10 h-10 rounded-full items-center justify-center mr-3"
+                  [ngClass]="{
+                    'bg-red-50': item.label === 'Abmelden',
+                    'bg-primary/10': item.label !== 'Abmelden',
+                  }"
+                >
+                  <svg:SVGImage
+                    [src]="
+                      item.icon
+                        | svgToDataUri
+                          : (item.label === 'Abmelden' ? '#DC2626' : '#4A6C6F')
+                    "
+                    class="w-5 h-5"
+                  />
+                </FlexboxLayout>
+
+                <!-- Label and Subtitle -->
+                <StackLayout class="flex-1">
+                  <Label
+                    class="text-base font-medium"
+                    [ngClass]="{
+                      'text-red-600': item.label === 'Abmelden',
+                      'text-neutral': item.label !== 'Abmelden',
+                    }"
+                    [text]="item.label"
+                  ></Label>
+                  @if (item.subtitle) {
+                    <Label
+                      class="text-sm text-gray-500"
+                      [text]="item.subtitle"
+                    ></Label>
+                  }
+                </StackLayout>
+
+                <!-- Toggle Switch -->
+                @if (item.type === "toggle") {
+                  <Switch
+                    [checked]="item.toggleValue || false"
+                    (checkedChange)="onToggleChange(item, $any($event))"
+                    class="ml-3"
+                  >
+                  </Switch>
+                }
+
+                <!-- Navigation Chevron -->
+                @if (item.showChevron && item.type === "navigation") {
+                  <svg:SVGImage
+                    [src]="icons.ChevronRight | svgToDataUri: '#9CA3AF'"
+                    class="w-5 h-5 ml-3"
+                  />
+                }
+              </FlexboxLayout>
+
+              @if (!isLast) {
+                <StackLayout class="h-px bg-base-200 ml-16"></StackLayout>
+              }
+            </StackLayout>
+          }
+        </StackLayout>
+      </StackLayout>
+    }
+  </StackLayout>
+</ScrollView>
