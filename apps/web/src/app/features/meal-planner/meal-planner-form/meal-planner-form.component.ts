@@ -150,11 +150,7 @@ export class MealPlannerFormComponent implements OnChanges {
         ],
       }),
       planDays: this.fb.control<number>(7, {
-        validators: [
-          Validators.required,
-          Validators.min(1),
-          Validators.max(7),
-        ],
+        validators: [Validators.required, Validators.min(1), Validators.max(7)],
       }),
       cookTime: this.fb.control<CookTimeOption>('30 Minuten', {
         validators: [Validators.required],
