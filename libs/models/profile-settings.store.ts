@@ -86,11 +86,7 @@ export class ProfileSettingsStore {
             dietWishes: '',
             allergies: '',
             personCount: 2,
-            preferredMeals: [
-              PreferredMeal.BREAKFAST,
-              PreferredMeal.LUNCH,
-              PreferredMeal.DINNER,
-            ],
+            preferredMeals: [],
           };
           const created =
             await this.api.createNutritionSettings(defaultSettings);
@@ -245,7 +241,10 @@ export class ProfileSettingsStore {
     }
   }
 
-  private isNutritionSettingsEmpty(dietWishes: string, settings: NutritionSettings | null): boolean {
+  private isNutritionSettingsEmpty(
+    dietWishes: string,
+    settings: NutritionSettings | null,
+  ): boolean {
     return (
       !dietWishes &&
       (!settings?.allergies || settings.allergies === '') &&

@@ -2,8 +2,9 @@ import {
   Component,
   NO_ERRORS_SCHEMA,
   signal,
-  OnInit,
   inject,
+  computed,
+  effect,
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { RouterExtensions } from '@nativescript/angular';
@@ -30,7 +31,7 @@ interface MealOption {
     `,
   ],
 })
-export class EditPreferredMealsComponent implements OnInit {
+export class EditPreferredMealsComponent {
   private readonly routerExtensions = inject(RouterExtensions);
   private readonly store = inject(ProfileSettingsStore);
 
@@ -41,43 +42,22 @@ export class EditPreferredMealsComponent implements OnInit {
     { id: PreferredMeal.SNACKS, label: 'Snacks', selected: false },
   ]);
 
-  ngOnInit() {
-    // Load current values from store - use effect to react to changes
+  protected readonly hasLoaded = computed(() => !!this.store.nutrition$());
+
+  private readonly syncMealsEffect = effect(() => {
     const currentSettings = this.store.nutrition$();
-    if (currentSettings) {
-      const selectedMeals = currentSettings.preferredMeals || [
-        PreferredMeal.BREAKFAST,
-        PreferredMeal.LUNCH,
-        PreferredMeal.DINNER,
-      ];
-
-      // Create new array with updated selected state
-      const updatedMeals = [
-        {
-          id: PreferredMeal.BREAKFAST,
-          label: 'Frühstück',
-          selected: selectedMeals.includes(PreferredMeal.BREAKFAST),
-        },
-        {
-          id: PreferredMeal.LUNCH,
-          label: 'Mittagessen',
-          selected: selectedMeals.includes(PreferredMeal.LUNCH),
-        },
-        {
-          id: PreferredMeal.DINNER,
-          label: 'Abendessen',
-          selected: selectedMeals.includes(PreferredMeal.DINNER),
-        },
-        {
-          id: PreferredMeal.SNACKS,
-          label: 'Snacks',
-          selected: selectedMeals.includes(PreferredMeal.SNACKS),
-        },
-      ];
-
-      this.meals.set(updatedMeals);
+    if (!currentSettings) {
+      return;
     }
-  }
+    const selectedMeals = currentSettings.preferredMeals || [];
+
+    this.meals.update((meals) =>
+      meals.map((meal) => ({
+        ...meal,
+        selected: selectedMeals.includes(meal.id),
+      })),
+    );
+  });
 
   protected toggleMeal(mealId: PreferredMeal, value?: boolean) {
     const currentMeals = this.meals();
@@ -94,6 +74,9 @@ export class EditPreferredMealsComponent implements OnInit {
   }
 
   protected async save() {
+    if (!this.hasLoaded()) {
+      return;
+    }
     try {
       const selectedMeals = this.meals()
         .filter((m) => m.selected)

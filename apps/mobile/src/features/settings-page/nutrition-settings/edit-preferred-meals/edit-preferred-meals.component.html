@@ -32,6 +32,7 @@
             ></Label>
 
             <Switch
+              [isEnabled]="hasLoaded()"
               [checked]="meal.selected"
               (checkedChange)="onSwitchChange($event, meal.id)"
               class="ml-3"
@@ -51,6 +52,7 @@
   <!-- Save Button -->
   <StackLayout row="2" class="p-5 bg-base-100">
     <Button
+      [isEnabled]="hasLoaded()"
       (tap)="save()"
       class="bg-primary text-white font-semibold text-lg py-4 rounded-2xl"
       text="Speichern"
