@@ -245,14 +245,19 @@ export class ProfileSettingsStore {
     }
   }
 
+  private isNutritionSettingsEmpty(dietWishes: string, settings: NutritionSettings | null): boolean {
+    return (
+      !dietWishes &&
+      (!settings?.allergies || settings.allergies === '') &&
+      (!settings?.preferredMeals || settings.preferredMeals.length === 0)
+    );
+  }
+
   async updateDietWishes(dietWishes: string) {
     const current = this.nutritionSettings();
 
     // Check if all nutrition fields would be empty
-    const wouldBeEmpty =
-      !dietWishes &&
-      (!current?.allergies || current.allergies === '') &&
-      (!current?.preferredMeals || current.preferredMeals.length === 0);
+    const wouldBeEmpty = this.isNutritionSettingsEmpty(dietWishes, current);
 
     this.loading.set(true);
     this.error.set(null);
