@@ -153,7 +153,7 @@ export class MealPlannerFormComponent implements OnChanges {
         validators: [
           Validators.required,
           Validators.min(1),
-          Validators.max(14),
+          Validators.max(7),
         ],
       }),
       cookTime: this.fb.control<CookTimeOption>('30 Minuten', {
@@ -218,9 +218,9 @@ export class MealPlannerFormComponent implements OnChanges {
         this.form.controls.planDays.setValue(3, { emitEvent: false });
       this.showPlanDaysHint.set(false);
     } else {
-      this.showPlanDaysHint.set(days > 14);
-      if (days > 14)
-        this.form.controls.planDays.setValue(14, { emitEvent: false });
+      this.showPlanDaysHint.set(days > 7);
+      if (days > 7)
+        this.form.controls.planDays.setValue(7, { emitEvent: false });
     }
   }
 

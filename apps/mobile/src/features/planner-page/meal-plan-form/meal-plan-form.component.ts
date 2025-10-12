@@ -161,7 +161,7 @@ export class MealPlanFormComponent implements AfterViewInit {
 
   onPlanDaysBlur() {
     const v = this.form.value;
-    const clamped = this.clampNumber(Number(v.planDays ?? 0), 1, 14);
+    const clamped = this.clampNumber(Number(v.planDays ?? 0), 1, 7);
     if (clamped !== v.planDays) this.form.patchValue({ planDays: clamped });
   }
 
@@ -180,7 +180,7 @@ export class MealPlanFormComponent implements AfterViewInit {
       diet: v.diet ?? '',
       allergies: v.allergies ?? '',
       people: Number(v.people ?? 2),
-      planDays: Number(v.planDays ?? 14),
+      planDays: Number(v.planDays ?? 7),
       cookTime: v.cookTime ?? '30 Minuten',
       meals: v.meals ?? {},
       planFocus: (this.focusOptions()[v.planFocusIndex ?? 0] ??
