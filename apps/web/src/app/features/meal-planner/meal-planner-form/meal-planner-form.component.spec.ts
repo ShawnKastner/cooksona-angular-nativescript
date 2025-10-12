@@ -33,6 +33,13 @@ describe('MealPlannerFormComponent', () => {
     expect(comp.form.controls.enableNutritionAnalysis.disabled).toBeTrue();
   });
 
+  it('enforces pro plan limits when isProUser=true', () => {
+    comp.isProUser = true;
+    comp.form.controls.planDays.setValue(10);
+    comp.onPlanDaysChange();
+    expect(comp.form.controls.planDays.value).toBe(7);
+  });
+
   it('emits submitPlan with form value on submit', () => {
     const spy = jasmine.createSpy('submit');
     comp.submitPlan.subscribe(spy);

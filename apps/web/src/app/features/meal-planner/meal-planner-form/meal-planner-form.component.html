@@ -101,14 +101,14 @@
             id="planDays"
             type="number"
             min="1"
-            [max]="isProUser ? 14 : 3"
+            [max]="isProUser ? 7 : 3"
             formControlName="planDays"
             class="w-full pl-12 pr-4 py-3 bg-base-200/60 border-2 border-transparent rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-primary transition-all duration-200 text-neutral placeholder-gray-500"
           />
         </div>
         @if (showPlanDaysHint() && isProUser) {
           <p class="text-xs text-error mt-1">
-            Maximal 14 Tage im Pro-Abo möglich.
+            Maximal 7 Tage im Pro-Abo möglich.
           </p>
         } @else if (!isProUser) {
           <p class="text-xs text-gray-500 mt-1">
@@ -116,7 +116,7 @@
             <span
               (click)="showUpgradeModal.emit()"
               class="text-secondary font-semibold cursor-pointer hover:underline"
-              >Upgrade für bis zu 14 Tage!</span
+              >Upgrade für bis zu 7 Tage!</span
             >
           </p>
         }
