@@ -15,10 +15,10 @@ describe('MealPlannerFormComponent', () => {
     fixture.detectChanges();
   });
 
-  it('initializes with defaults', () => {
+  it('initializes with defaults for free users', () => {
     const v = comp.form.getRawValue();
     expect(v.people).toBe(2);
-    expect(v.planDays).toBe(7);
+    expect(v.planDays).toBe(3); // Free tier limitation
     expect(v.meals.breakfast).toBeTrue();
   });
 
