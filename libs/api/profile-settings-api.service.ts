@@ -7,6 +7,9 @@ import {
   PlanPersonalization,
   CreatePlanPersonalizationDto,
   UpdatePlanPersonalizationDto,
+  NotificationSettings,
+  CreateNotificationSettingsDto,
+  UpdateNotificationSettingsDto,
 } from '@cooksona/models';
 
 @Injectable({
@@ -61,5 +64,32 @@ export class ProfileSettingsApiService {
 
   deletePlanPersonalization(): Promise<void> {
     return this.api.delete('/profile/plan-personalization');
+  }
+
+  // Notification Settings
+  getNotificationSettings(): Promise<NotificationSettings | undefined> {
+    return this.api.get<NotificationSettings>('/profile/notification-settings');
+  }
+
+  createNotificationSettings(
+    dto: CreateNotificationSettingsDto,
+  ): Promise<NotificationSettings | undefined> {
+    return this.api.post<NotificationSettings>(
+      '/profile/notification-settings',
+      dto,
+    );
+  }
+
+  updateNotificationSettings(
+    dto: UpdateNotificationSettingsDto,
+  ): Promise<NotificationSettings | undefined> {
+    return this.api.put<NotificationSettings>(
+      '/profile/notification-settings',
+      dto,
+    );
+  }
+
+  deleteNotificationSettings(): Promise<void> {
+    return this.api.delete('/profile/notification-settings');
   }
 }
