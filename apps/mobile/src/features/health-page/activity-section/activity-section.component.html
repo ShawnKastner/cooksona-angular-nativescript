@@ -47,9 +47,12 @@
                 }
               </FlexboxLayout>
               <StackLayout>
-                <Label
-                  class="font-semibold text-sm text-neutral"
-                  [text]="getActivityLabel(activity.activityType)"
+                <Label textWrap="true">
+                  <FormattedString>
+                    <Span
+                      class="font-semibold text-sm text-neutral"
+                      [text]="getActivityLabel(activity.activityType)"
+                    ></Span> </FormattedString
                 ></Label>
                 @if (activity.durationMinutes > 0) {
                   <Label
