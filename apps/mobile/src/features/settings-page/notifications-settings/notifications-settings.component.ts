@@ -45,11 +45,10 @@ export class NotificationsSettingsComponent implements OnInit, OnDestroy {
   } as const;
 
   protected waterReminderEnabled = signal(false);
-  protected waterReminderTime = signal('09:00');
+  protected waterReminderSummary = signal('Nicht aktiviert');
 
   ngOnInit() {
-    this.loadSettings();
-    this.checkNotificationStatus();
+    void this.loadSettings();
     this.page.on(Page.navigatedToEvent, this.onNavigatedTo);
   }
 
@@ -57,31 +56,67 @@ export class NotificationsSettingsComponent implements OnInit, OnDestroy {
     this.page.off(Page.navigatedToEvent, this.onNavigatedTo);
   }
 
-  private loadSettings() {
-    // Load saved settings
-    this.waterReminderEnabled.set(
-      ApplicationSettings.getBoolean('water_reminder_enabled', false),
-    );
-    this.waterReminderTime.set(
-      ApplicationSettings.getString('water_reminder_time', '09:00'),
-    );
+  private async loadSettings() {
+    const config = await this.notificationService.loadWaterReminderConfig();
+
+    if (!config || !config.enabled) {
+      this.waterReminderEnabled.set(false);
+      this.waterReminderSummary.set('Nicht aktiviert');
+      return;
+    }
+
+    this.waterReminderEnabled.set(true);
+
+    if (config.paused) {
+      this.waterReminderSummary.set('Pausiert');
+      return;
+    }
+
+    // Build summary based on configuration
+    let summary = '';
+
+    if (config.reminderType === 'fixed_times') {
+      const times = config.fixedTimes ?? [];
+      if (times.length === 1) {
+        const time = times[0];
+        summary = `Täglich um ${time.hour.toString().padStart(2, '0')}:${time.minute.toString().padStart(2, '0')}`;
+      } else if (times.length > 1) {
+        summary = `${times.length} Erinnerungen pro Tag`;
+      }
+    } else if (config.reminderType === 'interval') {
+      const hours = config.intervalHours ?? 2;
+      summary = `Alle ${hours} Stunde${hours > 1 ? 'n' : ''}`;
+    }
+
+    // Add weekday info if not all days are active
+    const allWeekdays = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ];
+    const activeWeekdays = config.activeWeekdays ?? allWeekdays;
+    if (activeWeekdays.length < 7 && activeWeekdays.length > 0) {
+      summary += ` • ${activeWeekdays.length} Tage`;
+    }
+
+    this.waterReminderSummary.set(summary || 'Konfiguriert');
   }
 
   private async checkNotificationStatus() {
     // Verify if the notification is actually scheduled
     const isScheduled =
       await this.notificationService.isWaterReminderScheduled();
-    const savedEnabled = ApplicationSettings.getBoolean(
-      'water_reminder_enabled',
-      false,
-    );
+    const config = await this.notificationService.loadWaterReminderConfig();
 
     // If saved as enabled but not actually scheduled, sync the state
-    if (savedEnabled && !isScheduled) {
+    if (config?.enabled && !isScheduled && !config.paused) {
       console.warn(
         'Water reminder was enabled but not scheduled, syncing state',
       );
-      ApplicationSettings.setBoolean('water_reminder_enabled', false);
       this.waterReminderEnabled.set(false);
     }
   }
@@ -91,11 +126,8 @@ export class NotificationsSettingsComponent implements OnInit, OnDestroy {
       {
         icon: this.icons.Droplet,
         label: 'Trink-Erinnerung',
-        subtitle: this.waterReminderEnabled()
-          ? `Täglich um ${this.waterReminderTime()}`
-          : 'Nicht aktiviert',
+        subtitle: this.waterReminderSummary(),
         enabled: this.waterReminderEnabled(),
-        time: this.waterReminderTime(),
         action: () => this.editWaterReminder(),
       },
     ];
@@ -115,7 +147,7 @@ export class NotificationsSettingsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.loadSettings();
+    void this.loadSettings();
     void this.checkNotificationStatus();
   };
 

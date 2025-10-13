@@ -15,7 +15,7 @@
         <FormattedString>
           <Span
             class="text-sm text-gray-500"
-            text="Stelle eine tägliche Erinnerung ein, um genug Wasser zu trinken."
+            text="Konfiguriere flexible Erinnerungen, um ausreichend Wasser zu trinken."
           ></Span>
         </FormattedString>
       </Label>
@@ -33,75 +33,248 @@
           ></Label>
           <Label
             class="text-sm text-gray-500"
-            text="Erhalte tägliche Benachrichtigungen"
+            text="Erhalte Benachrichtigungen"
           ></Label>
         </StackLayout>
         <Switch
-          [checked]="reminderEnabled()"
+          [checked]="config().enabled"
           (checkedChange)="toggleReminder($event)"
           class="ml-3"
         ></Switch>
       </FlexboxLayout>
     </StackLayout>
 
-    <!-- Time Picker Section -->
-    @if (reminderEnabled()) {
+    <!-- Main Configuration -->
+    @if (config().enabled) {
+      <!-- Pause Toggle -->
+      <StackLayout
+        class="bg-white rounded-2xl border border-base-200 p-4 space-y-3"
+      >
+        <FlexboxLayout class="items-center justify-between">
+          <StackLayout>
+            <Label
+              class="text-base font-medium text-neutral"
+              text="Pausiert"
+            ></Label>
+            <Label
+              class="text-sm text-gray-500"
+              text="Erinnerungen temporär deaktivieren"
+            ></Label>
+          </StackLayout>
+          <Switch
+            [checked]="config().paused ?? false"
+            (checkedChange)="togglePause($event)"
+            class="ml-3"
+          ></Switch>
+        </FlexboxLayout>
+      </StackLayout>
+
+      <!-- Reminder Type Selection -->
       <StackLayout class="space-y-3">
         <Label
           class="text-sm font-semibold text-gray-500 ml-1"
-          text="Uhrzeit"
+          text="Erinnerungsart"
         ></Label>
 
         <StackLayout
-          class="bg-white rounded-2xl border border-base-200 p-5 space-y-4"
+          class="bg-white rounded-2xl border border-base-200 p-4 space-y-3"
         >
-          <!-- Selected Time Display -->
-          <FlexboxLayout class="justify-center items-center p-4">
+          <!-- Fixed Times Option -->
+          <FlexboxLayout
+            class="items-center p-3 rounded-xl"
+            [class.bg-primary-50]="reminderTypeIsFixed()"
+            (tap)="onReminderTypeChange({ value: 'fixed_times' })"
+          >
             <Label
-              class="text-5xl font-bold text-primary"
-              [text]="formattedTime"
+              class="flex-1"
+              [text]="reminderTypeIsFixed() ? '● Feste Zeiten' : '○ Feste Zeiten'"
+              [class.text-primary]="reminderTypeIsFixed()"
+              [class.font-bold]="reminderTypeIsFixed()"
             ></Label>
           </FlexboxLayout>
 
-          <!-- Time Pickers -->
-          <GridLayout columns="*, auto, *" class="items-center">
-            <!-- Hour Picker -->
-            <StackLayout col="0" class="items-center">
-              <Label
-                class="text-xs font-semibold text-center text-gray-500 mb-2"
-                text="Stunde"
-              ></Label>
-              <ListPicker
-                [items]="hourItems"
-                [selectedIndex]="selectedHourIndex"
-                (selectedIndexChange)="onHourChange($event)"
-                class="w-20 h-32"
-              ></ListPicker>
-            </StackLayout>
-
-            <!-- Separator -->
+          <!-- Interval Option -->
+          <FlexboxLayout
+            class="items-center p-3 rounded-xl"
+            [class.bg-primary-50]="reminderTypeIsInterval()"
+            (tap)="onReminderTypeChange({ value: 'interval' })"
+          >
             <Label
-              col="1"
-              class="text-3xl font-bold text-gray-400 mx-2"
-              text=":"
+              class="flex-1"
+              [text]="reminderTypeIsInterval() ? '● Intervalle' : '○ Intervalle'"
+              [class.text-primary]="reminderTypeIsInterval()"
+              [class.font-bold]="reminderTypeIsInterval()"
             ></Label>
-
-            <!-- Minute Picker -->
-            <StackLayout col="2" class="items-center">
-              <Label
-                class="text-xs font-semibold text-gray-500 mb-2 text-center"
-                text="Minute"
-              ></Label>
-              <ListPicker
-                [items]="minuteItems"
-                [selectedIndex]="selectedMinuteIndex"
-                (selectedIndexChange)="onMinuteChange($event)"
-                class="w-20 h-32"
-              ></ListPicker>
-            </StackLayout>
-          </GridLayout>
+          </FlexboxLayout>
         </StackLayout>
       </StackLayout>
+
+      <!-- Fixed Times Configuration -->
+      @if (reminderTypeIsFixed()) {
+        <StackLayout class="space-y-3">
+          <Label
+            class="text-sm font-semibold text-gray-500 ml-1"
+            text="Erinnerungszeiten"
+          ></Label>
+
+          <StackLayout
+            class="bg-white rounded-2xl border border-base-200 p-4 space-y-3"
+          >
+            @for (time of config().fixedTimes; track $index; let i = $index) {
+              <FlexboxLayout class="items-center justify-between p-2">
+                <Label
+                  class="text-base text-neutral"
+                  [text]="formatTime(time)"
+                ></Label>
+                <FlexboxLayout class="gap-2">
+                  <Button
+                    text="✏️"
+                    (tap)="editFixedTime(i)"
+                    class="text-sm px-3 py-1"
+                  ></Button>
+                  <Button
+                    text="🗑️"
+                    (tap)="removeFixedTime(i)"
+                    class="text-sm px-3 py-1"
+                  ></Button>
+                </FlexboxLayout>
+              </FlexboxLayout>
+            }
+
+            <Button
+              text="+ Zeit hinzufügen"
+              (tap)="addFixedTime()"
+              class="bg-gray-100 text-neutral font-semibold py-3 rounded-xl"
+            ></Button>
+          </StackLayout>
+        </StackLayout>
+      }
+
+      <!-- Interval Configuration -->
+      @if (reminderTypeIsInterval()) {
+        <StackLayout class="space-y-3">
+          <Label
+            class="text-sm font-semibold text-gray-500 ml-1"
+            text="Intervall-Einstellungen"
+          ></Label>
+
+          <StackLayout
+            class="bg-white rounded-2xl border border-base-200 p-4 space-y-4"
+          >
+            <Label
+              class="text-sm text-gray-500"
+              text="Erinnerung alle:"
+            ></Label>
+            @for (opt of intervalOptions; track opt.value) {
+              <FlexboxLayout
+                class="items-center p-3 rounded-xl"
+                [class.bg-primary-50]="config().intervalHours === opt.value"
+                (tap)="onIntervalHoursChange({ value: opt.value })"
+              >
+                <Label
+                  class="flex-1"
+                  [text]="(config().intervalHours === opt.value ? '● ' : '○ ') + opt.label"
+                  [class.text-primary]="config().intervalHours === opt.value"
+                  [class.font-bold]="config().intervalHours === opt.value"
+                ></Label>
+              </FlexboxLayout>
+            }
+
+            <Label
+              class="text-sm text-gray-500 mt-4"
+              [text]="'Zeitfenster: ' + (config().intervalStartHour ?? 7).toString().padStart(2, '0') + ':00 - ' + (config().intervalEndHour ?? 22).toString().padStart(2, '0') + ':00'"
+            ></Label>
+          </StackLayout>
+        </StackLayout>
+      }
+
+      <!-- Advanced Settings -->
+      <Button
+        [text]="showAdvancedSettings() ? '▼ Erweiterte Einstellungen' : '▶ Erweiterte Einstellungen'"
+        (tap)="toggleAdvancedSettings()"
+        class="bg-gray-100 text-neutral font-semibold py-3 rounded-xl"
+      ></Button>
+
+      @if (showAdvancedSettings()) {
+        <!-- Weekday Selection -->
+        <StackLayout class="space-y-3">
+          <Label
+            class="text-sm font-semibold text-gray-500 ml-1"
+            text="Aktive Wochentage"
+          ></Label>
+
+          <StackLayout
+            class="bg-white rounded-2xl border border-base-200 p-4"
+          >
+            <GridLayout columns="*, *, *, *, *, *, *" class="gap-2">
+              @for (option of weekdayOptions; track option.day) {
+                <StackLayout
+                  [col]="$index"
+                  class="items-center p-2 rounded-lg"
+                  [class.bg-primary]="isWeekdayActive(option.day)"
+                  [class.bg-gray-100]="!isWeekdayActive(option.day)"
+                  (tap)="toggleWeekday(option.day)"
+                >
+                  <Label
+                    [text]="option.shortLabel"
+                    class="text-xs font-bold"
+                    [class.text-white]="isWeekdayActive(option.day)"
+                    [class.text-gray-500]="!isWeekdayActive(option.day)"
+                  ></Label>
+                </StackLayout>
+              }
+            </GridLayout>
+          </StackLayout>
+        </StackLayout>
+
+        <!-- Quiet Hours -->
+        <StackLayout class="space-y-3">
+          <StackLayout
+            class="bg-white rounded-2xl border border-base-200 p-4 space-y-3"
+          >
+            <FlexboxLayout class="items-center justify-between">
+              <StackLayout>
+                <Label
+                  class="text-base font-medium text-neutral"
+                  text="Ruhezeiten"
+                ></Label>
+                @if (hasQuietHours()) {
+                  <Label
+                    class="text-sm text-gray-500"
+                    [text]="formatQuietHoursDisplay()"
+                  ></Label>
+                }
+              </StackLayout>
+              <Switch
+                [checked]="hasQuietHours()"
+                (checkedChange)="toggleQuietHours($event)"
+                class="ml-3"
+              ></Switch>
+            </FlexboxLayout>
+          </StackLayout>
+        </StackLayout>
+
+        <!-- Water Goal -->
+        <StackLayout class="space-y-3">
+          <Label
+            class="text-sm font-semibold text-gray-500 ml-1"
+            text="Tagesziel (ml)"
+          ></Label>
+
+          <StackLayout
+            class="bg-white rounded-2xl border border-base-200 p-4"
+          >
+            <Label
+              class="text-center text-2xl font-bold text-primary"
+              [text]="(config().waterGoalMl ?? 2500) + ' ml'"
+            ></Label>
+            <Label
+              class="text-center text-sm text-gray-500 mt-2"
+              text="Bei Erreichen werden Erinnerungen gestoppt"
+            ></Label>
+          </StackLayout>
+        </StackLayout>
+      }
 
       <!-- Info Box -->
       <StackLayout class="bg-blue-50 rounded-xl p-4">
@@ -109,7 +282,7 @@
           <FormattedString>
             <Span
               class="text-sm text-blue-800"
-              text="💡 Wähle die Zeit für deine tägliche Trink-Erinnerung"
+              text="💡 Benachrichtigungen zeigen deinen Fortschritt zum Tagesziel"
             ></Span>
           </FormattedString>
         </Label>
