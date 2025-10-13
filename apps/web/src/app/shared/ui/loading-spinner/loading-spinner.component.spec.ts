@@ -19,9 +19,9 @@ describe('LoadingSpinnerComponent', () => {
   });
 
   it('should display label and subLabel in non-compact mode', () => {
-    comp.label = 'Loading...';
-    comp.subLabel = 'Please wait';
-    comp.compact = false;
+    fixture.componentRef.setInput('label', 'Loading...');
+    fixture.componentRef.setInput('subLabel', 'Please wait');
+    fixture.componentRef.setInput('compact', false);
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
@@ -30,9 +30,9 @@ describe('LoadingSpinnerComponent', () => {
   });
 
   it('should not display label and subLabel in compact mode', () => {
-    comp.label = 'Loading...';
-    comp.subLabel = 'Please wait';
-    comp.compact = true;
+    fixture.componentRef.setInput('label', 'Loading...');
+    fixture.componentRef.setInput('subLabel', 'Please wait');
+    fixture.componentRef.setInput('compact', true);
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;
@@ -41,31 +41,31 @@ describe('LoadingSpinnerComponent', () => {
   });
 
   it('should apply compact classes when compact is true', () => {
-    comp.compact = true;
+    fixture.componentRef.setInput('compact', true);
     fixture.detectChanges();
 
     const spinner = fixture.nativeElement.querySelector('[role="status"]');
     expect(spinner.classList.contains('p-6')).toBeTrue();
-    
+
     const spinnerRing = fixture.nativeElement.querySelector('.animate-spin');
     expect(spinnerRing.classList.contains('w-12')).toBeTrue();
     expect(spinnerRing.classList.contains('h-12')).toBeTrue();
   });
 
   it('should apply non-compact classes when compact is false', () => {
-    comp.compact = false;
+    fixture.componentRef.setInput('compact', false);
     fixture.detectChanges();
 
     const spinner = fixture.nativeElement.querySelector('[role="status"]');
     expect(spinner.classList.contains('p-12')).toBeTrue();
-    
+
     const spinnerRing = fixture.nativeElement.querySelector('.animate-spin');
     expect(spinnerRing.classList.contains('w-20')).toBeTrue();
     expect(spinnerRing.classList.contains('h-20')).toBeTrue();
   });
 
   it('should not have border when withOutBorder is true', () => {
-    comp.withOutBorder = true;
+    fixture.componentRef.setInput('withOutBorder', true);
     fixture.detectChanges();
 
     const spinner = fixture.nativeElement.querySelector('[role="status"]');
@@ -73,7 +73,7 @@ describe('LoadingSpinnerComponent', () => {
   });
 
   it('should have border when withOutBorder is false', () => {
-    comp.withOutBorder = false;
+    fixture.componentRef.setInput('withOutBorder', false);
     fixture.detectChanges();
 
     const spinner = fixture.nativeElement.querySelector('[role="status"]');

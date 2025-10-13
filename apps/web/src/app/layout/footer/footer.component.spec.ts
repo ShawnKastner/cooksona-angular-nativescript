@@ -32,17 +32,17 @@ describe('FooterComponent', () => {
   it('should close cookie settings', () => {
     comp.showCookieSettings.set(true);
     expect(comp.showCookieSettings()).toBeTrue();
-    
+
     comp.closeCookieSettings();
     expect(comp.showCookieSettings()).toBeFalse();
   });
 
   it('should toggle cookie settings on open then close', () => {
     expect(comp.showCookieSettings()).toBeFalse();
-    
+
     comp.openCookieSettings();
     expect(comp.showCookieSettings()).toBeTrue();
-    
+
     comp.closeCookieSettings();
     expect(comp.showCookieSettings()).toBeFalse();
   });

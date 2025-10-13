@@ -15,7 +15,10 @@ describe('AddToCollectionModalComponent', () => {
       'getCollectionsForRecipe',
       'suggestRecipeCollections',
     ]);
-    mockSnackbar = jasmine.createSpyObj('SnackbarService', ['error', 'success']);
+    mockSnackbar = jasmine.createSpyObj('SnackbarService', [
+      'error',
+      'success',
+    ]);
 
     await TestBed.configureTestingModule({
       imports: [AddToCollectionModalComponent],
@@ -27,10 +30,10 @@ describe('AddToCollectionModalComponent', () => {
 
     fixture = TestBed.createComponent(AddToCollectionModalComponent);
     comp = fixture.componentInstance;
-    
+
     mockCookbookApi.getCollectionsForRecipe.and.resolveTo([]);
     mockCookbookApi.suggestRecipeCollections.and.resolveTo([]);
-    
+
     fixture.detectChanges();
   });
 
@@ -40,17 +43,17 @@ describe('AddToCollectionModalComponent', () => {
 
   it('should check if collection is selected', () => {
     comp.selectedIds.set(new Set(['1', '2']));
-    
+
     expect(comp.isSelected('1')).toBeTrue();
     expect(comp.isSelected('3')).toBeFalse();
   });
 
   it('should toggle collection selection', () => {
     comp.selectedIds.set(new Set(['1']));
-    
+
     comp.toggle('1');
     expect(comp.isSelected('1')).toBeFalse();
-    
+
     comp.toggle('2');
     expect(comp.isSelected('2')).toBeTrue();
   });
@@ -60,21 +63,21 @@ describe('AddToCollectionModalComponent', () => {
       id: 'col-1',
       name: 'Favorites',
     } as CookbookCollection;
-    
+
     comp.cookbookCollections.set([existingCollection]);
     comp.selectedIds.set(new Set());
-    
+
     comp.addSuggestion('Favorites');
-    
+
     expect(comp.isSelected('col-1')).toBeTrue();
   });
 
   it('should create new collection from suggestion', () => {
     comp.cookbookCollections.set([]);
     comp.selectedIds.set(new Set());
-    
+
     comp.addSuggestion('New Collection');
-    
+
     expect(comp.newCollectionName()).toBe('');
     expect(comp.isSelected('new_New Collection')).toBeTrue();
     expect(comp.cookbookCollections().length).toBe(1);
@@ -84,9 +87,9 @@ describe('AddToCollectionModalComponent', () => {
   it('should create and select new collection', () => {
     comp.newCollectionName.set('My Collection');
     comp.cookbookCollections.set([]);
-    
+
     comp.createAndSelect();
-    
+
     expect(comp.isSelected('new_My Collection')).toBeTrue();
     expect(comp.newCollectionName()).toBe('');
     expect(comp.cookbookCollections().length).toBe(1);
@@ -98,13 +101,15 @@ describe('AddToCollectionModalComponent', () => {
       id: '1',
       name: 'Existing',
     } as CookbookCollection;
-    
+
     comp.cookbookCollections.set([existing]);
     comp.newCollectionName.set('Existing');
-    
+
     comp.createAndSelect();
-    
-    expect(comp.error()).toBe('Eine Sammlung mit diesem Namen existiert bereits.');
+
+    expect(comp.error()).toBe(
+      'Eine Sammlung mit diesem Namen existiert bereits.',
+    );
     expect(comp.cookbookCollections().length).toBe(1);
   });
 
@@ -113,15 +118,15 @@ describe('AddToCollectionModalComponent', () => {
       id: 'recipe-1',
       name: 'Test Recipe',
     } as Recipe;
-    
+
     comp.recipe = recipe;
     comp.selectedIds.set(new Set(['col-1', 'col-2']));
-    
+
     const saveSpy = jasmine.createSpy('save');
     comp.save.subscribe(saveSpy);
-    
+
     comp.saveSelections();
-    
+
     expect(saveSpy).toHaveBeenCalledWith({
       recipe,
       selectedIds: jasmine.arrayContaining(['col-1', 'col-2']),
@@ -134,15 +139,15 @@ describe('AddToCollectionModalComponent', () => {
       id: 'recipe-1',
       name: 'Test Recipe',
     } as Recipe;
-    
+
     comp.recipe = recipe;
     comp.selectedIds.set(new Set(['new_New Collection']));
-    
+
     const saveSpy = jasmine.createSpy('save');
     comp.save.subscribe(saveSpy);
-    
+
     comp.saveSelections();
-    
+
     expect(saveSpy).toHaveBeenCalledWith({
       recipe,
       selectedIds: ['New Collection'],
@@ -154,9 +159,9 @@ describe('AddToCollectionModalComponent', () => {
     comp.open = true;
     const closeSpy = jasmine.createSpy('close');
     comp.close.subscribe(closeSpy);
-    
+
     comp.onEsc();
-    
+
     expect(closeSpy).toHaveBeenCalled();
   });
 
@@ -165,25 +170,40 @@ describe('AddToCollectionModalComponent', () => {
       id: 'recipe-1',
       name: 'Test Recipe',
     } as Recipe;
-    
+
     const collections: CookbookCollection[] = [
       { id: '1', name: 'Collection 1' } as CookbookCollection,
       { id: '2', name: 'Collection 2' } as CookbookCollection,
     ];
-    
+
     mockCookbookApi.getCollectionsForRecipe.and.resolveTo(collections);
-    mockCookbookApi.suggestRecipeCollections.and.resolveTo(['Suggested 1', 'Suggested 2']);
-    
+    mockCookbookApi.suggestRecipeCollections.and.resolveTo([
+      'Suggested 1',
+      'Suggested 2',
+    ]);
+
     comp.recipe = recipe;
     comp.open = true;
     comp.collections = collections;
     comp.ngOnChanges({
-      open: { currentValue: true, previousValue: false, firstChange: false, isFirstChange: () => false },
-      recipe: { currentValue: recipe, previousValue: null, firstChange: false, isFirstChange: () => false },
+      open: {
+        currentValue: true,
+        previousValue: false,
+        firstChange: false,
+        isFirstChange: () => false,
+      },
+      recipe: {
+        currentValue: recipe,
+        previousValue: null,
+        firstChange: false,
+        isFirstChange: () => false,
+      },
     });
-    
+
     await fixture.whenStable();
-    
-    expect(mockCookbookApi.getCollectionsForRecipe).toHaveBeenCalledWith('recipe-1');
+
+    expect(mockCookbookApi.getCollectionsForRecipe).toHaveBeenCalledWith(
+      'recipe-1',
+    );
   });
 });

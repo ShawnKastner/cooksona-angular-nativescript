@@ -10,7 +10,7 @@ describe('MessageApiService', () => {
       providers: [MessageApiService],
     });
     service = TestBed.inject(MessageApiService);
-    
+
     // Clear localStorage before each test
     localStorage.clear();
   });
@@ -54,7 +54,7 @@ describe('MessageApiService', () => {
       localStorage.setItem('cooksona_messages', JSON.stringify(messages));
 
       const replies = service.getRepliesForUser();
-      
+
       expect(replies.length).toBe(2);
       expect(replies[0].id).toBe('3'); // Sorted by date descending
       expect(replies[1].id).toBe('1');
@@ -85,7 +85,7 @@ describe('MessageApiService', () => {
       localStorage.setItem('cooksona_messages', JSON.stringify(messages));
 
       const replies = service.getRepliesForUser();
-      
+
       expect(replies[0].id).toBe('2');
       expect(replies[1].id).toBe('3');
       expect(replies[2].id).toBe('1');
@@ -93,7 +93,7 @@ describe('MessageApiService', () => {
 
     it('should handle invalid JSON gracefully', () => {
       localStorage.setItem('cooksona_messages', 'invalid-json');
-      
+
       const replies = service.getRepliesForUser();
       expect(replies).toEqual([]);
     });
@@ -150,7 +150,10 @@ describe('MessageApiService', () => {
       ];
 
       localStorage.setItem('cooksona_messages', JSON.stringify(messages));
-      localStorage.setItem('cooksona_seen_replies_user-1', JSON.stringify(['1']));
+      localStorage.setItem(
+        'cooksona_seen_replies_user-1',
+        JSON.stringify(['1']),
+      );
 
       const count = service.getUnseenReplyCount('user-1');
       expect(count).toBe(1);
@@ -168,18 +171,19 @@ describe('MessageApiService', () => {
 
       const seenJson = localStorage.getItem('cooksona_seen_replies_user-1');
       expect(seenJson).toBeDefined();
-      
+
       const seen = JSON.parse(seenJson!);
       expect(seen).toContain('1');
       expect(seen).toContain('2');
     });
 
     it('should preserve previously seen replies', () => {
-      localStorage.setItem('cooksona_seen_replies_user-1', JSON.stringify(['1']));
+      localStorage.setItem(
+        'cooksona_seen_replies_user-1',
+        JSON.stringify(['1']),
+      );
 
-      const newReplies: Message[] = [
-        { id: '2' } as Message,
-      ];
+      const newReplies: Message[] = [{ id: '2' } as Message];
 
       service.markRepliesAsSeen('user-1', newReplies);
 
@@ -190,7 +194,10 @@ describe('MessageApiService', () => {
     });
 
     it('should not duplicate seen reply IDs', () => {
-      localStorage.setItem('cooksona_seen_replies_user-1', JSON.stringify(['1']));
+      localStorage.setItem(
+        'cooksona_seen_replies_user-1',
+        JSON.stringify(['1']),
+      );
 
       const replies: Message[] = [
         { id: '1' } as Message,

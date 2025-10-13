@@ -9,6 +9,7 @@ Tests have been added for both the web frontend and mobile applications to impro
 ## Web Frontend Tests Added
 
 ### Components
+
 1. **LoadingSpinnerComponent** (`apps/web/src/app/shared/ui/loading-spinner/loading-spinner.component.spec.ts`)
    - Tests for compact and non-compact modes
    - Border visibility tests
@@ -47,6 +48,7 @@ Tests have been added for both the web frontend and mobile applications to impro
 ## Mobile Application Tests Added
 
 ### Services
+
 1. **MobileTokenService** (`apps/mobile/src/core/mobile-token.service.spec.ts`)
    - Token hydration from storage
    - Token persistence to storage
@@ -56,6 +58,7 @@ Tests have been added for both the web frontend and mobile applications to impro
 ## Shared Library Tests Added
 
 ### Auth Services
+
 1. **AuthService** (`libs/auth/services/auth.service.spec.ts`)
    - Login/logout functionality
    - User state management
@@ -65,6 +68,7 @@ Tests have been added for both the web frontend and mobile applications to impro
    - User refresh functionality
 
 ### API Services
+
 1. **UserApiService** (`libs/api/user-api.service.spec.ts`)
    - User CRUD operations
    - User ID encoding for special characters
@@ -91,6 +95,7 @@ Tests have been added for both the web frontend and mobile applications to impro
 ## Test Infrastructure
 
 All tests follow the existing patterns in the repository:
+
 - Use Jasmine for test framework (web and libs)
 - Use Jest for mobile tests (where applicable)
 - Follow Angular testing best practices
@@ -100,16 +105,19 @@ All tests follow the existing patterns in the repository:
 ## Running Tests
 
 ### Web Tests
+
 ```bash
 npx nx test web
 ```
 
 ### Mobile Tests (when configured)
+
 ```bash
 npx nx test mobile
 ```
 
 ### All Tests
+
 ```bash
 npx nx run-many -t test
 ```
@@ -117,6 +125,7 @@ npx nx run-many -t test
 ## Coverage Metrics
 
 The tests added cover:
+
 - **17 new test files** created
 - **100+ test cases** added across components and services
 - Coverage for critical user flows (authentication, collection management, API interactions)
@@ -125,6 +134,7 @@ The tests added cover:
 ## Next Steps
 
 Recommended areas for future test expansion:
+
 1. E2E tests for critical user journeys
 2. Integration tests for complex component interactions
 3. Performance tests for data-heavy operations

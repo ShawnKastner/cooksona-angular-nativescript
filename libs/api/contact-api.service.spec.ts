@@ -110,7 +110,7 @@ describe('ContactApiService', () => {
     expect(result).toEqual(mockResponse);
     expect(apiServiceMock.put).toHaveBeenCalledWith(
       `/contact/${requestId}`,
-      updateData
+      updateData,
     );
   });
 

@@ -19,8 +19,8 @@ describe('PaginationComponent', () => {
   });
 
   it('should disable prev button on first page', () => {
-    comp.page = 1;
-    comp.totalPages = 5;
+    fixture.componentRef.setInput('page', 1);
+    fixture.componentRef.setInput('totalPages', 5);
     fixture.detectChanges();
 
     const buttons = fixture.nativeElement.querySelectorAll('button');
@@ -29,8 +29,8 @@ describe('PaginationComponent', () => {
   });
 
   it('should enable prev button when not on first page', () => {
-    comp.page = 2;
-    comp.totalPages = 5;
+    fixture.componentRef.setInput('page', 2);
+    fixture.componentRef.setInput('totalPages', 5);
     fixture.detectChanges();
 
     const buttons = fixture.nativeElement.querySelectorAll('button');
@@ -39,8 +39,8 @@ describe('PaginationComponent', () => {
   });
 
   it('should disable next button on last page', () => {
-    comp.page = 5;
-    comp.totalPages = 5;
+    fixture.componentRef.setInput('page', 5);
+    fixture.componentRef.setInput('totalPages', 5);
     fixture.detectChanges();
 
     const buttons = fixture.nativeElement.querySelectorAll('button');
@@ -49,8 +49,8 @@ describe('PaginationComponent', () => {
   });
 
   it('should enable next button when not on last page', () => {
-    comp.page = 2;
-    comp.totalPages = 5;
+    fixture.componentRef.setInput('page', 2);
+    fixture.componentRef.setInput('totalPages', 5);
     fixture.detectChanges();
 
     const buttons = fixture.nativeElement.querySelectorAll('button');
@@ -59,8 +59,8 @@ describe('PaginationComponent', () => {
   });
 
   it('should emit pageChange on prev click', () => {
-    comp.page = 3;
-    comp.totalPages = 5;
+    fixture.componentRef.setInput('page', 3);
+    fixture.componentRef.setInput('totalPages', 5);
     const spy = jasmine.createSpy('pageChange');
     comp.pageChange.subscribe(spy);
 
@@ -70,8 +70,8 @@ describe('PaginationComponent', () => {
   });
 
   it('should emit pageChange on next click', () => {
-    comp.page = 2;
-    comp.totalPages = 5;
+    fixture.componentRef.setInput('page', 2);
+    fixture.componentRef.setInput('totalPages', 5);
     const spy = jasmine.createSpy('pageChange');
     comp.pageChange.subscribe(spy);
 
@@ -81,8 +81,8 @@ describe('PaginationComponent', () => {
   });
 
   it('should not emit pageChange on prev when on first page', () => {
-    comp.page = 1;
-    comp.totalPages = 5;
+    fixture.componentRef.setInput('page', 1);
+    fixture.componentRef.setInput('totalPages', 5);
     const spy = jasmine.createSpy('pageChange');
     comp.pageChange.subscribe(spy);
 
@@ -92,8 +92,8 @@ describe('PaginationComponent', () => {
   });
 
   it('should not emit pageChange on next when on last page', () => {
-    comp.page = 5;
-    comp.totalPages = 5;
+    fixture.componentRef.setInput('page', 5);
+    fixture.componentRef.setInput('totalPages', 5);
     const spy = jasmine.createSpy('pageChange');
     comp.pageChange.subscribe(spy);
 
@@ -103,8 +103,8 @@ describe('PaginationComponent', () => {
   });
 
   it('should display current page and total pages', () => {
-    comp.page = 3;
-    comp.totalPages = 10;
+    fixture.componentRef.setInput('page', 3);
+    fixture.componentRef.setInput('totalPages', 10);
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement;

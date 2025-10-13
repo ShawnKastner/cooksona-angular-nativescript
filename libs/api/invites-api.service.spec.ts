@@ -61,7 +61,9 @@ describe('InvitesApiService', () => {
 
     await service.deleteInvite(inviteId);
 
-    expect(apiServiceMock.delete).toHaveBeenCalledWith(`/admin/invites/${inviteId}`);
+    expect(apiServiceMock.delete).toHaveBeenCalledWith(
+      `/admin/invites/${inviteId}`,
+    );
   });
 
   it('should encode invite ID when deleting', async () => {
@@ -72,7 +74,7 @@ describe('InvitesApiService', () => {
     await service.deleteInvite(inviteId);
 
     expect(apiServiceMock.delete).toHaveBeenCalledWith(
-      '/admin/invites/invite%40special%2Fid'
+      '/admin/invites/invite%40special%2Fid',
     );
   });
 
@@ -96,6 +98,9 @@ describe('InvitesApiService', () => {
     const result = await service.createInvite(createData);
 
     expect(result).toEqual(mockInvite);
-    expect(apiServiceMock.post).toHaveBeenCalledWith('/admin/invites', createData);
+    expect(apiServiceMock.post).toHaveBeenCalledWith(
+      '/admin/invites',
+      createData,
+    );
   });
 });

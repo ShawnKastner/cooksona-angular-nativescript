@@ -11,7 +11,7 @@ describe('MobileTokenService', () => {
 
   beforeEach(() => {
     tokensSubject = new BehaviorSubject<any>(null);
-    
+
     apiServiceMock = jasmine.createSpyObj('ApiService', ['setTokens'], {
       tokens$: tokensSubject.asObservable(),
     });
@@ -25,7 +25,7 @@ describe('MobileTokenService', () => {
 
     // Clear any existing tokens
     ApplicationSettings.remove('auth.tokens.v1');
-    
+
     service = TestBed.inject(MobileTokenService);
   });
 
@@ -111,7 +111,7 @@ describe('MobileTokenService', () => {
           accessToken: 'test',
           refreshToken: 'test',
           csrfToken: 'test',
-        })
+        }),
       );
 
       const allNull = {

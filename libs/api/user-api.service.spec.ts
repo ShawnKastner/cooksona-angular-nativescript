@@ -73,7 +73,7 @@ describe('UserApiService', () => {
     expect(result).toEqual(mockUpdatedUser);
     expect(apiServiceMock.patch).toHaveBeenCalledWith(
       `/admin/users/${userId}`,
-      userData
+      userData,
     );
   });
 
@@ -87,7 +87,7 @@ describe('UserApiService', () => {
 
     expect(apiServiceMock.patch).toHaveBeenCalledWith(
       '/admin/users/user%40special%2Fid',
-      userData
+      userData,
     );
   });
 
@@ -98,7 +98,9 @@ describe('UserApiService', () => {
 
     await service.deleteUser(userId);
 
-    expect(apiServiceMock.delete).toHaveBeenCalledWith(`/admin/users/${userId}`);
+    expect(apiServiceMock.delete).toHaveBeenCalledWith(
+      `/admin/users/${userId}`,
+    );
   });
 
   it('should encode user ID when deleting', async () => {
@@ -109,7 +111,7 @@ describe('UserApiService', () => {
     await service.deleteUser(userId);
 
     expect(apiServiceMock.delete).toHaveBeenCalledWith(
-      '/admin/users/user%40special%2Fid'
+      '/admin/users/user%40special%2Fid',
     );
   });
 
