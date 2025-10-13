@@ -1,35 +1,80 @@
 # 📱 Push-Benachrichtigungen Implementation
 
-## ✅ Vollständig implementiert und getestet
+## ✅ Vollständig implementiert und erweitert
 
-Die App unterstützt jetzt echte lokale Push-Benachrichtigungen mit dem `@nativescript/local-notifications` Package.
+Die App unterstützt jetzt erweiterte lokale Push-Benachrichtigungen mit dem `@nativescript/local-notifications` Package.
 
 ## 🎯 Features
 
-### Trink-Erinnerung
+### Trink-Erinnerung (Erweitert)
 
-- **Tägliche Benachrichtigungen** zur eingestellten Uhrzeit
-- **Auto-Save**: Änderungen werden automatisch gespeichert
-- **Keine Dialoge**: Sauberer, reibungsloser Workflow ohne Bestätigungsfenster
+#### Grundfunktionen
+
+- **Flexible Erinnerungszeiten**: Mehrere feste Zeiten oder intervallbasierte Erinnerungen
+- **Pause/Resume**: Erinnerungen temporär pausieren ohne Konfiguration zu löschen
 - **Ein-/Ausschalten**: Einfach per Toggle aktivieren/deaktivieren
 - **Persistenz**: Einstellungen bleiben nach App-Neustart erhalten
+- **Cloud-Sync**: Geräteübergreifende Synchronisation über Backend-API
+- **Offline-Funktionalität**: Lokale Planung funktioniert auch ohne Internetverbindung
 - **Automatische Berechtigungsanfrage**: Wird beim ersten Aktivieren durchgeführt
+
+#### Erweiterte Konfiguration
+
+- **Feste Zeiten**: Mehrere individuelle Erinnerungszeiten pro Tag konfigurierbar
+- **Intervalle**: Automatische Erinnerungen alle 1-4 Stunden innerhalb eines Zeitfensters
+- **Wochentage**: Auswahl aktiver Wochentage (Mo-So)
+- **Ruhezeiten**: Keine Erinnerungen während konfigurierbarer Ruhezeiten (z.B. 22:00-07:00)
+- **Tagesziel**: Automatische Unterdrückung weiterer Erinnerungen bei Erreichen des Wasserziels
+- **Fortschritts-Anzeige**: Benachrichtigungstext zeigt verbleibende ml bis zum Tagesziel
+
+#### Intelligente Features
+
+- **Dynamischer Content**: Benachrichtigungen passen sich dem aktuellen Fortschritt an
+- **Ziel-basierte Unterdrückung**: Keine weiteren Erinnerungen wenn Tagesziel erreicht
+- **Wochentags-Filter**: Erinnerungen nur an ausgewählten Wochentagen
+- **Ruhezeiten-Respektierung**: Keine Störungen während definierter Ruhezeiten
 
 ## 🔧 Wie es funktioniert
 
 ### User Flow
 
 1. **Einstellungen → Push-Benachrichtigungen** öffnen
-2. **Trink-Erinnerung Toggle** aktivieren → Navigiert automatisch zur Zeitauswahl
-3. **Zeit auswählen** mit den Scroll-Pickern → Wird automatisch gespeichert
+2. **Trink-Erinnerung** konfigurieren:
+   - Toggle aktivieren → Berechtigungen werden angefragt (falls nötig)
+   - **Erinnerungsart** wählen:
+     - **Feste Zeiten**: Mehrere spezifische Uhrzeiten hinzufügen/bearbeiten/löschen
+     - **Intervalle**: Intervall (1-4h) und Zeitfenster wählen
+   - **Erweiterte Einstellungen** (optional):
+     - Aktive Wochentage auswählen
+     - Ruhezeiten aktivieren
+     - Tagesziel anpassen
+   - **Pause-Toggle**: Erinnerungen temporär deaktivieren
+3. **Speichern** → Einstellungen werden lokal und im Backend gespeichert
 4. **Zurück navigieren** → Fertig!
 
 ### Technical Flow
 
-1. Toggle ON → Benachrichtigungsberechtigungen werden angefragt (falls nötig)
-2. Zeit ändern → Auto-Save nach jeder Änderung
-3. Notification wird sofort geplant mit der gewählten Zeit
-4. Toggle OFF → Notification wird sofort abgebrochen
+1. **Aktivierung**:
+   - Benachrichtigungsberechtigungen werden angefragt
+   - Konfiguration wird validiert
+   - Mehrere Notifications werden basierend auf Typ geplant
+   - Einstellungen werden lokal (ApplicationSettings) und remote (API) gespeichert
+
+2. **Scheduling Logic**:
+   - Bei Fixed Times: Jede Zeit bekommt eigene Notification-ID
+   - Bei Intervallen: Zeiten werden basierend auf Intervall und Zeitfenster berechnet
+   - Filter werden angewendet: Wochentage, Ruhezeiten
+   - Max. Anzahl pro Tag wird respektiert
+   - Alle IDs werden für spätere Verwaltung gespeichert
+
+3. **Runtime**:
+   - HealthStore liefert aktuellen Wasserkonsum
+   - Notification-Body wird dynamisch mit Fortschritt generiert
+   - Bei Erreichen des Tagesziels: Weitere Erinnerungen werden unterdrückt
+
+4. **Deaktivierung**:
+   - Alle geplanten Notifications werden abgebrochen
+   - Konfiguration bleibt erhalten für spätere Reaktivierung
 
 ## 📂 Dateien
 
@@ -101,12 +146,16 @@ Das Time-Picker Problem wurde behoben durch:
 
 ### Trink-Erinnerung
 
-- **ID**: 1001
+- **IDs**: 1001+ (Base ID 1001, weitere IDs für mehrere Erinnerungen)
 - **Titel**: "💧 Zeit zu trinken!"
-- **Body**: "Vergiss nicht, ein Glas Wasser zu trinken."
-- **Intervall**: Täglich zur gewählten Zeit
+- **Body** (dynamisch):
+  - Standard: "Vergiss nicht, ein Glas Wasser zu trinken."
+  - Mit Fortschritt: "Noch XXX ml bis zum Tagesziel!"
+  - Ziel erreicht: "Tagesziel erreicht! 🎉 Weiter so!"
+- **Intervall**: Täglich zur gewählten Zeit(en)
 - **Sound**: Default
 - **Badge**: 1
+- **Tap-Action**: Öffnet Health Hub (Wasser-Tracker)
 
 ## 🧪 Testing
 
@@ -134,27 +183,59 @@ Achten Sie auf die Console-Logs für:
 - Scheduling confirmation
 - Auto-save events
 
-## 🚀 Erweiterungsmöglichkeiten
+## 📊 Data Models
 
-Weitere Notification-Typen hinzufügen:
+### WaterReminderConfig
 
 ```typescript
-// notification.service.ts
-private readonly MEAL_REMINDER_ID = 1002;
+interface WaterReminderConfig {
+  enabled: boolean;
+  paused?: boolean;
+  reminderType: 'fixed_times' | 'interval';
 
-async scheduleMealReminder(hour: number, minute: number, mealType: string) {
-  // ... ähnlich wie scheduleWaterReminder
+  // Feste Zeiten
+  fixedTimes?: WaterReminderTime[];
+
+  // Intervall-Modus
+  intervalHours?: number; // 1-4
+  intervalStartHour?: number; // z.B. 7
+  intervalStartMinute?: number; // z.B. 0
+  intervalEndHour?: number; // z.B. 22
+  intervalEndMinute?: number; // z.B. 0
+
+  // Gemeinsame Einstellungen
+  activeWeekdays?: Weekday[];
+  quietHours?: QuietHours;
+  maxRemindersPerDay?: number;
+  waterGoalMl?: number;
 }
 ```
 
-Dann in `notifications-settings.component.ts` hinzufügen:
+### Storage
+
+- **Local**: `ApplicationSettings` mit Key `water_reminder_config_v2`
+- **Remote**: Backend API `/profile/notification-settings`
+- **Scheduled IDs**: `water_reminder_scheduled_ids` (für Verwaltung)
+
+## 🚀 Erweiterungsmöglichkeiten
+
+### Weitere Features (optional)
+
+- **Snooze-Buttons**: +15 Min, +30 Min Aktionen in Notification
+- **Smart-Timing**: ML-basierte Vorschläge für optimale Erinnerungszeiten
+- **Wetter-Integration**: Mehr Erinnerungen an heißen Tagen
+- **Aktivitäts-Integration**: Mehr Erinnerungen nach Sport
+
+### Weitere Notification-Typen
+
+Weitere Notification-Typen nach gleichem Muster:
 
 ```typescript
-{
-  icon: this.icons.ChefHat,
-  label: 'Mahlzeit-Erinnerung',
-  subtitle: '...',
-  action: () => this.editMealReminder(),
+// notification.service.ts
+private readonly MEAL_REMINDER_BASE_ID = 2001;
+
+async scheduleMealReminders(config: MealReminderConfig) {
+  // Ähnliche Logik wie scheduleWaterReminders
 }
 ```
 
