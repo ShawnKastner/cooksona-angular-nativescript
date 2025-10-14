@@ -110,6 +110,34 @@
           </GridLayout>
         }
       </StackLayout>
+      <StackLayout
+        class="space-y-2 text-sm text-neutral bg-white p-4 rounded-lg border border-base-200"
+      >
+        <Label
+          class="font-bold text-lg text-neutral"
+          text="Nährwerte (ca. pro Portion)"
+        ></Label>
+        @if (hasNutritionInfo()) {
+          @for (item of nutritionItems(); track item.label) {
+            <FlexboxLayout
+              justifyContent="space-between"
+              alignItems="center"
+              class="py-1"
+            >
+              <Label class="text-sm text-neutral" [text]="item.label"></Label>
+              <Label
+                class="font-semibold text-neutral"
+                [text]="item.value"
+              ></Label>
+            </FlexboxLayout>
+          }
+        } @else {
+          <Label
+            class="text-sm text-gray-500"
+            text="Nährwerte nicht verfügbar"
+          ></Label>
+        }
+      </StackLayout>
     </StackLayout>
   </ScrollView>
   <FlexboxLayout

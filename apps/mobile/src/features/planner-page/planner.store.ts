@@ -502,7 +502,7 @@ export class PlannerStore {
             snack: false,
             dessert: false,
           },
-          enableNutritionAnalysis: false,
+          enableNutritionAnalysis: true,
           planFocus: 'ausgewogen',
           gourmetMode: false,
         },
