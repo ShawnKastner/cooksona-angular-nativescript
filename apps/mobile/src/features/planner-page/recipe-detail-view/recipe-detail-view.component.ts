@@ -49,6 +49,34 @@ export class RecipeDetailViewComponent {
   private readonly dayName = signal<string | null>(null);
   private readonly mealKey = signal<string | null>(null);
   private readonly source = signal<'mealPlan' | 'cookbook'>('mealPlan');
+  readonly nutritionItems = computed<
+    ReadonlyArray<{ label: string; value: string }>
+  >(() => {
+    const nutrition = this.displayRecipe()?.nutrition;
+    if (!nutrition) return [];
+
+    const items: Array<{ label: string; value: string }> = [];
+    const pushIfValid = (
+      label: string,
+      rawValue: unknown,
+      unit: string,
+    ): void => {
+      const formatted = this.formatNutritionValue(rawValue, unit);
+      if (formatted) {
+        items.push({ label, value: formatted });
+      }
+    };
+
+    pushIfValid('Kalorien', nutrition.calories, 'kcal');
+    pushIfValid('Kohlenhydrate', nutrition.carbs, 'g');
+    pushIfValid('Eiweiß', nutrition.protein, 'g');
+    pushIfValid('Fett', nutrition.fat, 'g');
+
+    return items;
+  });
+  readonly hasNutritionInfo = computed<boolean>(
+    () => this.nutritionItems().length > 0,
+  );
 
   // Computed property to determine if swap button should be shown
   readonly showSwapButton = computed(() => this.source() === 'mealPlan');
@@ -146,6 +174,34 @@ export class RecipeDetailViewComponent {
         console.warn('[RecipeDetail] lookup by id failed', e);
       }
     }
+  }
+
+  private formatNutritionValue(value: unknown, unit: string): string | null {
+    if (value === null || value === undefined) return null;
+    if (typeof value === 'string' && value.trim() === '') return null;
+
+    const numeric = this.coerceToNumber(value);
+    if (numeric === null) return null;
+
+    const rounded = Math.round(numeric * 10) / 10;
+    const text = Number.isInteger(rounded)
+      ? rounded.toFixed(0)
+      : rounded.toFixed(1);
+    return `${text} ${unit}`;
+  }
+
+  private coerceToNumber(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const normalized = value.replace(',', '.');
+      const match = normalized.match(/-?\d+(\.\d+)?/);
+      if (!match) return null;
+      const parsed = parseFloat(match[0]);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+    return null;
   }
 
   private findMealContext(

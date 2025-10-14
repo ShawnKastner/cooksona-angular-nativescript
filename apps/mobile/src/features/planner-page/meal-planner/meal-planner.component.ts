@@ -18,6 +18,7 @@ import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { PlannerStore } from '../planner.store';
 import { DailyPlan, Recipe } from '@cooksona/models';
+import { PullToRefresh } from '@nativescript-community/ui-pulltorefresh';
 
 type MealKey = 'breakfast' | 'lunch' | 'dinner' | 'snack' | 'dessert';
 
@@ -115,6 +116,17 @@ export class MealPlannerComponent {
       this.openRecipe.emit({ recipe: meal, dayName, mealKey });
     } else {
       this.openRecipe.emit(null);
+    }
+  }
+
+  async onRefresh(event: { object: PullToRefresh }): Promise<void> {
+    const refresher = event?.object;
+    try {
+      await this.store.load();
+    } finally {
+      if (refresher) {
+        refresher.refreshing = false;
+      }
     }
   }
 }
