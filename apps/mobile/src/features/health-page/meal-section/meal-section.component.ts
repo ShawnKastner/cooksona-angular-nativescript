@@ -5,7 +5,10 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { NativeScriptCommonModule } from '@nativescript/angular';
+import {
+  NativeScriptCommonModule,
+  RouterExtensions,
+} from '@nativescript/angular';
 import { HealthStore } from '@cooksona/health';
 import type { MealEntry } from '@cooksona/api';
 import {
@@ -16,6 +19,9 @@ import {
   ChevronDown,
 } from '@cooksona/constants/icons';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
+import type { Recipe } from '@cooksona/models';
+import { action, alert } from '@nativescript/core/ui/dialogs';
+import { Router } from '@angular/router';
 
 type MealTypeKey = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
 
@@ -36,6 +42,8 @@ interface MealSection {
 })
 export class MealSectionComponent {
   private readonly store = inject(HealthStore);
+  private readonly routerExtensions = inject(RouterExtensions);
+  private readonly router = inject(Router);
 
   protected expandedMeal = signal<string | null>(null);
   protected readonly loading = this.store.loading;
@@ -99,5 +107,76 @@ export class MealSectionComponent {
   protected toggleMeal(key: string): void {
     const current = this.expandedMeal();
     this.expandedMeal.set(current === key ? null : key);
+  }
+
+  protected async onMealLongPress(meal: MealEntry): Promise<void> {
+    try {
+      const result = await action({
+        title: meal.name,
+        cancelButtonText: 'Abbrechen',
+        actions: ['Bearbeiten', 'Löschen'],
+      });
+
+      if (result === 'Bearbeiten') {
+        await this.openEditMeal(meal);
+      } else if (result === 'Löschen') {
+        await this.deleteMeal(meal);
+      }
+    } catch (error) {
+      console.error('[MealSection] long press action failed', error);
+    }
+  }
+
+  private async openEditMeal(meal: MealEntry): Promise<void> {
+    if (meal.sourceType !== 'recipe') {
+      await alert({
+        title: 'Bearbeiten nicht möglich',
+        message: 'Nur Rezepte mit Nährwertangaben können bearbeitet werden.',
+        okButtonText: 'OK',
+      });
+      return;
+    }
+    try {
+      const recipe = this.buildRecipeFromMeal(meal);
+      await this.routerExtensions.navigate(
+        ['/tracking-recipe', recipe.id ?? meal.id],
+        {
+          state: {
+            recipe,
+            mealEntry: meal,
+          },
+          transition: { name: 'slideLeft' },
+        },
+      );
+    } catch (error) {
+      console.error('[MealSection] open edit meal failed', error);
+    }
+  }
+
+  private async deleteMeal(meal: MealEntry): Promise<void> {
+    try {
+      await this.store.deleteMeal(meal.id);
+    } catch (error) {
+      console.error('[MealSection] delete meal failed', error);
+      await alert({
+        title: 'Fehler',
+        message: 'Die Mahlzeit konnte nicht gelöscht werden.',
+        okButtonText: 'OK',
+      });
+    }
+  }
+
+  private buildRecipeFromMeal(meal: MealEntry): Recipe {
+    return {
+      id: meal.recipeId ?? meal.id,
+      name: meal.name,
+      ingredients: [],
+      nutrition: {
+        calories: meal.calories,
+        protein: meal.protein,
+        carbs: meal.carbs,
+        fat: meal.fat,
+      },
+    };
   }
 }

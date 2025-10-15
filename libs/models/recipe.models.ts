@@ -1,10 +1,10 @@
 import { Ingredient } from './plan.models';
 
 export interface NutritionInfo {
-  calories: number;
-  protein: string;
-  carbs: string;
-  fat: string;
+  calories: number | string;
+  protein: number | string;
+  carbs: number | string;
+  fat: number | string;
 }
 
 export interface Recipe {

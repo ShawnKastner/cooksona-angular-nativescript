@@ -174,16 +174,28 @@
                               {{ meal.carbs }}g KH • {{ meal.fat }}g F
                             </p>
                           </div>
-                          <button
-                            type="button"
-                            class="text-gray-400 hover:text-error transition-colors rounded-full p-1.5"
-                            (click)="handleDeleteMeal(meal)"
-                          >
-                            <span
-                              [svgInject]="icons.Trash"
-                              class="w-4 h-4"
-                            ></span>
-                          </button>
+                          <div class="flex items-center gap-2">
+                            <button
+                              type="button"
+                              class="text-gray-400 hover:text-primary transition-colors rounded-full p-1.5"
+                              (click)="handleEditMeal(meal)"
+                            >
+                              <span
+                                [svgInject]="icons.Pencil"
+                                class="w-4 h-4"
+                              ></span>
+                            </button>
+                            <button
+                              type="button"
+                              class="text-gray-400 hover:text-error transition-colors rounded-full p-1.5"
+                              (click)="handleDeleteMeal(meal)"
+                            >
+                              <span
+                                [svgInject]="icons.Trash"
+                                class="w-4 h-4"
+                              ></span>
+                            </button>
+                          </div>
                         </li>
                       }
                     </ul>
@@ -317,3 +329,11 @@
   (close)="isTrackMealOpen.set(false)"
   (save)="handleTrackMeal($event)"
 ></app-track-meal-modal>
+
+<app-recipe-track-modal
+  [open]="isRecipeTrackEditOpen()"
+  [recipe]="recipeForEdit()"
+  [mealEntry]="selectedMealForEdit()"
+  (close)="handleCloseRecipeTrackEdit()"
+  (updated)="handleRecipeTrackEditSaved()"
+></app-recipe-track-modal>

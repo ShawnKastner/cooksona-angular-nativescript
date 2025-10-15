@@ -403,6 +403,42 @@ export class HealthStore {
     }
   }
 
+  async updateMeal(
+    id: string,
+    meal: {
+      date?: string;
+      name?: string;
+      sourceType?: 'manual' | 'recipe' | 'barcode';
+      mealType?: 'breakfast' | 'lunch' | 'dinner' | 'snacks';
+      recipeId?: string | null;
+      calories?: number;
+      protein?: number;
+      carbs?: number;
+      fat?: number;
+      salt?: number | null;
+      sugar?: number | null;
+      fiber?: number | null;
+      saturatedFat?: number | null;
+    },
+  ): Promise<void> {
+    this.mutating.set(true);
+    this.error.set(null);
+    try {
+      const data = await this.api.updateMeal(id, meal);
+      if (data) {
+        this.healthData.set(data);
+      }
+      await this.loadMealsForSelectedDate();
+      this.markDataFresh();
+    } catch (e: any) {
+      console.error('Failed to update meal', e);
+      this.error.set(e?.message ?? 'Mahlzeit konnte nicht aktualisiert werden');
+      throw e;
+    } finally {
+      this.mutating.set(false);
+    }
+  }
+
   async loadMeals(
     date?: string,
     mealType?: 'breakfast' | 'lunch' | 'dinner' | 'snacks',

@@ -47,7 +47,10 @@
               ></Label>
             }
             @for (item of meal.items; track item.id) {
-              <FlexboxLayout class="justify-between">
+              <FlexboxLayout
+                class="justify-between"
+                (longPress)="onMealLongPress(item)"
+              >
                 <Label class="text-xs text-gray-500" [text]="item.name"></Label>
                 <Label
                   class="text-xs text-gray-400"

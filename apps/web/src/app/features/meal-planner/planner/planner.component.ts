@@ -39,6 +39,8 @@ import { LeftOverModalComponent } from '../../../shared/ui/modals/left-over-moda
 import { ProUpgradeModalComponent } from '../../../shared/ui/modals/pro-upgrade-modal/pro-upgrade-modal.component';
 import { RecipeDetailModalComponent } from '../../../shared/ui/modals/recipe-detail-modal/recipe-detail-modal.component';
 import { RecipeTransformModalComponent } from '../../../shared/ui/modals/recipe-transform-modal/recipe-transform-modal.component';
+import { RecipeTrackModalComponent } from '../../../shared/ui/modals/recipe-track-modal/recipe-track-modal.component';
+import { SnackbarService } from '../../../shared/ui/snackbar/snackbar.service';
 
 type ActiveTab = 'current' | 'shopping-list' | 'history';
 type MealField = Exclude<keyof DailyPlan, 'day'>;
@@ -64,6 +66,7 @@ const MEAL_FIELDS: MealField[] = [
     LoadingSpinnerComponent,
     RecipeDetailModalComponent,
     RecipeTransformModalComponent,
+    RecipeTrackModalComponent,
     LeftOverModalComponent,
     ProUpgradeModalComponent,
     DeleteConfirmModalComponent,
@@ -76,6 +79,7 @@ export class PlannerComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly planApi = inject(PlanApiService);
   private readonly cookbookApi = inject(CookbookApiService);
+  private readonly snackbar = inject(SnackbarService);
 
   // State
   isLoading = signal(false);
@@ -86,6 +90,8 @@ export class PlannerComponent implements OnInit {
   selectedRecipe = signal<Recipe | null>(null);
   isTransformModalOpen = signal(false);
   recipeToTransform = signal<Recipe | null>(null);
+  isTrackModalOpen = signal(false);
+  recipeToTrack = signal<Recipe | null>(null);
   isLeftoverModalOpen = signal(false);
   isProUpgradeModalOpen = signal(false);
   isDeletePlanModalOpen = signal(false);
@@ -309,6 +315,19 @@ export class PlannerComponent implements OnInit {
     this.isTransformModalOpen.set(true);
   }
 
+  handleTrackRecipe(recipe: Recipe): void {
+    this.isRecipeModalOpen.set(false);
+    setTimeout(() => {
+      this.recipeToTrack.set(this.getEnrichedRecipe(recipe));
+      this.isTrackModalOpen.set(true);
+    }, 120);
+  }
+
+  handleRequestAddNutrition(recipe: Recipe): void {
+    this.isRecipeModalOpen.set(false);
+    setTimeout(() => this.handleOpenTransformModal(recipe), 150);
+  }
+
   handleCloseRecipeModal(): void {
     this.isRecipeModalOpen.set(false);
     setTimeout(() => this.selectedRecipe.set(null), 200);
@@ -317,6 +336,16 @@ export class PlannerComponent implements OnInit {
   handleCloseTransformModal(): void {
     this.isTransformModalOpen.set(false);
     setTimeout(() => this.recipeToTransform.set(null), 200);
+  }
+
+  handleCloseTrackModal(): void {
+    this.isTrackModalOpen.set(false);
+    setTimeout(() => this.recipeToTrack.set(null), 200);
+  }
+
+  handleRecipeTracked(): void {
+    this.handleCloseTrackModal();
+    this.snackbar.success('Rezept wurde zum Ernährungstagebuch übernommen.');
   }
 
   openLeftoverModal(): void {

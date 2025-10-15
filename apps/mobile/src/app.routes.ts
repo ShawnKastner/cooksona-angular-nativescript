@@ -219,6 +219,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'tracking-recipe/:id',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import(
+        './features/planner-page/recipe-track-sheet/recipe-track-sheet.component'
+      ).then((m) => m.RecipeTrackSheetComponent),
+  },
+  {
     path: 'food-detail/:id',
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>

@@ -81,6 +81,8 @@
   (close)="handleCloseDetailModal()"
   (toggleFavorite)="handleToggleFavoriteInModal($event)"
   (openTransform)="handleOpenTransformModal($event)"
+  (trackRecipe)="handleTrackRecipe($event)"
+  (requestAddNutrition)="handleRequestAddNutrition($event)"
 ></app-recipe-detail-modal>
 
 <app-recipe-transform-modal
@@ -114,3 +116,11 @@
   (close)="closeAddToCollection()"
   (save)="handleSaveCollections($event)"
 ></app-add-to-collection-modal>
+
+<app-recipe-track-modal
+  [open]="isTrackModalOpen()"
+  [recipe]="recipeToTrack()"
+  (close)="handleCloseTrackModal()"
+  (tracked)="handleRecipeTracked()"
+  (updated)="handleRecipeTracked()"
+></app-recipe-track-modal>

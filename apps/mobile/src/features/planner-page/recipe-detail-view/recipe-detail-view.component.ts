@@ -18,6 +18,8 @@ import {
   Shuffle,
   Users,
   Wand2,
+  ClipboardCheck,
+  Info,
 } from '@cooksona/constants/icons';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import { Recipe } from '@cooksona/models';
@@ -26,6 +28,7 @@ import { PlannerStore } from '../planner.store';
 import { DailyPlan } from '@cooksona/models';
 import { CookbookStore } from '../../cookbook-page/cookbook.store';
 import { Dialogs } from '@nativescript/core';
+import { getNutritionTotals } from '@cooksona/models';
 
 @Component({
   selector: 'ns-recipe-detail-view',
@@ -49,6 +52,10 @@ export class RecipeDetailViewComponent {
   private readonly dayName = signal<string | null>(null);
   private readonly mealKey = signal<string | null>(null);
   private readonly source = signal<'mealPlan' | 'cookbook'>('mealPlan');
+  readonly baseNutrition = computed(() =>
+    getNutritionTotals(this.displayRecipe()?.nutrition),
+  );
+  readonly canTrackRecipe = computed(() => this.baseNutrition() !== null);
   readonly nutritionItems = computed<
     ReadonlyArray<{ label: string; value: string }>
   >(() => {
@@ -111,6 +118,8 @@ export class RecipeDetailViewComponent {
     Shuffle,
     Wand2,
     Users,
+    ClipboardCheck,
+    Info,
   } as const;
 
   constructor() {
@@ -255,6 +264,16 @@ export class RecipeDetailViewComponent {
     if (recipe) {
       this.router.navigate(['/transform-recipe', recipe.id], {
         state: { recipe, source: this.source() },
+      });
+    }
+  }
+
+  navigateToTrackRecipe(): void {
+    const recipe = this.displayRecipe();
+    if (recipe) {
+      this.router.navigate(['/tracking-recipe', recipe.id], {
+        state: { recipe },
+        replaceUrl: false,
       });
     }
   }
