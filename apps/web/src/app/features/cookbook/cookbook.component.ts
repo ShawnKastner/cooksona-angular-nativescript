@@ -21,6 +21,7 @@ import { AddToCollectionModalComponent } from '../../shared/ui/modals/add-collec
 import { CollectionSidebarComponent } from './collection-sidebar/collection-sidebar.component';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading-spinner.component';
+import { RecipeTrackModalComponent } from '../../shared/ui/modals/recipe-track-modal/recipe-track-modal.component';
 
 @Component({
   selector: 'app-cookbook-page',
@@ -35,6 +36,7 @@ import { LoadingSpinnerComponent } from '../../shared/ui/loading-spinner/loading
     AddToCollectionModalComponent,
     CollectionSidebarComponent,
     LoadingSpinnerComponent,
+    RecipeTrackModalComponent,
   ],
   templateUrl: './cookbook.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,6 +59,8 @@ export class CookbookComponent implements OnInit {
   deleteModalOpen = signal(false);
   recipePendingDelete = signal<Recipe | null>(null);
   recipeToCategorize = signal<Recipe | null>(null);
+  recipeToTrack = signal<Recipe | null>(null);
+  isTrackModalOpen = signal(false);
 
   recipeCollections = signal<Record<string, string[]>>({});
   selectedCollectionId = signal<string>('all');
@@ -109,6 +113,19 @@ export class CookbookComponent implements OnInit {
     this.selectedRecipe.set(null);
   }
 
+  handleTrackRecipe(recipe: Recipe): void {
+    this.selectedRecipe.set(null);
+    setTimeout(() => {
+      this.recipeToTrack.set(this.enrichRecipeWithFallback(recipe));
+      this.isTrackModalOpen.set(true);
+    }, 120);
+  }
+
+  handleRequestAddNutrition(recipe: Recipe): void {
+    this.selectedRecipe.set(null);
+    setTimeout(() => this.handleOpenTransformModal(recipe), 150);
+  }
+
   async handleToggleFavoriteInModal(recipe: Recipe): Promise<void> {
     const success = await this.removeRecipe(recipe.id);
     if (success) {
@@ -145,6 +162,16 @@ export class CookbookComponent implements OnInit {
   handleCloseTransformModal(): void {
     this.isTransformModalOpen.set(false);
     setTimeout(() => this.recipeToTransform.set(null), 300);
+  }
+
+  handleCloseTrackModal(): void {
+    this.isTrackModalOpen.set(false);
+    setTimeout(() => this.recipeToTrack.set(null), 200);
+  }
+
+  handleRecipeTracked(): void {
+    this.handleCloseTrackModal();
+    this.snackbar.success('Rezept wurde erfolgreich getrackt.');
   }
 
   async handleTransformComplete(ev: {

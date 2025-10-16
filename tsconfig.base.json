@@ -22,7 +22,9 @@
       "@cooksona/models/*": ["libs/models/*"],
       "@cooksona/constants/*": ["libs/constants/index.ts"],
       "@cooksona/health": ["libs/health/index.ts"],
-      "@cooksona/health/*": ["libs/health/*"]
+      "@cooksona/health/*": ["libs/health/*"],
+      "@cooksona/analytics": ["libs/analytics/index.ts"],
+      "@cooksona/analytics/*": ["libs/analytics/*"]
     },
     "baseUrl": ".",
     "rootDir": "."

@@ -16,9 +16,12 @@ import {
   Users,
   Printer,
   X,
+  ClipboardCheck,
+  Info,
 } from '@cooksona/constants/icons';
 import { AuthService } from '@cooksona/auth';
 import { FocusTrapDirective } from '../../focus-trap.directive';
+import { getNutritionTotals } from '@cooksona/models';
 
 @Component({
   selector: 'app-recipe-detail-modal',
@@ -34,8 +37,19 @@ export class RecipeDetailModalComponent {
   @Output() close = new EventEmitter<void>();
   @Output() toggleFavorite = new EventEmitter<Recipe>();
   @Output() openTransform = new EventEmitter<Recipe>();
+  @Output() trackRecipe = new EventEmitter<Recipe>();
+  @Output() requestAddNutrition = new EventEmitter<Recipe>();
 
-  readonly icons = { BookText, Heart, Wand2, Users, Printer, X } as const;
+  readonly icons = {
+    BookText,
+    Heart,
+    Wand2,
+    Users,
+    Printer,
+    X,
+    ClipboardCheck,
+    Info,
+  } as const;
 
   constructor(private readonly auth: AuthService) {}
 
@@ -47,10 +61,32 @@ export class RecipeDetailModalComponent {
     }
   }
 
+  get canTrackRecipe(): boolean {
+    const recipe = this.recipe;
+    if (!recipe) return false;
+    return getNutritionTotals(recipe.nutrition) !== null;
+  }
+
   handleTransformClick(): void {
     const r = this.recipe;
     this.close.emit();
     if (r) setTimeout(() => this.openTransform.emit(r), 150);
+  }
+
+  handleTrackClick(): void {
+    const recipe = this.recipe;
+    this.close.emit();
+    if (recipe && this.canTrackRecipe) {
+      setTimeout(() => this.trackRecipe.emit(recipe), 120);
+    }
+  }
+
+  handleRequestAddNutrition(): void {
+    const recipe = this.recipe;
+    this.close.emit();
+    if (recipe) {
+      setTimeout(() => this.requestAddNutrition.emit(recipe), 150);
+    }
   }
 
   handlePrint(): void {

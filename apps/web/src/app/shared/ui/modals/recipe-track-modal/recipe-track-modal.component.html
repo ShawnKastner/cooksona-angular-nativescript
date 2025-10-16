@@ -1,0 +1,245 @@
+@if (open && recipe) {
+  <div
+    class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'recipe-track-title'"
+    (click)="handleClose()"
+  >
+    <div
+      class="bg-base-100 rounded-2xl shadow-soft-xl w-full max-w-2xl border border-base-200 overflow-hidden flex flex-col"
+      (click)="$event.stopPropagation()"
+      appFocusTrap
+    >
+      <header
+        class="px-6 py-5 border-b border-base-200 flex items-start justify-between gap-4"
+      >
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-primary">
+            {{ isEditMode ? 'Tracking bearbeiten' : 'Rezept tracken' }}
+          </p>
+          <h2
+            id="recipe-track-title"
+            class="text-2xl font-serif font-bold text-neutral"
+          >
+            {{ recipe.name }}
+          </h2>
+          <p class="text-sm text-gray-500 mt-1">
+            @if (isEditMode) {
+              <span
+                >Passe Portionsanzahl und Zeitpunkt an. Änderungen werden
+                sofort übernommen.</span
+              >
+            } @else {
+              <span
+                >Nährwerte pro Portion werden mit der gewählten
+                Portionsanzahl multipliziert.</span
+              >
+            }
+          </p>
+        </div>
+        <button
+          type="button"
+          class="p-2 rounded-full text-gray-400 hover:bg-base-200 hover:text-neutral transition-colors"
+          (click)="handleClose()"
+        >
+          <span [svgInject]="icons.X" class="w-5 h-5"></span>
+        </button>
+      </header>
+
+      <div class="p-6 space-y-6 overflow-y-auto">
+        @if (!hasNutrition()) {
+          <div
+            class="border border-amber-200 bg-amber-50 text-amber-900 rounded-xl p-4 text-sm"
+          >
+            <p class="font-semibold">
+              Für dieses Rezept liegen keine Nährwerte pro Portion vor.
+            </p>
+            <p class="mt-2">
+              Ergänze zunächst die Angaben und starte danach erneut den
+              Tracking-Vorgang.
+            </p>
+          </div>
+        } @else {
+          <section class="grid gap-5 md:grid-cols-[1.1fr,0.9fr]">
+            <div class="space-y-5">
+              <div>
+                <label class="block text-sm font-semibold text-neutral mb-2">
+                  Portionsanzahl
+                </label>
+                <div
+                  class="flex items-center gap-3 bg-base-100 border border-base-200 rounded-xl p-3"
+                >
+                  <button
+                    type="button"
+                    class="w-10 h-10 rounded-lg border border-base-200 flex items-center justify-center text-neutral hover:bg-base-200 transition-colors"
+                    (click)="adjustPortion(-0.25)"
+                    [disabled]="loading()"
+                  >
+                    <span [svgInject]="icons.Minus" class="w-4 h-4"></span>
+                  </button>
+                  <input
+                    type="number"
+                    min="0.25"
+                    max="10"
+                    step="0.25"
+                    class="flex-1 text-center text-xl font-semibold bg-transparent focus:outline-none"
+                    [value]="portion()"
+                    (input)="onPortionInput($event)"
+                    [disabled]="loading()"
+                    aria-label="Portionsanzahl"
+                  />
+                  <button
+                    type="button"
+                    class="w-10 h-10 rounded-lg border border-base-200 flex items-center justify-center text-neutral hover:bg-base-200 transition-colors"
+                    (click)="adjustPortion(0.25)"
+                    [disabled]="loading()"
+                  >
+                    <span [svgInject]="icons.Plus" class="w-4 h-4"></span>
+                  </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">
+                  Bereich 0,25 – 10 in 0,25er-Schritten.
+                </p>
+              </div>
+
+              <div class="grid sm:grid-cols-2 gap-4">
+                <div
+                  class="p-4 rounded-xl border border-base-200 bg-base-100/70"
+                >
+                  <p class="text-xs uppercase text-gray-400">Kalorien</p>
+                  <p class="text-2xl font-bold text-neutral mt-1">
+                    {{ displayCalories() }}
+                  </p>
+                </div>
+                <div
+                  class="p-4 rounded-xl border border-base-200 bg-base-100/70"
+                >
+                  <p class="text-xs uppercase text-gray-400">Protein</p>
+                  <p class="text-2xl font-bold text-neutral mt-1">
+                    {{ displayMacro('protein') }}
+                  </p>
+                </div>
+                <div
+                  class="p-4 rounded-xl border border-base-200 bg-base-100/70"
+                >
+                  <p class="text-xs uppercase text-gray-400">Kohlenhydrate</p>
+                  <p class="text-2xl font-bold text-neutral mt-1">
+                    {{ displayMacro('carbs') }}
+                  </p>
+                </div>
+                <div
+                  class="p-4 rounded-xl border border-base-200 bg-base-100/70"
+                >
+                  <p class="text-xs uppercase text-gray-400">Fett</p>
+                  <p class="text-2xl font-bold text-neutral mt-1">
+                    {{ displayMacro('fat') }}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-5">
+              <div>
+                <label class="block text-sm font-semibold text-neutral mb-2">
+                  Mahlzeit
+                </label>
+                <div class="space-y-3">
+                  @for (meal of mealTypes; track meal.key) {
+                    <button
+                      type="button"
+                      class="w-full border rounded-xl px-4 py-3 text-left transition-colors"
+                      [class.border-primary]="mealType() === meal.key"
+                      [class.bg-primary/10]="mealType() === meal.key"
+                      (click)="onMealTypeChange(meal.key)"
+                      [disabled]="loading()"
+                    >
+                      <p class="font-semibold text-neutral text-sm">
+                        {{ meal.label }}
+                      </p>
+                      <p class="text-xs text-gray-500 mt-0.5">
+                        {{ meal.description }}
+                      </p>
+                    </button>
+                  }
+                </div>
+              </div>
+
+            <!--   <div class="grid grid-cols-2 gap-3">
+                <label class="flex flex-col gap-2 text-sm text-neutral">
+                  Datum
+                  <div class="relative">
+                    <span
+                      class="absolute inset-y-0 left-3 flex items-center text-gray-400"
+                    >
+                      <span [svgInject]="icons.Calendar" class="w-4 h-4"></span>
+                    </span>
+                    <input
+                      type="date"
+                      class="w-full border border-base-200 rounded-lg py-2 pl-9 pr-3 bg-white focus:outline-none focus:ring-2 focus:ring-primary/60"
+                      [value]="selectedDate()"
+                      (change)="onDateChange($event)"
+                      [disabled]="loading()"
+                    />
+                  </div>
+                </label>
+                <label class="flex flex-col gap-2 text-sm text-neutral">
+                  Uhrzeit
+                  <div class="relative">
+                    <span
+                      class="absolute inset-y-0 left-3 flex items-center text-gray-400"
+                    >
+                      <span [svgInject]="icons.Clock" class="w-4 h-4"></span>
+                    </span>
+                    <input
+                      type="time"
+                      class="w-full border border-base-200 rounded-lg py-2 pl-9 pr-3 bg-white focus:outline-none focus:ring-2 focus:ring-primary/60"
+                      [value]="selectedTime()"
+                      (change)="onTimeChange($event)"
+                      [disabled]="loading()"
+                    />
+                  </div>
+                </label>
+              </div> -->
+            </div>
+          </section>
+        }
+
+        @if (error()) {
+          <div
+            class="border border-error/40 bg-error/10 text-error rounded-xl p-3 text-sm"
+          >
+            {{ error() }}
+          </div>
+        }
+      </div>
+
+      <footer
+        class="px-6 py-4 border-t border-base-200 flex items-center justify-end gap-3 bg-base-50"
+      >
+        <button
+          type="button"
+          class="px-4 py-2 text-sm font-semibold text-neutral hover:text-primary transition-colors"
+          (click)="handleClose()"
+          [disabled]="loading()"
+        >
+          Abbrechen
+        </button>
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-primary hover:bg-primary-focus transition-colors disabled:opacity-60"
+          (click)="save()"
+          [disabled]="loading() || !hasNutrition()"
+        >
+          @if (loading()) {
+            <span class="w-4 h-4 border-2 border-white/60 border-t-transparent rounded-full animate-spin"></span>
+            {{ isEditMode ? 'Aktualisiert …' : 'Speichert …' }}
+          } @else {
+            <span [svgInject]="icons.Check" class="w-4 h-4"></span>
+            {{ isEditMode ? 'Aktualisieren' : 'Speichern' }}
+          }
+        </button>
+      </footer>
+    </div>
+  </div>
+}

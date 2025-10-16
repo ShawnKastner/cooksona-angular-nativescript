@@ -9,8 +9,10 @@ import { HealthStore } from '@cooksona/health';
 import type { ActivityType, UserProfile } from '@cooksona/models/health.models';
 import { TrackActivityModalComponent } from './track-activity-modal/track-activity-modal.component';
 import { TrackMealModalComponent } from './track-meal-modal/track-meal-modal.component';
+import { RecipeTrackModalComponent } from '../../shared/ui/modals/recipe-track-modal/recipe-track-modal.component';
 import { getDateString } from '@cooksona/models';
 import type { ActivityEntry, MealEntry, MealType } from '@cooksona/api';
+import type { Recipe } from '@cooksona/models/recipe.models';
 import { SnackbarService } from '../../shared/ui/snackbar/snackbar.service';
 import { ACTIVITY_OPTIONS } from '@cooksona/constants/activities';
 
@@ -26,6 +28,7 @@ import { ACTIVITY_OPTIONS } from '@cooksona/constants/activities';
     HealthOnboardingModalComponent,
     TrackActivityModalComponent,
     TrackMealModalComponent,
+    RecipeTrackModalComponent,
   ],
 })
 export class HealthComponent {
@@ -46,6 +49,9 @@ export class HealthComponent {
   protected readonly activities = this.store.activities;
   protected readonly hasLoadedOnce = this.store.hasLoadedOnce;
   protected readonly error = this.store.error;
+  protected readonly selectedMealForEdit = signal<MealEntry | null>(null);
+  protected readonly recipeForEdit = signal<Recipe | null>(null);
+  protected readonly isRecipeTrackEditOpen = signal(false);
 
   protected readonly selectedDateString = computed(() =>
     getDateString(this.selectedDate()),
@@ -260,6 +266,38 @@ export class HealthComponent {
     } catch (e) {
       // store.error effect handles messaging
     }
+  }
+
+  handleEditMeal(meal: MealEntry): void {
+    this.selectedMealForEdit.set(meal);
+    this.recipeForEdit.set(this.buildRecipeFromMeal(meal));
+    this.isRecipeTrackEditOpen.set(true);
+  }
+
+  handleCloseRecipeTrackEdit(): void {
+    this.isRecipeTrackEditOpen.set(false);
+    setTimeout(() => {
+      this.selectedMealForEdit.set(null);
+      this.recipeForEdit.set(null);
+    }, 200);
+  }
+
+  handleRecipeTrackEditSaved(): void {
+    this.handleCloseRecipeTrackEdit();
+  }
+
+  private buildRecipeFromMeal(meal: MealEntry): Recipe {
+    return {
+      id: meal.recipeId ?? meal.id,
+      name: meal.name,
+      ingredients: [],
+      nutrition: {
+        calories: meal.calories,
+        protein: meal.protein,
+        carbs: meal.carbs,
+        fat: meal.fat,
+      },
+    };
   }
 
   async handleDeleteActivity(activity: ActivityEntry): Promise<void> {

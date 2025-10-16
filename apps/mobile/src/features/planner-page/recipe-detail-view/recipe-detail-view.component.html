@@ -20,6 +20,24 @@
         ></svg:SVGImage>
       </FlexboxLayout>
     </ActionItem>
+    <ActionItem>
+      @if (canTrackRecipe()) {
+        <FlexboxLayout
+          (tap)="navigateToTrackRecipe()"
+          class="items-center justify-center p-2 bg-transparent"
+        >
+          <svg:SVGImage
+            [src]="icons.ClipboardCheck | svgToDataUri: '#6B7280'"
+            class="w-6 h-6"
+          ></svg:SVGImage>
+          <Label
+            class="font-bold"
+            style="color: #6b7280"
+            text="Tracken"
+          ></Label>
+        </FlexboxLayout>
+      }
+    </ActionItem>
     <ActionItem
       ios.position="right"
       android.position="actionBar"
@@ -140,39 +158,64 @@
       </StackLayout>
     </StackLayout>
   </ScrollView>
-  <FlexboxLayout
+  <StackLayout
     row="2"
-    justifyContent="space-around"
     class="p-4 border-t border-base-200 flex-shrink-0"
-    [ngClass]="showSwapButton() ? 'grid grid-cols-2 space-x-3' : ''"
+    horizontalAlignment="stretch"
   >
-    @if (showSwapButton()) {
+    @if (!canTrackRecipe()) {
       <FlexboxLayout
-        (tap)="swappingMeal()"
-        flexDirection="row"
-        justifyContent="center"
+        class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-3"
         alignItems="center"
-        class="flex w-full items-center justify-center gap-2 bg-base-200 text-neutral font-bold py-3 rounded-xl mr-2"
       >
         <svg:SVGImage
-          [src]="icons.Shuffle | svgToDataUri"
+          [src]="icons.Info | svgToDataUri: '#B45309'"
           class="w-5 h-5 mr-2"
         ></svg:SVGImage>
-        <Label text="Tauschen"></Label>
+        <Label
+          class="text-xs text-amber-800"
+          textWrap="true"
+          text="Für dieses Rezept fehlen Nährwerte pro Portion. Ergänze sie, um das Tracking zu aktivieren."
+        ></Label>
       </FlexboxLayout>
     }
-    <FlexboxLayout
-      (tap)="navigateToTransformRecipe()"
-      flexDirection="row"
-      justifyContent="center"
-      alignItems="center"
-      class="flex w-full items-center justify-center gap-2 bg-secondary/20 text-secondary-focus font-bold py-3 rounded-xl"
-    >
-      <svg:SVGImage
-        [src]="icons.Wand2 | svgToDataUri: '#CA8A04'"
-        class="w-5 h-5 mr-2"
-      ></svg:SVGImage>
-      <Label text="Anpassen"></Label>
+    <FlexboxLayout justifyContent="space-between" alignItems="center">
+      @if (showSwapButton()) {
+        <FlexboxLayout
+          (tap)="swappingMeal()"
+          class="flex-1 mr-2 items-center justify-center bg-base-200 text-neutral font-bold py-3 rounded-xl"
+        >
+          <svg:SVGImage
+            [src]="icons.Shuffle | svgToDataUri"
+            class="w-5 h-5 mr-2"
+          ></svg:SVGImage>
+          <Label text="Tauschen"></Label>
+        </FlexboxLayout>
+      }
+      <!-- @if (canTrackRecipe()) {
+        <FlexboxLayout
+          (tap)="navigateToTrackRecipe()"
+          class="flex-1 mr-2 items-center justify-center bg-primary text-white font-bold py-3 rounded-xl"
+        >
+          <svg:SVGImage
+            [src]="icons.ClipboardCheck | svgToDataUri: '#FFFFFF'"
+            class="w-5 h-5 mr-2"
+          ></svg:SVGImage>
+          <Label text="Tracken"></Label>
+        </FlexboxLayout>
+      } -->
+      <FlexboxLayout
+        (tap)="navigateToTransformRecipe()"
+        class="flex-1 items-center justify-center bg-secondary/20 text-secondary-focus font-bold py-3 rounded-xl"
+      >
+        <svg:SVGImage
+          [src]="icons.Wand2 | svgToDataUri: '#CA8A04'"
+          class="w-5 h-5 mr-2"
+        ></svg:SVGImage>
+        <Label
+          [text]="canTrackRecipe() ? 'Anpassen' : 'Nährwerte ergänzen'"
+        ></Label>
+      </FlexboxLayout>
     </FlexboxLayout>
-  </FlexboxLayout>
+  </StackLayout>
 </GridLayout>
