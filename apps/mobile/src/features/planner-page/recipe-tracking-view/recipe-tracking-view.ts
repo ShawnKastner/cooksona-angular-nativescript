@@ -56,7 +56,7 @@ const MEAL_TYPES: Array<{ key: MealType; label: string; description: string }> =
   selector: 'ns-recipe-track-sheet',
   standalone: true,
   imports: [NativeScriptCommonModule],
-  templateUrl: './recipe-track-sheet.component.html',
+  templateUrl: './recipe-tracking-view.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   schemas: [NO_ERRORS_SCHEMA],
   styles: [
@@ -81,7 +81,7 @@ const MEAL_TYPES: Array<{ key: MealType; label: string; description: string }> =
     `,
   ],
 })
-export class RecipeTrackSheetComponent {
+export class RecipeTrackingView {
   private readonly routerExtensions = inject(RouterExtensions);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
