@@ -52,9 +52,9 @@ export function multiplyNutrition(
 ): NutritionTotals {
   return {
     calories: Math.round(base.calories * multiplier),
-    protein: Math.round(base.protein * multiplier),
-    carbs: Math.round(base.carbs * multiplier),
-    fat: Math.round(base.fat * multiplier),
+    protein: base.protein * multiplier,
+    carbs: base.carbs * multiplier,
+    fat: base.fat * multiplier,
   };
 }
 
