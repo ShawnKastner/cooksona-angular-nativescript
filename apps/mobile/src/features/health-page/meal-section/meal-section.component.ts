@@ -21,6 +21,7 @@ import {
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
 import type { Recipe } from '@cooksona/models';
 import { action, alert } from '@nativescript/core/ui/dialogs';
+import { showCustomConfirm } from '../../../utils/custom-confirm';
 import { Router } from '@angular/router';
 
 type MealTypeKey = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
@@ -46,6 +47,7 @@ export class MealSectionComponent {
   private readonly router = inject(Router);
 
   protected expandedMeal = signal<string | null>(null);
+  protected isActionSheetOpen = signal(false);
   protected readonly loading = this.store.loading;
   protected readonly meals = this.store.meals;
 
@@ -111,6 +113,11 @@ export class MealSectionComponent {
 
   protected async onMealLongPress(meal: MealEntry): Promise<void> {
     try {
+      // Prevent multiple action sheets
+      if (this.isActionSheetOpen()) return;
+
+      this.isActionSheetOpen.set(true);
+
       const result = await action({
         title: meal.name,
         cancelButtonText: 'Abbrechen',
@@ -118,12 +125,42 @@ export class MealSectionComponent {
       });
 
       if (result === 'Bearbeiten') {
-        await this.openEditMeal(meal);
+        // Ensure the native action sheet is fully closed before navigating
+        setTimeout(() => {
+          this.openEditMeal(meal)
+            .catch((err: any) => {
+              console.error('[MealSection] open edit meal failed', err);
+              alert({
+                title: 'Fehler',
+                message: 'Navigation fehlgeschlagen.',
+                okButtonText: 'OK',
+              });
+            })
+            .finally(() => {
+              setTimeout(() => {
+                this.isActionSheetOpen.set(false);
+              }, 50);
+            });
+        }, 100);
       } else if (result === 'Löschen') {
-        await this.deleteMeal(meal);
+        // Ensure the native action sheet is fully closed before showing confirm
+        setTimeout(async () => {
+          await this.deleteMealWithConfirm(meal);
+          setTimeout(() => {
+            this.isActionSheetOpen.set(false);
+          }, 50);
+        }, 100);
+      } else {
+        // Cancelled
+        setTimeout(() => {
+          this.isActionSheetOpen.set(false);
+        }, 300);
       }
     } catch (error) {
       console.error('[MealSection] long press action failed', error);
+      setTimeout(() => {
+        this.isActionSheetOpen.set(false);
+      }, 300);
     }
   }
 
@@ -153,8 +190,18 @@ export class MealSectionComponent {
     }
   }
 
-  private async deleteMeal(meal: MealEntry): Promise<void> {
+  private async deleteMealWithConfirm(meal: MealEntry): Promise<void> {
     try {
+      const confirmed = await showCustomConfirm({
+        title: 'Mahlzeit löschen',
+        message: `Möchtest du "${meal.name}" wirklich löschen?`,
+        okButtonText: 'Löschen',
+        cancelButtonText: 'Abbrechen',
+        okButtonColor: '#EF4444',
+      });
+
+      if (!confirmed) return;
+
       await this.store.deleteMeal(meal.id);
     } catch (error) {
       console.error('[MealSection] delete meal failed', error);
