@@ -271,11 +271,6 @@ export class RecipeTrackSheetComponent {
     try {
       if (this.mealEntry) {
         await this.healthStore.updateMeal(this.mealEntry.id, payload);
-        /* await Dialogs.alert({
-          title: 'Aktualisiert',
-          message: 'Der Tracking-Eintrag wurde aktualisiert.',
-          okButtonText: 'OK',
-        }); */
         this.analytics.trackRecipeTracking({
           action: 'update',
           mealType: this.mealType(),
@@ -284,11 +279,6 @@ export class RecipeTrackSheetComponent {
         });
       } else {
         await this.healthStore.createMeal(payload);
-        /*  await Dialogs.alert({
-          title: 'Erfolgreich gespeichert',
-          message: 'Das Rezept wurde deinem Ernährungstagebuch hinzugefügt.',
-          okButtonText: 'OK',
-        }); */
         this.analytics.trackRecipeTracking({
           action: 'create',
           mealType: this.mealType(),
