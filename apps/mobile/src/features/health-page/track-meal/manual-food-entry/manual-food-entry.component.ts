@@ -100,21 +100,34 @@ export class ManualFoodEntryComponent implements OnInit, OnDestroy {
 
     try {
       const formValue = this.manualFoodForm.value;
+      const toNumber = (value: unknown, fallback = 0): number => {
+        if (typeof value === 'number' && Number.isFinite(value)) return value;
+        if (typeof value === 'string') {
+          const parsed = Number.parseFloat(value);
+          return Number.isFinite(parsed) ? parsed : fallback;
+        }
+        return fallback;
+      };
+      const toNullableNumber = (value: unknown): number | null => {
+        if (value === null || value === undefined || value === '') {
+          return null;
+        }
+        const parsed = toNumber(value, Number.NaN);
+        return Number.isFinite(parsed) ? parsed : null;
+      };
 
       await this.healthStore.createMeal({
         name: formValue.name,
         sourceType: 'manual',
         mealType: this.mealType,
-        calories: parseInt(formValue.calories, 10),
-        protein: parseInt(formValue.protein, 10),
-        carbs: parseInt(formValue.carbs, 10),
-        fat: parseInt(formValue.fat, 10),
-        salt: formValue.salt ? parseInt(formValue.salt, 10) : null,
-        sugar: formValue.sugar ? parseInt(formValue.sugar, 10) : null,
-        fiber: formValue.fiber ? parseInt(formValue.fiber, 10) : null,
-        saturatedFat: formValue.saturatedFat
-          ? parseInt(formValue.saturatedFat, 10)
-          : null,
+        calories: Math.max(0, toNumber(formValue.calories)),
+        protein: Math.max(0, toNumber(formValue.protein)),
+        carbs: Math.max(0, toNumber(formValue.carbs)),
+        fat: Math.max(0, toNumber(formValue.fat)),
+        salt: toNullableNumber(formValue.salt),
+        sugar: toNullableNumber(formValue.sugar),
+        fiber: toNullableNumber(formValue.fiber),
+        saturatedFat: toNullableNumber(formValue.saturatedFat),
         date: getDateString(this.healthStore.selectedDate()),
       });
 

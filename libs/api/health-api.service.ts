@@ -63,6 +63,7 @@ export type CreateMealEntryDto = {
   sugar?: number | null;
   fiber?: number | null;
   saturatedFat?: number | null;
+  portions?: number | null;
 };
 
 export type UpdateMealEntryDto = {
@@ -79,6 +80,7 @@ export type UpdateMealEntryDto = {
   sugar?: number | null;
   fiber?: number | null;
   saturatedFat?: number | null;
+  portions?: number | null;
 };
 
 export type ListMealsDto = {
@@ -102,6 +104,7 @@ export type MealEntry = {
   sugar?: number | null;
   fiber?: number | null;
   saturatedFat?: number | null;
+  portions?: number | null;
   createdAt: string;
   updatedAt: string;
 };
