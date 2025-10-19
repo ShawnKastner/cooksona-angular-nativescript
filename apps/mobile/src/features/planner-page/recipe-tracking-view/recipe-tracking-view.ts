@@ -266,6 +266,7 @@ export class RecipeTrackingView {
       protein: totals.protein,
       carbs: totals.carbs,
       fat: totals.fat,
+      portions: portion,
     };
 
     try {
@@ -375,10 +376,7 @@ export class RecipeTrackingView {
         this.mealType.set(this.mealEntry.mealType);
       }
       if (base) {
-        const portion = clampPortion(
-          this.derivePortionFromTotals(this.mealEntry, base),
-        );
-        this.portion.set(portion);
+        this.portion.set(this.getInitialPortion(this.mealEntry, base));
       }
       this.selectedDateTime.set(this.parseDateFromMeal(this.mealEntry));
     } else {
@@ -392,6 +390,9 @@ export class RecipeTrackingView {
     meal: MealEntry,
     base: NutritionTotals,
   ): number {
+    if (Number.isFinite(meal.portions) && (meal.portions ?? 0) > 0) {
+      return meal.portions as number;
+    }
     if (base.calories > 0) {
       return meal.calories / base.calories;
     }
@@ -452,5 +453,18 @@ export class RecipeTrackingView {
       return 'dinner';
     }
     return 'snacks';
+  }
+
+  private getInitialPortion(
+    meal: MealEntry,
+    base: NutritionTotals | null,
+  ): number {
+    if (Number.isFinite(meal.portions) && (meal.portions ?? 0) > 0) {
+      return clampPortion(meal.portions as number);
+    }
+    if (base) {
+      return clampPortion(this.derivePortionFromTotals(meal, base));
+    }
+    return 1;
   }
 }

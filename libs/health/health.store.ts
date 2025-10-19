@@ -384,11 +384,19 @@ export class HealthStore {
     sugar?: number | null;
     fiber?: number | null;
     saturatedFat?: number | null;
+    portions?: number | null;
   }): Promise<void> {
     this.mutating.set(true);
     this.error.set(null);
     try {
-      const data = await this.api.createMeal(meal);
+      const payload = {
+        ...meal,
+        portions:
+          meal.portions !== undefined && meal.portions !== null
+            ? meal.portions
+            : 1,
+      };
+      const data = await this.api.createMeal(payload);
       if (data) {
         this.healthData.set(data);
       }
@@ -419,6 +427,7 @@ export class HealthStore {
       sugar?: number | null;
       fiber?: number | null;
       saturatedFat?: number | null;
+      portions?: number | null;
     },
   ): Promise<void> {
     this.mutating.set(true);

@@ -178,6 +178,7 @@ export class RecipeTrackModalComponent implements OnChanges {
           protein: totals.protein,
           carbs: totals.carbs,
           fat: totals.fat,
+          portions: portion,
         });
         this.snackbar.success('Tracking-Eintrag wurde aktualisiert.');
         this.updated.emit();
@@ -192,6 +193,7 @@ export class RecipeTrackModalComponent implements OnChanges {
           protein: totals.protein,
           carbs: totals.carbs,
           fat: totals.fat,
+          portions: portion,
         });
         this.snackbar.success(
           'Rezept wurde zum Ernährungstagebuch hinzugefügt.',
@@ -242,10 +244,7 @@ export class RecipeTrackModalComponent implements OnChanges {
     this.error.set(null);
     this.loading.set(false);
     if (meal) {
-      const initialPortion = base
-        ? clampPortion(this.derivePortionFromTotals(meal, base))
-        : 1;
-      this.portion.set(initialPortion);
+      this.portion.set(this.getInitialPortion(meal, base));
       this.mealType.set(meal.mealType);
       this.selectedDate.set(meal.date ?? this.getTodayDate());
       this.selectedTime.set(this.getCurrentTime());
@@ -291,6 +290,9 @@ export class RecipeTrackModalComponent implements OnChanges {
     meal: MealEntry,
     base: NutritionTotals,
   ): number {
+    if (Number.isFinite(meal.portions) && (meal.portions ?? 0) > 0) {
+      return meal.portions as number;
+    }
     if (base.calories > 0) {
       return meal.calories / base.calories;
     }
@@ -319,5 +321,18 @@ export class RecipeTrackModalComponent implements OnChanges {
       carbs: meal.carbs,
       fat: meal.fat,
     };
+  }
+
+  private getInitialPortion(
+    meal: MealEntry,
+    base: NutritionTotals | null,
+  ): number {
+    if (Number.isFinite(meal.portions) && (meal.portions ?? 0) > 0) {
+      return clampPortion(meal.portions as number);
+    }
+    if (base) {
+      return clampPortion(this.derivePortionFromTotals(meal, base));
+    }
+    return 1;
   }
 }
