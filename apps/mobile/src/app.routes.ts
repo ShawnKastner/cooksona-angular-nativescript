@@ -115,14 +115,6 @@ export const routes: Routes = [
       ).then((m) => m.NotificationsSettingsComponent),
   },
   {
-    path: 'edit-water-reminder',
-    canActivate: [mobileProtectedRouteGuard],
-    loadComponent: () =>
-      import(
-        './features/settings-page/notifications-settings/edit-water-reminder/edit-water-reminder.component'
-      ).then((m) => m.EditWaterReminderComponent),
-  },
-  {
     path: 'nutrition-settings',
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>

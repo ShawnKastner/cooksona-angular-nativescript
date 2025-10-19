@@ -11,94 +11,107 @@
 </ActionBar>
 
 <ScrollView class="h-full bg-base-100">
-  <StackLayout class="p-5 pb-10 space-y-5">
-    <!-- Description -->
-    <Label class="px-1" textWrap="true">
-      <FormattedString>
-        <Span
-          class="text-sm text-gray-500"
-          text="Verwalte deine Benachrichtigungen und Erinnerungen"
-        ></Span>
-      </FormattedString>
-    </Label>
-
-    <!-- Notifications Section -->
-    <StackLayout class="space-y-3">
-      <Label
-        class="text-sm font-semibold text-gray-500 ml-1"
-        text="Erinnerungen"
-      ></Label>
-
-      <StackLayout
-        class="bg-white rounded-2xl border border-base-200 overflow-hidden"
-      >
-        @for (
-          setting of notificationSettings;
-          track setting.label;
-          let isLast = $last
-        ) {
-          <StackLayout>
-            <FlexboxLayout class="p-4 items-center">
-              <!-- Icon -->
-              <FlexboxLayout
-                class="w-10 h-10 rounded-full items-center justify-center mr-3"
-                [ngClass]="{
-                  'bg-blue-50': setting.enabled,
-                  'bg-gray-50': !setting.enabled,
-                }"
-              >
-                <svg:SVGImage
-                  [src]="
-                    setting.icon
-                      | svgToDataUri: (setting.enabled ? '#3B82F6' : '#9CA3AF')
-                  "
-                  class="w-5 h-5"
-                />
-              </FlexboxLayout>
-
-              <!-- Label and Subtitle -->
-              <StackLayout class="flex-1" (tap)="setting.action()">
-                <Label
-                  class="text-base font-medium text-neutral"
-                  [text]="setting.label"
-                ></Label>
-                <Label
-                  class="text-sm"
-                  [ngClass]="{
-                    'text-blue-600': setting.enabled,
-                    'text-gray-500': !setting.enabled,
-                  }"
-                  [text]="setting.subtitle"
-                ></Label>
-              </StackLayout>
-
-              <!-- Toggle Switch -->
-              <Switch
-                [checked]="setting.enabled"
-                (checkedChange)="onToggleChange(setting, $any($event))"
-                class="ml-3"
-              >
-              </Switch>
-            </FlexboxLayout>
-
-            @if (!isLast) {
-              <StackLayout class="h-px bg-base-200 ml-16"></StackLayout>
-            }
-          </StackLayout>
-        }
-      </StackLayout>
-    </StackLayout>
-
-    <!-- Info Box -->
-    <StackLayout class="bg-blue-50 rounded-xl p-4 mt-4">
-      <Label textWrap="true" class="text-center">
+  <StackLayout class="p-5 pb-10 space-y-6">
+    <StackLayout class="space-y-2">
+      <Label class="text-base font-semibold text-neutral" text="Trink-Erinnerungen"></Label>
+      <Label class="text-sm text-gray-500" textWrap="true">
         <FormattedString>
           <Span
-            class="text-sm text-blue-800"
-            text="💡 Tipp: Regelmäßige Trink-Erinnerungen helfen dir, täglich genug Wasser zu trinken."
+            text="Aktiviere automatische Trink-Erinnerungen. Wir planen alle Benachrichtigungen lokal nach einem bewährten Tagesrhythmus."
           ></Span>
         </FormattedString>
       </Label>
+    </StackLayout>
+
+    <StackLayout class="bg-white rounded-2xl border border-base-200">
+      <FlexboxLayout class="p-4 items-center">
+        <FlexboxLayout
+          class="w-12 h-12 rounded-full items-center justify-center mr-4"
+          [ngClass]="{
+            'bg-blue-100': reminderEnabled(),
+            'bg-gray-100': !reminderEnabled(),
+          }"
+        >
+          <svg:SVGImage
+            [src]="
+              icons.Droplet | svgToDataUri: (reminderEnabled() ? '#2563EB' : '#9CA3AF')
+            "
+            class="w-6 h-6"
+          />
+        </FlexboxLayout>
+
+        <StackLayout class="flex-1">
+          <Label class="text-lg font-medium text-neutral" text="Trink-Erinnerungen"></Label>
+          <Label
+            class="text-sm"
+            [ngClass]="{
+              'text-blue-600': reminderEnabled(),
+              'text-gray-500': !reminderEnabled(),
+            }"
+            [text]="
+              reminderEnabled()
+                ? 'Aktiv – wir erinnern dich tagsüber automatisch.'
+                : 'Nicht aktiviert'
+            "
+          ></Label>
+        </StackLayout>
+
+        <Switch
+          class="ml-3"
+          [checked]="reminderEnabled()"
+          [isEnabled]="!isBusy()"
+          (checkedChange)="toggleReminders($any($event))"
+        ></Switch>
+      </FlexboxLayout>
+
+      <StackLayout class="px-4 pb-4 space-y-2">
+        <Label class="text-sm text-gray-600" textWrap="true">
+          <FormattedString>
+            <Span text="Benachrichtigungen werden gegen "></Span>
+            <Span
+              class="font-semibold text-neutral"
+              [text]="reminderTimes().join(', ')"
+            ></Span>
+            <Span text=" versendet (lokale Zeitzone)."></Span>
+          </FormattedString>
+        </Label>
+        <Label class="text-xs text-gray-500" textWrap="true">
+          <FormattedString>
+            <Span
+              text="Verpasste Erinnerungen werden automatisch auf das nächste verfügbare Zeitfenster desselben Tages verschoben."
+            ></Span>
+          </FormattedString>
+        </Label>
+      </StackLayout>
+    </StackLayout>
+
+    <StackLayout class="bg-blue-50 rounded-2xl p-4 space-y-3">
+      <Label
+        class="text-sm font-medium text-blue-900"
+        [text]="permissionLabel()"
+      ></Label>
+      <Label class="text-xs text-blue-800" textWrap="true">
+        <FormattedString>
+          <Span
+            text="Ruhezeiten und der Systemmodus „Nicht stören“ werden respektiert. Nach Erreichen deines Tagesziels werden verbleibende Erinnerungen automatisch pausiert."
+          ></Span>
+        </FormattedString>
+      </Label>
+
+      @if (permissionGranted() === false) {
+        <StackLayout class="space-y-2">
+          <Button
+            class="bg-blue-600 text-white text-center font-semibold py-3 rounded-xl"
+            text="Mitteilungen erlauben"
+            (tap)="requestPermissions()"
+          ></Button>
+          <Button
+            class="text-blue-700 font-semibold text-center py-3 rounded-xl border border-blue-200"
+            text="Systemeinstellungen öffnen"
+            (tap)="openSystemSettings()"
+          ></Button>
+        </StackLayout>
+      }
     </StackLayout>
   </StackLayout>
 </ScrollView>
