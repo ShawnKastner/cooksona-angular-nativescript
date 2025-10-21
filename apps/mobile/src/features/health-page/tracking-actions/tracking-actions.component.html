@@ -15,17 +15,5 @@
       ></Label>
     </FlexboxLayout>
   </StackLayout>
-  <StackLayout
-    col="1"
-    class="bg-white rounded-2xl border border-base-200 box-shadow-1 p-4"
-    (tap)="logQuickMeal()"
-  >
-    <FlexboxLayout class="items-center justify-center gap-2">
-      <svg:SVGImage
-        [src]="icons.Apple | svgToDataUri: '#4A6C6F'"
-        class="w-5 h-5"
-      ></svg:SVGImage>
-      <Label class="text-sm font-semibold text-neutral" text="Mahlzeit"></Label>
-    </FlexboxLayout>
-  </StackLayout>
+  <!-- Removed quick 'Mahlzeit' action (now reachable via + button on each meal section) -->
 </GridLayout>
