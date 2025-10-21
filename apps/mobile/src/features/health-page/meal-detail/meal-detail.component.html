@@ -1,0 +1,148 @@
+<GridLayout rows="auto, *" class="h-full bg-base-100">
+  <ActionBar
+    row="0"
+    class="bg-base-100 text-neutral"
+    [title]="mealConfig().label"
+  >
+    <NavigationButton
+      ios.position="left"
+      android.position="actionBar"
+      (tap)="goBack()"
+    />
+  </ActionBar>
+
+  <ScrollView row="1">
+    <StackLayout class="px-5 pb-10 space-y-5">
+      <StackLayout
+        class="bg-white p-5 rounded-2xl border border-base-200 box-shadow-1 space-y-4"
+      >
+        <FlexboxLayout class="items-center space-x-3">
+          <FlexboxLayout
+            class="w-12 h-12 rounded-full bg-base-200 items-center justify-center"
+          >
+            <svg:SVGImage
+              [src]="mealConfig().icon | svgToDataUri: '#4A6C6F'"
+              class="w-6 h-6"
+            ></svg:SVGImage>
+          </FlexboxLayout>
+          <StackLayout>
+            <Label
+              class="text-2xl font-bold text-neutral"
+              [text]="mealConfig().label"
+            ></Label>
+            <Label
+              class="text-xs text-gray-500"
+              [text]="formatTotalsLabel()"
+            ></Label>
+          </StackLayout>
+        </FlexboxLayout>
+
+        <GridLayout columns="*,*,*,*" class="mt-2">
+          <StackLayout col="0" class="items-center">
+            <Label class="text-xs text-gray-500" text="Kalorien"></Label>
+            <Label
+              class="text-base font-semibold text-neutral"
+              [text]="totals().calories + ' kcal'"
+            ></Label>
+          </StackLayout>
+          <StackLayout col="1" class="items-center">
+            <Label class="text-xs text-gray-500" text="Eiweiß"></Label>
+            <Label
+              class="text-base font-semibold text-neutral"
+              [text]="totals().protein + ' g'"
+            ></Label>
+          </StackLayout>
+          <StackLayout col="2" class="items-center">
+            <Label class="text-xs text-gray-500" text="Kohlenhydrate"></Label>
+            <Label
+              class="text-base font-semibold text-neutral"
+              [text]="totals().carbs + ' g'"
+            ></Label>
+          </StackLayout>
+          <StackLayout col="3" class="items-center">
+            <Label class="text-xs text-gray-500" text="Fett"></Label>
+            <Label
+              class="text-base font-semibold text-neutral"
+              [text]="totals().fat + ' g'"
+            ></Label>
+          </StackLayout>
+        </GridLayout>
+      </StackLayout>
+
+      <Button
+        text="Jetzt tracken"
+        class="bg-primary text-white font-semibold text-base py-3 rounded-full"
+        (tap)="onAddMeal()"
+      >
+      </Button>
+
+      <StackLayout class="space-y-3">
+        <FlexboxLayout class="items-center justify-between">
+          <Label
+            class="font-semibold text-neutral text-base"
+            text="Einträge"
+          ></Label>
+          @if (mealEntries().length > 0) {
+            <Label
+              class="text-xs text-gray-400"
+              text="Halte gedrückt zum Bearbeiten"
+            ></Label>
+          }
+        </FlexboxLayout>
+
+        @if (loading()) {
+          <FlexboxLayout class="items-center justify-center py-6">
+            <ActivityIndicator
+              busy="true"
+              class="w-6 h-6"
+              color="#4A6C6F"
+            ></ActivityIndicator>
+          </FlexboxLayout>
+        } @else {
+          @if (mealEntries().length === 0) {
+            <StackLayout
+              class="border border-base-200 rounded-2xl p-6 items-center text-center bg-base-100"
+            >
+              <Label
+                class="text-base font-semibold text-neutral mb-1"
+                text="Noch keine Einträge"
+              ></Label>
+              <Label textWrap="true">
+                <FormattedString>
+                  <Span
+                    class="text-xs text-gray-500"
+                    text="Starte mit deinem ersten Eintrag über den Button oben."
+                  ></Span>
+                </FormattedString>
+              </Label>
+            </StackLayout>
+          } @else {
+            @for (meal of mealEntries(); track meal.id) {
+              <StackLayout
+                class="bg-white border border-base-200 rounded-xl p-4 space-y-2"
+                (longPress)="onMealLongPress(meal)"
+              >
+                <FlexboxLayout class="items-start justify-between">
+                  <StackLayout class="flex-1 pr-3">
+                    <Label
+                      class="text-base font-semibold text-neutral"
+                      [text]="meal.name"
+                    ></Label>
+                    <Label
+                      class="text-xs text-gray-500"
+                      [text]="formatMealMacros(meal)"
+                    ></Label>
+                  </StackLayout>
+                  <Label
+                    class="text-sm font-semibold text-neutral"
+                    [text]="formatMealCalories(meal)"
+                  ></Label>
+                </FlexboxLayout>
+              </StackLayout>
+            }
+          }
+        }
+      </StackLayout>
+    </StackLayout>
+  </ScrollView>
+</GridLayout>

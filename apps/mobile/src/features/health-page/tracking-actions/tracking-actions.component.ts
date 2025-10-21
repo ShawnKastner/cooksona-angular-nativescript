@@ -22,8 +22,4 @@ export class TrackingActionsComponent {
   protected logQuickActivity(): void {
     this.routerExtensions.navigate(['/track-activity']);
   }
-
-  protected logQuickMeal(): void {
-    this.routerExtensions.navigate(['/track-meal']);
-  }
 }
