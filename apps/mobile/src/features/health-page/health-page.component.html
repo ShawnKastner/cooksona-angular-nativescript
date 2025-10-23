@@ -10,8 +10,8 @@
     </FlexboxLayout>
   } @else {
     <PullToRefresh (refresh)="onRefresh($any($event))">
-      <!-- Attach swipe gesture to ScrollView for horizontal swipes between days -->
-      <ScrollView #scrollView (swipe)="onSwipe($any($event))">
+      <!-- Pan gesture powers slow, interactive day transitions -->
+      <ScrollView #scrollView (pan)="onPan($any($event))">
         <StackLayout class="p-5 pb-10 space-y-5">
           @if (!isBusy() && loading() && hasLoadedOnce()) {
             <FlexboxLayout class="items-center justify-center py-2 space-x-2">

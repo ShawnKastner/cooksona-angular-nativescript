@@ -9,10 +9,11 @@ import {
   ElementRef,
 } from '@angular/core';
 import {
-  SwipeGestureEventData,
-  SwipeDirection,
+  PanGestureEventData,
+  GestureStateTypes,
   ScrollView,
   View,
+  Screen,
 } from '@nativescript/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { RouterExtensions } from '@nativescript/angular';
@@ -57,6 +58,12 @@ export class HealthPageComponent implements OnInit {
   protected readonly isBusy = signal(false); // For pull-to-refresh loading indicator
   protected hintMessage = signal<string | null>(null); // transient hint (e.g., "Kein weiterer Tag")
   protected isAnimating = signal(false); // blocks repeated swipes during transition
+  private isDragging = false;
+  private ignorePan = false;
+  private dragOffset = 0;
+  private readonly panActivationDistance = 12;
+  private readonly panCommitFraction = 0.25;
+  private readonly panFlingVelocity = 700;
   @ViewChild('scrollView', { read: ElementRef, static: false })
   protected scrollViewRef?: ElementRef<ScrollView>;
   @ViewChild('content', { read: ElementRef, static: false })
@@ -85,16 +92,114 @@ export class HealthPageComponent implements OnInit {
     }
   }
 
-  // NativeScript exposes a high-level swipe gesture that already handles platform quirks,
-  // so we can keep this lean and readable.
-  onSwipe(event: SwipeGestureEventData): void {
+  onPan(event: PanGestureEventData): void {
     if (this.isAnimating()) {
       return;
     }
-    if (event.direction === SwipeDirection.left) {
-      void this.goToNextDay();
-    } else if (event.direction === SwipeDirection.right) {
-      void this.goToPreviousDay();
+
+    const content = this.contentRef?.nativeElement;
+    if (!content) {
+      return;
+    }
+    const scrollView = this.scrollViewRef?.nativeElement;
+
+    switch (event.state) {
+      case GestureStateTypes.began: {
+        this.isDragging = false;
+        this.ignorePan = false;
+        this.dragOffset = 0;
+        return;
+      }
+      case GestureStateTypes.changed: {
+        if (this.ignorePan) {
+          return;
+        }
+        if (!this.isDragging) {
+          const absX = Math.abs(event.deltaX);
+          const absY = Math.abs(event.deltaY);
+          if (absX < this.panActivationDistance) {
+            return;
+          }
+          if (absY > absX) {
+            this.ignorePan = true;
+            return;
+          }
+          this.isDragging = true;
+          this.toggleScrollInteraction(scrollView, false);
+        }
+
+        const width = this.getContentWidth(content);
+        const maxOffset = width;
+        const clamped = Math.max(-maxOffset, Math.min(maxOffset, event.deltaX));
+        content.translateX = clamped;
+        this.dragOffset = clamped;
+        return;
+      }
+      case GestureStateTypes.cancelled:
+      case GestureStateTypes.ended: {
+        const offset = this.dragOffset;
+        const dragging = this.isDragging;
+        this.isDragging = false;
+        this.ignorePan = false;
+        this.dragOffset = 0;
+        this.toggleScrollInteraction(scrollView, true);
+
+        if (!dragging) {
+          if (offset !== 0) {
+            content.translateX = 0;
+          }
+          return;
+        }
+
+        const width = this.getContentWidth(content);
+        const threshold = Math.min(width * this.panCommitFraction, 140);
+        const velocity = (event as any).velocityX ?? 0;
+        const hasNext = this.store.hasNextDay();
+        const hasPrevious = this.store.hasPreviousDay();
+        const shouldGoNext =
+          (offset <= -threshold && hasNext) ||
+          (velocity < -this.panFlingVelocity && hasNext);
+        const shouldGoPrevious =
+          (offset >= threshold && hasPrevious) ||
+          (velocity > this.panFlingVelocity && hasPrevious);
+
+        if (shouldGoNext) {
+          void this.animateDayChange(
+            'next',
+            () => this.store.goToNextDay(),
+            offset,
+          );
+          return;
+        }
+
+        if (shouldGoPrevious) {
+          void this.animateDayChange(
+            'previous',
+            () => this.store.goToPreviousDay(),
+            offset,
+          );
+          return;
+        }
+
+        if (offset <= -threshold && !hasNext) {
+          this.showHint('Kein weiterer Tag');
+        } else if (offset >= threshold && !hasPrevious) {
+          this.showHint('Kein vorheriger Tag');
+        }
+
+        void content
+          .animate({
+            translate: { x: 0, y: 0 },
+            duration: 180,
+            curve: 'easeOut',
+          })
+          .catch(() => {
+            content.translateX = 0;
+          });
+        return;
+      }
+      default:
+        return;
     }
   }
 
@@ -140,6 +245,7 @@ export class HealthPageComponent implements OnInit {
   private async animateDayChange(
     direction: 'next' | 'previous',
     changeDay: () => void,
+    startOffset = 0,
   ): Promise<void> {
     if (this.isAnimating()) {
       return;
@@ -154,40 +260,55 @@ export class HealthPageComponent implements OnInit {
       return;
     }
 
+    const width = this.getContentWidth(content);
     const isNext = direction === 'next';
-    const exitTilt = isNext ? -7 : 7;
-    const returnOffset = isNext ? 80 : -80;
+    const exitOffset = isNext ? -width : width;
+    const fromOffset = startOffset ?? 0;
 
     let dayChanged = false;
 
     try {
-      await content.animate({
-        translate: { x: isNext ? -80 : 80, y: 0 },
-        scale: { x: 0.96, y: 0.96 },
-        rotate: exitTilt,
-        opacity: 0.7,
-        duration: 140,
-        curve: 'easeIn',
-      });
+      if (Math.abs(fromOffset - exitOffset) < 1) {
+        content.translateX = exitOffset;
+      } else {
+        const outDuration = this.animationDurationForDistance(
+          Math.abs(exitOffset - fromOffset),
+          width,
+        );
+        await content
+          .animate({
+            translate: { x: exitOffset, y: 0 },
+            duration: outDuration,
+            curve: 'easeInOut',
+          })
+          .catch(() => {
+            content.translateX = exitOffset;
+          });
+      }
 
       changeDay();
       dayChanged = true;
       this.resetScrollPosition();
+      await this.waitForLayoutTick(content);
 
-      content.translateX = returnOffset;
-      content.scaleX = 0.96;
-      content.scaleY = 0.96;
-      content.opacity = 0.7;
-      content.rotate = -exitTilt;
+      const refreshedWidth = this.getContentWidth(content);
+      const entryOffset = isNext ? refreshedWidth : -refreshedWidth;
+      content.translateX = entryOffset;
 
-      await content.animate({
-        translate: { x: 0, y: 0 },
-        scale: { x: 1, y: 1 },
-        rotate: 0,
-        opacity: 1,
-        duration: 180,
-        curve: 'easeOut',
-      });
+      const inDuration = this.animationDurationForDistance(
+        Math.abs(entryOffset),
+        refreshedWidth,
+      );
+
+      await content
+        .animate({
+          translate: { x: 0, y: 0 },
+          duration: inDuration,
+          curve: 'easeInOut',
+        })
+        .catch(() => {
+          content.translateX = 0;
+        });
     } catch (error) {
       if (!dayChanged) {
         changeDay();
@@ -195,11 +316,78 @@ export class HealthPageComponent implements OnInit {
       }
     } finally {
       content.translateX = 0;
-      content.scaleX = 1;
-      content.scaleY = 1;
-      content.opacity = 1;
-      content.rotate = 0;
       this.isAnimating.set(false);
+    }
+  }
+
+  private getContentWidth(view: View): number {
+    const native = view as any;
+    const measured =
+      typeof native?.getMeasuredWidth === 'function'
+        ? native.getMeasuredWidth()
+        : 0;
+    if (measured && measured > 0) {
+      return measured;
+    }
+    const actual =
+      typeof native?.getActualSize === 'function'
+        ? native.getActualSize()
+        : undefined;
+    if (actual?.width && actual.width > 0) {
+      return actual.width;
+    }
+    return Screen.mainScreen.widthDIPs || 360;
+  }
+
+  private animationDurationForDistance(
+    distance: number,
+    width: number,
+  ): number {
+    if (!width || width <= 0) {
+      return 200;
+    }
+    const progress = Math.min(1, distance / width);
+    return Math.round(140 + progress * 140);
+  }
+
+  private waitForLayoutTick(view: View): Promise<void> {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        try {
+          view.requestLayout?.();
+        } catch (e) {
+          // ignore
+        }
+        resolve();
+      }, 0);
+    });
+  }
+
+  private toggleScrollInteraction(
+    scrollView: ScrollView | undefined,
+    enabled: boolean,
+  ): void {
+    if (!scrollView) {
+      return;
+    }
+
+    try {
+      scrollView.isUserInteractionEnabled = enabled;
+      if (scrollView.ios) {
+        if (typeof scrollView.ios.setScrollEnabled === 'function') {
+          scrollView.ios.setScrollEnabled(enabled);
+        } else if (scrollView.ios.scrollEnabled !== undefined) {
+          scrollView.ios.scrollEnabled = enabled;
+        }
+      }
+      if (
+        scrollView.android &&
+        typeof scrollView.android.setNestedScrollingEnabled === 'function'
+      ) {
+        scrollView.android.setNestedScrollingEnabled(enabled);
+      }
+    } catch (e) {
+      // ignore platform quirks
     }
   }
 

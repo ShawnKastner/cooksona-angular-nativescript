@@ -1,14 +1,14 @@
 <FlexboxLayout
-  class="items-center justify-between bg-base-200/50 p-3 rounded-2xl mt-4"
+  class="items-center justify-between"
   accessibilityRole="header"
   accessibilityHint="Wechsle zwischen Tagen durch Wischen nach links oder rechts"
 >
-  <StackLayout class="p-2 rounded-full bg-base-100" (tap)="goToPreviousDay()">
+  <!--   <StackLayout class="p-2 rounded-full bg-base-100" (tap)="goToPreviousDay()">
     <svg:SVGImage
       [src]="icons.ArrowLeft | svgToDataUri: '#4A6C6F'"
       class="w-6 h-6"
     ></svg:SVGImage>
-  </StackLayout>
+  </StackLayout> -->
   <StackLayout class="items-center">
     <Label
       class="font-bold text-neutral"
@@ -21,7 +21,7 @@
       accessibilityLabel="Datum"
     ></Label>
   </StackLayout>
-  <StackLayout
+  <!--   <StackLayout
     class="p-2 rounded-full bg-base-100"
     [class.opacity-40]="isToday()"
     (tap)="goToNextDay()"
@@ -32,5 +32,5 @@
       "
       class="w-6 h-6"
     ></svg:SVGImage>
-  </StackLayout>
+  </StackLayout> -->
 </FlexboxLayout>
