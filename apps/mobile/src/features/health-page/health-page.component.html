@@ -10,7 +10,8 @@
     </FlexboxLayout>
   } @else {
     <PullToRefresh (refresh)="onRefresh($any($event))">
-      <ScrollView>
+      <!-- Attach swipe gesture to ScrollView for horizontal swipes between days -->
+      <ScrollView #scrollView (swipe)="onSwipe($any($event))">
         <StackLayout class="p-5 pb-10 space-y-5">
           @if (!isBusy() && loading() && hasLoadedOnce()) {
             <FlexboxLayout class="items-center justify-center py-2 space-x-2">
@@ -41,24 +42,42 @@
               <Label class="text-sm text-red-700" [text]="error()"></Label>
             </StackLayout>
           }
+          <StackLayout #content>
+            <ns-day-header></ns-day-header>
 
-          <ns-day-header></ns-day-header>
+            <ns-calorie-progress></ns-calorie-progress>
 
-          <ns-calorie-progress></ns-calorie-progress>
+            <ns-macronutrients></ns-macronutrients>
 
-          <ns-macronutrients></ns-macronutrients>
+            <ns-water-progress></ns-water-progress>
 
-          <ns-water-progress></ns-water-progress>
+            <ns-steps-card [stepGoal]="stepGoal()"> </ns-steps-card>
 
-          <ns-steps-card [stepGoal]="stepGoal()"> </ns-steps-card>
+            <ns-tracking-actions></ns-tracking-actions>
 
-          <ns-tracking-actions></ns-tracking-actions>
+            <ns-meal-section></ns-meal-section>
 
-          <ns-meal-section></ns-meal-section>
-
-          <ns-activity-section></ns-activity-section>
-        </StackLayout>
+            <ns-activity-section></ns-activity-section> </StackLayout
+        ></StackLayout>
       </ScrollView>
     </PullToRefresh>
+    @if (isAnimating()) {
+      <GridLayout
+        rows="*"
+        columns="*"
+        class="absolute inset-0"
+        (tap)="(void 0)"
+      />
+    }
+    <!-- transient hint overlay for end-of-range swipes -->
+    @if (hintMessage()) {
+      <StackLayout class="absolute inset-x-4 bottom-6 items-center">
+        <Label
+          class="bg-black/70 text-white px-4 py-2 rounded-full text-sm"
+          [text]="hintMessage()"
+          accessibilityLabel="Hinweis"
+        ></Label>
+      </StackLayout>
+    }
   }
 </StackLayout>

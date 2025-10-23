@@ -5,7 +5,15 @@ import {
   inject,
   computed,
   signal,
+  ViewChild,
+  ElementRef,
 } from '@angular/core';
+import {
+  SwipeGestureEventData,
+  SwipeDirection,
+  ScrollView,
+  View,
+} from '@nativescript/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { RouterExtensions } from '@nativescript/angular';
 import { HealthStore } from '@cooksona/health';
@@ -47,6 +55,12 @@ export class HealthPageComponent implements OnInit {
   protected readonly metrics = this.store.metricsForSelectedDate;
   protected readonly hasLoadedOnce = this.store.hasLoadedOnce;
   protected readonly isBusy = signal(false); // For pull-to-refresh loading indicator
+  protected hintMessage = signal<string | null>(null); // transient hint (e.g., "Kein weiterer Tag")
+  protected isAnimating = signal(false); // blocks repeated swipes during transition
+  @ViewChild('scrollView', { read: ElementRef, static: false })
+  protected scrollViewRef?: ElementRef<ScrollView>;
+  @ViewChild('content', { read: ElementRef, static: false })
+  protected contentRef?: ElementRef<View>;
 
   protected readonly requiresOnboarding = this.store.requiresOnboarding;
 
@@ -68,6 +82,124 @@ export class HealthPageComponent implements OnInit {
     // Sync all Apple Health data in the background
     if (this.store.shouldSyncHealthKit()) {
       void this.syncHealthKitData();
+    }
+  }
+
+  // NativeScript exposes a high-level swipe gesture that already handles platform quirks,
+  // so we can keep this lean and readable.
+  onSwipe(event: SwipeGestureEventData): void {
+    if (this.isAnimating()) {
+      return;
+    }
+    if (event.direction === SwipeDirection.left) {
+      void this.goToNextDay();
+    } else if (event.direction === SwipeDirection.right) {
+      void this.goToPreviousDay();
+    }
+  }
+
+  private showHint(text: string): void {
+    this.hintMessage.set(text);
+    // auto-hide after short delay
+    setTimeout(() => this.hintMessage.set(null), 900);
+  }
+
+  private async goToNextDay(): Promise<void> {
+    if (!this.store.hasNextDay()) {
+      this.showHint('Kein weiterer Tag');
+      return;
+    }
+    await this.animateDayChange('next', () => this.store.goToNextDay());
+  }
+
+  private async goToPreviousDay(): Promise<void> {
+    if (!this.store.hasPreviousDay()) {
+      this.showHint('Kein vorheriger Tag');
+      return;
+    }
+    await this.animateDayChange('previous', () => this.store.goToPreviousDay());
+  }
+
+  private resetScrollPosition(): void {
+    const scrollView = this.scrollViewRef?.nativeElement;
+    if (!scrollView) {
+      return;
+    }
+
+    try {
+      if (typeof scrollView.scrollToVerticalOffset === 'function') {
+        scrollView.scrollToVerticalOffset(0, false);
+      } else if (scrollView?.ios?.setContentOffset) {
+        scrollView.ios.setContentOffset({ x: 0, y: 0 }, false);
+      }
+    } catch (e) {
+      // ignore platform-specific inconsistencies
+    }
+  }
+
+  private async animateDayChange(
+    direction: 'next' | 'previous',
+    changeDay: () => void,
+  ): Promise<void> {
+    if (this.isAnimating()) {
+      return;
+    }
+    const content = this.contentRef?.nativeElement;
+    this.isAnimating.set(true);
+
+    if (!content) {
+      changeDay();
+      this.resetScrollPosition();
+      this.isAnimating.set(false);
+      return;
+    }
+
+    const isNext = direction === 'next';
+    const exitTilt = isNext ? -7 : 7;
+    const returnOffset = isNext ? 80 : -80;
+
+    let dayChanged = false;
+
+    try {
+      await content.animate({
+        translate: { x: isNext ? -80 : 80, y: 0 },
+        scale: { x: 0.96, y: 0.96 },
+        rotate: exitTilt,
+        opacity: 0.7,
+        duration: 140,
+        curve: 'easeIn',
+      });
+
+      changeDay();
+      dayChanged = true;
+      this.resetScrollPosition();
+
+      content.translateX = returnOffset;
+      content.scaleX = 0.96;
+      content.scaleY = 0.96;
+      content.opacity = 0.7;
+      content.rotate = -exitTilt;
+
+      await content.animate({
+        translate: { x: 0, y: 0 },
+        scale: { x: 1, y: 1 },
+        rotate: 0,
+        opacity: 1,
+        duration: 180,
+        curve: 'easeOut',
+      });
+    } catch (error) {
+      if (!dayChanged) {
+        changeDay();
+        this.resetScrollPosition();
+      }
+    } finally {
+      content.translateX = 0;
+      content.scaleX = 1;
+      content.scaleY = 1;
+      content.opacity = 1;
+      content.rotate = 0;
+      this.isAnimating.set(false);
     }
   }
 

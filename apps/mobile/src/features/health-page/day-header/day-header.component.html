@@ -1,5 +1,7 @@
 <FlexboxLayout
   class="items-center justify-between bg-base-200/50 p-3 rounded-2xl mt-4"
+  accessibilityRole="header"
+  accessibilityHint="Wechsle zwischen Tagen durch Wischen nach links oder rechts"
 >
   <StackLayout class="p-2 rounded-full bg-base-100" (tap)="goToPreviousDay()">
     <svg:SVGImage
@@ -8,8 +10,16 @@
     ></svg:SVGImage>
   </StackLayout>
   <StackLayout class="items-center">
-    <Label class="font-bold text-neutral" [text]="dayLabel()"></Label>
-    <Label class="text-xs text-gray-500" [text]="dateLabel()"></Label>
+    <Label
+      class="font-bold text-neutral"
+      [text]="dayLabel()"
+      accessibilityLabel="Wochentag"
+    ></Label>
+    <Label
+      class="text-xs text-gray-500"
+      [text]="dateLabel()"
+      accessibilityLabel="Datum"
+    ></Label>
   </StackLayout>
   <StackLayout
     class="p-2 rounded-full bg-base-100"

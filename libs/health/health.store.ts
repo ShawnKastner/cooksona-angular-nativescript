@@ -78,6 +78,60 @@ export class HealthStore {
     this.formatDate(this.selectedDate().toDateString()),
   );
 
+  /**
+   * Get the formatted day label for an arbitrary date (e.g. "Heute", "Gestern", or weekday).
+   */
+  dayLabelForDate(date: Date): string {
+    const now = new Date();
+    if (
+      date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth() &&
+      date.getDate() === now.getDate()
+    ) {
+      return 'Heute';
+    }
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    if (
+      date.getFullYear() === yesterday.getFullYear() &&
+      date.getMonth() === yesterday.getMonth() &&
+      date.getDate() === yesterday.getDate()
+    ) {
+      return 'Gestern';
+    }
+
+    const weekdays = [
+      'Sonntag',
+      'Montag',
+      'Dienstag',
+      'Mittwoch',
+      'Donnerstag',
+      'Freitag',
+      'Samstag',
+    ];
+    return weekdays[date.getDay()];
+  }
+
+  /**
+   * Format an arbitrary date string as dd.MM.yyyy
+   */
+  dateLabelForDate(date: Date): string {
+    return this.formatDate(date.toDateString());
+  }
+
+  /**
+   * Return DailyMetrics for an arbitrary date without changing selectedDate.
+   */
+  metricsForDate(date: Date): DailyMetrics {
+    const data = this.healthData();
+    if (!data) {
+      const fallback = getDefaultMetrics();
+      return { ...fallback, date: getDateString(date), eatenMeals: {} };
+    }
+    return getMetricsForDate(data, date);
+  }
+
   formatDate(dateStr: string): string {
     const d = new Date(dateStr);
     const day = String(d.getDate()).padStart(2, '0');
@@ -485,6 +539,36 @@ export class HealthStore {
     const dateString = getDateString(this.selectedDate());
     const activities = await this.loadActivities(dateString);
     this.activities.set(activities);
+  }
+
+  /**
+   * Returns true if there is a previous day available in the stored dailyMetrics
+   * (i.e. selectedDate is after the earliest available date).
+   */
+  hasPreviousDay(): boolean {
+    const data = this.healthData();
+    if (!data || !data.dailyMetrics.length) return false;
+    const earliest = data.dailyMetrics.reduce((a, b) =>
+      a.date < b.date ? a : b,
+    ).date;
+    const selectedStr = getDateString(this.selectedDate());
+    return selectedStr > earliest;
+  }
+
+  /**
+   * Returns true if a next day is available. We never allow moving beyond today
+   * and also not beyond the latest available day in the backend data.
+   */
+  hasNextDay(): boolean {
+    const data = this.healthData();
+    if (!data || !data.dailyMetrics.length) return false;
+    const latest = data.dailyMetrics.reduce((a, b) =>
+      a.date > b.date ? a : b,
+    ).date;
+    const todayStr = getDateString(new Date());
+    const selectedStr = getDateString(this.selectedDate());
+    const maxAllowed = latest < todayStr ? latest : todayStr;
+    return selectedStr < maxAllowed;
   }
 
   async updateActivity(
