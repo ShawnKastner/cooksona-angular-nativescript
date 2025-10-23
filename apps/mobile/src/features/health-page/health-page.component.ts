@@ -153,7 +153,7 @@ export class HealthPageComponent implements OnInit {
 
         const width = this.getContentWidth(content);
         const threshold = Math.min(width * this.panCommitFraction, 140);
-        const velocity = (event as any).velocityX ?? 0;
+        const velocity = (event as any).deltaX ?? 0;
         const hasNext = this.store.hasNextDay();
         const hasPrevious = this.store.hasPreviousDay();
         const shouldGoNext =
