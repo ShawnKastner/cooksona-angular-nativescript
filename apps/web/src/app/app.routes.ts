@@ -148,6 +148,18 @@ export const routes: Routes = [
     title: 'Impressum',
   },
   {
+    path: 'barrierefreiheit',
+    loadComponent: () =>
+      import('./pages/legal/accessibility-statement.component').then(
+        (m) => m.AccessibilityStatementComponent,
+      ),
+    title: 'Erklärung zur Barrierefreiheit',
+    data: {
+      description:
+        'Informationen zur Barrierefreiheit von CookSona gemäß WCAG 2.1 AA und BFSG.',
+    },
+  },
+  {
     path: 'contact',
     loadComponent: () =>
       import('./pages/legal//contact/contact.component').then(

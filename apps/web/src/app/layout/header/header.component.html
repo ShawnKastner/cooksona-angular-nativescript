@@ -1,4 +1,5 @@
 <header
+  role="banner"
   class="bg-base-100/80 backdrop-blur-lg sticky top-0 z-40 border-b border-base-200/50"
 >
   <div
@@ -8,11 +9,12 @@
       routerLink="/"
       (click)="closeDropdown()"
       class="flex items-center gap-3 cursor-pointer group"
+      aria-label="Zur Startseite"
     >
       <span
         [svgInject]="icons.UtensilsCrossed"
         class="h-8 w-8 text-primary group-hover:text-primary-focus transition-colors"
-        aria-label="Utensils"
+        aria-hidden="true"
       ></span>
       <h1
         class="text-2xl md:text-3xl font-serif font-bold text-neutral tracking-tight"
@@ -22,51 +24,60 @@
     </a>
     <div class="flex items-center gap-2">
       @if (user$ | async; as user) {
-        <div class="relative">
+        <nav role="navigation" aria-label="Hauptnavigation" class="relative">
           <button
             (click)="toggleDropdown()"
+            [attr.aria-expanded]="isDropdownOpen()"
+            aria-haspopup="true"
+            aria-label="Benutzermenü öffnen"
             class="flex items-center gap-2 p-2 rounded-full hover:bg-base-200 transition-colors"
           >
-            <span class="h-5 w-5 text-neutral" [svgInject]="icons.User"></span>
+            <span class="h-5 w-5 text-neutral" [svgInject]="icons.User" aria-hidden="true"></span>
             <span class="font-semibold text-sm hidden sm:inline">{{
               user.name
             }}</span>
           </button>
           @if (isDropdownOpen()) {
             <div
+              role="menu"
+              aria-label="Benutzermenü"
               class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-soft-lg py-2 border border-base-200"
             >
               <a
                 routerLink="/profile"
                 (click)="closeDropdown()"
+                role="menuitem"
                 class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
               >
-                <span class="h-4 w-4" [svgInject]="icons.User"></span>
+                <span class="h-4 w-4" [svgInject]="icons.User" aria-hidden="true"></span>
                 Profil
               </a>
               <a
                 routerLink="/health"
                 (click)="closeDropdown()"
+                role="menuitem"
                 class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
               >
-                <span class="h-4 w-4" [svgInject]="icons.HeartPulse"></span>
+                <span class="h-4 w-4" [svgInject]="icons.HeartPulse" aria-hidden="true"></span>
                 Health Hub
               </a>
               <a
                 routerLink="/cookbook"
                 (click)="closeDropdown()"
+                role="menuitem"
                 class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
               >
-                <span class="h-4 w-4" [svgInject]="icons.BookHeart"></span>
+                <span class="h-4 w-4" [svgInject]="icons.BookHeart" aria-hidden="true"></span>
                 Mein Kochbuch
               </a>
               <div class="border-t border-base-200 my-1"></div>
               <a
                 routerLink="/contact"
                 (click)="closeDropdown()"
+                role="menuitem"
                 class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
               >
-                <span class="h-4 w-4" [svgInject]="icons.MessageSquare"></span>
+                <span class="h-4 w-4" [svgInject]="icons.MessageSquare" aria-hidden="true"></span>
                 Kontakt & Feedback
               </a>
               <div class="border-t border-base-200 my-1"></div>
@@ -74,23 +85,25 @@
                 <a
                   routerLink="/admin"
                   (click)="closeDropdown()"
+                  role="menuitem"
                   class="flex items-center gap-3 px-4 py-2 text-sm text-neutral hover:bg-base-200 transition-colors"
                 >
-                  <span class="h-4 w-4" [svgInject]="icons.Shield"></span>
+                  <span class="h-4 w-4" [svgInject]="icons.Shield" aria-hidden="true"></span>
                   Admin
                 </a>
                 <div class="border-t border-base-200 my-1"></div>
               }
               <button
                 (click)="logout()"
+                role="menuitem"
                 class="w-full text-left flex items-center gap-3 px-4 py-2 text-sm text-error hover:bg-red-50 transition-colors"
               >
-                <span class="h-4 w-4" [svgInject]="icons.LogOut"></span>
+                <span class="h-4 w-4" [svgInject]="icons.LogOut" aria-hidden="true"></span>
                 Abmelden
               </button>
             </div>
           }
-        </div>
+        </nav>
       } @else {
         <div>
           <a

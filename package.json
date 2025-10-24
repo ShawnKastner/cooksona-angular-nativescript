@@ -10,7 +10,10 @@
     "lint": "nx run-many -t lint --all --parallel=3",
     "format": "prettier --write \"**/*.{ts,js,json,scss,css,html,md}\"",
     "format:check": "prettier --check \"**/*.{ts,js,json,scss,css,html,md}\"",
-    "format:staged": "git diff --name-only --staged --relative | grep -E '\\.(ts|js|json|scss|css|html|md)$' | xargs --no-run-if-empty prettier --write"
+    "format:staged": "git diff --name-only --staged --relative | grep -E '\\.(ts|js|json|scss|css|html|md)$' | xargs --no-run-if-empty prettier --write",
+    "a11y:test": "node tools/test-accessibility.js",
+    "a11y:test:ci": "pa11y-ci",
+    "a11y:audit": "axe http://localhost:4200 --save a11y-reports/axe-results.json --tags wcag2a,wcag2aa,wcag21a,wcag21aa"
   },
   "prettier": {
     "overrides": [
@@ -49,6 +52,8 @@
     "@angular/build": "^20.1.4",
     "@angular/cli": "^20.1.4",
     "@angular/compiler-cli": "^20.1.4",
+    "@axe-core/cli": "^4.11.0",
+    "@axe-core/playwright": "^4.11.0",
     "@eslint/js": "^9.8.0",
     "@nativescript/nx": "^21.0.0",
     "@nativescript/preview-cli": "1.0.14",
@@ -67,8 +72,10 @@
     "@swc/helpers": "~0.5.11",
     "@types/jasmine": "~5.1.0",
     "ajv": "~8.17.0",
+    "axe-core": "^4.11.0",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "jasmine-core": "~5.8.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -76,6 +83,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "nx": "21.5.2",
+    "pa11y": "^9.0.1",
     "prettier": "^3.6.2",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.40.0"

@@ -1,0 +1,194 @@
+<article class="max-w-4xl mx-auto p-6">
+  <h1 class="text-4xl font-bold mb-6 text-neutral">
+    Erklärung zur Barrierefreiheit
+  </h1>
+
+  <section aria-labelledby="commitment-heading" class="mb-8">
+    <h2 id="commitment-heading" class="text-2xl font-semibold mb-4 text-neutral">
+      Unser Engagement für Barrierefreiheit
+    </h2>
+    <p class="mb-4 text-gray-700 leading-relaxed">
+      CookSona ist bestrebt, seine Web- und Mobile-Anwendungen barrierefrei zu
+      gestalten, um allen Nutzer:innen unabhängig von ihren Fähigkeiten einen
+      gleichberechtigten Zugang zu ermöglichen. Wir verpflichten uns zur
+      Einhaltung der Web Content Accessibility Guidelines (WCAG) 2.1 auf Niveau
+      AA gemäß der europäischen Norm EN 301 549 und des deutschen
+      Barrierefreiheitsstärkungsgesetzes (BFSG).
+    </p>
+  </section>
+
+  <section aria-labelledby="standards-heading" class="mb-8">
+    <h2 id="standards-heading" class="text-2xl font-semibold mb-4 text-neutral">
+      Konformitätsstatus
+    </h2>
+    <p class="mb-4 text-gray-700 leading-relaxed">
+      Diese Anwendung erfüllt die WCAG 2.1 Konformitätsstufe AA. Dies bedeutet:
+    </p>
+    <ul class="list-disc list-inside mb-4 space-y-2 text-gray-700">
+      <li>Alle Inhalte sind per Tastatur bedienbar</li>
+      <li>Ausreichende Farbkontraste (mind. 4,5:1 für Text, 3:1 für UI-Elemente)</li>
+      <li>Semantische HTML-Struktur mit korrekten ARIA-Attributen</li>
+      <li>Kompatibilität mit Screenreadern (NVDA, JAWS, VoiceOver, TalkBack)</li>
+      <li>Unterstützung für Vergrößerung bis 200% ohne Funktionsverlust</li>
+      <li>Mobile Apps respektieren Systemschriftgrößen und Dynamic Type</li>
+    </ul>
+    <p class="text-sm text-gray-600">
+      <strong>Letzte Prüfung:</strong> {{ lastUpdated }}
+    </p>
+  </section>
+
+  <section aria-labelledby="features-heading" class="mb-8">
+    <h2 id="features-heading" class="text-2xl font-semibold mb-4 text-neutral">
+      Implementierte Barrierefreiheitsfunktionen
+    </h2>
+
+    <h3 class="text-xl font-semibold mb-3 text-neutral">Web-Anwendung</h3>
+    <ul class="list-disc list-inside mb-4 space-y-2 text-gray-700">
+      <li>Skip-Links zum Hauptinhalt</li>
+      <li>Sichtbare Fokusindikatoren für Tastaturnavigation</li>
+      <li>ARIA-Landmark-Regionen (banner, main, navigation, contentinfo)</li>
+      <li>Korrekte Überschriftenhierarchie (h1-h6)</li>
+      <li>Alternative Texte für alle Bilder und Icons</li>
+      <li>Formulare mit programmatisch verknüpften Labels</li>
+      <li>Fehlermeldungen mit aria-live und aria-invalid</li>
+      <li>Modale mit Fokusfalle und Fokusrückgabe</li>
+      <li>Unterstützung für "prefers-reduced-motion"</li>
+      <li>Unterstützung für "prefers-high-contrast"</li>
+    </ul>
+
+    <h3 class="text-xl font-semibold mb-3 text-neutral">Mobile App (iOS & Android)</h3>
+    <ul class="list-disc list-inside mb-4 space-y-2 text-gray-700">
+      <li>VoiceOver (iOS) und TalkBack (Android) Unterstützung</li>
+      <li>Touch-Ziele mind. 44×44 pt (iOS) bzw. 48 dp (Android)</li>
+      <li>Unterstützung für Dynamic Type / Systemschriftgrößen</li>
+      <li>Schaltersteuerung kompatibel</li>
+      <li>Semantische Beschriftungen für alle interaktiven Elemente</li>
+      <li>Gruppierung zusammenhängender Inhalte</li>
+      <li>Angemessene Reihenfolge für Navigation mit Hilfstechnologien</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="testing-heading" class="mb-8">
+    <h2 id="testing-heading" class="text-2xl font-semibold mb-4 text-neutral">
+      Tests und Qualitätssicherung
+    </h2>
+    <p class="mb-4 text-gray-700 leading-relaxed">
+      Wir führen regelmäßig folgende Tests durch:
+    </p>
+    <ul class="list-disc list-inside mb-4 space-y-2 text-gray-700">
+      <li>Automatisierte Tests mit axe-core, Lighthouse und pa11y in CI/CD</li>
+      <li>Manuelle Tests mit NVDA (Windows), JAWS (Windows), VoiceOver (macOS, iOS) und TalkBack (Android)</li>
+      <li>Tastatur-nur Navigation auf allen Seiten</li>
+      <li>Kontrastprüfungen mit Tools wie Colour Contrast Analyser</li>
+      <li>Zoom-Tests bis 200% Vergrößerung</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="known-issues-heading" class="mb-8">
+    <h2 id="known-issues-heading" class="text-2xl font-semibold mb-4 text-neutral">
+      Bekannte Einschränkungen
+    </h2>
+    <p class="mb-4 text-gray-700 leading-relaxed">
+      Trotz unserer Bemühungen können einige Barrieren bestehen. Wir arbeiten
+      kontinuierlich daran, diese zu beheben:
+    </p>
+    <ul class="list-disc list-inside mb-4 space-y-2 text-gray-700">
+      <li>
+        Drittanbieter-Inhalte (z.B. eingebettete Videos) entsprechen
+        möglicherweise nicht vollständig unseren Standards
+      </li>
+      <li>
+        Komplexe Datenvisualisierungen werden kontinuierlich verbessert, um
+        alternative Darstellungen zu bieten
+      </li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="feedback-heading" class="mb-8">
+    <h2 id="feedback-heading" class="text-2xl font-semibold mb-4 text-neutral">
+      Feedback und Kontakt
+    </h2>
+    <p class="mb-4 text-gray-700 leading-relaxed">
+      Wenn Sie auf Barrieren stoßen oder Verbesserungsvorschläge haben,
+      kontaktieren Sie uns bitte:
+    </p>
+    <div class="bg-base-100 p-4 rounded-lg border border-base-200 mb-4">
+      <p class="mb-2">
+        <strong>E-Mail:</strong>
+        <a
+          href="mailto:{{ email }}"
+          class="text-primary hover:underline ml-2"
+          >{{ email }}</a
+        >
+      </p>
+      <p class="mb-2">
+        <strong>Kontaktformular:</strong>
+        <a routerLink="/contact" class="text-primary hover:underline ml-2"
+          >Zum Kontaktformular</a
+        >
+      </p>
+    </div>
+    <p class="text-gray-700 leading-relaxed">
+      Wir bemühen uns, auf Ihre Anfragen innerhalb von 5 Werktagen zu antworten
+      und gemeldete Probleme so schnell wie möglich zu beheben.
+    </p>
+  </section>
+
+  <section aria-labelledby="enforcement-heading" class="mb-8">
+    <h2 id="enforcement-heading" class="text-2xl font-semibold mb-4 text-neutral">
+      Durchsetzungsverfahren
+    </h2>
+    <p class="mb-4 text-gray-700 leading-relaxed">
+      Sollten Sie mit unserer Antwort nicht zufrieden sein, können Sie sich an
+      die zuständige Durchsetzungsstelle wenden:
+    </p>
+    <div class="bg-base-100 p-4 rounded-lg border border-base-200">
+      <p class="font-semibold mb-2">
+        Bundesfachstelle Barrierefreiheit
+      </p>
+      <p>c/o Bundesministerium für Arbeit und Soziales</p>
+      <p>Mauerstraße 53</p>
+      <p>10117 Berlin</p>
+      <p class="mt-2">
+        E-Mail:
+        <a
+          href="mailto:info@bundesfachstelle-barrierefreiheit.de"
+          class="text-primary hover:underline"
+          >info@bundesfachstelle-barrierefreiheit.de</a
+        >
+      </p>
+      <p>
+        Website:
+        <a
+          href="https://www.bundesfachstelle-barrierefreiheit.de"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-primary hover:underline"
+          >www.bundesfachstelle-barrierefreiheit.de</a
+        >
+      </p>
+    </div>
+  </section>
+
+  <section aria-labelledby="updates-heading" class="mb-8">
+    <h2 id="updates-heading" class="text-2xl font-semibold mb-4 text-neutral">
+      Aktualisierungen dieser Erklärung
+    </h2>
+    <p class="text-gray-700 leading-relaxed">
+      Diese Erklärung wird regelmäßig überprüft und aktualisiert, um
+      Änderungen in der Anwendung oder den rechtlichen Anforderungen
+      Rechnung zu tragen.
+    </p>
+    <p class="mt-2 text-sm text-gray-600">
+      <strong>Letzte Aktualisierung:</strong> {{ lastUpdated }}
+    </p>
+  </section>
+
+  <div class="mt-8 pt-6 border-t border-base-200">
+    <a
+      routerLink="/"
+      class="text-primary hover:underline font-medium"
+      >&larr; Zurück zur Startseite</a
+    >
+  </div>
+</article>
