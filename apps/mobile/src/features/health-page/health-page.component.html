@@ -9,60 +9,67 @@
       ></ActivityIndicator>
     </FlexboxLayout>
   } @else {
-    <PullToRefresh (refresh)="onRefresh($any($event))">
-      <ScrollView>
-        <StackLayout
-          #contentContainer
-          class="p-5 pb-10 space-y-5"
-          (swipe)="onSwipe($event)"
-        >
-          @if (!isBusy() && (loading() || isTransitioning()) && hasLoadedOnce()) {
-            <FlexboxLayout class="items-center justify-center py-2 space-x-2">
-              <ActivityIndicator
-                busy="true"
-                class="w-5 h-5"
-                color="#4A6C6F"
-              ></ActivityIndicator>
-              <Label
-                class="text-xs text-gray-500"
-                [text]="isTransitioning() ? 'Wechsle Tag...' : 'Aktualisiere Daten...'"
-              ></Label>
-            </FlexboxLayout>
-          }
-          <StackLayout class="items-center">
-            <Label
-              class="text-3xl font-bold text-neutral"
-              text="Health Hub"
-            ></Label>
-            <Label
-              class="text-xs text-gray-500"
-              text="Deine tägliche Übersicht"
-            ></Label>
-          </StackLayout>
+    <AbsoluteLayout class="h-full w-full">
+      <StackLayout
+        #pagerContainer
+        left="0"
+        top="0"
+        width="100%"
+        height="100%"
+        (pan)="onPan($event)"
+      >
+        <PullToRefresh (refresh)="onRefresh($any($event))">
+          <ScrollView>
+            <StackLayout class="p-5 pb-10 space-y-5">
+              @if (!isBusy() && (loading() || isTransitioning()) && hasLoadedOnce()) {
+                <FlexboxLayout class="items-center justify-center py-2 space-x-2">
+                  <ActivityIndicator
+                    busy="true"
+                    class="w-5 h-5"
+                    color="#4A6C6F"
+                  ></ActivityIndicator>
+                  <Label
+                    class="text-xs text-gray-500"
+                    [text]="isTransitioning() ? 'Wechsle Tag...' : 'Aktualisiere Daten...'"
+                  ></Label>
+                </FlexboxLayout>
+              }
+              <StackLayout class="items-center">
+                <Label
+                  class="text-3xl font-bold text-neutral"
+                  text="Health Hub"
+                ></Label>
+                <Label
+                  class="text-xs text-gray-500"
+                  text="Deine tägliche Übersicht"
+                ></Label>
+              </StackLayout>
 
-          @if (error()) {
-            <StackLayout class="bg-red-50 border border-red-200 rounded-xl p-3">
-              <Label class="text-sm text-red-700" [text]="error()"></Label>
+              @if (error()) {
+                <StackLayout class="bg-red-50 border border-red-200 rounded-xl p-3">
+                  <Label class="text-sm text-red-700" [text]="error()"></Label>
+                </StackLayout>
+              }
+
+              <ns-day-header></ns-day-header>
+
+              <ns-calorie-progress></ns-calorie-progress>
+
+              <ns-macronutrients></ns-macronutrients>
+
+              <ns-water-progress></ns-water-progress>
+
+              <ns-steps-card [stepGoal]="stepGoal()"> </ns-steps-card>
+
+              <ns-tracking-actions></ns-tracking-actions>
+
+              <ns-meal-section></ns-meal-section>
+
+              <ns-activity-section></ns-activity-section>
             </StackLayout>
-          }
-
-          <ns-day-header></ns-day-header>
-
-          <ns-calorie-progress></ns-calorie-progress>
-
-          <ns-macronutrients></ns-macronutrients>
-
-          <ns-water-progress></ns-water-progress>
-
-          <ns-steps-card [stepGoal]="stepGoal()"> </ns-steps-card>
-
-          <ns-tracking-actions></ns-tracking-actions>
-
-          <ns-meal-section></ns-meal-section>
-
-          <ns-activity-section></ns-activity-section>
-        </StackLayout>
-      </ScrollView>
-    </PullToRefresh>
+          </ScrollView>
+        </PullToRefresh>
+      </StackLayout>
+    </AbsoluteLayout>
   }
 </StackLayout>

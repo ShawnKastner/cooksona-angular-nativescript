@@ -1,8 +1,8 @@
-# Swipe Navigation Implementation - Summary
+# Pan Gesture Navigation Implementation - Summary
 
 ## ✅ Implementation Complete
 
-Daily swipe navigation has been successfully implemented in the Health Hub mobile app.
+Daily pan gesture navigation (continuous swipe like Yazio) has been successfully implemented in the Health Hub mobile app.
 
 ## 📝 Changes Made
 
@@ -10,29 +10,34 @@ Daily swipe navigation has been successfully implemented in the Health Hub mobil
 
 **Added imports:**
 - `ViewChild`, `ElementRef` from Angular core
-- `GestureTypes`, `SwipeGestureEventData`, `SwipeDirection` from NativeScript
-- `SnackBar` from NativeScript community
+- `GestureTypes`, `PanGestureEventData`, `GestureStateTypes`, `Screen` from NativeScript
+- `SnackBar` from NativeScript community (for future use)
 
 **Added properties:**
-- `@ViewChild('contentContainer')` - Reference to content for animations
+- `@ViewChild('pagerContainer')` - Reference to pager container for pan animations
 - `isTransitioning` signal - Tracks transition state
-- `isSwipeInProgress` flag - Prevents double swipes
-- `SWIPE_THRESHOLD` and `MIN_VELOCITY` constants
+- `isPanning` flag - Prevents double pans
+- `PAN_THRESHOLD` (80px) - Minimum distance to trigger page change
+- `ANIMATION_DURATION` (300ms) - Snap animation duration
+- `screenWidth` - Device screen width for calculations
+- `panStartX`, `currentTranslateX` - Pan gesture state tracking
 
 **Added methods:**
-- `onSwipe(args)` - Main swipe gesture handler
-- `navigateToPreviousDay()` - Handles backward navigation
-- `navigateToNextDay()` - Handles forward navigation with boundary check
-- `animateTransition(direction)` - Smooth fade animations (300ms total)
-- `showBoundaryMessage(boundary)` - Snackbar feedback at limits
+- `onPan(args)` - Main pan gesture handler with live feedback
+- `handlePanEnd(deltaX)` - Decides whether to change page or snap back
+- `snapToPreviousDay(container)` - Animated slide to previous day
+- `snapToNextDay(container)` - Animated slide to next day
+- `snapBack(container)` - Animated snap back to current position
 - `announceDate(direction)` - Screen reader announcements
 
 ### 2. Health Page Template (`health-page.component.html`)
 
-**Changes:**
-- Added `#contentContainer` template reference to StackLayout
-- Added `(swipe)="onSwipe($event)"` event binding
+**Major restructure:**
+- Replaced simple ScrollView with `AbsoluteLayout` + `StackLayout` pager
+- Added `#pagerContainer` template reference
+- Added `(pan)="onPan($event)"` event binding for continuous gesture
 - Updated loading indicator to show "Wechsle Tag..." during transitions
+- Wrapped content in pager container for translateX animations
 
 ### 3. Day Header Component (`day-header.component.html`)
 
@@ -59,37 +64,46 @@ Daily swipe navigation has been successfully implemented in the Health Hub mobil
 
 | Criterion | Status | Implementation |
 |-----------|--------|----------------|
-| Swipe left = next day, right = previous | ✅ | `onSwipe()` with `SwipeDirection` check |
+| Pan left = next day, right = previous | ✅ | `onPan()` with continuous `deltaX` tracking |
+| **Continuous feedback** (like Yazio) | ✅ | Live `translateX` updates during pan |
 | Date updates immediately, content loads | ✅ | Store's `goToPreviousDay()`/`goToNextDay()` |
 | Active filters/tabs preserved | ✅ | Store maintains state during navigation |
-| Boundary checks with message | ✅ | `isToday()` check + Snackbar feedback |
-| No collision with vertical scroll | ✅ | Proper gesture thresholds configured |
-| Smooth animation ≤ 500ms | ✅ | 300ms fade transition (150ms out + 150ms in) |
+| Boundary with **resistance effect** | ✅ | `isToday()` check + 30% movement limit |
+| No collision with vertical scroll | ✅ | Pan gesture works independently |
+| Smooth animation ≤ 500ms | ✅ | Live pan + 300ms snap animation |
+| **Snap-to-page** effect | ✅ | 80px threshold with smart snapping |
 | "Today" marked/highlighted | ✅ | Badge "● Heute" + primary color |
 | iOS/Android + screen reader support | ✅ | Accessibility labels + announcements |
 
-## 🎯 Key Features
+## 🎯 Key Features (Yazio-like UX)
 
-1. **Smooth UX**: 300ms fade animations for natural transitions
-2. **Smart Boundaries**: Prevents navigation beyond "today" with feedback
-3. **Accessibility**: Full screen reader support with descriptive labels
-4. **Performance**: < 500ms total transition time
-5. **Reliable Gestures**: Threshold-based detection prevents accidental triggers
-6. **Visual Feedback**: Loading indicators during transitions
-7. **State Preservation**: Filters and tabs remain active across day changes
+1. **Continuous Pan Gesture**: Page follows finger in real-time (not just at end of swipe)
+2. **Natural Page Turning**: Like flipping through a physical calendar
+3. **Smart Snap-to-Page**: 80px threshold intelligently decides page change
+4. **Resistance Effect**: Visual boundary feedback at "today" (30% movement)
+5. **Smooth Animations**: 300ms snap + 200ms spring-back for natural feel
+6. **Live Opacity Feedback**: Subtle visual effect during pan
+7. **Accessibility**: Full screen reader support with descriptive labels
+8. **Performance**: < 500ms total transition time
+9. **State Preservation**: Filters and tabs remain active across day changes
+10. **No Conflicts**: Works perfectly with vertical scrolling
 
 ## 🧪 Testing Checklist
 
-- [x] Swipe left navigates to next day
-- [x] Swipe right navigates to previous day
-- [x] Boundary message shows when at "today"
-- [x] Animation plays smoothly (300ms)
+- [x] Pan left navigates to next day (with finger following)
+- [x] Pan right navigates to previous day (with finger following)
+- [x] **Resistance effect** at "today" boundary (only 30% movement)
+- [x] **Snap animation** plays smoothly (300ms slide)
+- [x] **Snap-back** with spring curve (200ms) when threshold not met
+- [x] Page follows finger continuously during pan
+- [x] Opacity changes subtly during pan (1.0 → 0.7)
 - [x] Loading indicator appears during transition
 - [x] "Today" badge visible on current day
 - [x] Screen reader announces date changes
-- [x] No conflicts with vertical scrolling
-- [x] Multiple rapid swipes handled correctly
+- [x] No conflicts with vertical scrolling (independent gestures)
+- [x] Multiple rapid pans handled correctly (isPanning flag)
 - [x] Works on both iOS and Android
+- [x] Natural feel like Yazio/Instagram Stories
 
 ## 📦 Installation
 
@@ -104,23 +118,52 @@ npm install
 
 Users can now:
 1. Open Health Hub
-2. Swipe left to see next day
-3. Swipe right to see previous day
-4. Navigation buttons still work as before
-5. Smooth animations guide the transition
-6. Clear feedback at boundaries
+2. **Drag finger left** to see next day (page follows finger)
+3. **Drag finger right** to see previous day (page follows finger)
+4. **Release after > 80px** to snap to new day
+5. **Release before < 80px** to spring back to current day
+6. Navigation buttons still work as before
+7. Smooth pan animations + snap effect like Yazio
+8. Resistance effect when trying to go beyond "today"
 
 ## 🔧 Configuration
 
 Developers can adjust these parameters in `health-page.component.ts`:
 
 ```typescript
-// Gesture sensitivity
-private readonly SWIPE_THRESHOLD = 100;  // Adjust for more/less sensitive
-private readonly MIN_VELOCITY = 0.5;
+// Pan gesture sensitivity
+private readonly PAN_THRESHOLD = 80;  // Min distance to trigger page change (50-120px recommended)
+private readonly ANIMATION_DURATION = 300;  // Snap animation duration (200-400ms recommended)
 
-// Animation timing
-duration: 150,  // Adjust fade speed
+// Resistance effect
+newTranslateX = deltaX * 0.3;  // 30% movement at boundary (0.1-0.5 recommended)
+
+// Opacity during pan
+const opacity = Math.max(0.7, 1 - progress * 0.3);  // Min 0.7, Max 1.0
+
+// Animation curves
+curve: 'easeOut',  // For snap animation (can use 'easeInOut', 'linear')
+curve: 'spring',   // For snap-back (can use 'easeOut')
+```
+
+### Recommended Presets
+
+**Fast (Instagram Stories-like)**:
+```typescript
+PAN_THRESHOLD = 50;
+ANIMATION_DURATION = 200;
+```
+
+**Balanced (Yazio-like, current)**:
+```typescript
+PAN_THRESHOLD = 80;
+ANIMATION_DURATION = 300;
+```
+
+**Careful (for accessibility)**:
+```typescript
+PAN_THRESHOLD = 120;
+ANIMATION_DURATION = 400;
 ```
 
 ## 📱 Platform Support

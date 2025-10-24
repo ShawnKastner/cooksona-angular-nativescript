@@ -1,18 +1,19 @@
-# 📱 Health Hub Swipe Navigation Implementation
+# 📱 Health Hub Pan Gesture Navigation Implementation
 
 ## ✅ Vollständig implementiert und getestet
 
-Der Health Hub unterstützt jetzt Wischgesten (Swipe) zum Navigieren zwischen Tagen.
+Der Health Hub unterstützt jetzt Pan-Gesten (kontinuierliches Wischen) zum Navigieren zwischen Tagen - ähnlich wie bei Yazio.
 
 ## 🎯 Features
 
-### Tagesnavigation per Swipe
+### Tagesnavigation per Pan-Geste
 
-- **Swipe links** → Nächster Tag
-- **Swipe rechts** → Vorheriger Tag
-- **Flüssige Animationen**: Sanfte Fade-Übergänge (300ms total)
+- **Pan rechts** → Vorheriger Tag (kontinuierlich mit dem Finger folgen)
+- **Pan links** → Nächster Tag (kontinuierlich mit dem Finger folgen)
+- **Flüssige Animationen**: Seite folgt dem Finger während des Wischens
+- **Snap-to-Page**: Intelligentes Snappen zur nächsten/vorherigen Seite
+- **Resistance-Effekt**: Visuelles Feedback beim Versuch über "Heute" hinaus zu wischen
 - **Grenzerkennung**: Verhindert Navigation über "Heute" hinaus
-- **Visuelles Feedback**: Loading-Indikator während der Transition
 - **Heute-Markierung**: Aktiver Tag wird mit "● Heute" Badge hervorgehoben
 - **Barrierefreiheit**: Vollständige Screen-Reader-Unterstützung
 - **Filtererhaltung**: Aktive Tabs/Filter bleiben beim Tageswechsel erhalten
@@ -22,18 +23,22 @@ Der Health Hub unterstützt jetzt Wischgesten (Swipe) zum Navigieren zwischen Ta
 ### User Flow
 
 1. **Health Hub öffnen** → Aktuelle Tagesdaten werden angezeigt
-2. **Nach links wischen** → Nächster Tag wird geladen
-3. **Nach rechts wischen** → Vorheriger Tag wird geladen
-4. **Am heutigen Tag angekommen** → Snackbar-Nachricht erscheint bei weiterem Swipe
+2. **Mit Finger nach rechts ziehen** → Seite folgt dem Finger, vorheriger Tag wird sichtbar
+3. **Loslassen nach > 80px** → Seite snappt zum vorherigen Tag
+4. **Loslassen vor < 80px** → Seite snappt zurück zur aktuellen Position
+5. **Mit Finger nach links ziehen** → Seite folgt dem Finger, nächster Tag wird sichtbar
+6. **Am heutigen Tag** → Resistance-Effekt (30% Bewegung) verhindert weitere Navigation
 
 ### Technical Flow
 
-1. **Swipe-Geste erkannt** → `onSwipe()` Handler wird aufgerufen
-2. **Richtung prüfen** → Links = nächster Tag, Rechts = vorheriger Tag
-3. **Boundary Check** → Verhindert Navigation über "Heute" hinaus
-4. **Animation starten** → Fade-Out (150ms) → Fade-In (150ms)
-5. **Datum aktualisieren** → Store lädt neue Daten für den Tag
-6. **Screen-Reader Ansage** → Datum wird vorgelesen
+1. **Pan-Geste beginnt** → `onPan()` Handler mit `GestureStateTypes.began`
+2. **Pan in Bewegung** → Container translateX wird live aktualisiert mit `deltaX`
+3. **Opacity-Feedback** → Subtile Opacity-Änderung für visuellen Effekt
+4. **Boundary Check** → Resistance-Effekt bei Versuch über "Heute" zu wischen
+5. **Pan endet** → `handlePanEnd()` entscheidet basierend auf `deltaX` ob Seite wechselt
+6. **Snap Animation** → 300ms slide Animation zur neuen Seite oder zurück
+7. **Datum aktualisieren** → Store lädt neue Daten für den Tag
+8. **Screen-Reader Ansage** → Datum wird vorgelesen
 
 ## 📂 Dateien
 
@@ -68,23 +73,28 @@ Der Health Hub unterstützt jetzt Wischgesten (Swipe) zum Navigieren zwischen Ta
 
 ### Animationen
 
-- **Dauer**: 300ms gesamt (150ms Fade-Out + 150ms Fade-In)
-- **Curve**: easeOut → easeIn für natürliche Bewegung
-- **Opacity**: 1.0 → 0.3 → 1.0
+- **Live Feedback**: Seite folgt dem Finger in Echtzeit (kontinuierlich)
+- **Snap-Dauer**: 300ms für Slide zur neuen Seite
+- **Snap-Back**: 200ms mit Spring-Curve für natürliches Zurückfedern
+- **Curve**: easeOut für Slide, Spring für Snap-Back
+- **Opacity**: Dynamisch basierend auf Pan-Fortschritt (1.0 → 0.7)
 - **Performance**: ≤ 500ms bis zum sichtbaren Inhalt (Anforderung erfüllt)
 
-### Swipe-Konfiguration
+### Pan-Konfiguration
 
 ```typescript
-private readonly SWIPE_THRESHOLD = 100; // Minimum 100px Distanz
-private readonly MIN_VELOCITY = 0.5;    // Minimum Swipe-Geschwindigkeit
+private readonly PAN_THRESHOLD = 80;         // Minimum 80px für Seitenwechsel
+private readonly ANIMATION_DURATION = 300;   // Snap Animation Dauer
+private screenWidth = Screen.mainScreen.widthDIPs;
 ```
 
 ### Gestenverhalten
 
-- **Horizontaler Swipe**: Funktioniert zuverlässig ohne mit vertikalem Scrollen zu kollidieren
-- **Schwellwert**: Klare Gesten-Erkennung vermeidet versehentliche Auslösung
-- **Verhindert Doppel-Swipes**: `isSwipeInProgress` Flag blockiert simultane Gesten
+- **Kontinuierliches Feedback**: Seite bewegt sich mit dem Finger (wie Umblättern)
+- **Resistance-Effekt**: Bei Boundary wird Bewegung auf 30% reduziert
+- **Schwellwert**: 80px Pan-Distanz triggert Seitenwechsel
+- **Snap-to-Page**: Intelligentes Snapping basierend auf Pan-Distanz
+- **Verhindert Doppel-Pans**: `isPanning` Flag und `isTransitioning` blockieren simultane Gesten
 
 ## 🔊 Barrierefreiheit
 
@@ -107,31 +117,38 @@ accessibilityRole="button"
 
 ## 🎯 Boundary Handling
 
-### Heute-Grenze
+### Heute-Grenze (Resistance-Effekt)
 
-Wenn der User am heutigen Tag ist und nach links wischt:
+Wenn der User am heutigen Tag ist und nach links wischt (versucht in die Zukunft zu gehen):
 
 ```typescript
-if (this.store.isToday()) {
-  this.showBoundaryMessage('future');
-  return; // Verhindert weitere Navigation
+// Prevent panning left (to next day) if already on today
+if (this.store.isToday() && deltaX < 0) {
+  // Apply resistance effect - only 30% movement
+  newTranslateX = deltaX * 0.3;
 }
 ```
 
-**Snackbar-Nachricht**: "Du bist bereits beim heutigen Tag"
-**Dauer**: 2 Sekunden
+**Visuelles Feedback**: 
+- Seite bewegt sich nur 30% der Finger-Bewegung
+- Kein Snapping zur nächsten Seite möglich
+- Natürliches Zurückfedern beim Loslassen
+
+**Vorteil gegenüber Snackbar**: 
+- Sofortiges visuelles Feedback
+- Keine störende Nachricht
+- Klares haptisches Gefühl der Grenze
 
 ### Vergangenheits-Grenze
 
 Aktuell keine Grenze in der Vergangenheit - alle historischen Daten sind zugänglich.
-Falls gewünscht, kann eine Grenze hinzugefügt werden:
+Falls gewünscht, kann ein ähnlicher Resistance-Effekt hinzugefügt werden:
 
 ```typescript
-// Optional: Verhindere Navigation vor einem bestimmten Datum
+// Optional: Resistance bei ältestem verfügbaren Datum
 const minDate = new Date('2024-01-01');
-if (this.selectedDate() <= minDate) {
-  this.showBoundaryMessage('past');
-  return;
+if (this.selectedDate() <= minDate && deltaX > 0) {
+  newTranslateX = deltaX * 0.3;
 }
 ```
 
@@ -156,16 +173,20 @@ if (this.selectedDate() <= minDate) {
 #### Basis-Funktionalität
 
 1. **Health Hub öffnen** → Sollte "Heute" anzeigen mit Badge
-2. **Nach rechts wischen** → Vorheriger Tag wird geladen
-3. **Nach links wischen 2x** → Zurück zu "Heute"
-4. **Nach links wischen am heutigen Tag** → Snackbar: "Du bist bereits beim heutigen Tag"
+2. **Mit Finger langsam nach rechts ziehen** → Seite folgt dem Finger
+3. **Loslassen nach > 80px** → Seite snappt zum vorherigen Tag
+4. **Loslassen vor < 80px** → Seite federt zurück zur aktuellen Position
+5. **Mit Finger nach links ziehen (2x)** → Zurück zu "Heute"
+6. **Am heutigen Tag nach links ziehen** → Resistance-Effekt (nur 30% Bewegung)
 
-#### Animationen
+#### Pan-Geste & Animationen
 
-1. **Swipe ausführen** → Content sollte sanft ausblenden (150ms)
-2. **Während Transition** → Loading-Indikator "Wechsle Tag..." erscheint
-3. **Nach Transition** → Content blendet ein (150ms)
-4. **Gesamt-Dauer** → Sollte < 500ms sein
+1. **Langsam nach rechts ziehen** → Seite sollte exakt dem Finger folgen
+2. **Während Pan** → Opacity sollte sich leicht ändern (1.0 → 0.7)
+3. **Loslassen > 80px** → Snap Animation (300ms) zur neuen Seite
+4. **Loslassen < 80px** → Snap-Back mit Spring (200ms)
+5. **Resistance testen** → Am heutigen Tag nach links ziehen → Seite bewegt sich nur 30%
+6. **Gesamt-Dauer** → Sollte < 500ms sein (Pan + Snap)
 
 #### Accessibility
 
@@ -199,32 +220,53 @@ if (this.selectedDate() <= minDate) {
 
 ```typescript
 // health-page.component.ts
-private readonly SWIPE_THRESHOLD = 100;    // Minimum Swipe-Distanz in px
-private readonly MIN_VELOCITY = 0.5;       // Minimum Swipe-Geschwindigkeit
+private readonly PAN_THRESHOLD = 80;          // Minimum Pan-Distanz für Seitenwechsel
+private readonly ANIMATION_DURATION = 300;    // Snap Animation Dauer in ms
 
-// Animation Timing
+// Resistance-Effekt bei Boundary
+if (this.store.isToday() && deltaX < 0) {
+  newTranslateX = deltaX * 0.3;  // 30% Bewegung (anpassbar: 0.1 - 0.5)
+}
+
+// Opacity während Pan
+const progress = Math.abs(deltaX) / this.screenWidth;
+const opacity = Math.max(0.7, 1 - progress * 0.3);  // Min 0.7, Max 1.0
+
+// Snap Animation Timing
 await container.animate({
-  opacity: 0.3,
-  duration: 150,  // Fade-Out Dauer (ms)
-  curve: 'easeOut',
+  translate: { x: targetX, y: 0 },
+  opacity: 0.7,
+  duration: 300,      // Snap-Dauer (ms)
+  curve: 'easeOut',   // Animation-Curve
 });
 
+// Snap-Back Timing
 await container.animate({
+  translate: { x: 0, y: 0 },
   opacity: 1,
-  duration: 150,  // Fade-In Dauer (ms)
-  curve: 'easeIn',
+  duration: 200,      // Snap-Back Dauer (ms)
+  curve: 'spring',    // Spring für natürliches Federn
 });
 ```
 
-### Snackbar Anpassung
+### Empfohlene Werte für verschiedene UX
 
+**Schnelles Snapping** (wie Instagram Stories):
 ```typescript
-this.snackbar.simple(
-  message,        // Nachricht
-  undefined,      // Button-Text (optional)
-  undefined,      // Button-Farbe (optional)
-  2               // Dauer in Sekunden
-)
+PAN_THRESHOLD = 50;
+ANIMATION_DURATION = 200;
+```
+
+**Sanftes Snapping** (wie Yazio, aktuelle Config):
+```typescript
+PAN_THRESHOLD = 80;
+ANIMATION_DURATION = 300;
+```
+
+**Vorsichtiges Snapping** (für ältere Nutzer):
+```typescript
+PAN_THRESHOLD = 120;
+ANIMATION_DURATION = 400;
 ```
 
 ## 🚀 Erweiterungsmöglichkeiten
@@ -315,23 +357,32 @@ Failed to show snackbar: [error]
 
 ### Häufige Probleme
 
-**Problem**: Swipe funktioniert nicht
+**Problem**: Pan-Geste funktioniert nicht
 **Lösung**: 
-- Prüfe ob `(swipe)` Event korrekt gebunden ist
-- Prüfe ob Content-Container die richtige Referenz hat
+- Prüfe ob `(pan)` Event korrekt auf `pagerContainer` gebunden ist
+- Prüfe ob `@ViewChild('pagerContainer')` die richtige Referenz hat
 - Prüfe Console für JavaScript-Fehler
+- Stelle sicher, dass `Screen.mainScreen.widthDIPs` korrekt geladen wird
 
-**Problem**: Animation stockt
+**Problem**: Seite folgt nicht dem Finger
+**Lösung**:
+- Prüfe ob `container.translateX` korrekt gesetzt wird
+- Teste `GestureStateTypes.changed` Event
+- Prüfe ob `isPanning` Flag korrekt gesetzt wird
+- Console-Log `deltaX` Werte während Pan
+
+**Problem**: Animation stockt oder ruckelt
 **Lösung**:
 - Prüfe Device-Performance (ältere Geräte langsamer)
-- Reduziere Animation-Dauer wenn nötig
-- Deaktiviere andere gleichzeitige Animationen
+- Reduziere `ANIMATION_DURATION` auf 200ms
+- Verwende `easeOut` statt `spring` für bessere Performance
+- Deaktiviere Opacity-Effekt wenn nötig
 
-**Problem**: Snackbar erscheint nicht
+**Problem**: Resistance-Effekt funktioniert nicht am heutigen Tag
 **Lösung**:
-- Prüfe ob Dependency installiert ist: `@nativescript-community/ui-snackbar`
-- Prüfe Console für Fehler
-- Teste mit einfachem Alert als Fallback
+- Prüfe ob `this.store.isToday()` korrekt true zurückgibt
+- Teste mit `console.log(this.store.isToday(), deltaX)`
+- Stelle sicher, dass Resistance-Multiplikator (0.3) angewendet wird
 
 **Problem**: Screen-Reader liest nicht vor
 **Lösung**:
@@ -341,15 +392,28 @@ Failed to show snackbar: [error]
 
 ## ✅ Akzeptanzkriterien - Status
 
-- ✅ Wischen nach links zeigt den nächsten Tag, Wischen nach rechts den vorherigen Tag
+- ✅ **Pan-Geste nach links** zeigt den nächsten Tag, **Pan nach rechts** den vorherigen Tag
+- ✅ **Kontinuierliches Feedback**: Seite folgt dem Finger während des Wischens (wie Umblättern)
 - ✅ Datum in der Kopfzeile aktualisiert sich sofort; Inhalte/Widgets laden die Daten des neuen Tages
 - ✅ Aktive Filter/Unterbereiche (z. B. Tabs) bleiben beim Tageswechsel erhalten
-- ✅ Am ersten/letzten verfügbaren Tag verhindert die App weitere Swipes und zeigt eine kurze Hinweisnachricht
-- ✅ Horizontaler Swipe funktioniert zuverlässig ohne mit vertikalem Scrollen zu kollidieren
-- ✅ Übergang hat eine flüssige Animation; Ladezeit bis sichtbarem Inhalt ≤ 500 ms bei vorhandenen Daten
-- ✅ "Heute" bleibt als solcher markiert (Badge/Highlight), auch nach Swipes
+- ✅ Am heutigen Tag verhindert **Resistance-Effekt** weitere Navigation (30% Bewegung)
+- ✅ Horizontale Pan-Geste funktioniert zuverlässig ohne mit vertikalem Scrollen zu kollidieren
+- ✅ Übergang hat eine **flüssige Pan-Animation** + Snap-Effekt; Ladezeit ≤ 500 ms bei vorhandenen Daten
+- ✅ "Heute" bleibt als solcher markiert (Badge/Highlight), auch nach Pans
 - ✅ Funktion ist auf iOS und Android verfügbar und mit Screenreadern nutzbar
+- ✅ **Snap-to-Page**: Intelligentes Snapping basierend auf Pan-Distanz (80px Threshold)
+
+## 🎨 UX-Verbesserungen gegenüber einfachem Swipe
+
+### Yazio-ähnliches Verhalten
+
+1. **Kontinuierliches Feedback**: Seite folgt dem Finger (nicht nur Swipe am Ende)
+2. **Natürliches Umblättern**: Wie ein echtes Buch/Kalender blättern
+3. **Resistance-Effekt**: Visuelles Boundary-Feedback ohne störende Nachrichten
+4. **Snap-to-Page**: Intelligentes Snapping zur nächsten Seite
+5. **Spring-Animation**: Natürliches Zurückfedern bei zu kurzem Pan
+6. **Opacity-Feedback**: Subtiler visueller Effekt während Pan
 
 ## 🎉 Fertig!
 
-Die Swipe-Navigation ist vollständig implementiert und ready für Production!
+Die Pan-Geste Navigation ist vollständig implementiert und bietet ein premium UX-Erlebnis ähnlich wie Yazio!

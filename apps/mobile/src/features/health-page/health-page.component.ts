@@ -23,8 +23,9 @@ import { HealthKitSyncService } from '../../plugins/healthkit/healthkit-sync.ser
 import { PullToRefresh } from '@nativescript-community/ui-pulltorefresh';
 import {
   GestureTypes,
-  SwipeGestureEventData,
-  SwipeDirection,
+  PanGestureEventData,
+  GestureStateTypes,
+  Screen,
 } from '@nativescript/core';
 import { SnackBar } from '@nativescript/community/ui-snackbar';
 
@@ -51,8 +52,8 @@ export class HealthPageComponent implements OnInit {
   private readonly healthKitSync = inject(HealthKitSyncService);
   private readonly snackbar = new SnackBar();
 
-  @ViewChild('contentContainer', { static: false })
-  contentContainer?: ElementRef;
+  @ViewChild('pagerContainer', { static: false })
+  pagerContainer?: ElementRef;
 
   protected readonly loading = this.store.loading;
   protected readonly error = this.store.error;
@@ -60,6 +61,7 @@ export class HealthPageComponent implements OnInit {
   protected readonly hasLoadedOnce = this.store.hasLoadedOnce;
   protected readonly isBusy = signal(false); // For pull-to-refresh loading indicator
   protected readonly isTransitioning = signal(false);
+  protected readonly isToday = this.store.isToday;
 
   protected readonly requiresOnboarding = this.store.requiresOnboarding;
 
@@ -69,10 +71,13 @@ export class HealthPageComponent implements OnInit {
     return profile?.stepGoal || 10000; // Default 10,000 steps
   });
 
-  // Swipe gesture configuration
-  private readonly SWIPE_THRESHOLD = 100; // Minimum distance in pixels
-  private readonly MIN_VELOCITY = 0.5; // Minimum swipe velocity
-  private isSwipeInProgress = false;
+  // Pan gesture configuration
+  private readonly PAN_THRESHOLD = 80; // Minimum distance to trigger page change
+  private readonly ANIMATION_DURATION = 300; // Snap animation duration
+  private screenWidth = Screen.mainScreen.widthDIPs;
+  private panStartX = 0;
+  private currentTranslateX = 0;
+  private isPanning = false;
 
   async ngOnInit(): Promise<void> {
     await this.store.load();
@@ -147,103 +152,148 @@ export class HealthPageComponent implements OnInit {
   }
 
   /**
-   * Handle swipe gesture for day navigation
-   * Swipe left = next day, Swipe right = previous day
+   * Handle pan gesture for continuous day navigation
+   * Like a page turner effect similar to Yazio
    */
-  onSwipe(args: SwipeGestureEventData): void {
-    // Prevent multiple simultaneous swipes
-    if (this.isSwipeInProgress || this.isTransitioning()) {
-      return;
-    }
+  onPan(args: PanGestureEventData): void {
+    const container = this.pagerContainer?.nativeElement;
+    if (!container || this.isTransitioning()) return;
 
-    const direction = args.direction;
+    const deltaX = args.deltaX;
+    const state = args.state;
 
-    // Swipe left = next day
-    if (direction === SwipeDirection.left) {
-      this.navigateToNextDay();
-    }
-    // Swipe right = previous day
-    else if (direction === SwipeDirection.right) {
-      this.navigateToPreviousDay();
+    if (state === GestureStateTypes.began) {
+      // Pan started
+      this.isPanning = true;
+      this.panStartX = this.currentTranslateX;
+    } else if (state === GestureStateTypes.changed) {
+      // Pan in progress - move container with finger
+      if (!this.isPanning) return;
+
+      let newTranslateX = deltaX;
+
+      // Prevent panning right (to next day) if already on today
+      if (this.store.isToday() && deltaX < 0) {
+        // Apply resistance effect
+        newTranslateX = deltaX * 0.3;
+      }
+
+      // Apply the translation
+      container.translateX = newTranslateX;
+      
+      // Subtle opacity effect for better visual feedback
+      const progress = Math.abs(deltaX) / this.screenWidth;
+      const opacity = Math.max(0.7, 1 - progress * 0.3);
+      container.opacity = opacity;
+    } else if (
+      state === GestureStateTypes.ended ||
+      state === GestureStateTypes.cancelled
+    ) {
+      // Pan ended - decide whether to snap to next/prev day or bounce back
+      this.handlePanEnd(deltaX);
     }
   }
 
-  private async navigateToPreviousDay(): Promise<void> {
-    if (this.isTransitioning()) return;
+  /**
+   * Handle pan end and decide whether to change day or snap back
+   */
+  private async handlePanEnd(deltaX: number): Promise<void> {
+    const container = this.pagerContainer?.nativeElement;
+    if (!container) return;
 
-    this.isSwipeInProgress = true;
+    this.isPanning = false;
+
+    // Determine if we should change the day based on pan distance
+    const shouldChangePage = Math.abs(deltaX) > this.PAN_THRESHOLD;
+
+    if (shouldChangePage && deltaX > 0) {
+      // Panned right - go to previous day
+      await this.snapToPreviousDay(container);
+    } else if (shouldChangePage && deltaX < 0 && !this.store.isToday()) {
+      // Panned left - go to next day (only if not today)
+      await this.snapToNextDay(container);
+    } else {
+      // Not enough distance or boundary hit - snap back to current position
+      await this.snapBack(container);
+    }
+  }
+
+  /**
+   * Snap to previous day with animation
+   */
+  private async snapToPreviousDay(container: any): Promise<void> {
     this.isTransitioning.set(true);
 
     try {
-      // Animate transition
-      await this.animateTransition('right');
+      // Animate slide to the right (full screen width)
+      await container.animate({
+        translate: { x: this.screenWidth, y: 0 },
+        opacity: 0.7,
+        duration: this.ANIMATION_DURATION,
+        curve: 'easeOut',
+      });
 
-      // Update date (store handles data loading)
+      // Change to previous day
       this.store.goToPreviousDay();
-
-      // Announce to screen readers
       this.announceDate('previous');
+
+      // Reset position without animation
+      container.translateX = 0;
+      container.opacity = 1;
     } catch (error) {
-      console.error('Failed to navigate to previous day:', error);
+      console.error('Failed to snap to previous day:', error);
+      container.translateX = 0;
+      container.opacity = 1;
     } finally {
-      this.isSwipeInProgress = false;
-      this.isTransitioning.set(false);
-    }
-  }
-
-  private async navigateToNextDay(): Promise<void> {
-    if (this.isTransitioning()) return;
-
-    // Check if we're already on today
-    if (this.store.isToday()) {
-      this.showBoundaryMessage('future');
-      return;
-    }
-
-    this.isSwipeInProgress = true;
-    this.isTransitioning.set(true);
-
-    try {
-      // Animate transition
-      await this.animateTransition('left');
-
-      // Update date (store handles data loading)
-      this.store.goToNextDay();
-
-      // Announce to screen readers
-      this.announceDate('next');
-    } catch (error) {
-      console.error('Failed to navigate to next day:', error);
-    } finally {
-      this.isSwipeInProgress = false;
       this.isTransitioning.set(false);
     }
   }
 
   /**
-   * Animate content transition with fade effect
+   * Snap to next day with animation
    */
-  private async animateTransition(direction: 'left' | 'right'): Promise<void> {
-    const container = this.contentContainer?.nativeElement;
-    if (!container) return;
+  private async snapToNextDay(container: any): Promise<void> {
+    this.isTransitioning.set(true);
 
     try {
-      // Quick fade out
+      // Animate slide to the left (full screen width)
       await container.animate({
-        opacity: 0.3,
-        duration: 150,
+        translate: { x: -this.screenWidth, y: 0 },
+        opacity: 0.7,
+        duration: this.ANIMATION_DURATION,
         curve: 'easeOut',
       });
 
-      // Quick fade back in
+      // Change to next day
+      this.store.goToNextDay();
+      this.announceDate('next');
+
+      // Reset position without animation
+      container.translateX = 0;
+      container.opacity = 1;
+    } catch (error) {
+      console.error('Failed to snap to next day:', error);
+      container.translateX = 0;
+      container.opacity = 1;
+    } finally {
+      this.isTransitioning.set(false);
+    }
+  }
+
+  /**
+   * Snap back to current position if pan threshold not met
+   */
+  private async snapBack(container: any): Promise<void> {
+    try {
       await container.animate({
+        translate: { x: 0, y: 0 },
         opacity: 1,
-        duration: 150,
-        curve: 'easeIn',
+        duration: 200,
+        curve: 'spring',
       });
     } catch (error) {
-      console.error('Animation error:', error);
-      // Reset opacity in case of error
+      console.error('Failed to snap back:', error);
+      container.translateX = 0;
       container.opacity = 1;
     }
   }
