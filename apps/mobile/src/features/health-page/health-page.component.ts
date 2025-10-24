@@ -73,11 +73,16 @@ export class HealthPageComponent implements OnInit {
   });
 
   // Pan gesture configuration
-  private readonly PAN_THRESHOLD = 80; // Minimum distance to trigger page change
-  private readonly ANIMATION_DURATION = 300; // Snap animation duration
+  private readonly PAN_THRESHOLD = signal(80); // Minimum distance to trigger page change
+  private readonly ANIMATION_DURATION = signal(300); // Snap animation duration
+  // Small threshold to detect horizontal intent before disabling vertical scroll
+  private readonly HORIZONTAL_DETECT_THRESHOLD = signal(8);
   private screenWidth = Screen.mainScreen.widthDIPs;
-  private panStartX = 0;
-  private currentTranslateX = 0;
+
+  // Internal flag to mark when we've determined the gesture is a horizontal swipe
+  private panDetected = signal(false);
+  // Internal flag to mark when we've determined the gesture is a vertical scroll
+  private verticalDetected = signal(false);
 
   async ngOnInit(): Promise<void> {
     await this.store.load();
@@ -159,18 +164,43 @@ export class HealthPageComponent implements OnInit {
   onPan(event: Event | PanGestureEventData): void {
     const args = event as PanGestureEventData;
     const container = this.pagerContainer?.nativeElement;
-    if (!container || this.isTransitioning()) return;
+    // If we're transitioning between days, ignore gestures
+    if (this.isTransitioning()) return;
 
-    const deltaX = args.deltaX;
+    const deltaX = args.deltaX ?? 0;
+    const deltaY = (args as any).deltaY ?? 0;
     const state = args.state;
 
     if (state === GestureStateTypes.began) {
-      // Pan started - disable scrolling
-      this.isPanning.set(true);
-      this.panStartX = this.currentTranslateX;
+      // Gesture started - don't immediately disable vertical scrolling.
+      // We'll only disable when horizontal intent is detected in 'changed'.
+      this.panDetected.set(false);
+      this.verticalDetected.set(false);
     } else if (state === GestureStateTypes.changed) {
-      // Pan in progress - move container with finger
-      if (!this.isPanning()) return;
+      // If we haven't yet decided the gesture intent, check it now.
+      if (!this.panDetected() && !this.verticalDetected()) {
+        const absX = Math.abs(deltaX);
+        const absY = Math.abs(deltaY);
+
+        // If horizontal movement dominates, mark as horizontal pan.
+        if (absX > absY && absX > this.HORIZONTAL_DETECT_THRESHOLD()) {
+          this.panDetected.set(true);
+          this.isPanning.set(true);
+        }
+
+        // If vertical movement dominates, mark as vertical scroll and don't
+        // allow horizontal panning for the remainder of this gesture.
+        if (absY > absX && absY > this.HORIZONTAL_DETECT_THRESHOLD()) {
+          this.verticalDetected.set(true);
+          // keep isPanning false so ScrollView stays enabled
+        }
+      }
+
+      // If a vertical gesture was detected, do not treat this as a horizontal pan
+      if (this.verticalDetected()) return;
+
+      // If it's a horizontal pan, handle translation
+      if (!this.panDetected()) return;
 
       let newTranslateX = deltaX;
 
@@ -181,16 +211,22 @@ export class HealthPageComponent implements OnInit {
       }
 
       // Apply the translation
-      container.translateX = newTranslateX;
+      if (container) {
+        container.translateX = newTranslateX;
 
-      // Subtle opacity effect for better visual feedback
-      const progress = Math.abs(deltaX) / this.screenWidth;
-      const opacity = Math.max(0.7, 1 - progress * 0.3);
-      container.opacity = opacity;
+        // Subtle opacity effect for better visual feedback
+        const progress = Math.abs(deltaX) / this.screenWidth;
+        const opacity = Math.max(0.7, 1 - progress * 0.3);
+        container.opacity = opacity;
+      }
     } else if (
       state === GestureStateTypes.ended ||
       state === GestureStateTypes.cancelled
     ) {
+      // Ensure pan flags are reset immediately so ScrollView becomes usable
+      this.isPanning.set(false);
+      this.panDetected.set(false);
+
       // Pan ended - decide whether to snap to next/prev day or bounce back
       this.handlePanEnd(deltaX);
     }
@@ -200,14 +236,16 @@ export class HealthPageComponent implements OnInit {
    * Handle pan end and decide whether to change day or snap back
    */
   private async handlePanEnd(deltaX: number): Promise<void> {
+    // Ensure panning flags are cleared regardless of container availability
+    this.isPanning.set(false);
+    this.panDetected.set(false);
+    this.verticalDetected.set(false);
+
     const container = this.pagerContainer?.nativeElement;
     if (!container) return;
 
-    // Re-enable scrolling after pan ends
-    this.isPanning.set(false);
-
     // Determine if we should change the day based on pan distance
-    const shouldChangePage = Math.abs(deltaX) > this.PAN_THRESHOLD;
+    const shouldChangePage = Math.abs(deltaX) > this.PAN_THRESHOLD();
 
     if (shouldChangePage && deltaX > 0) {
       // Panned right - go to previous day
@@ -232,7 +270,7 @@ export class HealthPageComponent implements OnInit {
       await container.animate({
         translate: { x: this.screenWidth, y: 0 },
         opacity: 0.7,
-        duration: this.ANIMATION_DURATION,
+        duration: this.ANIMATION_DURATION(),
         curve: 'easeOut',
       });
 
@@ -243,6 +281,7 @@ export class HealthPageComponent implements OnInit {
       // Reset position without animation
       container.translateX = 0;
       container.opacity = 1;
+      this.resetScrollPosition();
     } catch (error) {
       console.error('Failed to snap to previous day:', error);
       container.translateX = 0;
@@ -263,7 +302,7 @@ export class HealthPageComponent implements OnInit {
       await container.animate({
         translate: { x: -this.screenWidth, y: 0 },
         opacity: 0.7,
-        duration: this.ANIMATION_DURATION,
+        duration: this.ANIMATION_DURATION(),
         curve: 'easeOut',
       });
 
@@ -274,6 +313,7 @@ export class HealthPageComponent implements OnInit {
       // Reset position without animation
       container.translateX = 0;
       container.opacity = 1;
+      this.resetScrollPosition();
     } catch (error) {
       console.error('Failed to snap to next day:', error);
       container.translateX = 0;
@@ -315,6 +355,23 @@ export class HealthPageComponent implements OnInit {
     // For screen readers - announce the date change
     if (typeof (globalThis as any).accessibility !== 'undefined') {
       (globalThis as any).accessibility.announce(message);
+    }
+  }
+
+  private resetScrollPosition(): void {
+    const scrollView = this.scrollView?.nativeElement;
+    if (!scrollView) {
+      return;
+    }
+
+    try {
+      if (typeof scrollView.scrollToVerticalOffset === 'function') {
+        scrollView.scrollToVerticalOffset(0, false);
+      } else if (scrollView?.ios?.setContentOffset) {
+        scrollView.ios.setContentOffset({ x: 0, y: 0 }, false);
+      }
+    } catch (e) {
+      // ignore platform-specific inconsistencies
     }
   }
 }
