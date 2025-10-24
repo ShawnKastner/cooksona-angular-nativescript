@@ -45,13 +45,16 @@ Der Health Hub unterstützt jetzt Pan-Gesten (kontinuierliches Wischen) zum Navi
 ### Health Page Component
 
 - `apps/mobile/src/features/health-page/health-page.component.ts`
-  - Swipe-Gesten Handler
-  - Animations-Logik
-  - Boundary-Checks mit Snackbar-Feedback
+  - Pan-Gesten Handler mit kontinuierlichem Feedback
+  - Live translateX Updates während Pan
+  - Snap-to-Page Logik mit intelligenten Schwellwerten
+  - Boundary-Checks mit Resistance-Effekt
+  - ScrollView-Deaktivierung während Pan
   - Screen-Reader Ansagen
 
 - `apps/mobile/src/features/health-page/health-page.component.html`
-  - Swipe-Geste Binding auf Content-Container
+  - Pan-Geste Binding auf Pager-Container
+  - ScrollView mit `isScrollEnabled` Binding
   - Loading-Indikator für Transitionen
 
 ### Day Header Component
@@ -94,7 +97,8 @@ private screenWidth = Screen.mainScreen.widthDIPs;
 - **Resistance-Effekt**: Bei Boundary wird Bewegung auf 30% reduziert
 - **Schwellwert**: 80px Pan-Distanz triggert Seitenwechsel
 - **Snap-to-Page**: Intelligentes Snapping basierend auf Pan-Distanz
-- **Verhindert Doppel-Pans**: `isPanning` Flag und `isTransitioning` blockieren simultane Gesten
+- **Verhindert Doppel-Pans**: `isPanning` Signal und `isTransitioning` blockieren simultane Gesten
+- **ScrollView-Blockierung**: Während des Pans ist die ScrollView deaktiviert (`isScrollEnabled="false"`)
 
 ## 🔊 Barrierefreiheit
 

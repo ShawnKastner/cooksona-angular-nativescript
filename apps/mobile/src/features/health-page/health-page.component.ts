@@ -55,12 +55,16 @@ export class HealthPageComponent implements OnInit {
   @ViewChild('pagerContainer', { static: false })
   pagerContainer?: ElementRef;
 
+  @ViewChild('scrollView', { static: false })
+  scrollView?: ElementRef;
+
   protected readonly loading = this.store.loading;
   protected readonly error = this.store.error;
   protected readonly metrics = this.store.metricsForSelectedDate;
   protected readonly hasLoadedOnce = this.store.hasLoadedOnce;
   protected readonly isBusy = signal(false); // For pull-to-refresh loading indicator
   protected readonly isTransitioning = signal(false);
+  protected readonly isPanning = signal(false); // Signal for template binding
   protected readonly isToday = this.store.isToday;
 
   protected readonly requiresOnboarding = this.store.requiresOnboarding;
@@ -77,7 +81,6 @@ export class HealthPageComponent implements OnInit {
   private screenWidth = Screen.mainScreen.widthDIPs;
   private panStartX = 0;
   private currentTranslateX = 0;
-  private isPanning = false;
 
   async ngOnInit(): Promise<void> {
     await this.store.load();
@@ -163,12 +166,12 @@ export class HealthPageComponent implements OnInit {
     const state = args.state;
 
     if (state === GestureStateTypes.began) {
-      // Pan started
-      this.isPanning = true;
+      // Pan started - disable scrolling
+      this.isPanning.set(true);
       this.panStartX = this.currentTranslateX;
     } else if (state === GestureStateTypes.changed) {
       // Pan in progress - move container with finger
-      if (!this.isPanning) return;
+      if (!this.isPanning()) return;
 
       let newTranslateX = deltaX;
 
@@ -201,7 +204,8 @@ export class HealthPageComponent implements OnInit {
     const container = this.pagerContainer?.nativeElement;
     if (!container) return;
 
-    this.isPanning = false;
+    // Re-enable scrolling after pan ends
+    this.isPanning.set(false);
 
     // Determine if we should change the day based on pan distance
     const shouldChangePage = Math.abs(deltaX) > this.PAN_THRESHOLD;

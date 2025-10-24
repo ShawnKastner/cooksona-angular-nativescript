@@ -19,7 +19,7 @@
         (pan)="onPan($event)"
       >
         <PullToRefresh (refresh)="onRefresh($any($event))">
-          <ScrollView>
+          <ScrollView #scrollView [isScrollEnabled]="!isPanning()">
             <StackLayout class="p-5 pb-10 space-y-5">
               @if (!isBusy() && (loading() || isTransitioning()) && hasLoadedOnce()) {
                 <FlexboxLayout class="items-center justify-center py-2 space-x-2">

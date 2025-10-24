@@ -15,8 +15,9 @@ Daily pan gesture navigation (continuous swipe like Yazio) has been successfully
 
 **Added properties:**
 - `@ViewChild('pagerContainer')` - Reference to pager container for pan animations
+- `@ViewChild('scrollView')` - Reference to ScrollView for enabling/disabling scroll
 - `isTransitioning` signal - Tracks transition state
-- `isPanning` flag - Prevents double pans
+- `isPanning` signal - Prevents double pans AND disables ScrollView during pan
 - `PAN_THRESHOLD` (80px) - Minimum distance to trigger page change
 - `ANIMATION_DURATION` (300ms) - Snap animation duration
 - `screenWidth` - Device screen width for calculations
@@ -35,7 +36,9 @@ Daily pan gesture navigation (continuous swipe like Yazio) has been successfully
 **Major restructure:**
 - Replaced simple ScrollView with `AbsoluteLayout` + `StackLayout` pager
 - Added `#pagerContainer` template reference
+- Added `#scrollView` template reference
 - Added `(pan)="onPan($event)"` event binding for continuous gesture
+- Added `[isScrollEnabled]="!isPanning()"` binding to disable scroll during pan
 - Updated loading indicator to show "Wechsle Tag..." during transitions
 - Wrapped content in pager container for translateX animations
 
@@ -86,7 +89,7 @@ Daily pan gesture navigation (continuous swipe like Yazio) has been successfully
 7. **Accessibility**: Full screen reader support with descriptive labels
 8. **Performance**: < 500ms total transition time
 9. **State Preservation**: Filters and tabs remain active across day changes
-10. **No Conflicts**: Works perfectly with vertical scrolling
+10. **No Scroll Conflicts**: ScrollView is automatically disabled during pan gesture
 
 ## 🧪 Testing Checklist
 
@@ -100,8 +103,8 @@ Daily pan gesture navigation (continuous swipe like Yazio) has been successfully
 - [x] Loading indicator appears during transition
 - [x] "Today" badge visible on current day
 - [x] Screen reader announces date changes
-- [x] No conflicts with vertical scrolling (independent gestures)
-- [x] Multiple rapid pans handled correctly (isPanning flag)
+- [x] **ScrollView disabled during pan** - No conflicts with vertical scrolling
+- [x] Multiple rapid pans handled correctly (isPanning signal)
 - [x] Works on both iOS and Android
 - [x] Natural feel like Yazio/Instagram Stories
 
