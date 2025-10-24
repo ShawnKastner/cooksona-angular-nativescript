@@ -12,18 +12,21 @@
 
 <ScrollView class="h-full bg-base-100">
   <StackLayout class="p-5 pb-10 space-y-6">
+    <!-- Description -->
+    <Label class="px-1" textWrap="true">
+      <FormattedString>
+        <Span
+          class="text-sm text-gray-500"
+          text="Verwalte deine Benachrichtigungen und Erinnerungen"
+        ></Span>
+      </FormattedString>
+    </Label>
+
     <StackLayout class="space-y-2">
       <Label
-        class="text-base font-semibold text-neutral"
-        text="Trink-Erinnerungen"
+        class="text-sm font-semibold text-gray-500 ml-1"
+        text="Erinnerungen"
       ></Label>
-      <!--  <Label class="text-sm text-gray-500" textWrap="true">
-        <FormattedString>
-          <Span
-            text="Aktiviere automatische Trink-Erinnerungen. Wir planen alle Benachrichtigungen lokal nach einem bewährten Tagesrhythmus."
-          ></Span>
-        </FormattedString>
-      </Label> -->
     </StackLayout>
 
     <StackLayout class="bg-white rounded-2xl border border-base-200">
@@ -55,11 +58,7 @@
               'text-blue-600': reminderEnabled(),
               'text-gray-500': !reminderEnabled(),
             }"
-            [text]="
-              reminderEnabled()
-                ? 'Aktiviert'
-                : 'Nicht aktiviert'
-            "
+            [text]="reminderEnabled() ? 'Aktiviert' : 'Nicht aktiviert'"
           ></Label>
         </StackLayout>
 
