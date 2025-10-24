@@ -1,66 +1,66 @@
 <StackLayout
   class="bg-white p-5 rounded-2xl border border-base-200 box-shadow-1 space-y-4 mt-4"
 >
-  <Label class="font-bold text-neutral" text="Mahlzeitenprotokoll"></Label>
+  <FlexboxLayout class="items-center justify-between">
+    <Label class="font-bold text-neutral" text="Mahlzeitenprotokoll"></Label>
+    <!-- <Label class="text-xs text-gray-400" text="Tippe für Details"></Label> -->
+  </FlexboxLayout>
   @if (loading()) {
     <ActivityIndicator busy="true" class="text-primary"></ActivityIndicator>
   } @else {
-    @for (meal of mealSections(); track meal.key) {
-      <StackLayout class="border border-base-200 rounded-xl">
-        <GridLayout
-          columns="*, auto, auto"
-          class="items-center justify-between p-3"
-          (tap)="toggleMeal(meal.key)"
+    <StackLayout class="space-y-3">
+      @for (meal of mealSections(); track meal.key) {
+        <StackLayout
+          class="border border-base-200 rounded-2xl overflow-hidden bg-base-100"
         >
-          <FlexboxLayout column="0" class="items-center space-x-3">
+          <GridLayout
+            columns="auto, *, auto"
+            class="items-center px-4 py-4 space-y-4"
+          >
             <FlexboxLayout
-              class="w-10 h-10 rounded-full bg-base-200 items-center justify-center"
+              col="0"
+              class="w-12 h-12 rounded-full bg-base-200 items-center justify-center mr-3"
             >
               <svg:SVGImage
                 [src]="meal.icon | svgToDataUri: '#4A6C6F'"
-                class="w-5 h-5"
+                class="w-6 h-6"
               ></svg:SVGImage>
             </FlexboxLayout>
-            <Label
-              class="font-semibold text-sm text-neutral"
-              [text]="meal.label"
-            ></Label>
-          </FlexboxLayout>
-          <Label
-            column="1"
-            class="font-semibold text-sm text-neutral mr-3"
-            [text]="meal.calories + ' kcal'"
-          ></Label>
-          <svg:SVGImage
-            column="2"
-            [src]="icons.ChevronDown | svgToDataUri: '#94A3B8'"
-            class="w-5 h-5 transition-transform"
-            [class.rotate-180]="expandedMeal() === meal.key"
-          ></svg:SVGImage>
-        </GridLayout>
-        @if (expandedMeal() === meal.key) {
-          <StackLayout class="border-t border-base-200 px-4 py-2 space-y-1">
-            @if (meal.items.length === 0) {
-              <Label
-                class="text-xs text-gray-400 text-center py-2"
-                text="Keine Mahlzeiten eingetragen"
-              ></Label>
-            }
-            @for (item of meal.items; track item.id) {
-              <FlexboxLayout
-                class="justify-between"
-                (longPress)="onMealLongPress(item)"
-              >
-                <Label class="text-xs text-gray-500" [text]="item.name"></Label>
-                <Label
-                  class="text-xs text-gray-400"
-                  [text]="item.calories + ' kcal'"
-                ></Label>
+            <StackLayout
+              (tap)="openMealDetail(meal.key)"
+              col="1"
+              class="space-y-1"
+            >
+              <FlexboxLayout>
+                <StackLayout class="flex items-center justify-between">
+                  <Label
+                    class="font-semibold text-neutral text-base"
+                    [text]="meal.label"
+                  ></Label>
+                  <Label
+                    class="font-semibold text-neutral text-base"
+                    [text]="meal.calories + ' kcal'"
+                  ></Label>
+                </StackLayout>
+                <!-- <FlexboxLayout class="items-center">
+            <svg:SVGImage [src]="icons.ChevronRight | svgToDataUri: '#94A3B8'" class="w-7 h-7"></svg:SVGImage>
+            </FlexboxLayout> -->
               </FlexboxLayout>
-            }
-          </StackLayout>
-        }
-      </StackLayout>
-    }
+            </StackLayout>
+            <FlexboxLayout col="2" class="items-center space-x-2">
+              <FlexboxLayout
+                class="flex w-11 h-11 bg-primary rounded-full flex items-center justify-center text-white shadow-lg transform active:scale-95 transition-transform z-10"
+                (tap)="onAddMeal(meal.key)"
+              >
+                <svg:SVGImage
+                  [src]="icons.Plus | svgToDataUri: 'white'"
+                  class="w-6 h-6 font-bold"
+                ></svg:SVGImage>
+              </FlexboxLayout>
+            </FlexboxLayout>
+          </GridLayout>
+        </StackLayout>
+      }
+    </StackLayout>
   }
 </StackLayout>

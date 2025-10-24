@@ -8,6 +8,8 @@ import {
 import { Food } from '@cooksona/models';
 import { MealTrackingService } from '../../../core/services/meal-tracking.service';
 import { ArrowLeft } from '@cooksona/constants/icons';
+import { ActivatedRoute } from '@angular/router';
+import { MEAL_TYPE_CONFIG } from '../meal-section/meal-section.config';
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snacks';
 
@@ -44,10 +46,19 @@ export class TrackMealComponent implements OnInit {
     ArrowLeft,
   };
 
+  get selectedMealLabel(): string {
+    const type = this.selectedMealType();
+    return (
+      (MEAL_TYPE_CONFIG[type]?.label as string) ||
+      type.charAt(0).toUpperCase() + type.slice(1)
+    );
+  }
+
   constructor(
     private fb: FormBuilder,
     private mealTrackingService: MealTrackingService,
     private routerExtensions: RouterExtensions,
+    private route: ActivatedRoute,
   ) {}
 
   /**
@@ -85,6 +96,11 @@ export class TrackMealComponent implements OnInit {
     this.searchForm = this.fb.group({
       searchQuery: [''],
     });
+
+    const initialMealType = this.route.snapshot.queryParamMap.get('mealType');
+    if (this.isMealType(initialMealType)) {
+      this.selectedMealType.set(initialMealType);
+    }
 
     // Load all foods initially
     this.foods = this.mealTrackingService.searchFoods('');
@@ -132,5 +148,14 @@ export class TrackMealComponent implements OnInit {
       other: 'Sonstiges',
     };
     return labels[category] || category;
+  }
+
+  private isMealType(value: string | null): value is MealType {
+    return (
+      value === 'breakfast' ||
+      value === 'lunch' ||
+      value === 'dinner' ||
+      value === 'snacks'
+    );
   }
 }

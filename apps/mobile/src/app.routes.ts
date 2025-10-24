@@ -211,6 +211,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'meal-detail/:mealType',
+    canActivate: [mobileProtectedRouteGuard],
+    loadComponent: () =>
+      import('./features/health-page/meal-detail/meal-detail.component').then(
+        (m) => m.MealDetailComponent,
+      ),
+  },
+  {
     path: 'tracking-recipe/:id',
     canActivate: [mobileProtectedRouteGuard],
     loadComponent: () =>
