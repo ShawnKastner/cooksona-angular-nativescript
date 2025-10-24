@@ -13,7 +13,7 @@ import { Droplet } from '@cooksona/constants/icons';
 import { NotificationService } from '../../../core/services/notification.service';
 import { NotificationPreferencesService } from '../../../core/services/notification-preferences.service';
 import { confirm } from '@nativescript/core/ui/dialogs';
-import { NavigatedData, Page } from '@nativescript/core';
+import { NavigatedData, Page, Application } from '@nativescript/core';
 import { RouterExtensions } from '@nativescript/angular';
 
 @Component({
@@ -53,10 +53,13 @@ export class NotificationsSettingsComponent implements OnInit, OnDestroy {
   async ngOnInit() {
     await this.loadState();
     this.page.on(Page.navigatedToEvent, this.onNavigatedBack);
+    // If the user opens system settings and returns (resume), refresh state
+    Application.on(Application.resumeEvent, this.onAppResume);
   }
 
   ngOnDestroy() {
     this.page.off(Page.navigatedToEvent, this.onNavigatedBack);
+    Application.off(Application.resumeEvent, this.onAppResume);
   }
 
   protected async toggleReminders(event: { value: boolean }) {
@@ -131,6 +134,11 @@ export class NotificationsSettingsComponent implements OnInit, OnDestroy {
     if (!data?.isBackNavigation) {
       return;
     }
+    await this.loadState();
+  };
+
+  private readonly onAppResume = async () => {
+    // When returning from system settings the permission state may have changed.
     await this.loadState();
   };
 

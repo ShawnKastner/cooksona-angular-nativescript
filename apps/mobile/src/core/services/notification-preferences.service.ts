@@ -25,9 +25,9 @@ export class NotificationPreferencesService {
 
   async getWaterReminderEnabled(): Promise<boolean> {
     try {
-      const response = await this.api.get<NotificationPreferencesResponse | undefined>(
-        '/notifications/preferences',
-      );
+      const response = await this.api.get<
+        NotificationPreferencesResponse | undefined
+      >('/notifications/preferences');
       if (response && typeof response.waterReminderEnabled === 'boolean') {
         ApplicationSettings.setBoolean(
           this.storageKey,
@@ -47,9 +47,25 @@ export class NotificationPreferencesService {
   async setWaterReminderEnabled(enabled: boolean): Promise<void> {
     ApplicationSettings.setBoolean(this.storageKey, enabled);
     try {
-      await this.api.put('/notifications/preferences', {
-        waterReminderEnabled: enabled,
-      });
+      // Attempt to include the current server resource version to satisfy
+      // optimistic concurrency checks. The backend accepts either an If-Match
+      // header or a `version` field in the payload.
+      let version: number | undefined;
+      try {
+        const current = await this.api.get<
+          { waterReminderEnabled?: boolean; version?: number } | undefined
+        >('/notifications/preferences');
+        version = (current as any)?.version;
+      } catch (e) {
+        // ignore - we'll still attempt the put without a version field
+      }
+
+      const payload: any = { waterReminderEnabled: enabled };
+      if (typeof version === 'number') {
+        payload.version = version;
+      }
+
+      await this.api.put('/notifications/preferences', payload);
     } catch (error) {
       console.warn(
         '[NotificationPreferencesService] Persisting remote preferences failed.',

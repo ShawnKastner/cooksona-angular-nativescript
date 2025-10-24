@@ -120,7 +120,11 @@ export class NotificationService {
 
     const newEntries: ScheduledReminderRecord[] = [];
 
-    for (let dayOffset = 0; dayOffset < this.DAYS_TO_SCHEDULE_AHEAD; dayOffset++) {
+    for (
+      let dayOffset = 0;
+      dayOffset < this.DAYS_TO_SCHEDULE_AHEAD;
+      dayOffset++
+    ) {
       const date = new Date(now);
       date.setHours(0, 0, 0, 0);
       date.setDate(date.getDate() + dayOffset);
@@ -216,6 +220,20 @@ export class NotificationService {
   }
 
   getReminderDisplayTimes(locale?: string): string[] {
+    // Some JS runtimes used by NativeScript (older JSC on iOS or certain engines)
+    // may not provide the Intl API. Guard against that and fall back to a
+    // deterministic HH:MM formatting to avoid crashes like "ReferenceError: Intl is not defined".
+    if (
+      typeof Intl === 'undefined' ||
+      typeof Intl.DateTimeFormat !== 'function'
+    ) {
+      return this.WATER_REMINDER_TIMES.map((slot) => {
+        const hour = `${slot.hour}`.padStart(2, '0');
+        const minute = `${slot.minute}`.padStart(2, '0');
+        return `${hour}:${minute}`;
+      });
+    }
+
     const formatter = new Intl.DateTimeFormat(locale, {
       hour: '2-digit',
       minute: '2-digit',
@@ -316,7 +334,9 @@ export class NotificationService {
       await this.cancelByIds(idsToCancel);
     }
 
-    const remaining = schedule.filter((entry) => !idsToCancel.includes(entry.id));
+    const remaining = schedule.filter(
+      (entry) => !idsToCancel.includes(entry.id),
+    );
     this.saveSchedule(remaining);
     this.setSuppressedUntil(todayKey);
   }

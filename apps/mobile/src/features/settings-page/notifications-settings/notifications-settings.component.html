@@ -13,14 +13,17 @@
 <ScrollView class="h-full bg-base-100">
   <StackLayout class="p-5 pb-10 space-y-6">
     <StackLayout class="space-y-2">
-      <Label class="text-base font-semibold text-neutral" text="Trink-Erinnerungen"></Label>
-      <Label class="text-sm text-gray-500" textWrap="true">
+      <Label
+        class="text-base font-semibold text-neutral"
+        text="Trink-Erinnerungen"
+      ></Label>
+      <!--  <Label class="text-sm text-gray-500" textWrap="true">
         <FormattedString>
           <Span
             text="Aktiviere automatische Trink-Erinnerungen. Wir planen alle Benachrichtigungen lokal nach einem bewährten Tagesrhythmus."
           ></Span>
         </FormattedString>
-      </Label>
+      </Label> -->
     </StackLayout>
 
     <StackLayout class="bg-white rounded-2xl border border-base-200">
@@ -34,14 +37,18 @@
         >
           <svg:SVGImage
             [src]="
-              icons.Droplet | svgToDataUri: (reminderEnabled() ? '#2563EB' : '#9CA3AF')
+              icons.Droplet
+                | svgToDataUri: (reminderEnabled() ? '#2563EB' : '#9CA3AF')
             "
             class="w-6 h-6"
           />
         </FlexboxLayout>
 
         <StackLayout class="flex-1">
-          <Label class="text-lg font-medium text-neutral" text="Trink-Erinnerungen"></Label>
+          <Label
+            class="text-lg font-medium text-neutral"
+            text="Trink-Erinnerungen"
+          ></Label>
           <Label
             class="text-sm"
             [ngClass]="{
@@ -63,55 +70,6 @@
           (checkedChange)="toggleReminders($any($event))"
         ></Switch>
       </FlexboxLayout>
-
-      <StackLayout class="px-4 pb-4 space-y-2">
-        <Label class="text-sm text-gray-600" textWrap="true">
-          <FormattedString>
-            <Span text="Benachrichtigungen werden gegen "></Span>
-            <Span
-              class="font-semibold text-neutral"
-              [text]="reminderTimes().join(', ')"
-            ></Span>
-            <Span text=" versendet (lokale Zeitzone)."></Span>
-          </FormattedString>
-        </Label>
-        <Label class="text-xs text-gray-500" textWrap="true">
-          <FormattedString>
-            <Span
-              text="Verpasste Erinnerungen werden automatisch auf das nächste verfügbare Zeitfenster desselben Tages verschoben."
-            ></Span>
-          </FormattedString>
-        </Label>
-      </StackLayout>
-    </StackLayout>
-
-    <StackLayout class="bg-blue-50 rounded-2xl p-4 space-y-3">
-      <Label
-        class="text-sm font-medium text-blue-900"
-        [text]="permissionLabel()"
-      ></Label>
-      <Label class="text-xs text-blue-800" textWrap="true">
-        <FormattedString>
-          <Span
-            text="Ruhezeiten und der Systemmodus „Nicht stören“ werden respektiert. Nach Erreichen deines Tagesziels werden verbleibende Erinnerungen automatisch pausiert."
-          ></Span>
-        </FormattedString>
-      </Label>
-
-      @if (permissionGranted() === false) {
-        <StackLayout class="space-y-2">
-          <Button
-            class="bg-blue-600 text-white text-center font-semibold py-3 rounded-xl"
-            text="Mitteilungen erlauben"
-            (tap)="requestPermissions()"
-          ></Button>
-          <Button
-            class="text-blue-700 font-semibold text-center py-3 rounded-xl border border-blue-200"
-            text="Systemeinstellungen öffnen"
-            (tap)="openSystemSettings()"
-          ></Button>
-        </StackLayout>
-      }
     </StackLayout>
   </StackLayout>
 </ScrollView>
