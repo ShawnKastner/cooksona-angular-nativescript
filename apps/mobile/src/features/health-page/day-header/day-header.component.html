@@ -1,20 +1,42 @@
 <FlexboxLayout
   class="items-center justify-between bg-base-200/50 p-3 rounded-2xl mt-4"
+  accessibilityLabel="Tagesnavigation"
+  accessibilityHint="Wische nach links oder rechts, um zwischen Tagen zu wechseln"
 >
-  <StackLayout class="p-2 rounded-full bg-base-100" (tap)="goToPreviousDay()">
+  <StackLayout
+    class="p-2 rounded-full bg-base-100"
+    (tap)="goToPreviousDay()"
+    accessibilityLabel="Vorheriger Tag"
+    accessibilityRole="button"
+    accessibilityHint="Zeigt den vorherigen Tag an"
+  >
     <svg:SVGImage
       [src]="icons.ArrowLeft | svgToDataUri: '#4A6C6F'"
       class="w-6 h-6"
     ></svg:SVGImage>
   </StackLayout>
-  <StackLayout class="items-center">
-    <Label class="font-bold text-neutral" [text]="dayLabel()"></Label>
+  <StackLayout
+    class="items-center"
+    accessibilityLabel="Aktuelles Datum"
+    [accessibilityValue]="dayLabel() + ', ' + dateLabel()"
+  >
+    <Label
+      class="font-bold text-neutral"
+      [text]="dayLabel()"
+      [class.text-primary]="isToday()"
+    ></Label>
     <Label class="text-xs text-gray-500" [text]="dateLabel()"></Label>
+    @if (isToday()) {
+      <Label class="text-xs text-primary font-semibold mt-1" text="● Heute"></Label>
+    }
   </StackLayout>
   <StackLayout
     class="p-2 rounded-full bg-base-100"
     [class.opacity-40]="isToday()"
     (tap)="goToNextDay()"
+    [accessibilityLabel]="isToday() ? 'Heute ist der aktuelle Tag' : 'Nächster Tag'"
+    accessibilityRole="button"
+    [accessibilityHint]="isToday() ? 'Keine weiteren Tage verfügbar' : 'Zeigt den nächsten Tag an'"
   >
     <svg:SVGImage
       [src]="

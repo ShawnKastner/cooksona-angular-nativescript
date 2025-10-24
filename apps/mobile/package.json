@@ -5,6 +5,7 @@
   "version": "0.0.0",
   "dependencies": {
     "@nativescript-community/ui-pulltorefresh": "^2.5.3",
+    "@nativescript-community/ui-snackbar": "^1.1.1",
     "@nativescript/animated-circle": "^1.3.0",
     "@nativescript/apple-sign-in": "^1.0.0",
     "@nativescript/core": "*",
