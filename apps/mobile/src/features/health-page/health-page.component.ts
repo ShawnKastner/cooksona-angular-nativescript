@@ -266,8 +266,15 @@ export class HealthPageComponent implements OnInit {
     const fromOffset = startOffset ?? 0;
 
     let dayChanged = false;
+    let originalHeight: number | null = null;
 
     try {
+      // Fix height to prevent content shift during animation
+      originalHeight = this.getContentHeight(content);
+      if (originalHeight > 0) {
+        content.height = originalHeight;
+      }
+
       if (Math.abs(fromOffset - exitOffset) < 1) {
         content.translateX = exitOffset;
       } else {
@@ -316,6 +323,10 @@ export class HealthPageComponent implements OnInit {
       }
     } finally {
       content.translateX = 0;
+      // Restore automatic height
+      if (originalHeight !== null) {
+        content.height = NaN; // NaN means 'auto' in NativeScript
+      }
       this.isAnimating.set(false);
     }
   }
@@ -337,6 +348,25 @@ export class HealthPageComponent implements OnInit {
       return actual.width;
     }
     return Screen.mainScreen.widthDIPs || 360;
+  }
+
+  private getContentHeight(view: View): number {
+    const native = view as any;
+    const measured =
+      typeof native?.getMeasuredHeight === 'function'
+        ? native.getMeasuredHeight()
+        : 0;
+    if (measured && measured > 0) {
+      return measured;
+    }
+    const actual =
+      typeof native?.getActualSize === 'function'
+        ? native.getActualSize()
+        : undefined;
+    if (actual?.height && actual.height > 0) {
+      return actual.height;
+    }
+    return 0;
   }
 
   private animationDurationForDistance(
