@@ -22,12 +22,10 @@ import { StepsCardComponent } from './steps-card/steps-card.component';
 import { HealthKitSyncService } from '../../plugins/healthkit/healthkit-sync.service';
 import { PullToRefresh } from '@nativescript-community/ui-pulltorefresh';
 import {
-  GestureTypes,
   PanGestureEventData,
   GestureStateTypes,
   Screen,
 } from '@nativescript/core';
-import { SnackBar } from '@nativescript/community/ui-snackbar';
 
 @Component({
   selector: 'ns-health-page',
@@ -50,7 +48,6 @@ export class HealthPageComponent implements OnInit {
   private readonly store = inject(HealthStore);
   private readonly routerExtensions = inject(RouterExtensions);
   private readonly healthKitSync = inject(HealthKitSyncService);
-  private readonly snackbar = new SnackBar();
 
   @ViewChild('pagerContainer', { static: false })
   pagerContainer?: ElementRef;
@@ -158,7 +155,9 @@ export class HealthPageComponent implements OnInit {
    * Handle pan gesture for continuous day navigation
    * Like a page turner effect similar to Yazio
    */
-  onPan(args: PanGestureEventData): void {
+  // Accept either a DOM/Event (from template) or a PanGestureEventData and normalize
+  onPan(event: Event | PanGestureEventData): void {
+    const args = event as PanGestureEventData;
     const container = this.pagerContainer?.nativeElement;
     if (!container || this.isTransitioning()) return;
 
@@ -183,7 +182,7 @@ export class HealthPageComponent implements OnInit {
 
       // Apply the translation
       container.translateX = newTranslateX;
-      
+
       // Subtle opacity effect for better visual feedback
       const progress = Math.abs(deltaX) / this.screenWidth;
       const opacity = Math.max(0.7, 1 - progress * 0.3);
@@ -303,25 +302,6 @@ export class HealthPageComponent implements OnInit {
   }
 
   /**
-   * Show message when user reaches first or last available day
-   */
-  private showBoundaryMessage(boundary: 'past' | 'future'): void {
-    const message =
-      boundary === 'future'
-        ? 'Du bist bereits beim heutigen Tag'
-        : 'Keine weiteren Tage verfügbar';
-
-    this.snackbar
-      .simple(message, undefined, undefined, 2)
-      .then(() => {
-        // Snackbar shown successfully
-      })
-      .catch((error) => {
-        console.error('Failed to show snackbar:', error);
-      });
-  }
-
-  /**
    * Announce date change to screen readers
    */
   private announceDate(direction: 'previous' | 'next'): void {
@@ -333,8 +313,8 @@ export class HealthPageComponent implements OnInit {
         : `Vorheriger Tag: ${dayLabel}, ${dateLabel}`;
 
     // For screen readers - announce the date change
-    if (typeof (global as any).accessibility !== 'undefined') {
-      (global as any).accessibility.announce(message);
+    if (typeof (globalThis as any).accessibility !== 'undefined') {
+      (globalThis as any).accessibility.announce(message);
     }
   }
 }

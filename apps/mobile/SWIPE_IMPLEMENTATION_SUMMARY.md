@@ -9,11 +9,13 @@ Daily pan gesture navigation (continuous swipe like Yazio) has been successfully
 ### 1. Health Page Component (`health-page.component.ts`)
 
 **Added imports:**
+
 - `ViewChild`, `ElementRef` from Angular core
 - `GestureTypes`, `PanGestureEventData`, `GestureStateTypes`, `Screen` from NativeScript
 - `SnackBar` from NativeScript community (for future use)
 
 **Added properties:**
+
 - `@ViewChild('pagerContainer')` - Reference to pager container for pan animations
 - `@ViewChild('scrollView')` - Reference to ScrollView for enabling/disabling scroll
 - `isTransitioning` signal - Tracks transition state
@@ -24,6 +26,7 @@ Daily pan gesture navigation (continuous swipe like Yazio) has been successfully
 - `panStartX`, `currentTranslateX` - Pan gesture state tracking
 
 **Added methods:**
+
 - `onPan(args)` - Main pan gesture handler with live feedback
 - `handlePanEnd(deltaX)` - Decides whether to change page or snap back
 - `snapToPreviousDay(container)` - Animated slide to previous day
@@ -34,6 +37,7 @@ Daily pan gesture navigation (continuous swipe like Yazio) has been successfully
 ### 2. Health Page Template (`health-page.component.html`)
 
 **Major restructure:**
+
 - Replaced simple ScrollView with `AbsoluteLayout` + `StackLayout` pager
 - Added `#pagerContainer` template reference
 - Added `#scrollView` template reference
@@ -45,6 +49,7 @@ Daily pan gesture navigation (continuous swipe like Yazio) has been successfully
 ### 3. Day Header Component (`day-header.component.html`)
 
 **Accessibility enhancements:**
+
 - Added `accessibilityLabel` to navigation container
 - Added `accessibilityHint` for swipe gestures
 - Added `accessibilityRole="button"` to navigation buttons
@@ -55,28 +60,30 @@ Daily pan gesture navigation (continuous swipe like Yazio) has been successfully
 ### 4. Package Dependencies (`package.json`)
 
 **Added:**
+
 - `@nativescript-community/ui-snackbar": "^1.1.1"` - For boundary feedback
 
 ### 5. Documentation
 
 **Created:**
+
 - `SWIPE_NAVIGATION.md` - Complete feature documentation
 - `SWIPE_IMPLEMENTATION_SUMMARY.md` - This summary
 
 ## ✅ Acceptance Criteria - All Met
 
-| Criterion | Status | Implementation |
-|-----------|--------|----------------|
-| Pan left = next day, right = previous | ✅ | `onPan()` with continuous `deltaX` tracking |
-| **Continuous feedback** (like Yazio) | ✅ | Live `translateX` updates during pan |
-| Date updates immediately, content loads | ✅ | Store's `goToPreviousDay()`/`goToNextDay()` |
-| Active filters/tabs preserved | ✅ | Store maintains state during navigation |
-| Boundary with **resistance effect** | ✅ | `isToday()` check + 30% movement limit |
-| No collision with vertical scroll | ✅ | Pan gesture works independently |
-| Smooth animation ≤ 500ms | ✅ | Live pan + 300ms snap animation |
-| **Snap-to-page** effect | ✅ | 80px threshold with smart snapping |
-| "Today" marked/highlighted | ✅ | Badge "● Heute" + primary color |
-| iOS/Android + screen reader support | ✅ | Accessibility labels + announcements |
+| Criterion                               | Status | Implementation                              |
+| --------------------------------------- | ------ | ------------------------------------------- |
+| Pan left = next day, right = previous   | ✅     | `onPan()` with continuous `deltaX` tracking |
+| **Continuous feedback** (like Yazio)    | ✅     | Live `translateX` updates during pan        |
+| Date updates immediately, content loads | ✅     | Store's `goToPreviousDay()`/`goToNextDay()` |
+| Active filters/tabs preserved           | ✅     | Store maintains state during navigation     |
+| Boundary with **resistance effect**     | ✅     | `isToday()` check + 30% movement limit      |
+| No collision with vertical scroll       | ✅     | Pan gesture works independently             |
+| Smooth animation ≤ 500ms                | ✅     | Live pan + 300ms snap animation             |
+| **Snap-to-page** effect                 | ✅     | 80px threshold with smart snapping          |
+| "Today" marked/highlighted              | ✅     | Badge "● Heute" + primary color             |
+| iOS/Android + screen reader support     | ✅     | Accessibility labels + announcements        |
 
 ## 🎯 Key Features (Yazio-like UX)
 
@@ -120,6 +127,7 @@ npm install
 ## 🚀 Usage
 
 Users can now:
+
 1. Open Health Hub
 2. **Drag finger left** to see next day (page follows finger)
 3. **Drag finger right** to see previous day (page follows finger)
@@ -152,18 +160,21 @@ curve: 'spring',   // For snap-back (can use 'easeOut')
 ### Recommended Presets
 
 **Fast (Instagram Stories-like)**:
+
 ```typescript
 PAN_THRESHOLD = 50;
 ANIMATION_DURATION = 200;
 ```
 
 **Balanced (Yazio-like, current)**:
+
 ```typescript
 PAN_THRESHOLD = 80;
 ANIMATION_DURATION = 300;
 ```
 
 **Careful (for accessibility)**:
+
 ```typescript
 PAN_THRESHOLD = 120;
 ANIMATION_DURATION = 400;

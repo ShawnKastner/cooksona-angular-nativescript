@@ -1,1 +1,1 @@
-import '@nativescript/types;
+import '@nativescript/types';

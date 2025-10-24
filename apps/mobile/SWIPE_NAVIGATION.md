@@ -113,10 +113,7 @@ private screenWidth = Screen.mainScreen.widthDIPs;
 ### Accessibility Attributes
 
 ```html
-accessibilityLabel="Tagesnavigation"
-accessibilityHint="Wische nach links oder rechts, um zwischen Tagen zu wechseln"
-accessibilityRole="button"
-[accessibilityValue]="dayLabel() + ', ' + dateLabel()"
+accessibilityLabel="Tagesnavigation" accessibilityHint="Wische nach links oder rechts, um zwischen Tagen zu wechseln" accessibilityRole="button" [accessibilityValue]="dayLabel() + ', ' + dateLabel()"
 ```
 
 ## 🎯 Boundary Handling
@@ -133,12 +130,14 @@ if (this.store.isToday() && deltaX < 0) {
 }
 ```
 
-**Visuelles Feedback**: 
+**Visuelles Feedback**:
+
 - Seite bewegt sich nur 30% der Finger-Bewegung
 - Kein Snapping zur nächsten Seite möglich
 - Natürliches Zurückfedern beim Loslassen
 
-**Vorteil gegenüber Snackbar**: 
+**Vorteil gegenüber Snackbar**:
+
 - Sofortiges visuelles Feedback
 - Keine störende Nachricht
 - Klares haptisches Gefühl der Grenze
@@ -150,7 +149,7 @@ Falls gewünscht, kann ein ähnlicher Resistance-Effekt hinzugefügt werden:
 
 ```typescript
 // Optional: Resistance bei ältestem verfügbaren Datum
-const minDate = new Date('2024-01-01');
+const minDate = new Date("2024-01-01");
 if (this.selectedDate() <= minDate && deltaX > 0) {
   newTranslateX = deltaX * 0.3;
 }
@@ -256,18 +255,21 @@ await container.animate({
 ### Empfohlene Werte für verschiedene UX
 
 **Schnelles Snapping** (wie Instagram Stories):
+
 ```typescript
 PAN_THRESHOLD = 50;
 ANIMATION_DURATION = 200;
 ```
 
 **Sanftes Snapping** (wie Yazio, aktuelle Config):
+
 ```typescript
 PAN_THRESHOLD = 80;
 ANIMATION_DURATION = 300;
 ```
 
 **Vorsichtiges Snapping** (für ältere Nutzer):
+
 ```typescript
 PAN_THRESHOLD = 120;
 ANIMATION_DURATION = 400;
@@ -362,7 +364,8 @@ Failed to show snackbar: [error]
 ### Häufige Probleme
 
 **Problem**: Pan-Geste funktioniert nicht
-**Lösung**: 
+**Lösung**:
+
 - Prüfe ob `(pan)` Event korrekt auf `pagerContainer` gebunden ist
 - Prüfe ob `@ViewChild('pagerContainer')` die richtige Referenz hat
 - Prüfe Console für JavaScript-Fehler
@@ -370,6 +373,7 @@ Failed to show snackbar: [error]
 
 **Problem**: Seite folgt nicht dem Finger
 **Lösung**:
+
 - Prüfe ob `container.translateX` korrekt gesetzt wird
 - Teste `GestureStateTypes.changed` Event
 - Prüfe ob `isPanning` Flag korrekt gesetzt wird
@@ -377,6 +381,7 @@ Failed to show snackbar: [error]
 
 **Problem**: Animation stockt oder ruckelt
 **Lösung**:
+
 - Prüfe Device-Performance (ältere Geräte langsamer)
 - Reduziere `ANIMATION_DURATION` auf 200ms
 - Verwende `easeOut` statt `spring` für bessere Performance
@@ -384,12 +389,14 @@ Failed to show snackbar: [error]
 
 **Problem**: Resistance-Effekt funktioniert nicht am heutigen Tag
 **Lösung**:
+
 - Prüfe ob `this.store.isToday()` korrekt true zurückgibt
 - Teste mit `console.log(this.store.isToday(), deltaX)`
 - Stelle sicher, dass Resistance-Multiplikator (0.3) angewendet wird
 
 **Problem**: Screen-Reader liest nicht vor
 **Lösung**:
+
 - Prüfe ob `accessibilityLabel` Attribute gesetzt sind
 - Teste mit VoiceOver (iOS) oder TalkBack (Android) aktiviert
 - Prüfe ob global.accessibility verfügbar ist
