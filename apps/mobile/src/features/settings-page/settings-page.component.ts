@@ -264,31 +264,9 @@ export class SettingsPageComponent implements OnInit {
       return;
     }
 
-    if (item.label === 'Push-Benachrichtigungen') {
-      this.toggleNotifications(newValue);
-    } else if (item.label === 'Dunkler Modus') {
+    if (item.label === 'Dunkler Modus') {
       this.toggleDarkMode(newValue);
     }
-  }
-
-  protected toggleNotifications(value?: boolean) {
-    const newValue = value ?? !this.notifications();
-
-    if (newValue) {
-      this.notifications.set(true);
-      void this.notificationService.enableWaterReminders().then((result) => {
-        if (!result.success) {
-          // If permission denied or failed, reflect the actual state
-          this.notifications.set(false);
-        }
-      });
-    } else {
-      this.notifications.set(false);
-      void this.notificationService.disableWaterReminders();
-    }
-
-    // Update the toggle value in the settings sections
-    this.updateToggleValue('Push-Benachrichtigungen', newValue);
   }
 
   private readonly onAppResume = async () => {
