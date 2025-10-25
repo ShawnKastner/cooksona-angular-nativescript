@@ -1,4 +1,4 @@
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, NgZone, signal } from '@angular/core';
 import { RouterExtensions } from '@nativescript/angular';
 import {
   ApplicationSettings,
@@ -41,7 +41,10 @@ export class NotificationService {
   private readonly DAYS_TO_SCHEDULE_AHEAD = 3;
   private readonly WATER_GOAL_DEFAULT = 2500;
 
-  private tapHandlerInitialized = false;
+  private tapHandlerInitialized = signal(false);
+  // Prevent concurrent scheduling runs which can cause duplicate notifications
+  // when multiple parts of the app call syncWaterReminderSchedule() at once.
+  private schedulingInProgress = signal(false);
 
   constructor(
     private readonly routerExtensions: RouterExtensions,
@@ -91,10 +94,20 @@ export class NotificationService {
   }
 
   async syncWaterReminderSchedule(): Promise<void> {
+    // Avoid concurrent execution which can create duplicate scheduled entries
+    if (this.schedulingInProgress()) {
+      return;
+    }
+    this.schedulingInProgress.set(true);
+
     const enabled = this.preferences.getCachedWaterReminderEnabled();
     if (!enabled) {
-      await this.cancelAllWaterReminders();
-      this.saveSchedule([]);
+      try {
+        await this.cancelAllWaterReminders();
+        this.saveSchedule([]);
+      } finally {
+        this.schedulingInProgress.set(false);
+      }
       return;
     }
 
@@ -172,6 +185,7 @@ export class NotificationService {
         );
       } catch (error) {
         console.error('Failed to schedule water reminders:', error);
+        this.schedulingInProgress.set(false);
         return;
       }
     }
@@ -180,6 +194,7 @@ export class NotificationService {
       (a, b) => a.fireDate - b.fireDate,
     );
     this.saveSchedule(updatedSchedule);
+    this.schedulingInProgress.set(false);
   }
 
   async cancelAllWaterReminders(): Promise<void> {
@@ -285,7 +300,7 @@ export class NotificationService {
   }
 
   async initializeWaterReminderNavigation(): Promise<void> {
-    if (this.tapHandlerInitialized) {
+    if (this.tapHandlerInitialized()) {
       return;
     }
 
@@ -305,7 +320,7 @@ export class NotificationService {
         });
       });
 
-      this.tapHandlerInitialized = true;
+      this.tapHandlerInitialized.set(true);
     } catch (error) {
       console.error(
         'Failed to initialize water reminder tap navigation:',

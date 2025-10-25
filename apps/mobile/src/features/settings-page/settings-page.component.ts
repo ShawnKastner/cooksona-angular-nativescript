@@ -274,20 +274,13 @@ export class SettingsPageComponent implements OnInit {
   protected toggleNotifications(value?: boolean) {
     const newValue = value ?? !this.notifications();
 
-    // If enabling, go through NotificationService so permissions are requested
-    // and the server-side preference is persisted. If disabling, cancel
-    // scheduled reminders and persist the change.
     if (newValue) {
-      // Fire-and-forget: enableWaterReminders handles setting the preference
-      // and scheduling reminders. Update local signal optimistically.
       this.notifications.set(true);
       void this.notificationService.enableWaterReminders().then((result) => {
         if (!result.success) {
           // If permission denied or failed, reflect the actual state
           this.notifications.set(false);
         }
-        // No further UI change here; NotificationsSettingsComponent will
-        // refresh permission state when navigated to.
       });
     } else {
       this.notifications.set(false);
