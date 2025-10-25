@@ -27,7 +27,9 @@ import {
   CreditCard,
   LogOut,
 } from '@cooksona/constants/icons';
-import { ApplicationSettings, isIOS } from '@nativescript/core';
+import { ApplicationSettings, isIOS, Application } from '@nativescript/core';
+import { NotificationService } from '../../core/services/notification.service';
+import { NotificationPreferencesService } from '../../core/services/notification-preferences.service';
 import { confirm } from '@nativescript/core/ui/dialogs';
 import { RouterExtensions } from '@nativescript/angular';
 import { SubscriptionModalComponent } from '../profile-page/subscription-modal/subscription-modal.component';
@@ -61,6 +63,10 @@ export class SettingsPageComponent implements OnInit {
   private readonly routerExtensions = inject(RouterExtensions);
   private readonly modalService = inject(ModalDialogService);
   private readonly themeService = inject(ThemeService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly notificationPreferences = inject(
+    NotificationPreferencesService,
+  );
   private skipToggleInitialization = true;
 
   protected readonly icons = {
@@ -100,6 +106,12 @@ export class SettingsPageComponent implements OnInit {
     setTimeout(() => {
       this.skipToggleInitialization = false;
     });
+    // Refresh notification preference when returning from system settings
+    Application.on(Application.resumeEvent, this.onAppResume);
+  }
+
+  ngOnDestroy() {
+    Application.off(Application.resumeEvent, this.onAppResume);
   }
 
   private loadUserData() {
@@ -112,8 +124,10 @@ export class SettingsPageComponent implements OnInit {
   private loadSettings() {
     // Load saved settings
     this.darkMode.set(this.themeService.isDarkMode);
+    // Use cached preference; the NotificationPreferencesService persists per-user and
+    // will be updated via API when enabling/disabling reminders.
     this.notifications.set(
-      ApplicationSettings.getBoolean('notifications_enabled', true),
+      this.notificationPreferences.getCachedWaterReminderEnabled(),
     );
   }
 
@@ -250,21 +264,22 @@ export class SettingsPageComponent implements OnInit {
       return;
     }
 
-    if (item.label === 'Push-Benachrichtigungen') {
-      this.toggleNotifications(newValue);
-    } else if (item.label === 'Dunkler Modus') {
+    if (item.label === 'Dunkler Modus') {
       this.toggleDarkMode(newValue);
     }
   }
 
-  protected toggleNotifications(value?: boolean) {
-    const newValue = value ?? !this.notifications();
-    this.notifications.set(newValue);
-    ApplicationSettings.setBoolean('notifications_enabled', newValue);
-
-    // Update the toggle value in the settings sections
-    this.updateToggleValue('Push-Benachrichtigungen', newValue);
-  }
+  private readonly onAppResume = async () => {
+    // Re-read cached preference and refresh UI when the app resumes
+    try {
+      const cached =
+        this.notificationPreferences.getCachedWaterReminderEnabled();
+      this.notifications.set(cached);
+      this.updateToggleValue('Push-Benachrichtigungen', cached);
+    } catch (e) {
+      // ignore
+    }
+  };
 
   protected toggleDarkMode(value?: boolean) {
     const newValue = value ?? !this.darkMode();
