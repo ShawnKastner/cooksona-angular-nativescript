@@ -25,6 +25,8 @@ import {
   PanGestureEventData,
   GestureStateTypes,
   Screen,
+  Page,
+  ScrollEventData,
 } from '@nativescript/core';
 
 @Component({
@@ -48,6 +50,7 @@ export class HealthPageComponent implements OnInit {
   private readonly store = inject(HealthStore);
   private readonly routerExtensions = inject(RouterExtensions);
   private readonly healthKitSync = inject(HealthKitSyncService);
+  private readonly page = inject(Page);
 
   @ViewChild('pagerContainer', { static: false })
   pagerContainer?: ElementRef;
@@ -63,6 +66,11 @@ export class HealthPageComponent implements OnInit {
   protected readonly isTransitioning = signal(false);
   protected readonly isPanning = signal(false); // Signal for template binding
   protected readonly isToday = this.store.isToday;
+
+  // Compact action bar title when scrolled
+  protected readonly showCompactTitle = signal(false);
+  protected readonly dayLabel = computed(() => this.store.dayLabel());
+  protected readonly dateLabel = computed(() => this.store.dateLabel());
 
   protected readonly requiresOnboarding = this.store.requiresOnboarding;
 
@@ -83,8 +91,11 @@ export class HealthPageComponent implements OnInit {
   private panDetected = signal(false);
   // Internal flag to mark when we've determined the gesture is a vertical scroll
   private verticalDetected = signal(false);
+  // Scroll threshold to switch to compact action bar view
+  private readonly SCROLL_COMPACT_THRESHOLD = signal(56);
 
   async ngOnInit(): Promise<void> {
+    this.page.actionBarHidden = false;
     await this.store.load();
 
     // Automatically navigate to onboarding if profile is not complete
@@ -373,5 +384,19 @@ export class HealthPageComponent implements OnInit {
     } catch (e) {
       // ignore platform-specific inconsistencies
     }
+  }
+
+  // Handle native ScrollView scroll events and toggle compact ActionBar
+  onScroll(event: Event | ScrollEventData): void {
+    const args = event as ScrollEventData | any;
+
+    // NativeScript ScrollEventData commonly exposes `scrollY` or `verticalOffset` depending on platform
+    const offset =
+      (args &&
+        (args.scrollY ?? args.verticalOffset ?? args.object?.verticalOffset)) ||
+      0;
+
+    // Toggle compact title when past threshold
+    this.showCompactTitle.set(offset > this.SCROLL_COMPACT_THRESHOLD());
   }
 }
