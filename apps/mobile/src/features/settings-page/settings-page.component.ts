@@ -27,8 +27,7 @@ import {
   CreditCard,
   LogOut,
 } from '@cooksona/constants/icons';
-import { ApplicationSettings, isIOS, Application } from '@nativescript/core';
-import { NotificationService } from '../../core/services/notification.service';
+import { isIOS, Application } from '@nativescript/core';
 import { NotificationPreferencesService } from '../../core/services/notification-preferences.service';
 import { confirm } from '@nativescript/core/ui/dialogs';
 import { RouterExtensions } from '@nativescript/angular';
@@ -63,7 +62,6 @@ export class SettingsPageComponent implements OnInit {
   private readonly routerExtensions = inject(RouterExtensions);
   private readonly modalService = inject(ModalDialogService);
   private readonly themeService = inject(ThemeService);
-  private readonly notificationService = inject(NotificationService);
   private readonly notificationPreferences = inject(
     NotificationPreferencesService,
   );

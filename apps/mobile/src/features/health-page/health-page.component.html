@@ -1,64 +1,100 @@
-<StackLayout class="h-full bg-base-100" iosOverflowSafeArea="false">
-  @if (loading() && !hasLoadedOnce()) {
-    <FlexboxLayout class="h-full items-center justify-center">
-      <ActivityIndicator
-        busy="true"
-        iosIndicatorViewStyle="large"
-        class="w-10 h-10"
-        color="#4A6C6F"
-      ></ActivityIndicator>
+<GridLayout rows="auto, *">
+  @if (showCompactTitle()) {
+    <FlexboxLayout
+      row="0"
+      justifyContent="space-between"
+      verticalAlignment="top"
+      class="px-5 border-b border-base-200"
+    >
+      <StackLayout class="items-center mb-4 w-full">
+        <FlexboxLayout justifyContent="space-between" alignItems="center">
+          <Label
+            class="text-md font-bold text-neutral"
+            [text]="dayLabel()"
+          ></Label>
+        </FlexboxLayout>
+        <Label class="text-xs text-gray-500" [text]="dateLabel()"></Label>
+      </StackLayout>
     </FlexboxLayout>
   } @else {
-    <AbsoluteLayout class="h-full w-full">
-      <StackLayout
-        left="0"
-        top="0"
-        width="100%"
-        height="100%"
-        (pan)="onPan($event)"
-      >
-        <PullToRefresh (refresh)="onRefresh($any($event))">
-          <ScrollView #scrollView [isScrollEnabled]="!isPanning()">
-            <StackLayout class="p-5 pb-10 space-y-5">
-              <StackLayout class="items-center">
-                <Label
-                  class="text-3xl font-bold text-neutral"
-                  text="Health Hub"
-                ></Label>
-                <Label
-                  class="text-xs text-gray-500"
-                  text="Deine tägliche Übersicht"
-                ></Label>
-              </StackLayout>
-
-              @if (error()) {
-                <StackLayout
-                  class="bg-red-50 border border-red-200 rounded-xl p-3"
-                >
-                  <Label class="text-sm text-red-700" [text]="error()"></Label>
-                </StackLayout>
-              }
-              <StackLayout #pagerContainer>
-                <ns-day-header></ns-day-header>
-
-                <ns-calorie-progress></ns-calorie-progress>
-
-                <ns-macronutrients></ns-macronutrients>
-
-                <ns-water-progress></ns-water-progress>
-
-                <ns-steps-card [stepGoal]="stepGoal()"> </ns-steps-card>
-
-                <ns-tracking-actions></ns-tracking-actions>
-
-                <ns-meal-section></ns-meal-section>
-
-                <ns-activity-section></ns-activity-section>
-              </StackLayout>
-            </StackLayout>
-          </ScrollView>
-        </PullToRefresh>
+    <FlexboxLayout
+      row="0"
+      justifyContent="space-between"
+      verticalAlignment="top"
+      class="px-5 border-b border-base-200"
+    >
+      <StackLayout class="items-center mb-4 w-full">
+        <FlexboxLayout justifyContent="space-between" alignItems="center">
+          <Label
+            class="text-3xl font-bold text-neutral"
+            text="Health Hub"
+          ></Label>
+        </FlexboxLayout>
+        <Label
+          class="text-xs text-gray-500"
+          text="Deine tägliche Übersicht"
+        ></Label>
       </StackLayout>
-    </AbsoluteLayout>
+    </FlexboxLayout>
   }
-</StackLayout>
+  <StackLayout row="1" class="h-full bg-base-100" iosOverflowSafeArea="false">
+    @if (loading() && !hasLoadedOnce()) {
+      <FlexboxLayout class="h-full items-center justify-center">
+        <ActivityIndicator
+          busy="true"
+          iosIndicatorViewStyle="large"
+          class="w-10 h-10"
+          color="#4A6C6F"
+        ></ActivityIndicator>
+      </FlexboxLayout>
+    } @else {
+      <AbsoluteLayout class="h-full w-full">
+        <StackLayout
+          left="0"
+          top="0"
+          width="100%"
+          height="100%"
+          (pan)="onPan($event)"
+        >
+          <PullToRefresh (refresh)="onRefresh($any($event))">
+            <ScrollView
+              #scrollView
+              [isScrollEnabled]="!isPanning()"
+              (scroll)="onScroll($any($event))"
+            >
+              <StackLayout class="p-5 pb-10 space-y-5">
+                @if (error()) {
+                  <StackLayout
+                    class="bg-red-50 border border-red-200 rounded-xl p-3"
+                  >
+                    <Label
+                      class="text-sm text-red-700"
+                      [text]="error()"
+                    ></Label>
+                  </StackLayout>
+                }
+                <StackLayout #pagerContainer>
+                  <ns-day-header></ns-day-header>
+
+                  <ns-calorie-progress></ns-calorie-progress>
+
+                  <ns-macronutrients></ns-macronutrients>
+
+                  <ns-water-progress></ns-water-progress>
+
+                  <ns-steps-card [stepGoal]="stepGoal()"> </ns-steps-card>
+
+                  <ns-tracking-actions></ns-tracking-actions>
+
+                  <ns-meal-section></ns-meal-section>
+
+                  <ns-activity-section></ns-activity-section>
+                </StackLayout>
+              </StackLayout>
+            </ScrollView>
+          </PullToRefresh>
+        </StackLayout>
+      </AbsoluteLayout>
+    }
+  </StackLayout>
+</GridLayout>

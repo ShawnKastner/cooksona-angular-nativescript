@@ -1,14 +1,15 @@
 <ScrollView>
   <GridLayout rows="auto,*, auto" iosOverflowSafeArea="false" class="h-full">
-    <!-- Top Tabs -->
-    <ns-top-tabs
-      row="0"
-      [tabs]="tabs"
-      [(selected)]="selected"
-      [activeColor]="'#4A6C6F'"
-      [inactiveColor]="'#9CA3AF'"
-    ></ns-top-tabs>
-
+    <StackLayout row="0" class="px-5 pb-3">
+      <Label class="text-3xl font-bold text-neutral" text="Essensplan"></Label>
+      <!-- Top Tabs -->
+      <ns-top-tabs
+        [tabs]="tabs"
+        [(selected)]="selected"
+        [activeColor]="'#4A6C6F'"
+        [inactiveColor]="'#9CA3AF'"
+      ></ns-top-tabs>
+    </StackLayout>
     @if (selected() === "plan") {
       <GridLayout row="1">
         @if (!isGenerating()) {

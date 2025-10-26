@@ -8,8 +8,8 @@ import {
 import {
   NativeScriptCommonModule,
   ModalDialogService,
+  RouterExtensions,
 } from '@nativescript/angular';
-import { Router } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
 import { User } from '@cooksona/models';
 import { SvgToDataUriPipe } from '../../utils/svg-to-data-uri.pipe';
@@ -20,7 +20,12 @@ import {
   ChevronDown,
   Settings,
 } from '@cooksona/constants/icons';
-import { isIOS, isAndroid, ApplicationSettings } from '@nativescript/core';
+import {
+  isIOS,
+  isAndroid,
+  ApplicationSettings,
+  Page,
+} from '@nativescript/core';
 import { confirm } from '@nativescript/core/ui/dialogs';
 import { HealthKitService } from '../../plugins/healthkit/healthkit.service';
 import { HealthConnectionModalComponent } from './health-connection-modal/health-connection-modal.component';
@@ -49,9 +54,10 @@ interface SettingsItem {
 })
 export class ProfilePageComponent implements OnInit {
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly routerExtensions = inject(RouterExtensions);
   private readonly health = inject(HealthKitService);
   private readonly modalService = inject(ModalDialogService);
+  private readonly page = inject(Page);
 
   protected readonly icons = {
     User: UserIcon,
@@ -69,6 +75,7 @@ export class ProfilePageComponent implements OnInit {
   protected loading = signal(false);
 
   ngOnInit() {
+    this.page.actionBarHidden = true;
     this.loadUserData();
     this.checkHealthConnection();
   }
@@ -194,8 +201,13 @@ export class ProfilePageComponent implements OnInit {
   }
 
   protected navigateToSettings() {
-    this.router.navigate(['/settings']).catch((err) => {
-      console.error('Navigation to settings failed:', err);
-    });
+    this.routerExtensions
+      .navigate(['/settings'], {
+        clearHistory: false,
+        animated: true,
+      })
+      .catch((err) => {
+        console.error('Navigation to settings failed:', err);
+      });
   }
 }
