@@ -8,8 +8,8 @@ import {
 import {
   NativeScriptCommonModule,
   ModalDialogService,
+  RouterExtensions,
 } from '@nativescript/angular';
-import { Router } from '@angular/router';
 import { AuthService } from '@cooksona/auth';
 import { User } from '@cooksona/models';
 import { SvgToDataUriPipe } from '../../utils/svg-to-data-uri.pipe';
@@ -54,7 +54,7 @@ interface SettingsItem {
 })
 export class ProfilePageComponent implements OnInit {
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly routerExtensions = inject(RouterExtensions);
   private readonly health = inject(HealthKitService);
   private readonly modalService = inject(ModalDialogService);
   private readonly page = inject(Page);
@@ -201,8 +201,13 @@ export class ProfilePageComponent implements OnInit {
   }
 
   protected navigateToSettings() {
-    this.router.navigate(['/settings']).catch((err) => {
-      console.error('Navigation to settings failed:', err);
-    });
+    this.routerExtensions
+      .navigate(['/settings'], {
+        clearHistory: false,
+        animated: true,
+      })
+      .catch((err) => {
+        console.error('Navigation to settings failed:', err);
+      });
   }
 }
