@@ -95,7 +95,7 @@ export class HealthPageComponent implements OnInit {
   private readonly SCROLL_COMPACT_THRESHOLD = signal(56);
 
   async ngOnInit(): Promise<void> {
-    this.page.actionBarHidden = false;
+    this.page.actionBarHidden = true;
     await this.store.load();
 
     // Automatically navigate to onboarding if profile is not complete
