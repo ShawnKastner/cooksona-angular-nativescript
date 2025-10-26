@@ -1,14 +1,16 @@
 <ScrollView>
   <GridLayout rows="auto,*" iosOverflowSafeArea="false" class="h-full">
-    <!-- Top Tabs -->
-    <ns-top-tabs
-      row="0"
-      [compact]="true"
-      [tabs]="tabs"
-      [(selected)]="selected"
-      [activeColor]="'#4A6C6F'"
-      [inactiveColor]="'#9CA3AF'"
-    ></ns-top-tabs>
+    <StackLayout row="0" class="px-5 pb-3">
+      <Label class="text-3xl font-bold text-neutral" text="Kochbuch"></Label>
+      <!-- Top Tabs -->
+      <ns-top-tabs
+        [compact]="true"
+        [tabs]="tabs"
+        [(selected)]="selected"
+        [activeColor]="'#4A6C6F'"
+        [inactiveColor]="'#9CA3AF'"
+      ></ns-top-tabs>
+    </StackLayout>
     <StackLayout row="1" class="flex-grow overflow-y-auto p-4 space-y-4">
       <StackLayout
         class="bg-white box-shadow-1 border-2 border-base-200 rounded-full"
