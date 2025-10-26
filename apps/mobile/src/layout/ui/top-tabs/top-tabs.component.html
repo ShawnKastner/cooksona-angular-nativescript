@@ -13,15 +13,17 @@
         }"
         (tap)="onSelect(tab)"
       >
-        <svg:SVGImage
-          horizontalAlignment="center"
-          [src]="
-            tab.iconSvg
-              | svgToDataUri
-                : (selected() === tab.key ? activeColor() : inactiveColor())
-          "
-          class="w-5 h-5"
-        ></svg:SVGImage>
+        @if (!compact()) {
+          <svg:SVGImage
+            horizontalAlignment="center"
+            [src]="
+              tab.iconSvg
+                | svgToDataUri
+                  : (selected() === tab.key ? activeColor() : inactiveColor())
+            "
+            class="w-5 h-5"
+          ></svg:SVGImage>
+        }
         <Label
           textAlignment="center"
           [text]="tab.label"
