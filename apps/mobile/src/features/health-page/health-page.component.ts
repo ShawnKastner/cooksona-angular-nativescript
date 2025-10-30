@@ -15,7 +15,6 @@ import { DayHeaderComponent } from './day-header/day-header.component';
 import { CalorieProgressComponent } from './calorie-progress/calorie-progress.component';
 import { MacronutrientsComponent } from './macronutrients/macronutrients.component';
 import { WaterProgressComponent } from './water-progress/water-progress.component';
-import { TrackingActionsComponent } from './tracking-actions/tracking-actions.component';
 import { MealSectionComponent } from './meal-section/meal-section.component';
 import { ActivitySectionComponent } from './activity-section/activity-section.component';
 import { StepsCardComponent } from './steps-card/steps-card.component';
@@ -39,7 +38,6 @@ import {
     CalorieProgressComponent,
     MacronutrientsComponent,
     WaterProgressComponent,
-    TrackingActionsComponent,
     MealSectionComponent,
     ActivitySectionComponent,
     StepsCardComponent,

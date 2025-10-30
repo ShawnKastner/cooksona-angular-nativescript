@@ -14,6 +14,7 @@ import {
   Pencil,
   Trash,
   ChevronDown,
+  Plus,
 } from '@cooksona/constants/icons';
 import { ACTIVITY_OPTIONS } from '@cooksona/constants/activities';
 import { SvgToDataUriPipe } from '../../../utils/svg-to-data-uri.pipe';
@@ -41,6 +42,7 @@ export class ActivitySectionComponent {
     Pencil,
     Trash,
     ChevronDown,
+    Plus,
   } as const;
 
   // Computed total calories from activities
@@ -195,5 +197,9 @@ export class ActivitySectionComponent {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
+  }
+
+  protected onAddActivity(): void {
+    this.routerExtensions.navigate(['/track-activity']);
   }
 }
