@@ -2,11 +2,22 @@
   class="bg-white p-5 rounded-2xl border border-base-200 box-shadow-1 space-y-4 mt-4"
 >
   <FlexboxLayout class="items-center justify-between">
-    <Label class="font-bold text-neutral" text="Aktivitäten"></Label>
-    <Label
-      class="text-sm text-gray-500"
-      [text]="totalCalories() + ' kcal verbrannt'"
-    ></Label>
+    <StackLayout class="space-y-1">
+      <Label class="font-bold text-neutral" text="Aktivitäten"></Label>
+      <Label
+        class="text-sm text-gray-500"
+        [text]="totalCalories() + ' kcal verbrannt'"
+      ></Label>
+    </StackLayout>
+    <FlexboxLayout
+      class="w-11 h-11 bg-primary rounded-full items-center justify-center shadow-lg active:scale-95 transition-transform mr-4"
+      (tap)="onAddActivity()"
+    >
+      <svg:SVGImage
+        [src]="icons.Plus | svgToDataUri: 'white'"
+        class="w-6 h-6"
+      ></svg:SVGImage>
+    </FlexboxLayout>
   </FlexboxLayout>
 
   @if (loading()) {
