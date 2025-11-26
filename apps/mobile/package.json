@@ -18,6 +18,7 @@
     "@nativescript/ios": "~8.9.0",
     "@nativescript/preview-cli": "1.0.14",
     "@nativescript/tailwind": "^2.1.0",
-    "@nativescript/types": "^8.9.1"
+    "@nativescript/types": "^8.9.1",
+    "css-tree": "^1.1.3"
   }
 }

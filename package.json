@@ -50,6 +50,7 @@
     "@angular/cli": "^20.1.4",
     "@angular/compiler-cli": "^20.1.4",
     "@eslint/js": "^9.8.0",
+    "@nativescript/ios": "9.0.1",
     "@nativescript/nx": "^21.0.0",
     "@nativescript/preview-cli": "1.0.14",
     "@nativescript/tailwind": "^2.1.0",
@@ -77,6 +78,7 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "nx": "21.5.2",
     "prettier": "^3.6.2",
+    "process": "^0.11.10",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.40.0"
   },
