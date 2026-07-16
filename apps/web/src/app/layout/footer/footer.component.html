@@ -1,27 +1,33 @@
 <footer
+  role="contentinfo"
   class="text-center p-6 mt-auto border-t border-base-200 text-gray-500 text-sm non-printable"
 >
-  <div class="mb-2 flex flex-wrap justify-center items-center gap-2">
+  <nav aria-label="Footer-Navigation" class="mb-2 flex flex-wrap justify-center items-center gap-2">
     <a routerLink="/contact" class="hover:text-primary transition-colors">
       Kontakt
     </a>
-    <span class="mx-1">|</span>
+    <span class="mx-1" aria-hidden="true">|</span>
     <a routerLink="/impressum" class="hover:text-primary transition-colors">
       Impressum
     </a>
-    <span class="mx-1">|</span>
+    <span class="mx-1" aria-hidden="true">|</span>
     <a routerLink="/datenschutz" class="hover:text-primary transition-colors">
       Datenschutz
     </a>
-    <span class="mx-1">|</span>
+    <span class="mx-1" aria-hidden="true">|</span>
+    <a routerLink="/barrierefreiheit" class="hover:text-primary transition-colors">
+      Barrierefreiheit
+    </a>
+    <span class="mx-1" aria-hidden="true">|</span>
     <button
       type="button"
       class="hover:text-primary transition-colors bg-transparent border-none p-0 underline cursor-pointer"
       (click)="openCookieSettings()"
+      aria-label="Cookie-Einstellungen öffnen"
     >
       Cookie-Einstellungen
     </button>
-  </div>
+  </nav>
   <p class="mt-2">&copy; 2025 CookSona. Alle Rechte vorbehalten.</p>
 
   @if (showCookieSettings()) {

@@ -8,6 +8,8 @@
   <FlexboxLayout
     row="1"
     class="h-20 bg-base-100 flex-shrink-0 flex items-center justify-around border-t border-base-200 rounded-b-[30px]"
+    accessibilityLabel="Hauptnavigation"
+    accessibilityRole="navigation"
   >
     <!-- Item 0 -->
     <StackLayout
@@ -17,6 +19,12 @@
         'border-primary text-primary': selectedIndex() === 0,
         'text-gray-400': selectedIndex() !== 0,
       }"
+      accessibilityLabel="Planer"
+      accessibilityHint="Zur Essensplanung wechseln"
+      accessibilityRole="button"
+      [accessibilityState]="selectedIndex() === 0 ? 'selected' : ''"
+      minWidth="48"
+      minHeight="48"
     >
       <svg:SVGImage
         [src]="
@@ -24,8 +32,9 @@
             | svgToDataUri: (selectedIndex() === 0 ? '#4A6C6F' : '#9CA3AF')
         "
         class="w-6 h-6 mb-1"
+        accessibilityHidden="true"
       ></svg:SVGImage>
-      <Label class="font-semibold" text="Planer"></Label>
+      <Label class="font-semibold" text="Planer" accessibilityHidden="true"></Label>
     </StackLayout>
 
     <!-- Item 1 -->
@@ -36,6 +45,12 @@
         'border-primary text-primary': selectedIndex() === 1,
         'text-gray-400': selectedIndex() !== 1,
       }"
+      accessibilityLabel="Kochbuch"
+      accessibilityHint="Zum Kochbuch wechseln"
+      accessibilityRole="button"
+      [accessibilityState]="selectedIndex() === 1 ? 'selected' : ''"
+      minWidth="48"
+      minHeight="48"
     >
       <svg:SVGImage
         [src]="
@@ -43,8 +58,9 @@
             | svgToDataUri: (selectedIndex() === 1 ? '#4A6C6F' : '#9CA3AF')
         "
         class="w-6 h-6 mb-1"
+        accessibilityHidden="true"
       ></svg:SVGImage>
-      <Label class="font-semibold" text="Kochbuch"></Label>
+      <Label class="font-semibold" text="Kochbuch" accessibilityHidden="true"></Label>
     </StackLayout>
 
     <!-- Item 2 -->
@@ -55,6 +71,12 @@
         'border-primary text-primary': selectedIndex() === 2,
         'text-gray-400': selectedIndex() !== 2,
       }"
+      accessibilityLabel="Health"
+      accessibilityHint="Zu Gesundheitstracking wechseln"
+      accessibilityRole="button"
+      [accessibilityState]="selectedIndex() === 2 ? 'selected' : ''"
+      minWidth="48"
+      minHeight="48"
     >
       <svg:SVGImage
         [src]="
@@ -62,8 +84,9 @@
             | svgToDataUri: (selectedIndex() === 2 ? '#4A6C6F' : '#9CA3AF')
         "
         class="w-6 h-6 mb-1"
+        accessibilityHidden="true"
       ></svg:SVGImage>
-      <Label class="font-semibold" text="Health"></Label>
+      <Label class="font-semibold" text="Health" accessibilityHidden="true"></Label>
     </StackLayout>
 
     <!-- Item 3 -->
@@ -74,6 +97,12 @@
         'border-primary text-primary': selectedIndex() === 3,
         'text-gray-400': selectedIndex() !== 3,
       }"
+      accessibilityLabel="Profil"
+      accessibilityHint="Zum Profil wechseln"
+      accessibilityRole="button"
+      [accessibilityState]="selectedIndex() === 3 ? 'selected' : ''"
+      minWidth="48"
+      minHeight="48"
     >
       <svg:SVGImage
         [src]="
@@ -81,8 +110,9 @@
             | svgToDataUri: (selectedIndex() === 3 ? '#4A6C6F' : '#9CA3AF')
         "
         class="w-6 h-6 mb-1"
+        accessibilityHidden="true"
       ></svg:SVGImage>
-      <Label class="font-semibold" text="Profil"></Label>
+      <Label class="font-semibold" text="Profil" accessibilityHidden="true"></Label>
     </StackLayout>
   </FlexboxLayout>
 </GridLayout>

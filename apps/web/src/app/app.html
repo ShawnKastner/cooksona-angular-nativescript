@@ -1,11 +1,31 @@
 <div class="min-h-screen h-full font-sans text-neutral flex flex-col">
+  <!-- Skip to main content link for keyboard users -->
+  <a
+    href="#main-content"
+    class="skip-link"
+    appSkipLink="#main-content"
+  >
+    Zum Hauptinhalt springen
+  </a>
+  
   <div class="non-printable">
     <app-header></app-header>
   </div>
-  <main class="container mx-auto p-4 md:p-8 flex-1">
+  
+  <!-- Main content area with proper landmark -->
+  <main
+    id="main-content"
+    role="main"
+    class="container mx-auto p-4 md:p-8 flex-1"
+    tabindex="-1"
+  >
     <router-outlet></router-outlet>
   </main>
+  
   <app-footer></app-footer>
   <app-cookie-banner></app-cookie-banner>
   <app-snackbar></app-snackbar>
+  
+  <!-- Live announcer for screen reader notifications -->
+  <app-live-announcer></app-live-announcer>
 </div>
